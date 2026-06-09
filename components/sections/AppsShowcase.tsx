@@ -162,17 +162,28 @@ function cardTransform(diff: number) {
 function AppCard({ app, active }: { app: typeof APPS[0]; active: boolean }) {
   return (
     <div style={{
-      width:         CARD_W,
-      height:        CARD_H,
-      background:    "#fff",
-      borderRadius:  24,
-      overflow:      "hidden",
-      display:       "flex",
-      flexDirection: "column",
-      border:        "1px solid rgba(0,0,0,0.07)",
-      boxShadow:     active
-        ? "0 20px 60px rgba(0,0,0,0.18), 0 4px 16px rgba(0,0,0,0.08)"
-        : "0 6px 24px rgba(0,0,0,0.09), 0 2px 6px rgba(0,0,0,0.05)",
+      width:                CARD_W,
+      height:               CARD_H,
+      background:           "rgba(255,255,255,0.52)",
+      backdropFilter:       "blur(22px) saturate(1.9)",
+      WebkitBackdropFilter: "blur(22px) saturate(1.9)",
+      borderRadius:         24,
+      overflow:             "hidden",
+      display:              "flex",
+      flexDirection:        "column",
+      border:               "1px solid rgba(255,255,255,0.68)",
+      boxShadow:            active ? [
+        "inset 0 1.5px 0 rgba(255,255,255,0.90)",
+        "inset 0 -1px 0 rgba(0,0,0,0.04)",
+        "0 0 0 0.5px rgba(255,255,255,0.32)",
+        "0 24px 64px rgba(0,0,0,0.16)",
+        "0 4px 16px rgba(0,0,0,0.08)",
+      ].join(", ") : [
+        "inset 0 1.5px 0 rgba(255,255,255,0.82)",
+        "inset 0 -1px 0 rgba(0,0,0,0.03)",
+        "0 0 0 0.5px rgba(255,255,255,0.28)",
+        "0 6px 24px rgba(0,0,0,0.07)",
+      ].join(", "),
       userSelect: "none",
     }}>
       {/* Header */}
@@ -269,16 +280,53 @@ export function AppsShowcase() {
   const prev = useCallback(() => setActive(a => Math.max(0, a - 1)), []);
   const next = useCallback(() => setActive(a => Math.min(n - 1, a + 1)), [n]);
 
-  /* ── Touch / drag swipe ──────────────────────────────────────────────── */
+  /* ── Touch / drag swipe (pointer) ───────────────────────────────────── */
   const dragStart = useRef<number | null>(null);
-  const onPointerDown  = (e: React.PointerEvent) => { dragStart.current = e.clientX; };
-  const onPointerUp    = (e: React.PointerEvent) => {
+  const onPointerDown = (e: React.PointerEvent) => { dragStart.current = e.clientX; };
+  const onPointerUp   = (e: React.PointerEvent) => {
     if (dragStart.current === null) return;
     const dx = e.clientX - dragStart.current;
     if (dx < -40) next();
     else if (dx > 40) prev();
     dragStart.current = null;
   };
+
+  /* ── Trackpad / mouse-wheel horizontal swipe ─────────────────────────
+     Accumulates deltaX; navigates once the threshold is hit, then
+     enforces a 350 ms cooldown so one flick = exactly one step.        */
+  const stageRef      = useRef<HTMLDivElement>(null);
+  const wheelAccum    = useRef(0);
+  const wheelCooldown = useRef(false);
+
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el) return;
+
+    const onWheel = (e: WheelEvent) => {
+      // Only act on primarily-horizontal movement
+      if (Math.abs(e.deltaX) < Math.abs(e.deltaY) * 0.5) return;
+
+      e.preventDefault();          // stop page scroll while over the carousel
+      if (wheelCooldown.current) return;
+
+      wheelAccum.current += e.deltaX;
+
+      if (wheelAccum.current > 60) {
+        wheelAccum.current  = 0;
+        wheelCooldown.current = true;
+        next();
+        setTimeout(() => { wheelCooldown.current = false; }, 350);
+      } else if (wheelAccum.current < -60) {
+        wheelAccum.current  = 0;
+        wheelCooldown.current = true;
+        prev();
+        setTimeout(() => { wheelCooldown.current = false; }, 350);
+      }
+    };
+
+    el.addEventListener("wheel", onWheel, { passive: false });
+    return () => el.removeEventListener("wheel", onWheel);
+  }, [prev, next]);
 
   /* ── Keyboard nav ────────────────────────────────────────────────────── */
   useEffect(() => {
@@ -337,6 +385,7 @@ export function AppsShowcase() {
 
       {/* ── Coverflow stage ─────────────────────────────────────────────── */}
       <div
+        ref={stageRef}
         style={{
           position:   "relative",
           width:      "100%",
