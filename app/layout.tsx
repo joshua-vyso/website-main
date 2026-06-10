@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Barlow_Condensed, DM_Sans } from "next/font/google";
 import { LiquidGlassFilter }  from "@/components/ui/liquid-button";
 import { GlobalPixelTrail }   from "@/components/GlobalPixelTrail";
-import { BlendTextMobile }    from "@/components/BlendTextMobile";
 import "./globals.css";
 
 /* ── Heading font: Barlow Condensed ──────────────────────────────────────── */
@@ -50,8 +49,6 @@ export default function RootLayout({
         <LiquidGlassFilter />
         {/* Orange pixel trail — follows the cursor across every page */}
         <GlobalPixelTrail />
-        {/* Mobile blend-text reactivity — JS mirrors shader sine wave */}
-        <BlendTextMobile />
         {children}
       </body>
     </html>
