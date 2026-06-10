@@ -367,6 +367,27 @@ html, body {
   to   { transform: rotate(360deg); }
 }
 
+/* ── Mobile: remove stacking contexts that block mix-blend-mode ───────────── */
+/*
+  AppsShowcase (#apps), PricingSection (#pricing), and TrustStrip (#reach)
+  apply opacity/transform for their scroll-reveal animation directly on the
+  <section> element. On desktop this is fine. On mobile, having opacity or
+  transform on the section creates a CSS stacking context, which traps
+  mix-blend-mode: difference so it can only blend within the section instead
+  of against the global WebGL canvas — breaking the reactive text colour.
+  Forcing opacity:1 / transform:none permanently on mobile removes the
+  stacking context so blend-mode can reach the canvas as intended.
+*/
+@media (max-width: 767px) {
+  #apps,
+  #pricing,
+  #reach {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
 /* ── Mobile: hero + contact headline sizing ───────────────────────────────── */
 @media (max-width: 767px) {
   .hero-headline {
