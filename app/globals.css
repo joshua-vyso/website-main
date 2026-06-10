@@ -388,6 +388,33 @@ html, body {
   }
 }
 
+/* ── Mobile: neutralise positioned ancestors that trap mix-blend-mode ──────── */
+/*
+  On WebKit/mobile, a `position: relative` ancestor establishes a paint
+  container that traps mix-blend-mode: difference — the heading then blends
+  against that ancestor's (transparent) background instead of the global
+  position:fixed WebGL canvas, so the reactive colour never appears. Desktop
+  Chrome composites differently, which is why the same markup works there.
+
+  These four sections (Hero, "What we build", "Our toolkit", "Get in touch")
+  carry position:relative on the heading's section/wrapper purely as a
+  safety default — no absolutely-positioned child depends on it (their
+  absolute elements sit inside their own deeper relative containers). Forcing
+  these specific ancestors to position:static on mobile lets the blend reach
+  the canvas, matching the sections that already work (How it works, Pricing,
+  Our reach).
+*/
+@media (max-width: 767px) {
+  #hero > section,
+  #hero > section > div,
+  #systems > section,
+  #systems > section > div,
+  #apps,
+  section#contact {
+    position: static !important;
+  }
+}
+
 /* ── Mobile: blend headings use the SAME mix-blend-mode as desktop ─────────── */
 /*
   Now that the WebGL shader resolution is computed in device pixels, the sine
