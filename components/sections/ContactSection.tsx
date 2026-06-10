@@ -83,9 +83,9 @@ export function ContactSection() {
           letterSpacing: "-0.03em",
           margin:        "0 0 1.4rem",
         }}>
-          <span className="blend-text-plain" style={blendText}>Let&apos;s solve your </span>
-          <span className="blend-text-orange" style={blendOrange}>ops</span>
-          <span className="blend-text-plain" style={blendText}> together.</span>
+          <span className="blend-h-plain" style={blendText}>Let&apos;s solve your </span>
+          <span className="blend-h-orange" style={blendOrange}>ops</span>
+          <span className="blend-h-plain" style={blendText}> together.</span>
         </h2>
 
         {/* Subtext */}

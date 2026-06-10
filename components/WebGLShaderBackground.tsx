@@ -89,8 +89,9 @@ export function WebGLShaderBackground({ global: isGlobal = false }: { global?: b
     r.renderer.setClearColor(new THREE.Color(0xffffff));
     r.camera   = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, -1);
 
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     r.uniforms = {
-      resolution: { value: [window.innerWidth, window.innerHeight] },
+      resolution: { value: [window.innerWidth * dpr, window.innerHeight * dpr] },
       time:       { value: 0.0 },
       xScale:     { value: 0.75 },   // longer wave period — stays in text region longer
       yScale:     { value: 0.28 },   // tighter amplitude — line hugs headline height
@@ -116,7 +117,8 @@ export function WebGLShaderBackground({ global: isGlobal = false }: { global?: b
     const resize = () => {
       if (!r.renderer || !r.uniforms) return;
       r.renderer.setSize(window.innerWidth, window.innerHeight, false);
-      (r.uniforms.resolution.value as number[]) = [window.innerWidth, window.innerHeight];
+      const d = Math.min(window.devicePixelRatio || 1, 2);
+      (r.uniforms.resolution.value as number[]) = [window.innerWidth * d, window.innerHeight * d];
     };
 
     const animate = () => {

@@ -159,8 +159,8 @@ export function SystemsShowcase() {
           letterSpacing: "-0.03em",
           margin:        "0 0 3rem",
         }}>
-          <span style={{ color: "white", mixBlendMode: "difference" as const }}>Systems built for </span>
-          <span style={blendOrange}>your specific needs.</span>
+          <span className="blend-h-plain" style={{ color: "white", mixBlendMode: "difference" as const }}>Systems built for </span>
+          <span className="blend-h-orange" style={blendOrange}>your specific needs.</span>
         </h2>
 
         {/* ── Bento grid ───────────────────────────────────────────────────── */}

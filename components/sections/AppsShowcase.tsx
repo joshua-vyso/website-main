@@ -371,8 +371,8 @@ export function AppsShowcase() {
           fontSize: "clamp(2.2rem, 5vw, 4rem)", fontWeight: 700,
           letterSpacing: "-0.03em", margin: "0 0 1rem", lineHeight: 1.05,
         }}>
-          <span style={blendWhite}>Moulded around your </span>
-          <span style={blendOrange}>business.</span>
+          <span className="blend-h-plain" style={blendWhite}>Moulded around your </span>
+          <span className="blend-h-orange" style={blendOrange}>business.</span>
         </h2>
         <p style={{
           fontFamily: "var(--font-body, var(--font-sans))",

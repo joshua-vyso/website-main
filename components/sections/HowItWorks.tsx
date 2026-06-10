@@ -131,8 +131,8 @@ export function HowItWorks() {
             How it works
           </p>
           <h2 style={{ ...FONT, fontSize: "clamp(2rem, 5vw, 3.8rem)", fontWeight: 700, letterSpacing: "-0.025em", margin: 0 }}>
-            <span style={blendWhite}>Three steps. </span>
-            <span style={blendOrange}>Real results.</span>
+            <span className="blend-h-plain" style={blendWhite}>Three steps. </span>
+            <span className="blend-h-orange" style={blendOrange}>Real results.</span>
           </h2>
         </div>
 

@@ -77,11 +77,11 @@ export function HeroSection() {
           color:         "#0D0D0D",
           margin:        0,
         }}>
-          <span className="blend-text-plain" style={blendText}>Your business is running on </span>
-          <span className="blend-text-orange" style={blendOrange}>WhatsApp</span>
-          <span className="blend-text-plain" style={blendText}> and </span>
-          <span className="blend-text-orange" style={blendOrange}>spreadsheets.</span>
-          <span className="blend-text-plain" style={blendText}> That ends here.</span>
+          <span className="blend-h-plain" style={blendText}>Your business is running on </span>
+          <span className="blend-h-orange" style={blendOrange}>WhatsApp</span>
+          <span className="blend-h-plain" style={blendText}> and </span>
+          <span className="blend-h-orange" style={blendOrange}>spreadsheets.</span>
+          <span className="blend-h-plain" style={blendText}> That ends here.</span>
         </h1>
 
         <p className="blend-para" style={{
