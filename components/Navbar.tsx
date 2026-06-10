@@ -154,31 +154,44 @@ export function Navbar({ visible = true }: NavbarProps) {
             <button
               aria-label="Open menu"
               style={{
-                display:         "flex",
-                alignItems:      "center",
-                justifyContent:  "center",
-                width:           40,
-                height:          40,
-                borderRadius:    10,
-                border:          "1px solid rgba(0,0,0,0.1)",
-                background:      "rgba(255,255,255,0.7)",
-                backdropFilter:  "blur(12px)",
-                cursor:          "pointer",
-                color:           "#0d0d0d",
+                display:              "flex",
+                alignItems:           "center",
+                justifyContent:       "center",
+                width:                42,
+                height:               42,
+                borderRadius:         12,
+                border:               "1px solid rgba(255,255,255,0.68)",
+                background:           "rgba(255,255,255,0.52)",
+                backdropFilter:       "blur(22px) saturate(1.9)",
+                WebkitBackdropFilter: "blur(22px) saturate(1.9)",
+                boxShadow:            [
+                  "inset 0 1.5px 0 rgba(255,255,255,0.88)",
+                  "inset 0 -1px 0 rgba(0,0,0,0.04)",
+                  "0 0 0 0.5px rgba(255,255,255,0.30)",
+                  "0 4px 16px rgba(0,0,0,0.08)",
+                ].join(", "),
+                cursor:               "pointer",
+                color:                "#0d0d0d",
               }}
             >
-              <Menu size={20} />
+              <Menu size={18} />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent
             align="end"
             className="min-w-[200px]"
             style={{
-              background:      "rgba(255,255,255,0.92)",
-              backdropFilter:  "blur(20px)",
-              border:          "1px solid rgba(0,0,0,0.08)",
-              borderRadius:    14,
-              padding:         "0.4rem",
+              background:           "rgba(255,255,255,0.72)",
+              backdropFilter:       "blur(28px) saturate(1.9)",
+              WebkitBackdropFilter: "blur(28px) saturate(1.9)",
+              border:               "1px solid rgba(255,255,255,0.68)",
+              borderRadius:         16,
+              padding:              "0.4rem",
+              boxShadow:            [
+                "inset 0 1.5px 0 rgba(255,255,255,0.88)",
+                "0 0 0 0.5px rgba(255,255,255,0.30)",
+                "0 16px 48px rgba(0,0,0,0.12)",
+              ].join(", "),
             }}
           >
             {NAV_ITEMS.map(({ label, href }) => (

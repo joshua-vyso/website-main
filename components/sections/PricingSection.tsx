@@ -51,7 +51,7 @@ function Check({ muted = false }: { muted?: boolean }) {
 /* ── Audit banner ─────────────────────────────────────────────────────────── */
 function AuditBanner() {
   return (
-    <div style={{
+    <div className="audit-banner" style={{
       ...GLASS,
       borderRadius:  18,
       boxShadow:     GLASS_SHADOW,
@@ -101,13 +101,13 @@ function AuditBanner() {
       </p>
 
       {/* Feature list */}
-      <div style={{ display: "flex", gap: "0.5rem 2.2rem", flex: 1, flexWrap: "wrap", minWidth: 0 }}>
+      <div className="audit-features" style={{ display: "flex", gap: "0.5rem 2.2rem", flex: 1, flexWrap: "wrap", minWidth: 0 }}>
         {["Operations review","Bottleneck identification","Automation opportunities","Recommendations report","7-day diagnostic period"]
           .map(f => (
             <div key={f} style={{ display: "flex", alignItems: "center", gap: "0.45rem" }}>
               <Check muted />
               <span style={{ fontFamily: "var(--font-body, var(--font-sans))", fontSize: "0.8rem",
-                color: "#555", whiteSpace: "nowrap" }}>{f}</span>
+                color: "#555" }}>{f}</span>
             </div>
           ))}
       </div>
