@@ -15,7 +15,9 @@ export function BlendTextMobile() {
   const timeRef = useRef(0);
 
   useEffect(() => {
-    if (window.matchMedia("(pointer: fine)").matches) return;
+    // No pointer check here — CSS @media (max-width: 767px) ensures the
+    // colour swaps only have visual effect on mobile. Running the rAF on
+    // desktop is harmless (the .line-over rules are inside the media query).
 
     const tick = () => {
       timeRef.current += TIME_STEP;
