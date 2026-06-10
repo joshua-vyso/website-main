@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Barlow_Condensed, DM_Sans } from "next/font/google";
 import { LiquidGlassFilter }  from "@/components/ui/liquid-button";
-import { CustomCursor }       from "@/components/ui/CustomCursor";
 import { GlobalPixelTrail }   from "@/components/GlobalPixelTrail";
+import { BlendTextMobile }    from "@/components/BlendTextMobile";
 import "./globals.css";
 
 /* ── Heading font: Barlow Condensed ──────────────────────────────────────── */
@@ -48,10 +48,10 @@ export default function RootLayout({
       <body className="min-h-full">
         {/* Global SVG filter for LiquidButton glass effect */}
         <LiquidGlassFilter />
-        {/* Custom cursor — self-activates on hover-capable devices only */}
-        <CustomCursor />
         {/* Orange pixel trail — follows the cursor across every page */}
         <GlobalPixelTrail />
+        {/* Mobile blend-text reactivity — JS mirrors shader sine wave */}
+        <BlendTextMobile />
         {children}
       </body>
     </html>

@@ -452,11 +452,10 @@ export function PricingSection() {
             fontSize: "clamp(2.2rem, 5vw, 4rem)", fontWeight: 700,
             letterSpacing: "-0.03em", margin: "0 0 0.9rem", lineHeight: 1.05,
           }}>
-            {/* blendWhite: appears black on white bg, white on dark shader line */}
-            <span style={blendWhite}>Simple pricing.</span>
+            <span className="blend-h-plain" style={blendWhite}>Simple pricing.</span>
             <br />
-            <span style={blendWhite}>No </span>
-            <span style={blendOrange}>surprises.</span>
+            <span className="blend-h-plain" style={blendWhite}>No </span>
+            <span className="blend-h-orange" style={blendOrange}>surprises.</span>
           </h2>
           <p style={{
             fontFamily: "var(--font-body, var(--font-sans))",

@@ -203,10 +203,9 @@ export function TrustStrip() {
               margin:        "0 0 1.2rem",
             }}>
               {/* "Built for businesses that" — black/white blend */}
-              <span style={blendWhite}>Built for businesses that</span>
+              <span className="blend-h-plain" style={blendWhite}>Built for businesses that</span>
               <br />
-              {/* "run on operations." — orange/blue blend */}
-              <span style={blendOrange}>run on operations.</span>
+              <span className="blend-h-orange" style={blendOrange}>run on operations.</span>
             </h2>
 
             <p style={{
