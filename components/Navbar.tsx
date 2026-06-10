@@ -2,8 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { Menu } from "lucide-react";
 import { LiquidButton }  from "./ui/liquid-button";
 import { GradientText }  from "./ui/gradient-text";
+import {
+  DropdownMenu, DropdownMenuContent, DropdownMenuItem,
+  DropdownMenuSeparator, DropdownMenuTrigger,
+} from "./ui/dropdown-menu";
 
 export const LOGO_LEFT_PAD = 40;
 export const NAV_LOGO_W    = 120;
@@ -39,17 +44,15 @@ export function Navbar({ visible = true }: NavbarProps) {
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY;
-      // Show when scrolling up or near the top; hide when scrolling down past 80px
       if (y < 80) {
         setScrolledDown(false);
       } else if (y > lastY.current + 4) {
-        setScrolledDown(true);   // scrolled down — hide
+        setScrolledDown(true);
       } else if (y < lastY.current - 4) {
-        setScrolledDown(false);  // scrolled up — reveal
+        setScrolledDown(false);
       }
       lastY.current = y;
     };
-
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
@@ -67,8 +70,8 @@ export function Navbar({ visible = true }: NavbarProps) {
         display:        "flex",
         alignItems:     "center",
         justifyContent: "space-between",
-        paddingLeft:    LOGO_LEFT_PAD,
-        paddingRight:   LOGO_LEFT_PAD,
+        paddingLeft:    "clamp(16px, 4vw, 40px)",
+        paddingRight:   "clamp(16px, 4vw, 40px)",
         background:     "transparent",
         zIndex:         500,
         opacity:        visible ? 1 : 0,
@@ -97,13 +100,13 @@ export function Navbar({ visible = true }: NavbarProps) {
         </svg>
       </Link>
 
-      {/* Centre nav — fades out when scrolling down, logo + CTA always stay */}
+      {/* ── Desktop: centre nav ─────────────────────────────────────────────── */}
       <nav
         aria-label="Main navigation"
+        className="hidden md:flex"
         style={{
           position:      "absolute",
           left:          "50%",
-          display:       "flex",
           gap:           "2.2rem",
           transform:     navShown
             ? "translateX(-50%) translateY(0)"
@@ -126,21 +129,100 @@ export function Navbar({ visible = true }: NavbarProps) {
         ))}
       </nav>
 
-      {/* CTA */}
-      <LiquidButton asChild variant="default" size="md">
-        <Link
-          href="/#contact"
-          style={{
-            textDecoration: "none",
-            fontFamily:     "var(--font-sans)",
-            fontWeight:     500,
-            letterSpacing:  "0.06em",
-            flexShrink:     0,
-          }}
-        >
-          <GradientText as="span">Contact us</GradientText>
-        </Link>
-      </LiquidButton>
+      {/* ── Desktop: CTA button ─────────────────────────────────────────────── */}
+      <div className="hidden md:block">
+        <LiquidButton asChild variant="default" size="md">
+          <Link
+            href="/#contact"
+            style={{
+              textDecoration: "none",
+              fontFamily:     "var(--font-sans)",
+              fontWeight:     500,
+              letterSpacing:  "0.06em",
+              flexShrink:     0,
+            }}
+          >
+            <GradientText as="span">Contact us</GradientText>
+          </Link>
+        </LiquidButton>
+      </div>
+
+      {/* ── Mobile: hamburger dropdown ──────────────────────────────────────── */}
+      <div className="md:hidden">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              aria-label="Open menu"
+              style={{
+                display:         "flex",
+                alignItems:      "center",
+                justifyContent:  "center",
+                width:           40,
+                height:          40,
+                borderRadius:    10,
+                border:          "1px solid rgba(0,0,0,0.1)",
+                background:      "rgba(255,255,255,0.7)",
+                backdropFilter:  "blur(12px)",
+                cursor:          "pointer",
+                color:           "#0d0d0d",
+              }}
+            >
+              <Menu size={20} />
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="end"
+            className="min-w-[200px]"
+            style={{
+              background:      "rgba(255,255,255,0.92)",
+              backdropFilter:  "blur(20px)",
+              border:          "1px solid rgba(0,0,0,0.08)",
+              borderRadius:    14,
+              padding:         "0.4rem",
+            }}
+          >
+            {NAV_ITEMS.map(({ label, href }) => (
+              <DropdownMenuItem key={href} asChild>
+                <Link
+                  href={href}
+                  style={{
+                    fontFamily:     "var(--font-body, var(--font-sans))",
+                    fontSize:       "0.92rem",
+                    fontWeight:     500,
+                    color:          "#0d0d0d",
+                    textDecoration: "none",
+                    display:        "block",
+                    padding:        "0.55rem 0.75rem",
+                    borderRadius:   8,
+                    width:          "100%",
+                  }}
+                >
+                  {label}
+                </Link>
+              </DropdownMenuItem>
+            ))}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link
+                href="/#contact"
+                style={{
+                  fontFamily:     "var(--font-body, var(--font-sans))",
+                  fontSize:       "0.92rem",
+                  fontWeight:     600,
+                  color:          "hsl(22,69%,44%)",
+                  textDecoration: "none",
+                  display:        "block",
+                  padding:        "0.55rem 0.75rem",
+                  borderRadius:   8,
+                  width:          "100%",
+                }}
+              >
+                Contact us →
+              </Link>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </header>
   );
 }

@@ -68,7 +68,7 @@ export function HeroSection() {
           AI-powered operations for SMEs
         </GradientText>
 
-        <h1 style={{
+        <h1 className="hero-headline" style={{
           ...FONT,
           fontSize:      "clamp(2.8rem, 7.5vw, 6.4rem)",
           fontWeight:    700,
@@ -77,14 +77,14 @@ export function HeroSection() {
           color:         "#0D0D0D",
           margin:        0,
         }}>
-          <span style={blendText}>Your business is running on </span>
-          <span style={blendOrange}>WhatsApp</span>
-          <span style={blendText}> and </span>
-          <span style={blendOrange}>spreadsheets.</span>
-          <span style={blendText}> That ends here.</span>
+          <span className="blend-text-plain" style={blendText}>Your business is running on </span>
+          <span className="blend-text-orange" style={blendOrange}>WhatsApp</span>
+          <span className="blend-text-plain" style={blendText}> and </span>
+          <span className="blend-text-orange" style={blendOrange}>spreadsheets.</span>
+          <span className="blend-text-plain" style={blendText}> That ends here.</span>
         </h1>
 
-        <p style={{
+        <p className="blend-para" style={{
           ...BODY,
           fontSize:     "clamp(1.05rem, 1.9vw, 1.3rem)",
           fontWeight:   400,

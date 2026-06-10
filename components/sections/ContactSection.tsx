@@ -61,7 +61,7 @@ export function ContactSection() {
       <div style={{ textAlign: "center", marginBottom: "3.5rem" }}>
 
         {/* Eyebrow */}
-        <p style={{
+        <p className="blend-para" style={{
           ...BODY,
           fontSize:      "0.7rem",
           fontWeight:    600,
@@ -75,7 +75,7 @@ export function ContactSection() {
         </p>
 
         {/* Headline — same blend trick as HeroSection */}
-        <h2 style={{
+        <h2 className="contact-headline" style={{
           ...FONT,
           fontSize:      "clamp(3rem, 7vw, 5.6rem)",
           fontWeight:    700,
@@ -83,13 +83,13 @@ export function ContactSection() {
           letterSpacing: "-0.03em",
           margin:        "0 0 1.4rem",
         }}>
-          <span style={blendText}>Let&apos;s solve your </span>
-          <span style={blendOrange}>ops</span>
-          <span style={blendText}> together.</span>
+          <span className="blend-text-plain" style={blendText}>Let&apos;s solve your </span>
+          <span className="blend-text-orange" style={blendOrange}>ops</span>
+          <span className="blend-text-plain" style={blendText}> together.</span>
         </h2>
 
         {/* Subtext */}
-        <p style={{
+        <p className="blend-para" style={{
           ...BODY,
           fontSize:     "clamp(1rem, 1.8vw, 1.18rem)",
           color:        "white",
@@ -142,7 +142,7 @@ export function ContactSection() {
         </div>
 
         {/* Quiet fallback email */}
-        <p style={{
+        <p className="blend-para" style={{
           ...BODY,
           fontSize:   "0.78rem",
           color:      "white",

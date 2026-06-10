@@ -302,6 +302,9 @@
 /* ── Continuous scroll — shader is the global background ─────────────────── */
 html, body {
   background: transparent !important;
+  /* Prevent any section or fixed element from causing horizontal scroll */
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 /* ── Systems Showcase bento — stack to 1 col on mobile ───────────────────── */
@@ -362,4 +365,32 @@ html, body {
 @keyframes spin {
   from { transform: rotate(0deg); }
   to   { transform: rotate(360deg); }
+}
+
+/* ── Mobile: fix blend-mode text that renders invisible on some mobile browsers ── */
+@media (max-width: 767px) {
+  /* Plain white blend-text spans → force dark/readable */
+  .blend-text-plain {
+    color: #0d0d0d !important;
+    mix-blend-mode: normal !important;
+  }
+  /* Orange gradient blend spans → drop the difference blend, keep gradient */
+  .blend-text-orange {
+    mix-blend-mode: normal !important;
+  }
+  /* Misc inline mix-blend-mode paragraphs (subtext, eyebrow) */
+  .blend-para {
+    color: #444 !important;
+    mix-blend-mode: normal !important;
+  }
+}
+
+/* ── Mobile: hero headline sizing ─────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .hero-headline {
+    font-size: clamp(2.2rem, 9vw, 3.2rem) !important;
+  }
+  .contact-headline {
+    font-size: clamp(2.4rem, 10vw, 3.6rem) !important;
+  }
 }
