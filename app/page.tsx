@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { BounceDot }               from "@/components/BounceDot";
 import { Navbar }                  from "@/components/Navbar";
 import { HeroSection }             from "@/components/HeroSection";
@@ -9,29 +9,43 @@ import { HowItWorks }              from "@/components/sections/HowItWorks";
 import { AppsShowcase }            from "@/components/sections/AppsShowcase";
 import { PricingSection }          from "@/components/sections/PricingSection";
 import { TrustStrip }              from "@/components/sections/TrustStrip";
+import { ContactSection }          from "@/components/sections/ContactSection";
 import { SiteFooter }              from "@/components/sections/SiteFooter";
 import { WebGLShaderBackground }   from "@/components/WebGLShaderBackground";
 
-const SECTIONS = [
-  HeroSection,
-  SystemsShowcase,
-  HowItWorks,
-  AppsShowcase,
-  PricingSection,
-  TrustStrip,
-  SiteFooter,
+const SECTIONS: [React.ComponentType, string][] = [
+  [HeroSection,      "hero"        ],
+  [SystemsShowcase,  "systems"     ],
+  [HowItWorks,       "how-it-works"],
+  [AppsShowcase,     "our-toolkit" ],
+  [PricingSection,   "pricing"     ],
+  [TrustStrip,       "trust"       ],
+  [ContactSection,   "contact"     ],
 ];
 
 export default function Home() {
   const [siteVisible, setSiteVisible] = useState(false);
 
+  // Lock body scroll while the intro is playing so the user can't
+  // accidentally scroll away from hero before the animation finishes.
+  useEffect(() => {
+    if (!siteVisible) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [siteVisible]);
+
   const handleAnimationComplete = useCallback(() => {
+    // Snap back to the top before revealing the site so the user
+    // always lands on the hero no matter where scroll drifted during the intro.
+    window.scrollTo({ top: 0, behavior: "instant" });
     setSiteVisible(true);
   }, []);
 
   return (
     <>
-      {/* Intro animation */}
       <BounceDot onComplete={handleAnimationComplete} />
 
       <div
@@ -41,19 +55,18 @@ export default function Home() {
           pointerEvents: siteVisible ? "auto" : "none",
         }}
       >
-        {/* Global shader line — fixed behind everything */}
         <WebGLShaderBackground global />
-
-        {/* Fixed navbar */}
         <Navbar />
 
-        {/* Continuous scroll — no z-index on main so mix-blend-mode on hero
-            text can reach through to blend against the shader canvas */}
         <main style={{ paddingTop: 64 }}>
-          {SECTIONS.map((Section, i) => (
-            <Section key={i} />
+          {SECTIONS.map(([Section, id]) => (
+            <div key={id} id={id}>
+              <Section />
+            </div>
           ))}
         </main>
+
+        <SiteFooter />
       </div>
     </>
   );

@@ -1,39 +1,82 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { LiquidButton }  from "./ui/liquid-button";
 import { GradientText }  from "./ui/gradient-text";
 
-// Must match morphToNav.ts constants so the logo crossfade is seamless
 export const LOGO_LEFT_PAD = 40;
 export const NAV_LOGO_W    = 120;
 const NAV_H                = 64;
 const ASPECT               = 900 / 350;
 const NAV_LOGO_H           = NAV_LOGO_W / ASPECT;
 
-interface NavbarProps {
-  visible?: boolean;
-}
+const NAV_ITEMS = [
+  { label: "What we build", href: "/#systems"      },
+  { label: "How it works",  href: "/#how-it-works" },
+  { label: "Our toolkit",   href: "/#our-toolkit"  },
+  { label: "Pricing",       href: "/#pricing"      },
+  { label: "Our reach",     href: "/#trust"        },
+];
+
+const LINK_STYLE: React.CSSProperties = {
+  fontFamily:     "var(--font-body, var(--font-sans))",
+  fontSize:       "0.88rem",
+  fontWeight:     500,
+  color:          "#0d0d0d",
+  textDecoration: "none",
+  letterSpacing:  "0.01em",
+  transition:     "color 0.15s",
+  whiteSpace:     "nowrap",
+};
+
+interface NavbarProps { visible?: boolean }
 
 export function Navbar({ visible = true }: NavbarProps) {
+  const [scrolledDown, setScrolledDown] = useState(false);
+  const lastY = useRef(0);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY;
+      // Show when scrolling up or near the top; hide when scrolling down past 80px
+      if (y < 80) {
+        setScrolledDown(false);
+      } else if (y > lastY.current + 4) {
+        setScrolledDown(true);   // scrolled down — hide
+      } else if (y < lastY.current - 4) {
+        setScrolledDown(false);  // scrolled up — reveal
+      }
+      lastY.current = y;
+    };
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const navShown = !scrolledDown;
+
   return (
     <header
       style={{
-        position: "fixed",
-        top: 0, left: 0, right: 0,
-        height: NAV_H,
-        display: "flex",
-        alignItems: "center",
+        position:       "fixed",
+        top:            0,
+        left:           0,
+        right:          0,
+        height:         NAV_H,
+        display:        "flex",
+        alignItems:     "center",
         justifyContent: "space-between",
-        paddingLeft: LOGO_LEFT_PAD,
-        paddingRight: LOGO_LEFT_PAD,
-        background: "transparent",
-        zIndex: 500,
-        opacity: visible ? 1 : 0,
-        pointerEvents: visible ? "auto" : "none",
+        paddingLeft:    LOGO_LEFT_PAD,
+        paddingRight:   LOGO_LEFT_PAD,
+        background:     "transparent",
+        zIndex:         500,
+        opacity:        visible ? 1 : 0,
+        pointerEvents:  visible ? "auto" : "none",
+        transition:     "opacity 0.25s ease",
       }}
     >
-      {/* Logo — exact position matches morphToNav animation endpoint */}
+      {/* Logo */}
       <Link href="/" aria-label="Vyso home" style={{ lineHeight: 0, flexShrink: 0 }}>
         <svg
           viewBox="175 455 900 350"
@@ -54,18 +97,48 @@ export function Navbar({ visible = true }: NavbarProps) {
         </svg>
       </Link>
 
-      {/* Single CTA */}
+      {/* Centre nav — fades out when scrolling down, logo + CTA always stay */}
+      <nav
+        aria-label="Main navigation"
+        style={{
+          position:      "absolute",
+          left:          "50%",
+          display:       "flex",
+          gap:           "2.2rem",
+          transform:     navShown
+            ? "translateX(-50%) translateY(0)"
+            : "translateX(-50%) translateY(-6px)",
+          opacity:       navShown ? 1 : 0,
+          pointerEvents: navShown ? "auto" : "none",
+          transition:    "opacity 0.3s ease, transform 0.3s ease",
+        }}
+      >
+        {NAV_ITEMS.map(({ label, href }) => (
+          <Link
+            key={href}
+            href={href}
+            style={LINK_STYLE}
+            onMouseEnter={e => ((e.target as HTMLElement).style.color = "hsl(22,69%,44%)")}
+            onMouseLeave={e => ((e.target as HTMLElement).style.color = "#0d0d0d")}
+          >
+            {label}
+          </Link>
+        ))}
+      </nav>
+
+      {/* CTA */}
       <LiquidButton asChild variant="default" size="md">
         <Link
-          href="/contact"
+          href="/#contact"
           style={{
             textDecoration: "none",
-            fontFamily: "var(--font-sans)",
-            fontWeight: 500,
-            letterSpacing: "0.06em",
+            fontFamily:     "var(--font-sans)",
+            fontWeight:     500,
+            letterSpacing:  "0.06em",
+            flexShrink:     0,
           }}
         >
-          <GradientText as="span">Request an audit</GradientText>
+          <GradientText as="span">Contact us</GradientText>
         </Link>
       </LiquidButton>
     </header>

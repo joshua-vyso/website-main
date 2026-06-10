@@ -342,3 +342,24 @@ html, body {
   background-color: hsl(22 69% 44% / 0.45);
   border-radius: 2px;
 }
+
+/* ── Aurora background animation ─────────────────────────────────────────── */
+@keyframes aurora {
+  from { background-position: 50% 50%, 50% 50%; }
+  to   { background-position: 350% 50%, 350% 50%; }
+}
+.animate-aurora {
+  animation: aurora 60s linear infinite;
+}
+
+/* ── Contact page responsive grid ────────────────────────────────────────── */
+@media (max-width: 767px) {
+  .contact-grid    { grid-template-columns: 1fr !important; }
+  .form-name-row   { grid-template-columns: 1fr !important; }
+}
+
+/* ── Spinner for ContactForm loading state ────────────────────────────────── */
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}

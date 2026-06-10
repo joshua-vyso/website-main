@@ -1,38 +1,58 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import ButtonLink from "@/components/ButtonLink";
 import { ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
+import Link from "next/link";
 
 type Status = "idle" | "loading" | "success" | "error";
 
+const INITIAL_STATE = { name: "", business: "", email: "", challenge: "", tier: "" };
+
+const BODY: React.CSSProperties = { fontFamily: "var(--font-body, var(--font-sans))" };
+
+const INPUT: React.CSSProperties = {
+  ...BODY,
+  width:           "100%",
+  padding:         "0.65rem 1rem",
+  fontSize:        "0.9rem",
+  color:           "#0d0d0d",
+  background:      "rgba(255,255,255,0.7)",
+  border:          "1px solid #e0ddd9",
+  borderRadius:    12,
+  outline:         "none",
+  boxSizing:       "border-box" as const,
+  transition:      "border-color 0.2s, box-shadow 0.2s",
+};
+
+const LABEL: React.CSSProperties = {
+  ...BODY,
+  fontSize:     "0.8rem",
+  fontWeight:   600,
+  color:        "#444",
+  marginBottom: "0.4rem",
+  display:      "block",
+};
+
 export default function ContactForm() {
-  const [status, setStatus] = useState<Status>("idle");
-  const [errorMsg, setErrorMsg] = useState("");
+  const [status, setStatus]   = useState<Status>("idle");
+  const [errorMsg, setError]  = useState("");
+  const [fields, setFields]   = useState(INITIAL_STATE);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+    setFields(f => ({ ...f, [e.target.name]: e.target.value }));
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setStatus("loading");
-    setErrorMsg("");
+    setError("");
 
-    const form = e.currentTarget;
-    const data = {
-      name: (form.elements.namedItem("name") as HTMLInputElement).value,
-      business: (form.elements.namedItem("business") as HTMLInputElement).value,
-      email: (form.elements.namedItem("email") as HTMLInputElement).value,
-      challenge: (form.elements.namedItem("challenge") as HTMLTextAreaElement).value,
-      tier: (form.elements.namedItem("tier") as HTMLSelectElement).value,
-    };
+    const data = fields;
 
     try {
       const res = await fetch("/api/contact", {
-        method: "POST",
+        method:  "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
+        body:    JSON.stringify(data),
       });
 
       if (!res.ok) {
@@ -43,123 +63,202 @@ export default function ContactForm() {
       setStatus("success");
     } catch (err) {
       setStatus("error");
-      setErrorMsg(err instanceof Error ? err.message : "Something went wrong.");
+      setError(err instanceof Error ? err.message : "Something went wrong.");
     }
   }
 
   if (status === "success") {
     return (
-      <div className="flex flex-col items-center justify-center py-16 text-center">
-        <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-5">
-          <CheckCircle2 className="h-7 w-7 text-primary" />
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center",
+        justifyContent: "center", padding: "4rem 1rem", textAlign: "center" }}>
+        <div style={{
+          width: 56, height: 56, borderRadius: "50%",
+          background: "hsl(22 69% 44% / 0.1)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          marginBottom: "1.2rem",
+        }}>
+          <CheckCircle2 size={28} color="hsl(22,69%,44%)" />
         </div>
-        <h2 className="text-2xl font-bold mb-3">Message received</h2>
-        <p className="text-muted-foreground max-w-sm mb-6 leading-relaxed">
+        <h2 style={{ fontFamily: "var(--font-sans)", fontSize: "1.6rem", fontWeight: 700,
+          color: "#0d0d0d", margin: "0 0 0.75rem" }}>Message received</h2>
+        <p style={{ ...BODY, fontSize: "0.95rem", color: "#666", lineHeight: 1.65,
+          maxWidth: 340, margin: "0 0 1.5rem" }}>
           We&apos;ve sent a confirmation to your email with a link to book a 15-minute
           call at a time that suits you.
         </p>
-        <ButtonLink
-          href="https://calendly.com/joshua-vyso/new-meeting"
-          className="bg-primary text-primary-foreground hover:bg-primary/90"
-          target="_blank"
-          rel="noopener noreferrer"
+        <button
+          onClick={() => { setStatus("idle"); setFields(INITIAL_STATE); setError(""); }}
+          style={{
+            ...BODY,
+            display: "inline-flex", alignItems: "center", gap: "0.4rem",
+            padding: "0.75rem 1.8rem", borderRadius: 50,
+            background: "hsl(22,69%,44%)", color: "#fff",
+            fontSize: "0.9rem", fontWeight: 600, border: "none", cursor: "pointer",
+          }}
         >
-          Book Your Call Now <ArrowRight className="ml-2 h-4 w-4" />
-        </ButtonLink>
+          Send in another enquiry <ArrowRight size={16} />
+        </button>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-5">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
-        <div className="space-y-2">
-          <Label htmlFor="name">Your name</Label>
-          <Input
-            id="name"
-            name="name"
-            placeholder="Joshua Moreira"
+    <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
+      {/* Name + Business */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}
+        className="form-name-row">
+        <div>
+          <label htmlFor="name" style={LABEL}>Your name</label>
+          <input
+            id="name" name="name" type="text"
+            placeholder="John Smith"
+            value={fields.name}
+            onChange={handleChange}
             required
-            className="bg-secondary border-border"
+            style={INPUT}
+            onFocus={e => {
+              e.currentTarget.style.borderColor = "hsl(22,69%,44%)";
+              e.currentTarget.style.boxShadow   = "0 0 0 3px hsl(22 69% 44% / 0.12)";
+            }}
+            onBlur={e => {
+              e.currentTarget.style.borderColor = "#e0ddd9";
+              e.currentTarget.style.boxShadow   = "none";
+            }}
           />
         </div>
-        <div className="space-y-2">
-          <Label htmlFor="business">Business name</Label>
-          <Input
-            id="business"
-            name="business"
-            placeholder="My Restaurant"
+        <div>
+          <label htmlFor="business" style={LABEL}>Business name</label>
+          <input
+            id="business" name="business" type="text"
+            placeholder="My Business"
+            value={fields.business}
+            onChange={handleChange}
             required
-            className="bg-secondary border-border"
+            style={INPUT}
+            onFocus={e => {
+              e.currentTarget.style.borderColor = "hsl(22,69%,44%)";
+              e.currentTarget.style.boxShadow   = "0 0 0 3px hsl(22 69% 44% / 0.12)";
+            }}
+            onBlur={e => {
+              e.currentTarget.style.borderColor = "#e0ddd9";
+              e.currentTarget.style.boxShadow   = "none";
+            }}
           />
         </div>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="email">Email address</Label>
-        <Input
-          id="email"
-          name="email"
-          type="email"
+      {/* Email */}
+      <div>
+        <label htmlFor="email" style={LABEL}>Email address</label>
+        <input
+          id="email" name="email" type="email"
           placeholder="you@yourbusiness.co.za"
+          value={fields.email}
+          onChange={handleChange}
           required
-          className="bg-secondary border-border"
+          style={INPUT}
+          onFocus={e => {
+            e.currentTarget.style.borderColor = "hsl(22,69%,44%)";
+            e.currentTarget.style.boxShadow   = "0 0 0 3px hsl(22 69% 44% / 0.12)";
+          }}
+          onBlur={e => {
+            e.currentTarget.style.borderColor = "#e0ddd9";
+            e.currentTarget.style.boxShadow   = "none";
+          }}
         />
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="tier">Which tier are you interested in?</Label>
+      {/* Tier */}
+      <div>
+        <label htmlFor="tier" style={LABEL}>What are you interested in?</label>
         <select
-          id="tier"
-          name="tier"
-          className="w-full rounded-md border border-border bg-secondary px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-          defaultValue=""
+          id="tier" name="tier"
+          value={fields.tier}
+          onChange={handleChange}
+          style={{ ...INPUT, cursor: "pointer", appearance: "none" as const,
+            backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+            backgroundRepeat: "no-repeat",
+            backgroundPosition: "right 1rem center",
+            paddingRight: "2.5rem",
+          }}
         >
-          <option value="" disabled>
-            Select a tier (optional)
-          </option>
+          <option value="" disabled>Select a tier (optional)</option>
+          <option value="Audit">Audit — Operational health check (R3,000)</option>
           <option value="Starter">Starter — Quick wins with existing tools</option>
-          <option value="Build">Build — Custom app + automations</option>
+          <option value="Create">Create — Custom app + automations</option>
           <option value="Scale">Scale — Full ops platform</option>
           <option value="Not sure">Not sure yet</option>
         </select>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="challenge">What&apos;s your biggest operational challenge?</Label>
-        <Textarea
-          id="challenge"
-          name="challenge"
+      {/* Challenge */}
+      <div>
+        <label htmlFor="challenge" style={LABEL}>What&apos;s your biggest operational challenge?</label>
+        <textarea
+          id="challenge" name="challenge"
           placeholder="Describe what's breaking down in your ops — stock management, wastage, supplier chaos, no visibility into margins..."
+          value={fields.challenge}
+          onChange={handleChange}
           rows={5}
           required
-          className="bg-secondary border-border resize-none"
+          style={{ ...INPUT, resize: "none" as const, lineHeight: 1.6 }}
+          onFocus={e => {
+            e.currentTarget.style.borderColor = "hsl(22,69%,44%)";
+            e.currentTarget.style.boxShadow   = "0 0 0 3px hsl(22 69% 44% / 0.12)";
+          }}
+          onBlur={e => {
+            e.currentTarget.style.borderColor = "#e0ddd9";
+            e.currentTarget.style.boxShadow   = "none";
+          }}
         />
       </div>
 
       {status === "error" && (
-        <p className="text-sm text-destructive">{errorMsg}</p>
+        <p style={{ ...BODY, fontSize: "0.85rem", color: "#c0392b" }}>{errorMsg}</p>
       )}
 
-      <Button
+      {/* Submit — pill shape */}
+      <button
         type="submit"
-        size="lg"
         disabled={status === "loading"}
-        className="w-full bg-primary text-primary-foreground hover:bg-primary/90 font-semibold"
+        style={{
+          ...BODY,
+          width:           "100%",
+          padding:         "0.9rem 1.5rem",
+          borderRadius:    50,
+          border:          "none",
+          background:      "hsl(22,69%,44%)",
+          color:           "#fff",
+          fontSize:        "0.95rem",
+          fontWeight:      600,
+          cursor:          status === "loading" ? "not-allowed" : "pointer",
+          opacity:         status === "loading" ? 0.7 : 1,
+          display:         "flex",
+          alignItems:      "center",
+          justifyContent:  "center",
+          gap:             "0.4rem",
+          transition:      "background 0.2s, opacity 0.2s",
+        }}
+        onMouseEnter={e => {
+          if (status !== "loading") (e.currentTarget as HTMLButtonElement).style.background = "hsl(22,72%,38%)";
+        }}
+        onMouseLeave={e => {
+          (e.currentTarget as HTMLButtonElement).style.background = "hsl(22,69%,44%)";
+        }}
       >
         {status === "loading" ? (
           <>
-            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+            <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} />
             Sending...
           </>
         ) : (
           <>
-            Send Enquiry <ArrowRight className="ml-2 h-4 w-4" />
+            Send Enquiry <ArrowRight size={16} />
           </>
         )}
-      </Button>
+      </button>
 
-      <p className="text-xs text-muted-foreground text-center">
+      <p style={{ ...BODY, fontSize: "0.75rem", color: "#999", textAlign: "center", margin: 0 }}>
         We&apos;ll respond within 24 hours. You&apos;ll also receive a link to book a free
         15-minute call straight away.
       </p>

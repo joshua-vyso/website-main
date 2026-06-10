@@ -1,7 +1,6 @@
 "use client";
 
-import Link          from "next/link";
-import { PixelTrail }  from "./PixelTrail";
+import Link           from "next/link";
 import { LiquidButton } from "./ui/liquid-button";
 import { GradientText } from "./ui/gradient-text";
 
@@ -47,13 +46,6 @@ export function HeroSection() {
         textAlign:      "center",
       }}
     >
-      <PixelTrail
-        pixelSize={30}
-        fadeDuration={900}
-        pixelClassName="pixel-orange"
-        style={{ position: "absolute", inset: 0, zIndex: 0 }}
-      />
-
       <div
         style={{
           position:      "relative",

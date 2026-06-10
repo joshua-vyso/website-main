@@ -43,9 +43,13 @@ export function WebGLShaderBackground({ global: isGlobal = false }: { global?: b
       uniform float xScale;
       uniform float yScale;
       uniform float distortion;
+      uniform float lineOffset;
 
       void main() {
         vec2 p = (gl_FragCoord.xy * 2.0 - resolution) / min(resolution.x, resolution.y);
+
+        // Shift the line upward by lineOffset (positive = toward top of screen)
+        float py = p.y - lineOffset;
 
         float d  = length(p) * distortion;
 
@@ -54,9 +58,9 @@ export function WebGLShaderBackground({ global: isGlobal = false }: { global?: b
         float bx = p.x * (1.0 - d);
 
         // Per-channel line brightness (same formula as original)
-        float bR = clamp(0.05 / abs(p.y + sin((rx + time) * xScale) * yScale), 0.0, 1.5);
-        float bG = clamp(0.05 / abs(p.y + sin((gx + time) * xScale) * yScale), 0.0, 1.5);
-        float bB = clamp(0.05 / abs(p.y + sin((bx + time) * xScale) * yScale), 0.0, 1.5);
+        float bR = clamp(0.05 / abs(py + sin((rx + time) * xScale) * yScale), 0.0, 1.5);
+        float bG = clamp(0.05 / abs(py + sin((gx + time) * xScale) * yScale), 0.0, 1.5);
+        float bB = clamp(0.05 / abs(py + sin((bx + time) * xScale) * yScale), 0.0, 1.5);
 
         // Start with white
         vec3 col = vec3(1.0);
@@ -88,9 +92,10 @@ export function WebGLShaderBackground({ global: isGlobal = false }: { global?: b
     r.uniforms = {
       resolution: { value: [window.innerWidth, window.innerHeight] },
       time:       { value: 0.0 },
-      xScale:     { value: 1.0 },
-      yScale:     { value: 0.5 },
+      xScale:     { value: 0.75 },   // longer wave period — stays in text region longer
+      yScale:     { value: 0.28 },   // tighter amplitude — line hugs headline height
       distortion: { value: 0.05 },
+      lineOffset: { value: 0.32 },   // 0 = centre, positive = higher up the screen
     };
 
     const geo = new THREE.BufferGeometry();

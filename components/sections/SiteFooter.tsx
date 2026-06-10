@@ -2,11 +2,11 @@
 import Link from "next/link";
 
 const NAV = [
-  { label: "Home",         href: "/" },
-  { label: "How it works", href: "#how-it-works" },
-  { label: "Apps",         href: "#apps" },
-  { label: "Pricing",      href: "#pricing" },
-  { label: "Contact",      href: "/contact" },
+  { label: "Home",         href: "/"              },
+  { label: "How it works", href: "/#how-it-works" },
+  { label: "Our toolkit",  href: "/#our-toolkit"  },
+  { label: "Pricing",      href: "/#pricing"      },
+  { label: "Contact",      href: "/#contact"      },
 ];
 
 /* Inline Vyso wordmark — same paths as Navbar but via a tiny self-contained SVG */

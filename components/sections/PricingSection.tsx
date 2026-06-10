@@ -89,7 +89,7 @@ function AuditBanner() {
           </h3>
           <p style={{ fontFamily: "var(--font-sans)", fontSize: "1.1rem", fontWeight: 700,
             color: "hsl(22,69%,44%)", margin: "0.1rem 0 0" }}>
-            R5,000 <span style={{ fontSize: "0.78rem", fontWeight: 500, color: "#888" }}>once-off</span>
+            R3,000 <span style={{ fontSize: "0.78rem", fontWeight: 500, color: "#888" }}>once-off</span>
           </p>
         </div>
       </div>
@@ -114,26 +114,29 @@ function AuditBanner() {
 
       {/* CTA */}
       <div style={{ flexShrink: 0, textAlign: "center" }}>
-        <a href="#contact" style={{
-          display: "inline-flex", alignItems: "center", gap: "0.4rem",
-          padding: "0.65rem 1.4rem", borderRadius: 50,
-          border: "1.5px solid hsl(22,69%,44%)",
-          background: "transparent", color: "hsl(22,69%,44%)",
-          fontFamily: "var(--font-body, var(--font-sans))", fontSize: "0.85rem",
-          fontWeight: 600, textDecoration: "none", cursor: "pointer",
-          transition: "background 0.2s, color 0.2s", whiteSpace: "nowrap",
-        }}
-          onMouseEnter={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = "hsl(22,69%,44%)"; el.style.color = "#fff"; }}
-          onMouseLeave={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.background = "transparent"; el.style.color = "hsl(22,69%,44%)"; }}
+        <button
+          onClick={() => { document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" }); }}
+          style={{
+            display: "inline-flex", alignItems: "center", gap: "0.4rem",
+            padding: "0.65rem 1.4rem", borderRadius: 50,
+            border: "1.5px solid hsl(22,69%,44%)",
+            background: "transparent", color: "hsl(22,69%,44%)",
+            fontFamily: "var(--font-body, var(--font-sans))", fontSize: "0.85rem",
+            fontWeight: 600, cursor: "pointer",
+            transition: "background 0.2s, color 0.2s", whiteSpace: "nowrap",
+            outline: "none",
+          }}
+          onMouseEnter={e => { const el = e.currentTarget; el.style.background = "hsl(22,69%,44%)"; el.style.color = "#fff"; }}
+          onMouseLeave={e => { const el = e.currentTarget; el.style.background = "transparent"; el.style.color = "hsl(22,69%,44%)"; }}
         >
-          Request an audit
+          Book a free discovery call
           <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor"
             strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
             <path d="M2.5 7h9M8 3.5L11.5 7 8 10.5"/>
           </svg>
-        </a>
+        </button>
         <p style={{ fontFamily: "var(--font-body, var(--font-sans))", fontSize: "0.68rem",
-          color: "#aaa", margin: "0.4rem 0 0" }}>Required before implementation</p>
+          color: "#aaa", margin: "0.4rem 0 0" }}>Free 15 min · no commitment</p>
       </div>
     </div>
   );
@@ -157,7 +160,7 @@ const TIERS = [
   },
   {
     num:      "Tier 2",
-    name:     "Build",
+    name:     "Create",
     tagline:  "Replace spreadsheets and WhatsApp with a system your team uses daily.",
     features: [
       { text: "Everything in Start",                          sub: "" },
@@ -167,7 +170,7 @@ const TIERS = [
       { text: "One round of post-launch revisions",          sub: "" },
     ],
     pricing: [
-      { label: "Build fee",        value: "From R30,000", unit: "" },
+      { label: "Create fee",       value: "From R30,000", unit: "" },
       { label: "Monthly retainer", value: "R8,000",       unit: "/month" },
     ],
     cta: "Talk to us",
@@ -177,7 +180,7 @@ const TIERS = [
     name:     "Scale",
     tagline:  "An ongoing ops partner for growing teams.",
     features: [
-      { text: "Everything in Build",                   sub: "" },
+      { text: "Everything in Create",                  sub: "" },
       { text: "Unlimited access to the Vyso toolkit",  sub: "" },
       { text: "Full ops intelligence platform",        sub: "" },
       { text: "Third-party integrations",              sub: "" },
@@ -304,7 +307,7 @@ function TierCard({ tier, active }: { tier: typeof TIERS[0]; active: boolean }) 
 
       {/* CTA — flowing orange→blue gradient when active, plain glass when not */}
       <button
-        onClick={() => { window.location.href = "#contact"; }}
+        onClick={() => { document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" }); }}
         className={active ? "price-btn-active" : "price-btn-inactive"}
         style={{
           width: "100%", padding: "0.78rem 1.4rem", borderRadius: 50,
@@ -327,6 +330,10 @@ function TierCard({ tier, active }: { tier: typeof TIERS[0]; active: boolean }) 
           <path d="M2.5 7h9M8 3.5L11.5 7 8 10.5"/>
         </svg>
       </button>
+      <p style={{ fontFamily: "var(--font-body, var(--font-sans))", fontSize: "0.68rem",
+        color: active ? "rgba(255,255,255,0.55)" : "#aaa", margin: "0.5rem 0 0", textAlign: "center" }}>
+        Starts with a free 15-min discovery call
+      </p>
     </div>
   );
 }

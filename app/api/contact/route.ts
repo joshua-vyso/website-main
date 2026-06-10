@@ -60,7 +60,7 @@ export async function POST(req: Request) {
                 href="${CALENDLY_LINK}"
                 style="
                   display: inline-block;
-                  background-color: #10b981;
+                  background-color: #BE5D23;
                   color: #fff;
                   text-decoration: none;
                   padding: 12px 24px;
@@ -80,9 +80,9 @@ export async function POST(req: Request) {
             <p style="color: #6b7280; font-size: 13px;">
               Joshua Moreira<br>
               Vyso — Operations & Automation for Food Businesses<br>
-              <a href="mailto:joshua@vyso.co.za" style="color: #10b981;">joshua@vyso.co.za</a>
+              <a href="mailto:joshua@vyso.co.za" style="color: #BE5D23;">joshua@vyso.co.za</a>
               &nbsp;·&nbsp;
-              <a href="https://vyso.co.za" style="color: #10b981;">vyso.co.za</a>
+              <a href="https://vyso.co.za" style="color: #BE5D23;">vyso.co.za</a>
             </p>
           </div>
         `,

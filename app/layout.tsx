@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import { Barlow_Condensed, DM_Sans } from "next/font/google";
-import { LiquidGlassFilter } from "@/components/ui/liquid-button";
-import { CustomCursor }      from "@/components/ui/CustomCursor";
+import { LiquidGlassFilter }  from "@/components/ui/liquid-button";
+import { CustomCursor }       from "@/components/ui/CustomCursor";
+import { GlobalPixelTrail }   from "@/components/GlobalPixelTrail";
 import "./globals.css";
 
 /* ── Heading font: Barlow Condensed ──────────────────────────────────────── */
@@ -49,6 +50,8 @@ export default function RootLayout({
         <LiquidGlassFilter />
         {/* Custom cursor — self-activates on hover-capable devices only */}
         <CustomCursor />
+        {/* Orange pixel trail — follows the cursor across every page */}
+        <GlobalPixelTrail />
         {children}
       </body>
     </html>
