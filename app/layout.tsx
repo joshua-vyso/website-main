@@ -21,14 +21,14 @@ const dmSans = DM_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Vyso — Operations & Automation for Food Businesses",
+  title: "Vyso — AI-Powered Operations for SMEs",
   description:
-    "Vyso automates the day-to-day operations of food businesses. Stock tracking, wastage logging, supplier management, and custom apps — all in one place.",
+    "AI-powered operations for SMEs. Vyso automates day-to-day operations — stock tracking, wastage logging, supplier management, and custom apps — all in one place.",
   metadataBase: new URL("https://vyso.co.za"),
   openGraph: {
-    title: "Vyso — Operations & Automation for Food Businesses",
+    title: "Vyso — AI-Powered Operations for SMEs",
     description:
-      "Stop running your business on WhatsApp and spreadsheets. Vyso builds automation systems and simple custom apps for food businesses.",
+      "Stop running your business on WhatsApp and spreadsheets. Vyso builds AI-powered automation systems and simple custom apps for SMEs.",
     url:      "https://vyso.co.za",
     siteName: "Vyso",
     locale:   "en_ZA",

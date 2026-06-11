@@ -79,7 +79,7 @@ export async function POST(req: Request) {
             <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;">
             <p style="color: #6b7280; font-size: 13px;">
               Joshua Moreira<br>
-              Vyso — Operations & Automation for Food Businesses<br>
+              Vyso — AI-Powered Operations for SMEs<br>
               <a href="mailto:joshua@vyso.co.za" style="color: #BE5D23;">joshua@vyso.co.za</a>
               &nbsp;·&nbsp;
               <a href="https://vyso.co.za" style="color: #BE5D23;">vyso.co.za</a>

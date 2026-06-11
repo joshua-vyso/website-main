@@ -17,7 +17,7 @@ export default function Footer() {
               className="h-8 w-auto mb-4"
             />
             <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
-              AI-powered operations and automation for food businesses in Africa.
+              AI-powered operations and automation for SMEs in Africa.
             </p>
           </div>
 

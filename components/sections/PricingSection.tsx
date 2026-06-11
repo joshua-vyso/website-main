@@ -361,26 +361,6 @@ export function PricingSection() {
   const prev = useCallback(() => setActive(a => Math.max(0, a - 1)), []);
   const next = useCallback(() => setActive(a => Math.min(n - 1, a + 1)), [n]);
 
-  /* ── Cursor-driven card tracking ────────────────────────────────────────── */
-  const lastZone = useRef(1);
-  useEffect(() => {
-    const section = sectionRef.current as HTMLElement | null;
-    if (!section) return;
-    const onMove = (e: MouseEvent) => {
-      const rect  = section.getBoundingClientRect();
-      if (e.clientY < rect.top || e.clientY > rect.bottom) return;
-      const ratio = (e.clientX - rect.left) / rect.width;
-      const DEAD  = 0.05;
-      let zone    = lastZone.current;
-      if      (ratio < 1/3 - DEAD)        zone = 0;
-      else if (ratio > 2/3 + DEAD)        zone = 2;
-      else if (ratio > 1/3 + DEAD && ratio < 2/3 - DEAD) zone = 1;
-      if (zone !== lastZone.current) { lastZone.current = zone; setActive(zone); }
-    };
-    window.addEventListener("mousemove", onMove);
-    return () => window.removeEventListener("mousemove", onMove);
-  }, []);
-
   /* ── Trackpad swipe ─────────────────────────────────────────────────────── */
   const wheelAccum    = useRef(0);
   const wheelCooldown = useRef(false);
@@ -486,6 +466,7 @@ export function PricingSection() {
           <div ref={stageRef} style={{
             position: "relative", width: "100%", height: CARD_H + 48,
             perspective: 1400, overflow: "hidden",
+            cursor: "grab", touchAction: "pan-y",
           }}
             onPointerDown={onPointerDown} onPointerUp={onPointerUp}
           >
