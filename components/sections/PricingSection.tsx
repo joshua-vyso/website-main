@@ -95,10 +95,16 @@ function AuditBanner() {
       </div>
 
       {/* Description */}
-      <p style={{ fontFamily: "var(--font-body, var(--font-sans))", fontSize: "0.83rem",
-        color: "#666", lineHeight: 1.55, margin: 0, flexShrink: 0, maxWidth: 220 }}>
-        Operational diagnostics period spanning 7 days.
-      </p>
+      <div style={{ flexShrink: 0, maxWidth: 240 }}>
+        <p style={{ fontFamily: "var(--font-body, var(--font-sans))", fontSize: "0.83rem",
+          color: "#666", lineHeight: 1.55, margin: "0 0 0.35rem" }}>
+          7-day operational diagnostics before any engagement. De-risks delivery.
+        </p>
+        <p style={{ fontFamily: "var(--font-body, var(--font-sans))", fontSize: "0.75rem",
+          color: "hsl(22,69%,44%)", lineHeight: 1.45, margin: 0 }}>
+          Founding clients: R3,000 credited toward their tier fee.
+        </p>
+      </div>
 
       {/* Feature list */}
       <div className="audit-features" style={{ display: "flex", gap: "0.5rem 2.2rem", flex: 1, flexWrap: "wrap", minWidth: 0 }}>
@@ -147,49 +153,51 @@ const TIERS = [
   {
     num:      "Tier 1",
     name:     "Start",
-    tagline:  "Quick operational wins using your existing tools.",
+    tagline:  "We automate what your current tools can already do.",
     features: [
-      { text: "Workflow automation setup", sub: "using existing tools" },
-      { text: "30-day support period post-setup", sub: "" },
+      { text: "Workflow automation in your existing stack", sub: "WhatsApp, Google Sheets, Outlook, etc." },
+      { text: "Up to 5 automations included",              sub: "" },
+      { text: "Maintenance — breakages fixed proactively", sub: "" },
+      { text: "New automations on a monthly delivery cycle", sub: "" },
+      { text: "30-day support period post-setup",          sub: "" },
     ],
     pricing: [
-      { label: "Once off fee", value: "R8,000",        unit: "" },
-      { label: "Retainer",     value: "R4,000",        unit: "/month" },
+      { label: "Setup (once-off)", value: "R10,000",       unit: "" },
+      { label: "Retainer",        value: "R5,000",         unit: "/month", note: "+R1,000/month per extra automation (max 3)" },
     ],
     cta: "Get started",
   },
   {
     num:      "Tier 2",
-    name:     "Create",
-    tagline:  "Replace spreadsheets and WhatsApp with a system your team uses daily.",
+    name:     "Build",
+    tagline:  "We replace those tools with a module that owns your data.",
     features: [
-      { text: "Everything in Start",                          sub: "" },
-      { text: "Access to one lightweight web or mobile app", sub: "" },
-      { text: "Automations integrated into the app",         sub: "" },
-      { text: "Team onboarding and 60-day support",          sub: "" },
-      { text: "One round of post-launch revisions",          sub: "" },
+      { text: "One productised Vyso module of your choice", sub: "" },
+      { text: "Migration of Start automations into the module", sub: "" },
+      { text: "Team onboarding and 60-day support",         sub: "" },
+      { text: "One round of post-launch revisions",         sub: "" },
     ],
     pricing: [
-      { label: "Create fee",       value: "From R30,000", unit: "" },
-      { label: "Monthly retainer", value: "R8,000",       unit: "/month" },
+      { label: "Build fee",        value: "From R30,000", unit: "",       note: "includes automation migration" },
+      { label: "Retainer",         value: "R10,000",      unit: "/month" },
     ],
     cta: "Talk to us",
   },
   {
     num:      "Tier 3",
     name:     "Scale",
-    tagline:  "An ongoing ops partner for growing teams.",
+    tagline:  "We connect unlimited modules into a full ops platform.",
     features: [
-      { text: "Everything in Create",                  sub: "" },
-      { text: "Unlimited access to the Vyso toolkit",  sub: "" },
-      { text: "Full ops intelligence platform",        sub: "" },
-      { text: "Third-party integrations",              sub: "" },
-      { text: "Monthly ops review and reporting",      sub: "" },
-      { text: "Priority development & support",        sub: "" },
+      { text: "Everything in Build",                        sub: "" },
+      { text: "2 to unlimited Vyso modules",               sub: "" },
+      { text: "Two-way integrations with outside systems",  sub: "accounting, POS, banking" },
+      { text: "24/7 support and dedicated support line",    sub: "" },
+      { text: "Monthly ops reports",                        sub: "" },
+      { text: "Priority development",                       sub: "" },
     ],
     pricing: [
-      { label: "Setup fee",        value: "From R50,000", unit: "",       note: "includes build + integrations" },
-      { label: "Monthly retainer", value: "From R10,000", unit: "/month", note: "increases with each app" },
+      { label: "Setup fee",  value: "From R50,000", unit: "",       note: "includes build + integrations" },
+      { label: "Retainer",   value: "R15,000",      unit: "/month", note: "+R5,000/month per additional module" },
     ],
     cta: "Talk to us",
   },
