@@ -169,7 +169,7 @@ const TIERS = [
   },
   {
     num:      "Tier 2",
-    name:     "Build",
+    name:     "Create",
     tagline:  "We replace those tools with a module that owns your data.",
     features: [
       { text: "One productised Vyso module of your choice", sub: "" },
