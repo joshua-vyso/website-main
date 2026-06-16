@@ -1,6 +1,12 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Pin the Turbopack workspace root to THIS folder. Without this, a stray
+  // ~/package-lock.json makes Next infer the home directory as the root, which
+  // breaks module/path (@/*) resolution (see the "inferred workspace root" warning).
+  turbopack: {
+    root: __dirname,
+  },
   async redirects() {
     return [
       // Canonical host: redirect www.vyso.co.za → vyso.co.za (preserve path),

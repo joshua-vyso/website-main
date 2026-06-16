@@ -1,0 +1,72 @@
+/**
+ * Document-type metadata driving the Doc-U Hub tiles, type-filter tabs/chips,
+ * and KPI computations. Tints sampled from the Figma "Doc-U Mobile / Hub" screen.
+ * Mirrored into each app's lib folder.
+ */
+import type { Document, DocumentType } from './types';
+
+export interface DocTypeMeta {
+  /** null = the "All" pseudo-type. */
+  key: DocumentType | null;
+  /** Plural label for tiles/tabs. */
+  label: string;
+  /** Tinted tile background. */
+  tint: string;
+  /** Icon chip background. */
+  iconBg: string;
+}
+
+export const DOC_TYPES: readonly DocTypeMeta[] = [
+  { key: null, label: 'All', tint: '#E9EFEC', iconBg: '#1E5E54' },
+  { key: 'invoice', label: 'Invoices', tint: '#E6F1FB', iconBg: '#0C447C' },
+  { key: 'statement', label: 'Statements', tint: '#E1F5EE', iconBg: '#0F6E56' },
+  { key: 'delivery_note', label: 'Delivery notes', tint: '#FBEEDA', iconBg: '#854F0B' },
+  { key: 'price_list', label: 'Price lists', tint: '#ECEAFB', iconBg: '#5B4FD6' },
+  { key: 'order', label: 'Orders', tint: '#FBE7EC', iconBg: '#C0345A' },
+];
+
+/** Singular, human-readable label for a document type (table "Type" column). */
+export const DOC_TYPE_LABEL: Record<DocumentType, string> = {
+  invoice: 'Invoice',
+  statement: 'Statement',
+  delivery_note: 'Delivery note',
+  price_list: 'Price list',
+  order: 'Order',
+};
+
+/** KPI roll-ups computed from a document set — shared by web + mobile. */
+export interface DocKpis {
+  total: number;
+  awaiting: number;
+  flagged: number;
+  avgConfidence: number | null;
+}
+
+export function computeKpis(docs: Pick<Document, 'status' | 'confidence'>[]): DocKpis {
+  const withConfidence = docs.filter(
+    (d): d is typeof d & { confidence: number } => typeof d.confidence === 'number',
+  );
+  const avg =
+    withConfidence.length > 0
+      ? Math.round(
+          withConfidence.reduce((sum, d) => sum + d.confidence, 0) / withConfidence.length,
+        )
+      : null;
+  return {
+    total: docs.length,
+    // "Awaiting review" = extracted + pending (per the Figma KPI sublabel).
+    awaiting: docs.filter((d) => d.status === 'extracted' || d.status === 'pending').length,
+    // "Flagged" = error status (needs attention).
+    flagged: docs.filter((d) => d.status === 'error').length,
+    avgConfidence: avg,
+  };
+}
+
+/** Count documents per type, including the `null` ("All") bucket. */
+export function countByType(
+  docs: Pick<Document, 'document_type'>[],
+  type: DocumentType | null,
+): number {
+  if (type === null) return docs.length;
+  return docs.filter((d) => d.document_type === type).length;
+}

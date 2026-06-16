@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Barlow_Condensed, DM_Sans } from "next/font/google";
+import { Barlow_Condensed, DM_Sans, Inter } from "next/font/google";
 import { LiquidGlassFilter }  from "@/components/ui/liquid-button";
 import { GlobalPixelTrail }   from "@/components/GlobalPixelTrail";
 import "./globals.css";
@@ -15,6 +15,14 @@ const barlowCondensed = Barlow_Condensed({
 /* ── Body font: DM Sans ───────────────────────────────────────────────────── */
 const dmSans = DM_Sans({
   variable: "--font-body",
+  subsets:  ["latin"],
+  weight:   ["400", "500", "600", "700"],
+  display:  "swap",
+});
+
+/* ── Platform font: Inter (scoped to /login and /app via --font-inter) ─────── */
+const inter = Inter({
+  variable: "--font-inter",
   subsets:  ["latin"],
   weight:   ["400", "500", "600", "700"],
   display:  "swap",
@@ -42,7 +50,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${barlowCondensed.variable} ${dmSans.variable} h-full antialiased`}
+      className={`${barlowCondensed.variable} ${dmSans.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full">
         {/* Global SVG filter for LiquidButton glass effect */}
