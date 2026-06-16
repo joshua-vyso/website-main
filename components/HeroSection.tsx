@@ -3,6 +3,7 @@
 import Link           from "next/link";
 import { LiquidButton } from "./ui/liquid-button";
 import { GradientText } from "./ui/gradient-text";
+import { HeroAuthCta } from "./platform/MarketingAuth";
 
 const FONT: React.CSSProperties = { fontFamily: "var(--font-sans)" };
 const BODY: React.CSSProperties = { fontFamily: "var(--font-body, var(--font-sans))" };
@@ -108,6 +109,8 @@ export function HeroSection() {
             </svg>
           </Link>
         </LiquidButton>
+
+        <HeroAuthCta />
       </div>
     </section>
   );

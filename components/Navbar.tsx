@@ -9,6 +9,7 @@ import {
   DropdownMenu, DropdownMenuContent, DropdownMenuItem,
   DropdownMenuSeparator, DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
+import { NavLoginLink } from "./platform/MarketingAuth";
 
 export const LOGO_LEFT_PAD = 40;
 export const NAV_LOGO_W    = 120;
@@ -129,8 +130,9 @@ export function Navbar({ visible = true }: NavbarProps) {
         ))}
       </nav>
 
-      {/* ── Desktop: CTA button ─────────────────────────────────────────────── */}
-      <div className="hidden md:block">
+      {/* ── Desktop: Log in + CTA button ────────────────────────────────────── */}
+      <div className="hidden md:flex md:items-center md:gap-6">
+        <NavLoginLink />
         <LiquidButton asChild variant="default" size="md">
           <Link
             href="/#contact"
@@ -215,6 +217,24 @@ export function Navbar({ visible = true }: NavbarProps) {
               </DropdownMenuItem>
             ))}
             <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link
+                href="/login"
+                style={{
+                  fontFamily:     "var(--font-body, var(--font-sans))",
+                  fontSize:       "0.92rem",
+                  fontWeight:     500,
+                  color:          "#0d0d0d",
+                  textDecoration: "none",
+                  display:        "block",
+                  padding:        "0.55rem 0.75rem",
+                  borderRadius:   8,
+                  width:          "100%",
+                }}
+              >
+                Log in →
+              </Link>
+            </DropdownMenuItem>
             <DropdownMenuItem asChild>
               <Link
                 href="/#contact"
