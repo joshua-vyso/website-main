@@ -83,11 +83,13 @@ export interface ExtractedField {
   confidence: number;
 }
 
-/** A single line item from a statement/invoice table (qty/price/amount). */
+/** A single product line from a statement/invoice table. */
 export interface ExtractedLineItem {
   reference?: string;
   description: string;
+  weight?: string;
   quantity?: string;
+  units_per_box?: string;
   unit_price?: string;
   amount?: string;
   confidence: number;

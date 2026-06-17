@@ -25,7 +25,9 @@ export interface ExtractedField {
 export interface ExtractedLineItem {
   reference?: string;
   description: string;
+  weight?: string;
   quantity?: string;
+  units_per_box?: string;
   unit_price?: string;
   amount?: string;
   confidence: number;
@@ -53,18 +55,34 @@ function textOf(message: Anthropic.Message): string {
     .join('\n');
 }
 
-const EXTRACT_INSTRUCTION = `You are Doc-U, Vyso's document-extraction engine for SME food & wholesale businesses.
-Extract ALL data from the attached document (an invoice, supplier/market statement, delivery note, price list, or order).
+const EXTRACT_INSTRUCTION = `You are Doc-U, Vyso's product-line extractor for SME food & wholesale businesses.
+The attached document is a supplier/market statement, invoice, delivery note, price list, or order. It contains a table of PRODUCT PURCHASE LINES.
+Extract ONLY the product line items — do NOT extract header/summary/account/banking/VAT/balance/total fields.
 Respond with ONLY a JSON object (no prose, no markdown code fences) of exactly this shape:
 {
   "document_type": "invoice" | "statement" | "delivery_note" | "price_list" | "order",
-  "fields": [ { "label": string, "value": string, "confidence": number } ],
-  "line_items": [ { "reference": string, "description": string, "quantity": string, "unit_price": string, "amount": string, "confidence": number } ],
+  "line_items": [
+    {
+      "description": string,
+      "weight": string,
+      "quantity": string,
+      "units_per_box": string,
+      "unit_price": string,
+      "amount": string,
+      "confidence": number
+    }
+  ],
   "overall_confidence": number
 }
-- "fields": the header/summary values — e.g. Supplier/Market, Account #, Buyer, Document/Statement date, Guarantee, Opening balance, Deposits paid, Total purchases, Closing balance, Totals.
-- "line_items": EVERY transaction/purchase/product row across ALL pages — do NOT skip rows or summarise. For a market buyer statement each purchase row has invoice, agent, commodity, qty, unit price, total → map commodity→description, invoice→reference, qty→quantity, unit price→unit_price, total→amount. For an invoice, map each line product→description with its qty/unit_price/amount. Leave a sub-field as "" if the document doesn't have it.
-All confidence values are 0–100.`;
+Rules:
+- Include EVERY product row across ALL pages and ALL "PURCHASES ON CARD ID" sections. Do not skip or summarise rows.
+- The commodity cell is often a messy comma-separated string like "BABY BUTTERNUT,300G PUNNE,*,0,*,12,*" or "ORANGES,6KG POCKET,NAVEL,2,M,*". From it derive:
+    - description = the produce name, cleaned and Title Case (e.g. "Baby Butternut", "Oranges Navel"). Drop packaging words, grade codes, asterisks, and stray numeric codes.
+    - weight = the explicit pack/unit weight token, e.g. "300G", "6KG", "18KG"; "" if none shown.
+    - units_per_box = the number of punnets/units packed per box when the line clearly encodes it. For "BABY BUTTERNUT,300G PUNNE,*,0,*,12,*" that is "12". "" if not indicated.
+- quantity, unit_price and amount come from the QTY, UNIT PRICE and TOTAL columns of that row — NOT from the commodity string.
+- Ignore non-product rows: pallets, deposits, card fees, charges, balances, subtotals, grand totals, banking details.
+- Output numbers as plain strings (keep decimals; omit currency symbols). All confidence values 0-100.`;
 
 /** Parse a PDF or image document into structured fields + line items. */
 export async function extractDocument(params: {

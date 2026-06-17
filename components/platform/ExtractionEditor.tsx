@@ -19,7 +19,7 @@ function ConfidenceChip({ confidence }: { confidence: number }) {
   );
 }
 
-const COLS = 'grid grid-cols-[110px_1fr_64px_92px_104px_28px] gap-2 items-center';
+const COLS = 'grid grid-cols-[1fr_80px_56px_72px_92px_104px_28px] gap-2 items-center';
 
 export function ExtractionEditor({
   id,
@@ -81,10 +81,8 @@ export function ExtractionEditor({
       </div>
 
       <div className="flex-1 overflow-y-auto px-6 py-5">
-        {/* Summary fields */}
-        {draft.length === 0 ? (
-          <p className="text-[14px] text-[#9A9DA1]">No summary fields were extracted.</p>
-        ) : (
+        {/* Summary fields (legacy docs only — products-only extraction returns no fields) */}
+        {draft.length > 0 && (
           <div className="grid grid-cols-2 gap-x-4 gap-y-5">
             {draft.map((field, index) => {
               const low = field.confidence < FIELD_REVIEW_THRESHOLD;
@@ -123,9 +121,10 @@ export function ExtractionEditor({
               </span>
             </div>
             <div className={`${COLS} border-b border-[#E7E7E2] px-1 pb-2 text-[11px] text-[#5F6368]`}>
-              <span>Reference</span>
               <span>Description</span>
+              <span>Weight</span>
               <span>Qty</span>
+              <span>Units/box</span>
               <span>Unit price</span>
               <span>Amount</span>
               <span />
@@ -133,9 +132,10 @@ export function ExtractionEditor({
             <div className="mt-2 space-y-2">
               {lines.map((l, i) => (
                 <div key={i} className={COLS}>
-                  <input className={cellCls} value={l.reference ?? ''} onChange={(e) => updateLine(i, 'reference', e.target.value)} />
                   <input className={cellCls} value={l.description ?? ''} onChange={(e) => updateLine(i, 'description', e.target.value)} />
+                  <input className={cellCls} value={l.weight ?? ''} onChange={(e) => updateLine(i, 'weight', e.target.value)} />
                   <input className={`${cellCls} text-right`} value={l.quantity ?? ''} onChange={(e) => updateLine(i, 'quantity', e.target.value)} />
+                  <input className={`${cellCls} text-right`} value={l.units_per_box ?? ''} onChange={(e) => updateLine(i, 'units_per_box', e.target.value)} />
                   <input className={`${cellCls} text-right`} value={l.unit_price ?? ''} onChange={(e) => updateLine(i, 'unit_price', e.target.value)} />
                   <input className={`${cellCls} text-right`} value={l.amount ?? ''} onChange={(e) => updateLine(i, 'amount', e.target.value)} />
                   <button
