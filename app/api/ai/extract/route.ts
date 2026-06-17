@@ -3,6 +3,9 @@ import { resolveUser, AI_CORS_HEADERS } from '@/lib/ai/auth';
 import { extractDocument, aiConfigured } from '@/lib/ai/anthropic';
 import type { Document } from '@/lib/platform/types';
 
+// Multi-page statements with many line items can take a while to parse.
+export const maxDuration = 60;
+
 export async function OPTIONS() {
   return new NextResponse(null, { headers: AI_CORS_HEADERS });
 }
@@ -60,7 +63,7 @@ export async function POST(req: Request) {
     .update({
       status: 'extracted',
       confidence: result.overall_confidence,
-      extracted_data: { fields: result.fields },
+      extracted_data: { fields: result.fields, line_items: result.line_items },
       document_type: doc.document_type ?? result.document_type,
     })
     .eq('id', doc.id);

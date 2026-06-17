@@ -25,7 +25,6 @@ export type AppIconKey =
   | 'docu'
   | 'proc'
   | 'margin'
-  | 'stock'
   | 'waste'
   | 'shift'
   | 'supplier'
@@ -84,9 +83,20 @@ export interface ExtractedField {
   confidence: number;
 }
 
+/** A single line item from a statement/invoice table (qty/price/amount). */
+export interface ExtractedLineItem {
+  reference?: string;
+  description: string;
+  quantity?: string;
+  unit_price?: string;
+  amount?: string;
+  confidence: number;
+}
+
 /** The shape stored in `documents.extracted_data` (jsonb). */
 export interface ExtractedData {
   fields: ExtractedField[];
+  line_items?: ExtractedLineItem[];
 }
 
 export interface Document {
