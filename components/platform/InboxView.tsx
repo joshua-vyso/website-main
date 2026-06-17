@@ -74,8 +74,24 @@ export function InboxView({
         />
       </div>
 
-      {/* Table */}
-      <DocumentsTable docs={docs} />
+      {/* Table or new-user empty state */}
+      {docs.length === 0 ? (
+        <div className="mt-6 rounded-2xl border border-dashed border-[#E7E7E2] bg-white px-8 py-14 text-center">
+          <h2 className="text-[18px] font-semibold text-[#1A1C1E]">No documents yet</h2>
+          <p className="mx-auto mt-1 max-w-md text-[14px] text-[#5F6368]">
+            Upload your first document and Doc-U will extract the details automatically. Your
+            stats above will fill in as documents come through.
+          </p>
+          <Link
+            href="/app/docu/upload"
+            className="mt-5 inline-flex h-10 items-center rounded-xl bg-[#D9730D] px-5 text-[14px] font-medium text-white transition-colors hover:bg-[#C2650B]"
+          >
+            Upload your first document
+          </Link>
+        </div>
+      ) : (
+        <DocumentsTable docs={docs} />
+      )}
     </div>
   );
 }

@@ -34,7 +34,8 @@ export function Sidebar() {
 
       <nav className="flex-1 space-y-1 px-3">
         {MODULES.map((m) => {
-          const enabled = features[m.key];
+          // A module is reachable only when it's active AND entitled.
+          const enabled = m.status === 'active' && features[m.key];
           const active =
             pathname === m.screens.desktop || pathname.startsWith(`${m.screens.desktop}/`);
           const content = (
