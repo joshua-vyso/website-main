@@ -1,7 +1,8 @@
 /**
  * The MODULES registry — the single source of truth that drives BOTH the
- * desktop sidebar nav and the mobile Modules switcher. Order matches the Figma
- * "Doc-U Mobile / Modules" screen. Mirrored into each app's lib folder.
+ * desktop sidebar nav and the mobile Modules switcher. Mirrored into each app's
+ * lib folder. A module is reachable only when `status === 'active'` AND the org
+ * has the feature enabled; everything else renders a "Coming soon" state.
  */
 import type { AppIconKey, FeatureKey, ModuleStatus } from './types';
 
@@ -47,14 +48,6 @@ export const MODULES: readonly ModuleDefinition[] = [
     screens: { mobile: '/marginview', desktop: '/app/marginview' },
   },
   {
-    key: 'stockpulse',
-    label: 'StockPulse',
-    description: 'Live stock & inventory',
-    icon: 'stock',
-    status: 'soon',
-    screens: { mobile: '/stockpulse', desktop: '/app/stockpulse' },
-  },
-  {
     key: 'wastelog',
     label: 'WasteLog',
     description: 'Track shrink & wastage',
@@ -72,10 +65,10 @@ export const MODULES: readonly ModuleDefinition[] = [
   },
   {
     key: 'suppliers',
-    label: 'Suppliers',
-    description: 'Directory, terms & contacts',
+    label: 'SupplierHub',
+    description: 'Supplier directory, terms & contacts',
     icon: 'supplier',
-    status: 'active',
+    status: 'soon',
     screens: { mobile: '/suppliers', desktop: '/app/suppliers' },
   },
   {

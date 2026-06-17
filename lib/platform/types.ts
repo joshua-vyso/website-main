@@ -11,7 +11,6 @@ export type FeatureKey =
   | 'docu'
   | 'procurepulse'
   | 'marginview'
-  | 'stockpulse'
   | 'wastelog'
   | 'shiftboard'
   | 'orderflow'
