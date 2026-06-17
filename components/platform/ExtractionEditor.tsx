@@ -4,9 +4,8 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/platform/supabase-browser';
 import { FIELD_REVIEW_THRESHOLD } from '@/lib/platform/tokens';
-import type { DocumentStatus, ExtractedField } from '@/lib/platform/types';
+import type { DocumentStatus, ExtractedField, ExtractedLineItem } from '@/lib/platform/types';
 
-/** Amber "check" chip for low-confidence fields, green chip otherwise. */
 function ConfidenceChip({ confidence }: { confidence: number }) {
   const low = confidence < FIELD_REVIEW_THRESHOLD;
   return (
@@ -15,34 +14,47 @@ function ConfidenceChip({ confidence }: { confidence: number }) {
         low ? 'bg-[#FBEEDA] text-[#854F0B]' : 'bg-[#E1F5EE] text-[#0F6E56]'
       }`}
     >
-      {confidence}%{low ? ' · check' : ''}
+      {Math.round(confidence)}%{low ? ' · check' : ''}
     </span>
   );
 }
+
+const COLS = 'grid grid-cols-[110px_1fr_64px_92px_104px_28px] gap-2 items-center';
 
 export function ExtractionEditor({
   id,
   status,
   fields,
+  lineItems,
 }: {
   id: string;
   status: DocumentStatus;
   fields: ExtractedField[];
+  lineItems: ExtractedLineItem[];
 }) {
   const router = useRouter();
-  const [draft, setDraft] = useState<ExtractedField[]>(() =>
-    fields.map((f) => ({ ...f })),
-  );
+  const [draft, setDraft] = useState<ExtractedField[]>(() => fields.map((f) => ({ ...f })));
+  const [lines, setLines] = useState<ExtractedLineItem[]>(() => lineItems.map((l) => ({ ...l })));
   const [busy, setBusy] = useState(false);
 
   const needsReview = useMemo(
     () => draft.filter((f) => f.confidence < FIELD_REVIEW_THRESHOLD).length,
     [draft],
   );
+  const lineTotal = useMemo(
+    () =>
+      lines.reduce((sum, l) => {
+        const n = parseFloat((l.amount ?? '').replace(/[^0-9.-]/g, ''));
+        return sum + (Number.isFinite(n) ? n : 0);
+      }, 0),
+    [lines],
+  );
 
-  const updateValue = (index: number, value: string) => {
+  const updateValue = (index: number, value: string) =>
     setDraft((prev) => prev.map((f, i) => (i === index ? { ...f, value } : f)));
-  };
+  const updateLine = (index: number, key: keyof ExtractedLineItem, value: string) =>
+    setLines((prev) => prev.map((l, i) => (i === index ? { ...l, [key]: value } : l)));
+  const removeLine = (index: number) => setLines((prev) => prev.filter((_, i) => i !== index));
 
   const persist = async (nextStatus: Extract<DocumentStatus, 'reviewed' | 'error'>) => {
     if (busy) return;
@@ -51,27 +63,27 @@ export function ExtractionEditor({
     if (supabase) {
       await supabase
         .from('documents')
-        .update({ status: nextStatus, extracted_data: { fields: draft } })
+        .update({ status: nextStatus, extracted_data: { fields: draft, line_items: lines } })
         .eq('id', id);
     }
     router.push('/app/docu');
     router.refresh();
   };
 
+  const cellCls =
+    'h-9 w-full rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:border-[#1E5E54]/40 focus:outline-none';
+
   return (
-    <div className="flex h-full flex-col rounded-2xl border border-[#E7E7E2] bg-white">
-      {/* Card header */}
+    <div className="flex h-full max-h-[calc(100vh-180px)] flex-col rounded-2xl border border-[#E7E7E2] bg-white">
       <div className="border-b border-[#F0F0EC] px-6 py-5">
         <h2 className="text-[16px] font-bold text-[#1A1C1E]">Extracted data</h2>
-        <p className="mt-1 text-[13px] text-[#5F6368]">
-          Confirm or correct each field before it&apos;s saved
-        </p>
+        <p className="mt-1 text-[13px] text-[#5F6368]">Confirm or correct each field, then save</p>
       </div>
 
-      {/* Fields */}
-      <div className="flex-1 px-6 py-5">
+      <div className="flex-1 overflow-y-auto px-6 py-5">
+        {/* Summary fields */}
         {draft.length === 0 ? (
-          <p className="text-[14px] text-[#9A9DA1]">No fields were extracted from this document.</p>
+          <p className="text-[14px] text-[#9A9DA1]">No summary fields were extracted.</p>
         ) : (
           <div className="grid grid-cols-2 gap-x-4 gap-y-5">
             {draft.map((field, index) => {
@@ -79,10 +91,7 @@ export function ExtractionEditor({
               return (
                 <div key={`${field.label}-${index}`} className="min-w-0">
                   <div className="mb-1.5 flex items-center justify-between gap-2">
-                    <label
-                      htmlFor={`field-${index}`}
-                      className="truncate text-[13px] text-[#5F6368]"
-                    >
+                    <label htmlFor={`field-${index}`} className="truncate text-[13px] text-[#5F6368]">
                       {field.label}
                     </label>
                     <ConfidenceChip confidence={field.confidence} />
@@ -104,23 +113,60 @@ export function ExtractionEditor({
           </div>
         )}
 
-        {/* Review note */}
-        {needsReview > 0 ? (
-          <div className="mt-6 flex items-center gap-2 text-[13px] text-[#854F0B]">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#D9730D]" aria-hidden />
-            {needsReview} {needsReview === 1 ? 'field needs' : 'fields need'} review before this can
-            be confirmed
+        {/* Line items */}
+        {lines.length > 0 ? (
+          <div className="mt-7">
+            <div className="mb-2 flex items-baseline justify-between">
+              <h3 className="text-[14px] font-semibold text-[#1A1C1E]">Line items ({lines.length})</h3>
+              <span className="text-[13px] text-[#5F6368]">
+                Total {lineTotal.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}
+              </span>
+            </div>
+            <div className={`${COLS} border-b border-[#E7E7E2] px-1 pb-2 text-[11px] text-[#5F6368]`}>
+              <span>Reference</span>
+              <span>Description</span>
+              <span>Qty</span>
+              <span>Unit price</span>
+              <span>Amount</span>
+              <span />
+            </div>
+            <div className="mt-2 space-y-2">
+              {lines.map((l, i) => (
+                <div key={i} className={COLS}>
+                  <input className={cellCls} value={l.reference ?? ''} onChange={(e) => updateLine(i, 'reference', e.target.value)} />
+                  <input className={cellCls} value={l.description ?? ''} onChange={(e) => updateLine(i, 'description', e.target.value)} />
+                  <input className={`${cellCls} text-right`} value={l.quantity ?? ''} onChange={(e) => updateLine(i, 'quantity', e.target.value)} />
+                  <input className={`${cellCls} text-right`} value={l.unit_price ?? ''} onChange={(e) => updateLine(i, 'unit_price', e.target.value)} />
+                  <input className={`${cellCls} text-right`} value={l.amount ?? ''} onChange={(e) => updateLine(i, 'amount', e.target.value)} />
+                  <button
+                    type="button"
+                    onClick={() => removeLine(i)}
+                    aria-label="Remove line"
+                    className="flex h-9 w-7 items-center justify-center rounded-lg text-[#9A9DA1] transition-colors hover:bg-[#FCEBEB] hover:text-[#A32D2D]"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
           </div>
-        ) : (
-          <div className="mt-6 flex items-center gap-2 text-[13px] text-[#0F6E56]">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#0F6E56]" aria-hidden />
-            All fields confirmed
-          </div>
-        )}
+        ) : null}
+
+        <div className="mt-6 flex items-center gap-2 text-[13px]">
+          <span
+            className="h-1.5 w-1.5 rounded-full"
+            style={{ backgroundColor: needsReview > 0 ? '#D9730D' : '#0F6E56' }}
+            aria-hidden
+          />
+          <span style={{ color: needsReview > 0 ? '#854F0B' : '#0F6E56' }}>
+            {needsReview > 0
+              ? `${needsReview} ${needsReview === 1 ? 'field needs' : 'fields need'} review`
+              : 'All fields confirmed'}
+          </span>
+        </div>
       </div>
 
-      {/* Sticky action row */}
-      <div className="sticky bottom-0 flex items-center justify-end gap-3 rounded-b-2xl border-t border-[#F0F0EC] bg-white px-6 py-4">
+      <div className="flex items-center justify-end gap-3 rounded-b-2xl border-t border-[#F0F0EC] bg-white px-6 py-4">
         <button
           type="button"
           disabled={busy}

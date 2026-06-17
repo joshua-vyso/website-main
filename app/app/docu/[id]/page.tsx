@@ -44,6 +44,15 @@ export default async function DocumentReviewPage({
   }
 
   const fields = doc.extracted_data?.fields ?? [];
+  const lineItems = doc.extracted_data?.line_items ?? [];
+
+  let originalUrl: string | null = null;
+  if (doc.storage_path) {
+    const { data: signed } = await supabase.storage
+      .from('documents')
+      .createSignedUrl(doc.storage_path, 600);
+    originalUrl = signed?.signedUrl ?? null;
+  }
 
   return (
     <div className="px-8 py-7">
@@ -74,12 +83,20 @@ export default async function DocumentReviewPage({
         <div className="flex flex-col rounded-2xl border border-[#E7E7E2] bg-white">
           <div className="flex items-center justify-between gap-3 border-b border-[#F0F0EC] px-6 py-5">
             <h2 className="text-[15px] font-semibold text-[#1A1C1E]">Original document</h2>
-            <button
-              type="button"
-              className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[#E7E7E2] bg-white px-3.5 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/30"
-            >
-              <span aria-hidden>↗</span> View original document
-            </button>
+            {originalUrl ? (
+              <a
+                href={originalUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[#E7E7E2] bg-white px-3.5 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/30"
+              >
+                <span aria-hidden>↗</span> View original document
+              </a>
+            ) : (
+              <span className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[#E7E7E2] bg-white px-3.5 text-[13px] font-medium text-[#9A9DA1]">
+                <span aria-hidden>↗</span> No file
+              </span>
+            )}
           </div>
 
           {/* Placeholder preview */}
@@ -109,7 +126,7 @@ export default async function DocumentReviewPage({
         </div>
 
         {/* Right — extraction editor */}
-        <ExtractionEditor id={doc.id} status={doc.status} fields={fields} />
+        <ExtractionEditor id={doc.id} status={doc.status} fields={fields} lineItems={lineItems} />
       </div>
     </div>
   );
