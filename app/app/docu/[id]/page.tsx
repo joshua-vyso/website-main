@@ -54,6 +54,14 @@ export default async function DocumentReviewPage({
     originalUrl = signed?.signedUrl ?? null;
   }
 
+  // Detect image vs PDF by filename extension (the row carries no mime type).
+  const ext = (doc.filename || doc.storage_path || '')
+    .toLowerCase()
+    .split('?')[0]
+    .split('.')
+    .pop();
+  const isImage = ['jpg', 'jpeg', 'png', 'heic', 'webp', 'gif', 'bmp'].includes(ext ?? '');
+
   return (
     <div className="px-8 py-7">
       {/* Header */}
@@ -79,49 +87,34 @@ export default async function DocumentReviewPage({
 
       {/* Two-column layout */}
       <div className="mt-6 grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)] gap-6">
-        {/* Left — original document */}
+        {/* Left — original document (inline preview) */}
         <div className="flex flex-col rounded-2xl border border-[#E7E7E2] bg-white">
           <div className="flex items-center justify-between gap-3 border-b border-[#F0F0EC] px-6 py-5">
             <h2 className="text-[15px] font-semibold text-[#1A1C1E]">Original document</h2>
-            {originalUrl ? (
-              <a
-                href={originalUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[#E7E7E2] bg-white px-3.5 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/30"
-              >
-                <span aria-hidden>↗</span> View original document
-              </a>
-            ) : (
-              <span className="inline-flex h-9 items-center gap-1.5 rounded-xl border border-[#E7E7E2] bg-white px-3.5 text-[13px] font-medium text-[#9A9DA1]">
-                <span aria-hidden>↗</span> No file
-              </span>
-            )}
+            <span className="truncate text-[12px] text-[#9A9DA1]">{doc.filename}</span>
           </div>
 
-          {/* Placeholder preview */}
-          <div className="flex-1 px-6 py-6">
-            <div className="rounded-xl border border-dashed border-[#E7E7E2] bg-[#FAFAF8] px-6 py-10">
-              <div className="text-[15px] font-semibold uppercase tracking-wide text-[#1A1C1E]">
-                {doc.supplier?.name ?? 'Source document'}
+          {/* Inline preview */}
+          <div className="flex-1 p-4">
+            {originalUrl ? (
+              isImage ? (
+                <img
+                  src={originalUrl}
+                  alt="Original document"
+                  className="h-full max-h-[80vh] w-full rounded-xl border border-[#E7E7E2] object-contain"
+                />
+              ) : (
+                <iframe
+                  src={originalUrl}
+                  title="Original document"
+                  className="h-[80vh] min-h-[70vh] w-full rounded-xl border border-[#E7E7E2]"
+                />
+              )
+            ) : (
+              <div className="flex h-full min-h-[70vh] items-center justify-center rounded-xl border border-dashed border-[#E7E7E2] bg-[#FAFAF8]">
+                <span className="text-[13px] text-[#9A9DA1]">Preview unavailable</span>
               </div>
-              <div className="mt-1 text-[12px] text-[#9A9DA1]">
-                Scanned source PDF · {doc.filename}
-              </div>
-              <div className="mt-6 space-y-3">
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <div key={i} className="flex items-center gap-4">
-                    <div className="h-2.5 flex-1 rounded-full bg-[#ECECE6]" />
-                    <div className="h-2.5 w-12 rounded-full bg-[#ECECE6]" />
-                    <div className="h-2.5 w-16 rounded-full bg-[#ECECE6]" />
-                  </div>
-                ))}
-              </div>
-              <div className="mt-8 flex items-center justify-between border-t border-[#E7E7E2] pt-4 text-[12px] text-[#9A9DA1]">
-                <span>Preview unavailable in-app</span>
-                <span>scanned source PDF</span>
-              </div>
-            </div>
+            )}
           </div>
         </div>
 
