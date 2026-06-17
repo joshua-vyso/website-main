@@ -52,6 +52,9 @@ export async function POST(req: Request) {
   try {
     result = await extractDocument({ base64, mediaType, filename: doc.filename });
   } catch (err) {
+    // Don't leave the document stuck on "pending" — mark it errored so the
+    // inbox shows a failure the user can retry rather than an endless spinner.
+    await supabase.from('documents').update({ status: 'error' }).eq('id', doc.id);
     return NextResponse.json(
       { error: err instanceof Error ? err.message : 'Extraction failed' },
       { status: 500, headers: AI_CORS_HEADERS },

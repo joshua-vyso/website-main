@@ -47,11 +47,14 @@ export default function UploadPage() {
         .single();
       if (insertErr) throw insertErr;
 
-      // Kick off AI extraction (fire-and-forget; the inbox updates when it lands).
+      // Kick off AI extraction. `keepalive` lets the request outlive this
+      // page's navigation — without it the router.push below cancels the
+      // in-flight fetch and the document is stranded on "pending".
       void fetch('/api/ai/extract', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ documentId: inserted.id }),
+        keepalive: true,
       });
 
       router.push('/app/docu');
