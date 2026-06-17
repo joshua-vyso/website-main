@@ -25,7 +25,6 @@ export type AppIconKey =
   | 'docu'
   | 'proc'
   | 'margin'
-  | 'stock'
   | 'waste'
   | 'shift'
   | 'supplier'
