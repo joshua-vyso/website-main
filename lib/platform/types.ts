@@ -103,6 +103,7 @@ export interface Document {
   id: string;
   org_id: string;
   supplier_id: string | null;
+  folder_id: string | null;
   filename: string;
   document_type: DocumentType | null;
   status: DocumentStatus;
@@ -117,4 +118,13 @@ export interface Document {
 /** Document joined with a thin supplier projection — used by list/table views. */
 export interface DocumentWithSupplier extends Document {
   supplier: Pick<Supplier, 'id' | 'name' | 'initials'> | null;
+}
+
+/** A user-created folder/category that documents are filed into. */
+export interface DocumentFolder {
+  id: string;
+  org_id: string | null;
+  name: string;
+  created_by: string | null;
+  created_at: string;
 }
