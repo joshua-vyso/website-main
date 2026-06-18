@@ -3,6 +3,9 @@
  * desktop sidebar nav and the mobile Modules switcher. Mirrored into each app's
  * lib folder. A module is reachable only when `status === 'active'` AND the org
  * has the feature enabled; everything else renders a "Coming soon" state.
+ *
+ * NOTE: `key` is the stable internal/DB identifier (org_features.feature_key) and
+ * must NOT change. `label` is the display brand name and can be re-styled freely.
  */
 import type { AppIconKey, FeatureKey, ModuleStatus } from './types';
 
@@ -26,7 +29,7 @@ export const MODULES: readonly ModuleDefinition[] = [
   {
     key: 'docu',
     label: 'Doc-U',
-    description: 'Document ingestion & extraction',
+    description: 'Document management',
     icon: 'docu',
     status: 'active',
     screens: { mobile: '/docu/hub', desktop: '/app/docu' },
@@ -34,23 +37,31 @@ export const MODULES: readonly ModuleDefinition[] = [
   {
     key: 'procurepulse',
     label: 'ProcurePulse',
-    description: 'Purchase orders & supplier pricing',
+    description: 'Procurement intelligence',
     icon: 'proc',
     status: 'soon',
     screens: { mobile: '/procurepulse', desktop: '/app/procurepulse' },
   },
   {
-    key: 'marginview',
-    label: 'MarginView',
-    description: 'Margins & profitability',
+    key: 'pricepilot',
+    label: 'PricePilot',
+    description: 'Pricing recommendations',
     icon: 'margin',
+    status: 'soon',
+    screens: { mobile: '/pricepilot', desktop: '/app/pricepilot' },
+  },
+  {
+    key: 'marginview',
+    label: 'PlanWise',
+    description: 'Budgeting & forecasting',
+    icon: 'dash',
     status: 'soon',
     screens: { mobile: '/marginview', desktop: '/app/marginview' },
   },
   {
     key: 'wastelog',
-    label: 'WasteLog',
-    description: 'Track shrink & wastage',
+    label: 'WasteWatch',
+    description: 'Wastage & shrinkage',
     icon: 'waste',
     status: 'soon',
     screens: { mobile: '/wastelog', desktop: '/app/wastelog' },
@@ -58,23 +69,23 @@ export const MODULES: readonly ModuleDefinition[] = [
   {
     key: 'shiftboard',
     label: 'ShiftBoard',
-    description: 'Staff shifts & rostering',
+    description: 'Labour & scheduling',
     icon: 'shift',
     status: 'soon',
     screens: { mobile: '/shiftboard', desktop: '/app/shiftboard' },
   },
   {
     key: 'suppliers',
-    label: 'SupplierHub',
-    description: 'Supplier directory, terms & contacts',
+    label: 'SupplySync',
+    description: 'Supplier management',
     icon: 'supplier',
     status: 'soon',
     screens: { mobile: '/suppliers', desktop: '/app/suppliers' },
   },
   {
     key: 'reportgen',
-    label: 'ReportGen',
-    description: 'Automated reports & exports',
+    label: 'InsightGen',
+    description: 'Reporting & analytics',
     icon: 'dash',
     status: 'soon',
     screens: { mobile: '/reportgen', desktop: '/app/reportgen' },
@@ -82,7 +93,7 @@ export const MODULES: readonly ModuleDefinition[] = [
   {
     key: 'orderflow',
     label: 'OrderFlow',
-    description: 'Order management & fulfilment',
+    description: 'Order management',
     icon: 'dash',
     status: 'soon',
     screens: { mobile: '/orderflow', desktop: '/app/orderflow' },
