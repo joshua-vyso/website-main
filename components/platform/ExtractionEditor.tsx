@@ -122,7 +122,7 @@ export function ExtractionEditor({
             </div>
             <div className={`${COLS} border-b border-[#E7E7E2] px-1 pb-2 text-[11px] text-[#5F6368]`}>
               <span>Description</span>
-              <span>Weight</span>
+              <span>Weight (kg)</span>
               <span>Qty</span>
               <span>Units/box</span>
               <span>Unit price</span>

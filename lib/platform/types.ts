@@ -10,6 +10,7 @@
 export type FeatureKey =
   | 'docu'
   | 'procurepulse'
+  | 'pricepilot'
   | 'marginview'
   | 'wastelog'
   | 'shiftboard'

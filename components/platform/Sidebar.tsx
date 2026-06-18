@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { MODULES } from '@/lib/platform/modules';
 import { usePlatform } from '@/lib/platform/session';
 import { createClient } from '@/lib/platform/supabase-browser';
+import { AppIcon } from './AppIcon';
 import { VysoMark } from './VysoMark';
 
 function initials(name: string | null | undefined): string {
@@ -40,14 +41,7 @@ export function Sidebar() {
             pathname === m.screens.desktop || pathname.startsWith(`${m.screens.desktop}/`);
           const content = (
             <>
-              <span
-                className="h-4.5 w-4.5 rounded-[5px]"
-                style={{
-                  width: 18,
-                  height: 18,
-                  backgroundColor: active ? '#0C447C' : enabled ? '#1E5E54' : '#D7D7D2',
-                }}
-              />
+              <AppIcon name={m.icon} size={26} />
               <span className="flex-1">{m.label}</span>
               {!enabled ? <span className="text-[11px] text-[#9A9DA1]">soon</span> : null}
             </>
