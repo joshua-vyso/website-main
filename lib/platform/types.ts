@@ -128,6 +128,7 @@ export interface DocumentFolder {
   id: string;
   org_id: string | null;
   name: string;
+  starred: boolean;
   created_by: string | null;
   created_at: string;
 }
