@@ -8,6 +8,11 @@ import Anthropic from '@anthropic-ai/sdk';
  */
 const apiKey = process.env.ANTHROPIC_API_KEY;
 const MODEL = process.env.ANTHROPIC_MODEL || 'claude-opus-4-8';
+// Document extraction is high-volume + structured, so it's right-sized to the
+// fast/cheap tier rather than Opus. On real statements Haiku 4.5 matched Opus on
+// every product, weight and amount at ~1/5 the cost and lower latency. Override
+// with ANTHROPIC_EXTRACT_MODEL if a future document type needs more muscle.
+const EXTRACT_MODEL = process.env.ANTHROPIC_EXTRACT_MODEL || 'claude-haiku-4-5';
 
 export const aiConfigured = Boolean(apiKey);
 
@@ -109,8 +114,8 @@ export async function extractDocument(params: {
       };
 
   const message = await client().messages.create({
-    model: MODEL,
-    max_tokens: 16000, // statements can carry many line items
+    model: EXTRACT_MODEL,
+    max_tokens: 16000, // statements can carry many line items (Haiku 4.5 allows up to 64k)
     messages: [
       {
         role: 'user',
