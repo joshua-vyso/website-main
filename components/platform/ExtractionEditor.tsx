@@ -84,13 +84,13 @@ export function ExtractionEditor({
     'h-9 w-full rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:border-[#1E5E54]/40 focus:outline-none';
 
   return (
-    <div className="flex h-full max-h-[calc(100vh-180px)] flex-col rounded-2xl border border-[#E7E7E2] bg-white">
+    <div className="flex flex-col rounded-2xl border border-[#E7E7E2] bg-white">
       <div className="border-b border-[#F0F0EC] px-6 py-5">
         <h2 className="text-[16px] font-bold text-[#1A1C1E]">Extracted data</h2>
         <p className="mt-1 text-[13px] text-[#5F6368]">Confirm or correct each field, then save</p>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 py-5">
+      <div className="px-6 py-5">
         {/* Summary fields (legacy docs only — products-only extraction returns no fields) */}
         {draft.length > 0 && (
           <div className="grid grid-cols-2 gap-x-4 gap-y-5">

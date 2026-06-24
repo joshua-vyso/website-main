@@ -65,24 +65,24 @@ export function DocumentDetailPanel({
         <h2 className="text-[15px] font-semibold text-[#1A1C1E]">Original document</h2>
         <span className="truncate text-[12px] text-[#9A9DA1]">{doc.filename}</span>
       </div>
-      <div className="flex-1 p-4">
+      <div className="p-4">
         {originalUrl ? (
           isImage ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={originalUrl}
               alt="Original document"
-              className="h-full max-h-[70vh] w-full rounded-xl border border-[#E7E7E2] object-contain"
+              className="max-h-[calc(100vh-12rem)] w-full rounded-xl border border-[#E7E7E2] object-contain"
             />
           ) : (
             <iframe
               src={originalUrl}
               title="Original document"
-              className="h-[70vh] w-full rounded-xl border border-[#E7E7E2]"
+              className="h-[calc(100vh-12rem)] min-h-[420px] w-full rounded-xl border border-[#E7E7E2]"
             />
           )
         ) : (
-          <div className="flex h-full min-h-[50vh] items-center justify-center rounded-xl border border-dashed border-[#E7E7E2] bg-[#FAFAF8]">
+          <div className="flex min-h-[50vh] items-center justify-center rounded-xl border border-dashed border-[#E7E7E2] bg-[#FAFAF8]">
             <span className="text-[13px] text-[#9A9DA1]">Preview unavailable</span>
           </div>
         )}
@@ -124,10 +124,14 @@ export function DocumentDetailPanel({
         </div>
       </div>
 
-      {/* Two main blocks — extracted data (left) + original preview (right) */}
+      {/* Two main blocks — extracted data (left) + original preview (right).
+          The preview cell stretches to the row height and holds a sticky child,
+          so the preview stays in view while the long list scrolls the page. */}
       <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
         <ExtractionEditor id={doc.id} status={doc.status} fields={fields} lineItems={lineItems} />
-        {preview}
+        <div className="lg:self-stretch">
+          <div className="lg:sticky lg:top-6">{preview}</div>
+        </div>
       </div>
 
       {/* Additional information — collapsed by default */}

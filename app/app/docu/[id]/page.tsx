@@ -87,7 +87,11 @@ export default async function DocumentReviewPage({
   const isImage = ['jpg', 'jpeg', 'png', 'heic', 'webp', 'gif', 'bmp'].includes(ext ?? '');
 
   return (
-    <div className="px-8 py-7">
+    // Own scroll container: html/body have overflow-x:hidden (which forces
+    // overflow-y:auto on them and breaks position:sticky relative to the
+    // viewport). Scrolling here instead keeps one clean page scroll AND lets
+    // the preview stick.
+    <div className="h-screen overflow-y-auto px-8 py-7">
       <DocumentDetailPanel
         doc={doc}
         orgDocs={orgDocs}
