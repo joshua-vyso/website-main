@@ -99,6 +99,19 @@ export async function unfeedDocumentFromProcurePulse(
   await supabase.from('pp_movements').delete().eq('source_document_id', documentId);
 
   for (const [id, contrib] of byItem) {
+    // If this item has no movements left, it has no source anymore — remove it
+    // entirely (cascades its supplier prices) so deleting the last feeding
+    // document doesn't leave a zombie zero-stock item behind.
+    const { data: remaining } = await supabase
+      .from('pp_movements')
+      .select('id')
+      .eq('stock_item_id', id)
+      .limit(1);
+    if (!remaining || remaining.length === 0) {
+      await supabase.from('pp_stock_items').delete().eq('id', id);
+      continue;
+    }
+    // Otherwise it's still fed by other documents — just reverse on_hand.
     const { data: cur } = await supabase
       .from('pp_stock_items')
       .select('on_hand')
