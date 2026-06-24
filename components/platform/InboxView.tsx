@@ -6,6 +6,7 @@ import { DocumentStatsCards } from './docu/DocumentStatsCards';
 import { DocumentFilters } from './docu/DocumentFilters';
 import { DocumentTable } from './docu/DocumentTable';
 import { UploadBubble } from './docu/UploadBubble';
+import { DocuNav } from './docu/DocuNav';
 import { applySearch, parseSearch, SEARCH_EXAMPLES } from '@/lib/platform/docu/search';
 import { deriveFlags } from '@/lib/platform/docu/flags';
 import type { DocumentFolder, DocumentType, DocumentWithSupplier } from '@/lib/platform/types';
@@ -75,8 +76,10 @@ export function InboxView({
 
   return (
     <div className="px-8 py-7">
+      <DocuNav />
+
       {/* Header */}
-      <div className="flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
+      <div className="mt-6 flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
         <div className="min-w-[12rem] flex-1">
           <h1 className="text-[26px] font-bold leading-tight text-[#1A1C1E]">{title}</h1>
           <p className="mt-1 text-[14px] text-[#5F6368]">{subtitle}</p>

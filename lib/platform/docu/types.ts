@@ -6,7 +6,36 @@
  * `source: 'derived' | 'mock'` on the intelligence shapes records whether a
  * value comes from real document data or is illustrative until a backend lands.
  */
-import type { DocumentStatus, DocumentType, FeatureKey } from '@/lib/platform/types';
+import type { DocumentStatus, DocumentType, ExtractedData, FeatureKey } from '@/lib/platform/types';
+
+// ---------------------------------------------------------------------------
+// Statement totals (TRANSACTION SUMMARY) — parsed from a statement's footer and
+// cached in extracted_data.summary. Powers the totals card + reconciliation CSV.
+// ---------------------------------------------------------------------------
+export interface StatementSummary {
+  /** Statement date as printed (e.g. "23/MAY/2026") or ISO if resolvable. */
+  statement_date: string | null;
+  opening_balance: number | null;
+  payments: number | null;
+  total_purchases: number | null;
+  total_pallet_refunds: number | null;
+  total_pallet_usage: number | null;
+  vat: number | null;
+  total_charges: number | null;
+  closing_balance: number | null;
+  net_financial_transactions: number | null;
+  audit_error: number | null;
+}
+
+/**
+ * Web-only view over documents.extracted_data that also carries the user-set
+ * custom type and the parsed statement summary (both stored in the same jsonb,
+ * so no schema change / mirror edit is needed).
+ */
+export interface DocuExtractedData extends ExtractedData {
+  custom_type?: string;
+  summary?: StatementSummary | null;
+}
 
 // ---------------------------------------------------------------------------
 // Flags (feature 4)

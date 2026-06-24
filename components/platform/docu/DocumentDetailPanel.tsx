@@ -8,6 +8,8 @@ import { ApprovalActions } from './ApprovalActions';
 import { DocumentRename } from './DocumentRename';
 import { FolderPicker } from './FolderPicker';
 import { PushToButton } from './PushToButton';
+import { TypePicker } from './TypePicker';
+import { StatementTotalsCard } from './StatementTotalsCard';
 import { FlagsList } from './FlagsList';
 import { AiSummaryCard } from './AiSummaryCard';
 import { ConfidenceBreakdown } from './ConfidenceBreakdown';
@@ -20,7 +22,7 @@ import { deriveFlags } from '@/lib/platform/docu/flags';
 import { deriveSupplierIntelligence } from '@/lib/platform/docu/supplier-intel';
 import { getMissingDocs } from '@/lib/platform/docu/missing-docs';
 import { inferSupplierFromDoc } from '@/lib/platform/docu/supplier-match';
-import type { AiSummary } from '@/lib/platform/docu/types';
+import type { AiSummary, DocuExtractedData } from '@/lib/platform/docu/types';
 import type { DocumentFolder, DocumentWithSupplier, FeatureKey } from '@/lib/platform/types';
 
 /**
@@ -58,6 +60,8 @@ export function DocumentDetailPanel({
   const missing = getMissingDocs(doc);
   const initialSummary = (doc.ai_summary as AiSummary | null) ?? null;
   const autoMatched = !doc.supplier && match.matched && match.canonical != null;
+  const extracted = (doc.extracted_data as DocuExtractedData | null) ?? null;
+  const statementSummary = extracted?.summary ?? null;
 
   const preview = (
     <div className="flex flex-col rounded-2xl border border-[#E7E7E2] bg-white">
@@ -117,8 +121,9 @@ export function DocumentDetailPanel({
             </div>
           </div>
         </div>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 flex-wrap items-center justify-end gap-2">
           <PushToButton documentId={doc.id} docType={doc.document_type} features={features} />
+          <TypePicker documentId={doc.id} documentType={doc.document_type} extractedData={extracted} />
           <FolderPicker documentId={doc.id} folders={folders} currentFolderId={doc.folder_id} />
           <StatusPill status={doc.status} />
         </div>
@@ -161,6 +166,7 @@ export function DocumentDetailPanel({
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <ApprovalActions documentId={doc.id} status={doc.status} />
               <AiSummaryCard documentId={doc.id} initialSummary={initialSummary} />
+              {statementSummary ? <StatementTotalsCard summary={statementSummary} /> : null}
               <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
                 <h3 className="mb-3 text-[14px] font-medium text-[#1A1C1E]">Flags</h3>
                 <FlagsList flags={flags} />

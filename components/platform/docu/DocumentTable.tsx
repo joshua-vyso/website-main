@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { StatusPill, ConfidenceText } from '@/components/platform/ui';
-import { DOC_TYPE_LABEL } from '@/lib/platform/documents';
+import { documentTypeLabel } from '@/lib/platform/documents';
 import { deriveFlags } from '@/lib/platform/docu/flags';
 import type { DocumentWithSupplier } from '@/lib/platform/types';
 import { FlagsList } from './FlagsList';
@@ -85,9 +85,7 @@ function DocRow({ doc, allDocs }: { doc: DocumentWithSupplier; allDocs: Document
       </div>
       <span className="truncate text-[#5F6368]">{doc.supplier?.name ?? '—'}</span>
       <span className="text-[#5F6368]">{formatDate(doc.created_at)}</span>
-      <span className="text-[#5F6368]">
-        {doc.document_type ? DOC_TYPE_LABEL[doc.document_type] : '—'}
-      </span>
+      <span className="text-[#5F6368]">{documentTypeLabel(doc)}</span>
       <span>
         <StatusPill status={doc.status} />
       </span>

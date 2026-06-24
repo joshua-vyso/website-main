@@ -1,6 +1,6 @@
 import 'server-only';
 import Anthropic from '@anthropic-ai/sdk';
-import type { AiSummary } from '@/lib/platform/docu/types';
+import type { AiSummary, StatementSummary } from '@/lib/platform/docu/types';
 
 /**
  * Server-only Anthropic integration. The API key is read from a non-public env
@@ -54,6 +54,7 @@ export interface ExtractionResult {
   document_type: ExtractedDocType;
   fields: ExtractedField[];
   line_items: ExtractedLineItem[];
+  summary: StatementSummary | null;
   overall_confidence: number;
 }
 
@@ -81,9 +82,23 @@ Respond with ONLY a JSON object (no prose, no markdown code fences) of exactly t
       "confidence": number
     }
   ],
+  "summary": {
+    "statement_date": string | null,
+    "opening_balance": number | null,
+    "payments": number | null,
+    "total_purchases": number | null,
+    "total_pallet_refunds": number | null,
+    "total_pallet_usage": number | null,
+    "vat": number | null,
+    "total_charges": number | null,
+    "closing_balance": number | null,
+    "net_financial_transactions": number | null,
+    "audit_error": number | null
+  } | null,
   "overall_confidence": number
 }
 Rules:
+- "summary": if the document has a TRANSACTION SUMMARY / account-totals block (opening balance, closing/system balance, total purchases, VAT, pallet refunds/usage, payments, audit error), extract those figures as plain NUMBERS — strip currency symbols and thousands separators, keep the sign as printed (money out may be negative). Map: opening_balance, payments (or "net financial transactions" if no explicit payments line → put it in net_financial_transactions), total_purchases, total_pallet_refunds (pallet refunds/deposits), total_pallet_usage (pallet usage fee), vat ("VAT included in above transactions"), total_charges, closing_balance ("system closing balance"), audit_error. statement_date = the date printed next to the closing balance / "as at" date, exactly as shown (e.g. "23/MAY/2026"). If there is NO totals block, set "summary" to null.
 - Include EVERY product row across ALL pages and ALL "PURCHASES ON CARD ID" sections. Do not skip or summarise rows.
 - The commodity cell is often a messy comma-separated string like "BABY BUTTERNUT,300G PUNNE,*,0,*,12,*" or "ORANGES,6KG POCKET,NAVEL,2,M,*". From it derive:
     - description = the produce name, cleaned and Title Case (e.g. "Baby Butternut", "Oranges Navel"). Drop packaging words, grade codes, asterisks, and stray numeric codes.
@@ -139,9 +154,33 @@ export async function extractDocument(params: {
     document_type: parsed.document_type ?? null,
     fields: Array.isArray(parsed.fields) ? parsed.fields : [],
     line_items: Array.isArray(parsed.line_items) ? parsed.line_items : [],
+    summary: coerceSummary(parsed.summary),
     overall_confidence:
       typeof parsed.overall_confidence === 'number' ? parsed.overall_confidence : 0,
   };
+}
+
+/** Coerce a parsed summary block into a StatementSummary, or null. */
+function coerceSummary(raw: unknown): StatementSummary | null {
+  if (!raw || typeof raw !== 'object') return null;
+  const s = raw as Record<string, unknown>;
+  const num = (v: unknown): number | null => (typeof v === 'number' && Number.isFinite(v) ? v : null);
+  const out: StatementSummary = {
+    statement_date: typeof s.statement_date === 'string' ? s.statement_date : null,
+    opening_balance: num(s.opening_balance),
+    payments: num(s.payments),
+    total_purchases: num(s.total_purchases),
+    total_pallet_refunds: num(s.total_pallet_refunds),
+    total_pallet_usage: num(s.total_pallet_usage),
+    vat: num(s.vat),
+    total_charges: num(s.total_charges),
+    closing_balance: num(s.closing_balance),
+    net_financial_transactions: num(s.net_financial_transactions),
+    audit_error: num(s.audit_error),
+  };
+  // If literally nothing was parsed, treat as no summary.
+  const hasAny = Object.values(out).some((v) => v != null);
+  return hasAny ? out : null;
 }
 
 /** Generic prompt → text helper for any module (summaries, drafting, Q&A). */

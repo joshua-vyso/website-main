@@ -50,6 +50,19 @@ export const DOC_TYPE_LABEL: Record<DocumentType, string> = {
   order: 'Order',
 };
 
+/**
+ * Display label for a document's type, preferring a user-set custom type
+ * (extracted_data.custom_type) over the built-in category. Falls back to the
+ * raw value title-cased, then "—".
+ */
+export function documentTypeLabel(doc: Pick<Document, 'document_type' | 'extracted_data'>): string {
+  const custom = (doc.extracted_data as { custom_type?: string } | null)?.custom_type?.trim();
+  if (custom) return custom;
+  const t = doc.document_type;
+  if (!t) return '—';
+  return (DOC_TYPE_LABEL as Record<string, string>)[t] ?? t.replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
 /** KPI roll-ups computed from a document set — shared by web + mobile. */
 export interface DocKpis {
   total: number;

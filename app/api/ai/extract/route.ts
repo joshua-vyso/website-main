@@ -68,7 +68,7 @@ export async function POST(req: Request) {
     .update({
       status: 'extracted',
       confidence: result.overall_confidence,
-      extracted_data: { fields: result.fields, line_items: result.line_items },
+      extracted_data: { fields: result.fields, line_items: result.line_items, summary: result.summary },
       document_type: documentType,
     })
     .eq('id', doc.id);
