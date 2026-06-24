@@ -39,7 +39,7 @@ export const MODULES: readonly ModuleDefinition[] = [
     label: 'ProcurePulse',
     description: 'Procurement intelligence',
     icon: 'proc',
-    status: 'soon',
+    status: 'active',
     screens: { mobile: '/procurepulse', desktop: '/app/procurepulse' },
   },
   {
