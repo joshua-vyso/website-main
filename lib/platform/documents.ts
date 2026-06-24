@@ -25,6 +25,22 @@ export const DOC_TYPES: readonly DocTypeMeta[] = [
   { key: 'order', label: 'Orders', tint: '#FBE7EC', iconBg: '#C0345A' },
 ];
 
+/**
+ * Vyso's built-in "default" folders — the document categories every account
+ * gets, mirroring the document types. Custom folders are anything a user creates
+ * whose name isn't one of these. (Folders are matched by name.)
+ */
+export const DEFAULT_FOLDERS: readonly { name: string; color: string }[] = DOC_TYPES.filter(
+  (t) => t.key !== null,
+).map((t) => ({ name: t.label, color: t.iconBg }));
+
+export const DEFAULT_FOLDER_NAMES: readonly string[] = DEFAULT_FOLDERS.map((f) => f.name);
+
+/** Is this folder name one of the built-in default categories? */
+export function isDefaultFolderName(name: string): boolean {
+  return DEFAULT_FOLDER_NAMES.includes(name);
+}
+
 /** Singular, human-readable label for a document type (table "Type" column). */
 export const DOC_TYPE_LABEL: Record<DocumentType, string> = {
   invoice: 'Invoice',
