@@ -34,6 +34,10 @@ export function InboxView({
   const [activeFolderId, setActiveFolderId] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<'desc' | 'asc'>('desc');
   const [uploadOpen, setUploadOpen] = useState(false);
+  const [selectMode, setSelectMode] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [confirmBulk, setConfirmBulk] = useState(false);
+  const [bulkBusy, setBulkBusy] = useState(false);
 
   // While any document is still extracting (status 'pending'), poll the server
   // component so rows flip from "Extracting…" to their result live. The budget
@@ -74,6 +78,39 @@ export function InboxView({
     });
   }, [docs, search, activeType, activeFolderId, sortDir]);
 
+  // Selectable = the currently-shown rows that have finished extracting.
+  const selectableIds = useMemo(
+    () => rows.filter((d) => d.status !== 'pending').map((d) => d.id),
+    [rows],
+  );
+  const allSelected = selectableIds.length > 0 && selectableIds.every((id) => selected.has(id));
+
+  function toggleSelect(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+  function exitSelect() {
+    setSelectMode(false);
+    setSelected(new Set());
+    setConfirmBulk(false);
+  }
+  async function bulkDelete() {
+    if (selected.size === 0) return;
+    setBulkBusy(true);
+    await fetch('/api/documents/delete', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ documentIds: [...selected] }),
+    }).catch(() => {});
+    router.refresh();
+    setBulkBusy(false);
+    exitSelect();
+  }
+
   return (
     <div className="px-8 py-7">
       <DocuNav />
@@ -93,6 +130,15 @@ export function InboxView({
             aria-label="Search documents"
             className="h-10 w-72 rounded-xl border border-[#E7E7E2] bg-white px-4 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none"
           />
+          {docs.length > 0 ? (
+            <button
+              type="button"
+              onClick={() => (selectMode ? exitSelect() : setSelectMode(true))}
+              className="inline-flex h-10 shrink-0 items-center rounded-xl border border-[#E7E7E2] bg-white px-4 text-[14px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/30"
+            >
+              {selectMode ? 'Cancel' : 'Select'}
+            </button>
+          ) : null}
           <div className="relative">
             <button
               type="button"
@@ -141,6 +187,51 @@ export function InboxView({
               onSortToggle={() => setSortDir((d) => (d === 'desc' ? 'asc' : 'desc'))}
             />
           </div>
+          {selectMode ? (
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#1E5E54]/30 bg-[#E9EFEC] px-4 py-2.5">
+              <div className="flex items-center gap-4 text-[13px]">
+                <span className="font-medium text-[#0F4C44]">{selected.size} selected</span>
+                <button
+                  type="button"
+                  onClick={() => setSelected(allSelected ? new Set() : new Set(selectableIds))}
+                  className="text-[#1E5E54] hover:underline"
+                >
+                  {allSelected ? 'Clear all' : 'Select all'}
+                </button>
+              </div>
+              {confirmBulk ? (
+                <div className="flex items-center gap-2 text-[13px]">
+                  <span className="text-[#5F6368]">
+                    Delete {selected.size} document{selected.size === 1 ? '' : 's'} permanently?
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setConfirmBulk(false)}
+                    className="rounded-lg px-2.5 py-1 text-[#5F6368] hover:bg-white/60"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => void bulkDelete()}
+                    disabled={bulkBusy}
+                    className="rounded-lg bg-[#A32D2D] px-3 py-1 font-medium text-white transition-colors hover:bg-[#8f2727] disabled:opacity-40"
+                  >
+                    {bulkBusy ? '…' : 'Confirm delete'}
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setConfirmBulk(true)}
+                  disabled={selected.size === 0}
+                  className="inline-flex items-center rounded-lg bg-[#A32D2D] px-3 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-[#8f2727] disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Delete{selected.size ? ` (${selected.size})` : ''}
+                </button>
+              )}
+            </div>
+          ) : null}
           <div className="mt-4">
             {rows.length === 0 && search.trim() ? (
               <div className="rounded-2xl border border-[#E7E7E2] bg-white px-6 py-12 text-center">
@@ -150,7 +241,13 @@ export function InboxView({
                 </p>
               </div>
             ) : (
-              <DocumentTable rows={rows} allDocs={docs} />
+              <DocumentTable
+                rows={rows}
+                allDocs={docs}
+                selectMode={selectMode}
+                selected={selected}
+                onToggleSelect={toggleSelect}
+              />
             )}
           </div>
         </>

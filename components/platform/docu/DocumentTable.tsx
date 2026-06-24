@@ -72,13 +72,65 @@ function ExtractingRow({ doc }: { doc: DocumentWithSupplier }) {
 }
 
 /**
- * One document row — a link once extracted, the live row while pending. Uses a
- * stretched-link overlay so the whole row navigates, while the kebab menu
- * (rename / delete) sits above it and stays interactive.
+ * One document row. In select mode the row is a toggle button with a checkbox;
+ * otherwise it's a stretched-link row with a kebab menu (rename / delete).
+ * Pending docs always render the live "Extracting…" row.
  */
-function DocRow({ doc, allDocs }: { doc: DocumentWithSupplier; allDocs: DocumentWithSupplier[] }) {
+function DocRow({
+  doc,
+  allDocs,
+  selectMode,
+  selected,
+  onToggle,
+}: {
+  doc: DocumentWithSupplier;
+  allDocs: DocumentWithSupplier[];
+  selectMode: boolean;
+  selected: boolean;
+  onToggle: (id: string) => void;
+}) {
   if (doc.status === 'pending') return <ExtractingRow doc={doc} />;
   const flags = deriveFlags(doc, allDocs);
+
+  if (selectMode) {
+    return (
+      <button
+        type="button"
+        onClick={() => onToggle(doc.id)}
+        className={`grid ${COLS} w-full items-center border-b border-[#F0F0EC] px-6 py-3.5 text-left text-[14px] transition-colors last:border-b-0 ${
+          selected ? 'bg-[#E9EFEC]' : 'hover:bg-[#FAFAF8]'
+        }`}
+      >
+        <span className="flex min-w-0 items-center gap-3">
+          <span
+            className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-[5px] border transition-colors ${
+              selected ? 'border-[#1E5E54] bg-[#1E5E54] text-white' : 'border-[#C9CCC8] bg-white'
+            }`}
+          >
+            {selected ? (
+              <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden>
+                <path d="M2.5 6.2l2.3 2.3L9.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            ) : null}
+          </span>
+          <span className="truncate text-[#1A1C1E]">{doc.filename}</span>
+        </span>
+        <span className="truncate text-[#5F6368]">{doc.supplier?.name ?? '—'}</span>
+        <span className="text-[#5F6368]">{formatDate(doc.created_at)}</span>
+        <span className="text-[#5F6368]">{documentTypeLabel(doc)}</span>
+        <span>
+          <StatusPill status={doc.status} />
+        </span>
+        <span>
+          <FlagsList flags={flags} compact />
+        </span>
+        <span>
+          <ConfidenceText value={doc.confidence} />
+        </span>
+      </button>
+    );
+  }
+
   const cell = 'pointer-events-none relative z-10';
   return (
     <div
@@ -90,7 +142,7 @@ function DocRow({ doc, allDocs }: { doc: DocumentWithSupplier; allDocs: Document
         <span className="h-7 w-7 shrink-0 rounded-md bg-[#F0F0EC]" aria-hidden />
         <span className="truncate text-[#1A1C1E]">{doc.filename}</span>
         <span className="pointer-events-auto shrink-0">
-          <DocumentRowMenu id={doc.id} filename={doc.filename} storagePath={doc.storage_path} />
+          <DocumentRowMenu id={doc.id} filename={doc.filename} />
         </span>
       </div>
       <span className={`${cell} truncate text-[#5F6368]`}>{doc.supplier?.name ?? '—'}</span>
@@ -117,9 +169,15 @@ function DocRow({ doc, allDocs }: { doc: DocumentWithSupplier; allDocs: Document
 export function DocumentTable({
   rows,
   allDocs,
+  selectMode = false,
+  selected,
+  onToggleSelect,
 }: {
   rows: DocumentWithSupplier[];
   allDocs: DocumentWithSupplier[];
+  selectMode?: boolean;
+  selected?: Set<string>;
+  onToggleSelect?: (id: string) => void;
 }) {
   // Group preserving the incoming (already-sorted) order.
   const groups: { key: string; docs: DocumentWithSupplier[] }[] = [];
@@ -192,7 +250,14 @@ export function DocumentTable({
                   <span>Confidence</span>
                 </div>
                 {g.docs.map((doc) => (
-                  <DocRow key={doc.id} doc={doc} allDocs={allDocs} />
+                  <DocRow
+                    key={doc.id}
+                    doc={doc}
+                    allDocs={allDocs}
+                    selectMode={selectMode}
+                    selected={selected?.has(doc.id) ?? false}
+                    onToggle={onToggleSelect ?? (() => {})}
+                  />
                 ))}
               </div>
             ) : null}

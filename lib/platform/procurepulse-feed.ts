@@ -75,6 +75,43 @@ export async function orgHasProcurePulse(supabase: SupabaseClient, orgId: string
   return Boolean((data as { enabled?: boolean } | null)?.enabled);
 }
 
+/**
+ * Reverse a document's contribution to ProcurePulse — used when the document is
+ * deleted. Removes its stock movements and subtracts their net effect from the
+ * affected items' on-hand (clamped at 0). Supplier prices have no per-document
+ * link, so they are left as-is. Safe to call for docs that never fed stock.
+ */
+export async function unfeedDocumentFromProcurePulse(
+  supabase: SupabaseClient,
+  documentId: string,
+): Promise<{ itemsReversed: number }> {
+  const { data: moves } = await supabase
+    .from('pp_movements')
+    .select('stock_item_id, change')
+    .eq('source_document_id', documentId);
+  if (!moves || moves.length === 0) return { itemsReversed: 0 };
+
+  const byItem = new Map<string, number>();
+  for (const m of moves as { stock_item_id: string; change: number }[]) {
+    byItem.set(m.stock_item_id, (byItem.get(m.stock_item_id) ?? 0) + Number(m.change));
+  }
+
+  await supabase.from('pp_movements').delete().eq('source_document_id', documentId);
+
+  for (const [id, contrib] of byItem) {
+    const { data: cur } = await supabase
+      .from('pp_stock_items')
+      .select('on_hand')
+      .eq('id', id)
+      .maybeSingle();
+    if (cur) {
+      const next = Math.max(0, Number((cur as { on_hand: number }).on_hand) - contrib);
+      await supabase.from('pp_stock_items').update({ on_hand: next }).eq('id', id);
+    }
+  }
+  return { itemsReversed: byItem.size };
+}
+
 type FedDoc = Pick<
   Document,
   'id' | 'org_id' | 'filename' | 'document_type' | 'supplier_id' | 'extracted_data'

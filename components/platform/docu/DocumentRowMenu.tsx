@@ -12,15 +12,7 @@ type Mode = 'menu' | 'rename' | 'delete';
  * navigates. The dropdown is fixed-positioned to escape the month tile's
  * overflow-hidden, and closes on outside click or scroll.
  */
-export function DocumentRowMenu({
-  id,
-  filename,
-  storagePath,
-}: {
-  id: string;
-  filename: string;
-  storagePath: string | null;
-}) {
+export function DocumentRowMenu({ id, filename }: { id: string; filename: string }) {
   const router = useRouter();
   const btnRef = useRef<HTMLButtonElement>(null);
   const [open, setOpen] = useState(false);
@@ -62,11 +54,12 @@ export function DocumentRowMenu({
 
   async function remove() {
     setBusy(true);
-    const supabase = createClient();
-    if (supabase) {
-      if (storagePath) await supabase.storage.from('documents').remove([storagePath]);
-      await supabase.from('documents').delete().eq('id', id);
-    }
+    // Routed server-side so it also reverses any ProcurePulse contribution.
+    await fetch('/api/documents/delete', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ documentIds: [id] }),
+    }).catch(() => {});
     router.refresh();
     setBusy(false);
     close();
