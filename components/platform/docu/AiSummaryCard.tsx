@@ -5,9 +5,9 @@ import { useRouter } from 'next/navigation';
 import type { AiSummary } from '@/lib/platform/docu/types';
 
 /**
- * AI summary card for the Doc-U detail panel. Renders a cached operational
- * briefing (headline, spend, price movements, discrepancies, actions and
- * linked documents) and can generate / regenerate it via /api/ai/summary.
+ * AI summary card for the Doc-U detail panel. Renders a cached, concise
+ * (≤500 char) operational briefing plus spend/supplier chips, and can
+ * generate / regenerate it via /api/ai/summary (Haiku).
  */
 export function AiSummaryCard({
   documentId,
@@ -94,9 +94,9 @@ export function AiSummaryCard({
 
       {/* Summary body */}
       {summary && !loading ? (
-        <div className="mt-4 space-y-5">
-          {/* Headline */}
-          <p className="text-[15px] leading-relaxed text-[#1A1C1E]">{summary.headline}</p>
+        <div className="mt-4 space-y-4">
+          {/* Briefing (≤500 chars) */}
+          <p className="text-[14px] leading-relaxed text-[#1A1C1E]">{summary.text}</p>
 
           {/* Stat chips */}
           {summary.total_spend || summary.supplier ? (
@@ -114,98 +114,6 @@ export function AiSummaryCard({
                 </div>
               ) : null}
             </div>
-          ) : null}
-
-          {/* Key categories */}
-          {summary.key_categories.length > 0 ? (
-            <div className="flex flex-wrap gap-2">
-              {summary.key_categories.map((cat, i) => (
-                <span
-                  key={i}
-                  className="rounded-full bg-[#F0F0EC] px-2.5 py-1 text-[12px] text-[#5F6368]"
-                >
-                  {cat}
-                </span>
-              ))}
-            </div>
-          ) : null}
-
-          {/* Price movements */}
-          {summary.price_movements.length > 0 ? (
-            <section>
-              <h4 className="text-[14px] font-medium text-[#1A1C1E]">Price movements</h4>
-              <ul className="mt-2 space-y-2">
-                {summary.price_movements.map((m, i) => {
-                  const mark =
-                    m.direction === 'up' ? '▲' : m.direction === 'down' ? '▼' : '—';
-                  const color =
-                    m.direction === 'up'
-                      ? '#0F6E56'
-                      : m.direction === 'down'
-                        ? '#A32D2D'
-                        : '#9A9DA1';
-                  return (
-                    <li key={i} className="flex items-start gap-2.5">
-                      <span
-                        className="mt-px shrink-0 text-[12px] leading-relaxed"
-                        style={{ color }}
-                      >
-                        {mark}
-                      </span>
-                      <div className="min-w-0">
-                        <span className="text-[13px] font-medium text-[#1A1C1E]">{m.label}</span>
-                        <span className="text-[13px] text-[#5F6368]"> — {m.detail}</span>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ul>
-            </section>
-          ) : null}
-
-          {/* Discrepancies */}
-          {summary.discrepancies.length > 0 ? (
-            <section>
-              <h4 className="text-[14px] font-medium text-[#1A1C1E]">Discrepancies</h4>
-              <ul className="mt-2 space-y-2">
-                {summary.discrepancies.map((d, i) => (
-                  <li key={i} className="flex items-start gap-2.5">
-                    <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#A32D2D]" />
-                    <span className="text-[13px] text-[#5F6368]">{d}</span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ) : null}
-
-          {/* Suggested actions */}
-          {summary.suggested_actions.length > 0 ? (
-            <section>
-              <h4 className="text-[14px] font-medium text-[#1A1C1E]">Suggested actions</h4>
-              <ul className="mt-2 space-y-2">
-                {summary.suggested_actions.map((a, i) => (
-                  <li key={i} className="flex items-start gap-2.5">
-                    <span className="mt-px shrink-0 text-[12px] leading-relaxed text-[#1E5E54]">✓</span>
-                    <span className="text-[13px] text-[#5F6368]">{a}</span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ) : null}
-
-          {/* Linked documents */}
-          {summary.linked_documents.length > 0 ? (
-            <section>
-              <h4 className="text-[14px] font-medium text-[#1A1C1E]">Linked documents</h4>
-              <ul className="mt-2 space-y-1.5">
-                {summary.linked_documents.map((doc, i) => (
-                  <li key={doc.id ?? i} className="flex items-baseline justify-between gap-3">
-                    <span className="min-w-0 truncate text-[13px] text-[#1A1C1E]">{doc.label}</span>
-                    <span className="shrink-0 text-[12px] text-[#9A9DA1]">{doc.relation}</span>
-                  </li>
-                ))}
-              </ul>
-            </section>
           ) : null}
         </div>
       ) : null}

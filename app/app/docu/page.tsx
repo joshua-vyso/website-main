@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation';
 import { getPlatformSession, createServerSupabase } from '@/lib/platform/supabase-server';
 import { InboxView } from '@/components/platform/InboxView';
-import type { DocumentWithSupplier } from '@/lib/platform/types';
+import type { DocumentFolder, DocumentWithSupplier } from '@/lib/platform/types';
 
 export default async function DocuInboxPage() {
   const session = await getPlatformSession();
@@ -21,17 +21,27 @@ export default async function DocuInboxPage() {
   }
 
   const supabase = await createServerSupabase();
-  const { data } = await supabase
-    .from('documents')
-    .select('*, supplier:suppliers(id,name,initials)')
-    .eq('org_id', session.org?.id ?? '')
-    .order('created_at', { ascending: false });
+  const orgId = session.org?.id ?? '';
+  const [{ data }, { data: folderData }] = await Promise.all([
+    supabase
+      .from('documents')
+      .select('*, supplier:suppliers(id,name,initials)')
+      .eq('org_id', orgId)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('document_folders')
+      .select('*')
+      .eq('org_id', orgId)
+      .order('name', { ascending: true }),
+  ]);
 
   const docs = (data ?? []) as DocumentWithSupplier[];
+  const folders = (folderData ?? []) as DocumentFolder[];
 
   return (
     <InboxView
       docs={docs}
+      folders={folders}
       title="Documents"
       subtitle="Everything Doc-U has ingested, ready to review"
     />

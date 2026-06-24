@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getPlatformSession, createServerSupabase } from '@/lib/platform/supabase-server';
 import { DocumentDetailPanel } from '@/components/platform/docu/DocumentDetailPanel';
-import type { DocumentWithSupplier } from '@/lib/platform/types';
+import type { DocumentFolder, DocumentWithSupplier } from '@/lib/platform/types';
 
 export default async function DocumentReviewPage({
   params,
@@ -43,13 +43,22 @@ export default async function DocumentReviewPage({
   }
 
   // Sibling org documents power the cross-document intelligence (duplicate
-  // detection, supplier history, relationships). Keep the same select shape.
-  const { data: siblingData } = await supabase
-    .from('documents')
-    .select('*, supplier:suppliers(id,name,initials)')
-    .eq('org_id', doc.org_id)
-    .order('created_at', { ascending: false });
+  // detection, supplier history, relationships); folders power the folder
+  // picker. Keep the same document select shape.
+  const [{ data: siblingData }, { data: folderData }] = await Promise.all([
+    supabase
+      .from('documents')
+      .select('*, supplier:suppliers(id,name,initials)')
+      .eq('org_id', doc.org_id)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('document_folders')
+      .select('*')
+      .eq('org_id', doc.org_id)
+      .order('name', { ascending: true }),
+  ]);
   const orgDocs = (siblingData as DocumentWithSupplier[] | null) ?? [];
+  const folders = (folderData as DocumentFolder[] | null) ?? [];
 
   let originalUrl: string | null = null;
   if (doc.storage_path) {
@@ -69,7 +78,7 @@ export default async function DocumentReviewPage({
 
   return (
     <div className="px-8 py-7">
-      <DocumentDetailPanel doc={doc} orgDocs={orgDocs} originalUrl={originalUrl} isImage={isImage} />
+      <DocumentDetailPanel doc={doc} orgDocs={orgDocs} folders={folders} originalUrl={originalUrl} isImage={isImage} />
     </div>
   );
 }

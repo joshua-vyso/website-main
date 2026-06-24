@@ -65,28 +65,13 @@ export interface ActivityEvent {
 
 // ---------------------------------------------------------------------------
 // AI summary (feature 1) — cached on documents.ai_summary
+// A short (≤500 char) operational briefing plus two at-a-glance metadata chips.
 // ---------------------------------------------------------------------------
-export interface AiSummaryPriceMovement {
-  label: string;
-  direction: 'up' | 'down' | 'flat';
-  detail: string;
-}
-
-export interface AiSummaryLinkedDoc {
-  id?: string;
-  label: string;
-  relation: string;
-}
-
 export interface AiSummary {
-  headline: string;
+  /** The briefing — capped at 500 characters server-side. */
+  text: string;
   total_spend: string | null;
   supplier: string | null;
-  key_categories: string[];
-  price_movements: AiSummaryPriceMovement[];
-  discrepancies: string[];
-  suggested_actions: string[];
-  linked_documents: AiSummaryLinkedDoc[];
   generated_at: string;
   model: string;
 }

@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { ConfidenceText, StatusPill } from '@/components/platform/ui';
 import { ExtractionEditor } from '@/components/platform/ExtractionEditor';
 import { ApprovalActions } from './ApprovalActions';
+import { DocumentRename } from './DocumentRename';
+import { FolderPicker } from './FolderPicker';
 import { FlagsList } from './FlagsList';
 import { AiSummaryCard } from './AiSummaryCard';
 import { ConfidenceBreakdown } from './ConfidenceBreakdown';
@@ -17,7 +19,7 @@ import { deriveSupplierIntelligence } from '@/lib/platform/docu/supplier-intel';
 import { getMissingDocs } from '@/lib/platform/docu/missing-docs';
 import { inferSupplierFromDoc } from '@/lib/platform/docu/supplier-match';
 import type { AiSummary } from '@/lib/platform/docu/types';
-import type { DocumentWithSupplier } from '@/lib/platform/types';
+import type { DocumentFolder, DocumentWithSupplier } from '@/lib/platform/types';
 
 /**
  * The enriched document detail. Left: original preview + extracted-data editor.
@@ -27,11 +29,13 @@ import type { DocumentWithSupplier } from '@/lib/platform/types';
 export function DocumentDetailPanel({
   doc,
   orgDocs,
+  folders,
   originalUrl,
   isImage,
 }: {
   doc: DocumentWithSupplier;
   orgDocs: DocumentWithSupplier[];
+  folders: DocumentFolder[];
   originalUrl: string | null;
   isImage: boolean;
 }) {
@@ -58,9 +62,7 @@ export function DocumentDetailPanel({
             <span aria-hidden>‹</span> Documents
           </Link>
           <div className="min-w-0">
-            <h1 className="truncate text-[20px] font-bold leading-tight text-[#1A1C1E]">
-              {doc.filename}
-            </h1>
+            <DocumentRename documentId={doc.id} filename={doc.filename} />
             <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[13px]">
               <span className="text-[#5F6368]">{supplierName}</span>
               {autoMatched ? (
@@ -75,7 +77,10 @@ export function DocumentDetailPanel({
             </div>
           </div>
         </div>
-        <StatusPill status={doc.status} />
+        <div className="flex shrink-0 items-center gap-2">
+          <FolderPicker documentId={doc.id} folders={folders} currentFolderId={doc.folder_id} />
+          <StatusPill status={doc.status} />
+        </div>
       </div>
 
       {/* Main grid */}

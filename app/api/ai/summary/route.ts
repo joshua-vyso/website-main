@@ -3,7 +3,7 @@ import { resolveUser, AI_CORS_HEADERS } from '@/lib/ai/auth';
 import { summariseDocument, aiConfigured } from '@/lib/ai/anthropic';
 import type { Document } from '@/lib/platform/types';
 
-// One opus call; cached after the first generation.
+// One short Haiku call; cached on documents.ai_summary after first generation.
 export const maxDuration = 60;
 
 export async function OPTIONS() {
@@ -74,13 +74,16 @@ export async function POST(req: Request) {
     );
   }
 
+  // Cache the briefing. If the write fails (e.g. the ai_summary column hasn't
+  // been migrated yet) still return the freshly generated summary so the
+  // feature works — it just won't persist, and will regenerate next open.
   const { error: updateErr } = await supabase
     .from('documents')
     .update({ ai_summary: summary })
     .eq('id', doc.id);
-  if (updateErr) {
-    return NextResponse.json({ error: updateErr.message }, { status: 500, headers: AI_CORS_HEADERS });
-  }
 
-  return NextResponse.json({ summary, cached: false }, { headers: AI_CORS_HEADERS });
+  return NextResponse.json(
+    { summary, cached: false, persisted: !updateErr },
+    { headers: AI_CORS_HEADERS },
+  );
 }
