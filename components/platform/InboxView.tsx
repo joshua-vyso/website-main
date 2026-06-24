@@ -7,6 +7,7 @@ import { DocumentFilters } from './docu/DocumentFilters';
 import { DocumentTable } from './docu/DocumentTable';
 import { UploadBubble } from './docu/UploadBubble';
 import { DocuNav } from './docu/DocuNav';
+import { createClient } from '@/lib/platform/supabase-browser';
 import { applySearch, parseSearch, SEARCH_EXAMPLES } from '@/lib/platform/docu/search';
 import { deriveFlags } from '@/lib/platform/docu/flags';
 import type { DocumentFolder, DocumentType, DocumentWithSupplier } from '@/lib/platform/types';
@@ -106,6 +107,15 @@ export function InboxView({
       headers: { 'content-type': 'application/json' },
       body: JSON.stringify({ documentIds: [...selected] }),
     }).catch(() => {});
+    router.refresh();
+    setBulkBusy(false);
+    exitSelect();
+  }
+  async function bulkReview() {
+    if (selected.size === 0) return;
+    setBulkBusy(true);
+    const supabase = createClient();
+    if (supabase) await supabase.from('documents').update({ status: 'reviewed' }).in('id', [...selected]);
     router.refresh();
     setBulkBusy(false);
     exitSelect();
@@ -221,14 +231,24 @@ export function InboxView({
                   </button>
                 </div>
               ) : (
-                <button
-                  type="button"
-                  onClick={() => setConfirmBulk(true)}
-                  disabled={selected.size === 0}
-                  className="inline-flex items-center rounded-lg bg-[#A32D2D] px-3 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-[#8f2727] disabled:cursor-not-allowed disabled:opacity-40"
-                >
-                  Delete{selected.size ? ` (${selected.size})` : ''}
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => void bulkReview()}
+                    disabled={selected.size === 0 || bulkBusy}
+                    className="inline-flex items-center rounded-lg bg-[#1E5E54] px-3 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    {bulkBusy ? '…' : `Mark reviewed${selected.size ? ` (${selected.size})` : ''}`}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setConfirmBulk(true)}
+                    disabled={selected.size === 0}
+                    className="inline-flex items-center rounded-lg border border-[#A32D2D]/40 px-3 py-1.5 text-[13px] font-medium text-[#A32D2D] transition-colors hover:bg-[#FCEBEB] disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    Delete{selected.size ? ` (${selected.size})` : ''}
+                  </button>
+                </div>
               )}
             </div>
           ) : null}
