@@ -7,9 +7,10 @@ import { documentTypeLabel } from '@/lib/platform/documents';
 import { deriveFlags } from '@/lib/platform/docu/flags';
 import type { DocumentWithSupplier } from '@/lib/platform/types';
 import { FlagsList } from './FlagsList';
+import { DocumentRowMenu } from './DocumentRowMenu';
 
 /** Shared column template — header + rows MUST use the same grid. */
-const COLS = 'grid-cols-[1fr_150px_92px_120px_116px_84px_92px]';
+const COLS = 'grid-cols-[minmax(170px,1fr)_150px_92px_120px_116px_84px_92px]';
 
 /** Format an ISO timestamp as "DD Mon" (e.g. "12 Mar"). */
 function formatDate(iso: string): string {
@@ -70,32 +71,41 @@ function ExtractingRow({ doc }: { doc: DocumentWithSupplier }) {
   );
 }
 
-/** One document row — a link once extracted, the live row while pending. */
+/**
+ * One document row — a link once extracted, the live row while pending. Uses a
+ * stretched-link overlay so the whole row navigates, while the kebab menu
+ * (rename / delete) sits above it and stays interactive.
+ */
 function DocRow({ doc, allDocs }: { doc: DocumentWithSupplier; allDocs: DocumentWithSupplier[] }) {
   if (doc.status === 'pending') return <ExtractingRow doc={doc} />;
   const flags = deriveFlags(doc, allDocs);
+  const cell = 'pointer-events-none relative z-10';
   return (
-    <Link
-      href={`/app/docu/${doc.id}`}
-      className={`grid ${COLS} items-center border-b border-[#F0F0EC] px-6 py-3.5 text-[14px] transition-colors last:border-b-0 hover:bg-[#FAFAF8]`}
+    <div
+      className={`group relative grid ${COLS} items-center border-b border-[#F0F0EC] px-6 py-3.5 text-[14px] transition-colors last:border-b-0 hover:bg-[#FAFAF8]`}
     >
-      <div className="flex min-w-0 items-center gap-3">
+      <Link href={`/app/docu/${doc.id}`} aria-label={`Open ${doc.filename}`} className="absolute inset-0 z-0" />
+
+      <div className="pointer-events-none relative z-10 flex min-w-0 items-center gap-2.5">
         <span className="h-7 w-7 shrink-0 rounded-md bg-[#F0F0EC]" aria-hidden />
         <span className="truncate text-[#1A1C1E]">{doc.filename}</span>
+        <span className="pointer-events-auto shrink-0">
+          <DocumentRowMenu id={doc.id} filename={doc.filename} storagePath={doc.storage_path} />
+        </span>
       </div>
-      <span className="truncate text-[#5F6368]">{doc.supplier?.name ?? '—'}</span>
-      <span className="text-[#5F6368]">{formatDate(doc.created_at)}</span>
-      <span className="text-[#5F6368]">{documentTypeLabel(doc)}</span>
-      <span>
+      <span className={`${cell} truncate text-[#5F6368]`}>{doc.supplier?.name ?? '—'}</span>
+      <span className={`${cell} text-[#5F6368]`}>{formatDate(doc.created_at)}</span>
+      <span className={`${cell} text-[#5F6368]`}>{documentTypeLabel(doc)}</span>
+      <span className={cell}>
         <StatusPill status={doc.status} />
       </span>
-      <span>
+      <span className={cell}>
         <FlagsList flags={flags} compact />
       </span>
-      <span>
+      <span className={cell}>
         <ConfidenceText value={doc.confidence} />
       </span>
-    </Link>
+    </div>
   );
 }
 
