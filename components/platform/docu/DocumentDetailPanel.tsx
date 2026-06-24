@@ -133,7 +133,13 @@ export function DocumentDetailPanel({
           The preview cell stretches to the row height and holds a sticky child,
           so the preview stays in view while the long list scrolls the page. */}
       <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
-        <ExtractionEditor id={doc.id} status={doc.status} fields={fields} lineItems={lineItems} />
+        <ExtractionEditor
+          id={doc.id}
+          status={doc.status}
+          fields={fields}
+          lineItems={lineItems}
+          extractedData={extracted}
+        />
         <div className="lg:self-stretch">
           <div className="lg:sticky lg:top-6">{preview}</div>
         </div>

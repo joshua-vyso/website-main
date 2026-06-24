@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/platform/supabase-browser';
 import { FIELD_REVIEW_THRESHOLD } from '@/lib/platform/tokens';
 import type { DocumentStatus, ExtractedField, ExtractedLineItem } from '@/lib/platform/types';
+import type { DocuExtractedData } from '@/lib/platform/docu/types';
 
 function ConfidenceChip({ confidence }: { confidence: number }) {
   const low = confidence < FIELD_REVIEW_THRESHOLD;
@@ -26,11 +27,14 @@ export function ExtractionEditor({
   status,
   fields,
   lineItems,
+  extractedData,
 }: {
   id: string;
   status: DocumentStatus;
   fields: ExtractedField[];
   lineItems: ExtractedLineItem[];
+  /** The doc's full extracted_data, so saving preserves summary / custom_type. */
+  extractedData?: DocuExtractedData | null;
 }) {
   const router = useRouter();
   const [draft, setDraft] = useState<ExtractedField[]>(() => fields.map((f) => ({ ...f })));
@@ -63,7 +67,11 @@ export function ExtractionEditor({
     if (supabase) {
       await supabase
         .from('documents')
-        .update({ status: nextStatus, extracted_data: { fields: draft, line_items: lines } })
+        // Merge so the parsed statement summary + custom type survive a review.
+        .update({
+          status: nextStatus,
+          extracted_data: { ...(extractedData ?? {}), fields: draft, line_items: lines },
+        })
         .eq('id', id);
     }
     // Re-sync the corrected lines into ProcurePulse (idempotent, best-effort).
