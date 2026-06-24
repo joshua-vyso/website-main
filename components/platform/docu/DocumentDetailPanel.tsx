@@ -30,12 +30,14 @@ export function DocumentDetailPanel({
   doc,
   orgDocs,
   folders,
+  fedItemCount,
   originalUrl,
   isImage,
 }: {
   doc: DocumentWithSupplier;
   orgDocs: DocumentWithSupplier[];
   folders: DocumentFolder[];
+  fedItemCount: number;
   originalUrl: string | null;
   isImage: boolean;
 }) {
@@ -132,7 +134,7 @@ export function DocumentDetailPanel({
           <DocumentRelationshipFlow doc={doc} />
           <MissingDocumentsCard insights={missing} />
           <ActivityTimeline doc={doc} />
-          <RoutingCard docType={doc.document_type} />
+          <RoutingCard docType={doc.document_type} documentId={doc.id} fedItemCount={fedItemCount} />
         </div>
       </div>
     </div>

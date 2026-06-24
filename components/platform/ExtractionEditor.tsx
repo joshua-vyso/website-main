@@ -66,6 +66,16 @@ export function ExtractionEditor({
         .update({ status: nextStatus, extracted_data: { fields: draft, line_items: lines } })
         .eq('id', id);
     }
+    // Re-sync the corrected lines into ProcurePulse (idempotent, best-effort).
+    // keepalive lets it outlive the navigation below.
+    if (nextStatus === 'reviewed') {
+      void fetch('/api/procurepulse/feed', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ documentId: id }),
+        keepalive: true,
+      }).catch(() => {});
+    }
     router.push('/app/docu');
     router.refresh();
   };

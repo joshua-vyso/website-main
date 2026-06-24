@@ -60,6 +60,16 @@ export default async function DocumentReviewPage({
   const orgDocs = (siblingData as DocumentWithSupplier[] | null) ?? [];
   const folders = (folderData as DocumentFolder[] | null) ?? [];
 
+  // How many DISTINCT ProcurePulse stock items this document feeds (its live
+  // contribution). RLS returns nothing for orgs without the procurepulse feature.
+  const { data: fedMoves } = await supabase
+    .from('pp_movements')
+    .select('stock_item_id')
+    .eq('source_document_id', doc.id);
+  const fedItemCount = new Set(
+    (fedMoves as { stock_item_id: string }[] | null)?.map((m) => m.stock_item_id) ?? [],
+  ).size;
+
   let originalUrl: string | null = null;
   if (doc.storage_path) {
     const { data: signed } = await supabase.storage
@@ -78,7 +88,14 @@ export default async function DocumentReviewPage({
 
   return (
     <div className="px-8 py-7">
-      <DocumentDetailPanel doc={doc} orgDocs={orgDocs} folders={folders} originalUrl={originalUrl} isImage={isImage} />
+      <DocumentDetailPanel
+        doc={doc}
+        orgDocs={orgDocs}
+        folders={folders}
+        fedItemCount={fedItemCount ?? 0}
+        originalUrl={originalUrl}
+        isImage={isImage}
+      />
     </div>
   );
 }

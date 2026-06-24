@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { resolveUser, AI_CORS_HEADERS } from '@/lib/ai/auth';
 import { extractDocument, aiConfigured } from '@/lib/ai/anthropic';
+import { feedDocumentToProcurePulse, orgHasProcurePulse } from '@/lib/platform/procurepulse-feed';
 import type { Document } from '@/lib/platform/types';
 
 // Multi-page statements with many line items can take a while to parse.
@@ -61,18 +62,37 @@ export async function POST(req: Request) {
     );
   }
 
+  const documentType = doc.document_type ?? result.document_type;
   const { error: updateErr } = await supabase
     .from('documents')
     .update({
       status: 'extracted',
       confidence: result.overall_confidence,
       extracted_data: { fields: result.fields, line_items: result.line_items },
-      document_type: doc.document_type ?? result.document_type,
+      document_type: documentType,
     })
     .eq('id', doc.id);
   if (updateErr) {
     return NextResponse.json({ error: updateErr.message }, { status: 500, headers: AI_CORS_HEADERS });
   }
 
-  return NextResponse.json({ ok: true, result }, { headers: AI_CORS_HEADERS });
+  // Auto-feed the extracted lines into ProcurePulse (best-effort — a feed
+  // failure must never fail extraction). Gated on the org having the feature.
+  let feed = null;
+  try {
+    if (await orgHasProcurePulse(supabase, doc.org_id)) {
+      feed = await feedDocumentToProcurePulse(supabase, {
+        id: doc.id,
+        org_id: doc.org_id,
+        filename: doc.filename,
+        document_type: documentType,
+        supplier_id: doc.supplier_id,
+        extracted_data: { fields: result.fields, line_items: result.line_items },
+      });
+    }
+  } catch {
+    /* swallow — extraction already succeeded */
+  }
+
+  return NextResponse.json({ ok: true, result, feed }, { headers: AI_CORS_HEADERS });
 }
