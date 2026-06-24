@@ -92,6 +92,7 @@ export default async function DocumentReviewPage({
         doc={doc}
         orgDocs={orgDocs}
         folders={folders}
+        features={session.features}
         fedItemCount={fedItemCount ?? 0}
         originalUrl={originalUrl}
         isImage={isImage}

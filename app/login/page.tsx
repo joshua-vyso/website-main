@@ -41,7 +41,10 @@ export default function LoginPage() {
 
   return (
     <div
-      style={{ fontFamily: 'var(--font-inter)' }}
+      // Globals set --radius: 0, which squares the rounded-sm/md/lg/xl scale.
+      // Give the login subtree a real radius so its inputs + button round (same
+      // as the platform layout).
+      style={{ fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties}
       className="flex min-h-screen items-center justify-center bg-[#F6F6F4] px-4 text-[#1A1C1E] antialiased"
     >
       <div className="w-full max-w-[400px]">

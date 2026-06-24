@@ -8,7 +8,7 @@ import type { DocumentWithSupplier } from '@/lib/platform/types';
 export function DocumentStatsCards({ docs }: { docs: DocumentWithSupplier[] }) {
   const kpis = computeKpis(docs);
   return (
-    <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
       <KpiTile
         label="Total documents"
         value={String(kpis.total)}
@@ -21,13 +21,6 @@ export function DocumentStatsCards({ docs }: { docs: DocumentWithSupplier[] }) {
         accent="#D9730D"
         sublabel="Extracted + pending"
         href="/app/docu/awaiting"
-      />
-      <KpiTile
-        label="Flagged"
-        value={String(kpis.flagged)}
-        accent="#A32D2D"
-        sublabel="Needs attention"
-        href="/app/docu/flagged"
       />
       <KpiTile
         label="Avg confidence"

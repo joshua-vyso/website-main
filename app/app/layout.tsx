@@ -15,7 +15,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   return (
     <PlatformProvider value={session}>
       <div
-        style={{ fontFamily: 'var(--font-inter)' }}
+        // Globals set --radius: 0 (sharp shadcn default), which zeroes the
+        // rounded-sm/md/lg/xl scale and leaves buttons/inputs square. Give the
+        // platform subtree a real radius so all corners round consistently.
+        style={{ fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties}
         className="flex min-h-screen bg-[#F6F6F4] text-[#1A1C1E] antialiased"
       >
         <Sidebar />

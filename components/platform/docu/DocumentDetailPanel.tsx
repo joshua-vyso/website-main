@@ -1,11 +1,13 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { ConfidenceText, StatusPill } from '@/components/platform/ui';
 import { ExtractionEditor } from '@/components/platform/ExtractionEditor';
 import { ApprovalActions } from './ApprovalActions';
 import { DocumentRename } from './DocumentRename';
 import { FolderPicker } from './FolderPicker';
+import { PushToButton } from './PushToButton';
 import { FlagsList } from './FlagsList';
 import { AiSummaryCard } from './AiSummaryCard';
 import { ConfidenceBreakdown } from './ConfidenceBreakdown';
@@ -19,17 +21,19 @@ import { deriveSupplierIntelligence } from '@/lib/platform/docu/supplier-intel';
 import { getMissingDocs } from '@/lib/platform/docu/missing-docs';
 import { inferSupplierFromDoc } from '@/lib/platform/docu/supplier-match';
 import type { AiSummary } from '@/lib/platform/docu/types';
-import type { DocumentFolder, DocumentWithSupplier } from '@/lib/platform/types';
+import type { DocumentFolder, DocumentWithSupplier, FeatureKey } from '@/lib/platform/types';
 
 /**
- * The enriched document detail. Left: original preview + extracted-data editor.
- * Right: the intelligence rail (approval, AI summary, flags, supplier intel,
- * confidence, relationships, missing docs, activity, routing).
+ * The document detail. Two main blocks side by side — extracted-data editor
+ * (left) and original preview (right) — with everything else (workflow, AI
+ * summary, flags, supplier intel, confidence, relationships, missing docs,
+ * activity, routing) tucked into a collapsible "Additional information" tile.
  */
 export function DocumentDetailPanel({
   doc,
   orgDocs,
   folders,
+  features,
   fedItemCount,
   originalUrl,
   isImage,
@@ -37,10 +41,13 @@ export function DocumentDetailPanel({
   doc: DocumentWithSupplier;
   orgDocs: DocumentWithSupplier[];
   folders: DocumentFolder[];
+  features: Record<FeatureKey, boolean>;
   fedItemCount: number;
   originalUrl: string | null;
   isImage: boolean;
 }) {
+  const [showMore, setShowMore] = useState(false);
+
   const fields = doc.extracted_data?.fields ?? [];
   const lineItems = doc.extracted_data?.line_items ?? [];
 
@@ -51,6 +58,37 @@ export function DocumentDetailPanel({
   const missing = getMissingDocs(doc);
   const initialSummary = (doc.ai_summary as AiSummary | null) ?? null;
   const autoMatched = !doc.supplier && match.matched && match.canonical != null;
+
+  const preview = (
+    <div className="flex flex-col rounded-2xl border border-[#E7E7E2] bg-white">
+      <div className="flex items-center justify-between gap-3 border-b border-[#F0F0EC] px-6 py-5">
+        <h2 className="text-[15px] font-semibold text-[#1A1C1E]">Original document</h2>
+        <span className="truncate text-[12px] text-[#9A9DA1]">{doc.filename}</span>
+      </div>
+      <div className="flex-1 p-4">
+        {originalUrl ? (
+          isImage ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={originalUrl}
+              alt="Original document"
+              className="h-full max-h-[70vh] w-full rounded-xl border border-[#E7E7E2] object-contain"
+            />
+          ) : (
+            <iframe
+              src={originalUrl}
+              title="Original document"
+              className="h-[70vh] w-full rounded-xl border border-[#E7E7E2]"
+            />
+          )
+        ) : (
+          <div className="flex h-full min-h-[50vh] items-center justify-center rounded-xl border border-dashed border-[#E7E7E2] bg-[#FAFAF8]">
+            <span className="text-[13px] text-[#9A9DA1]">Preview unavailable</span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 
   return (
     <div>
@@ -80,62 +118,58 @@ export function DocumentDetailPanel({
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-2">
+          <PushToButton documentId={doc.id} docType={doc.document_type} features={features} />
           <FolderPicker documentId={doc.id} folders={folders} currentFolderId={doc.folder_id} />
           <StatusPill status={doc.status} />
         </div>
       </div>
 
-      {/* Main grid */}
-      <div className="mt-6 grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
-        {/* LEFT — original + extracted data */}
-        <div className="space-y-6">
-          <div className="flex flex-col rounded-2xl border border-[#E7E7E2] bg-white">
-            <div className="flex items-center justify-between gap-3 border-b border-[#F0F0EC] px-6 py-5">
-              <h2 className="text-[15px] font-semibold text-[#1A1C1E]">Original document</h2>
-              <span className="truncate text-[12px] text-[#9A9DA1]">{doc.filename}</span>
-            </div>
-            <div className="p-4">
-              {originalUrl ? (
-                isImage ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={originalUrl}
-                    alt="Original document"
-                    className="max-h-[60vh] w-full rounded-xl border border-[#E7E7E2] object-contain"
-                  />
-                ) : (
-                  <iframe
-                    src={originalUrl}
-                    title="Original document"
-                    className="h-[60vh] w-full rounded-xl border border-[#E7E7E2]"
-                  />
-                )
-              ) : (
-                <div className="flex h-[40vh] items-center justify-center rounded-xl border border-dashed border-[#E7E7E2] bg-[#FAFAF8]">
-                  <span className="text-[13px] text-[#9A9DA1]">Preview unavailable</span>
-                </div>
-              )}
+      {/* Two main blocks — extracted data (left) + original preview (right) */}
+      <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
+        <ExtractionEditor id={doc.id} status={doc.status} fields={fields} lineItems={lineItems} />
+        {preview}
+      </div>
+
+      {/* Additional information — collapsed by default */}
+      <div className="mt-6 overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
+        <button
+          type="button"
+          onClick={() => setShowMore((s) => !s)}
+          className="flex w-full items-center justify-between px-6 py-4 text-left transition-colors hover:bg-[#FAFAF8]"
+          aria-expanded={showMore}
+        >
+          <span className="flex items-center gap-2">
+            <span className="text-[15px] font-semibold text-[#1A1C1E]">Additional information</span>
+            <span className="text-[12px] text-[#9A9DA1]">
+              Workflow, AI summary, flags, supplier intel & more
+            </span>
+          </span>
+          <span
+            className={`text-[#9A9DA1] transition-transform ${showMore ? 'rotate-180' : ''}`}
+            aria-hidden
+          >
+            ▾
+          </span>
+        </button>
+
+        {showMore ? (
+          <div className="border-t border-[#F0F0EC] p-5">
+            <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+              <ApprovalActions documentId={doc.id} status={doc.status} />
+              <AiSummaryCard documentId={doc.id} initialSummary={initialSummary} />
+              <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
+                <h3 className="mb-3 text-[14px] font-medium text-[#1A1C1E]">Flags</h3>
+                <FlagsList flags={flags} />
+              </div>
+              <SupplierIntelligenceCard intel={intel} />
+              <ConfidenceBreakdown doc={doc} />
+              <DocumentRelationshipFlow doc={doc} />
+              <MissingDocumentsCard insights={missing} />
+              <ActivityTimeline doc={doc} />
+              <RoutingCard docType={doc.document_type} documentId={doc.id} fedItemCount={fedItemCount} />
             </div>
           </div>
-
-          <ExtractionEditor id={doc.id} status={doc.status} fields={fields} lineItems={lineItems} />
-        </div>
-
-        {/* RIGHT — intelligence rail */}
-        <div className="space-y-4">
-          <ApprovalActions documentId={doc.id} status={doc.status} />
-          <AiSummaryCard documentId={doc.id} initialSummary={initialSummary} />
-          <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
-            <h3 className="mb-3 text-[14px] font-medium text-[#1A1C1E]">Flags</h3>
-            <FlagsList flags={flags} />
-          </div>
-          <SupplierIntelligenceCard intel={intel} />
-          <ConfidenceBreakdown doc={doc} />
-          <DocumentRelationshipFlow doc={doc} />
-          <MissingDocumentsCard insights={missing} />
-          <ActivityTimeline doc={doc} />
-          <RoutingCard docType={doc.document_type} documentId={doc.id} fedItemCount={fedItemCount} />
-        </div>
+        ) : null}
       </div>
     </div>
   );
