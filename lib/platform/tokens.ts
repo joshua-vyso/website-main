@@ -32,6 +32,9 @@ export const STATUS_COLORS: Record<DocumentStatus, { bg: string; fg: string }> =
   extracted: { bg: '#E6F1FB', fg: '#0C447C' },
   reviewed: { bg: '#E1F5EE', fg: '#0F6E56' },
   error: { bg: '#FCEBEB', fg: '#A32D2D' },
+  approved: { bg: '#E1F5EE', fg: '#0F6E56' },
+  rejected: { bg: '#FCEBEB', fg: '#A32D2D' },
+  archived: { bg: '#F0F0EC', fg: '#5F6368' },
 };
 
 export const STATUS_LABELS: Record<DocumentStatus, string> = {
@@ -39,6 +42,9 @@ export const STATUS_LABELS: Record<DocumentStatus, string> = {
   extracted: 'Extracted',
   reviewed: 'Reviewed',
   error: 'Error',
+  approved: 'Approved',
+  rejected: 'Rejected',
+  archived: 'Archived',
 };
 
 /** Per-field extraction confidence below this is flagged amber ("check"). */

@@ -1,5 +1,6 @@
 import 'server-only';
 import Anthropic from '@anthropic-ai/sdk';
+import type { AiSummary } from '@/lib/platform/docu/types';
 
 /**
  * Server-only Anthropic integration. The API key is read from a non-public env
@@ -149,4 +150,62 @@ export async function runPrompt(prompt: string, system?: string): Promise<string
     messages: [{ role: 'user', content: prompt }],
   });
   return textOf(message);
+}
+
+const SUMMARY_SYSTEM = `You are Doc-U's operational analyst for an SME food & wholesale business in South Africa.
+Given ONE document's extracted data plus a short list of the organisation's other recent documents, write a concise operational briefing for the owner.
+Respond with ONLY a JSON object (no prose, no markdown code fences) of exactly this shape:
+{
+  "headline": string,
+  "total_spend": string | null,
+  "supplier": string | null,
+  "key_categories": string[],
+  "price_movements": [{ "label": string, "direction": "up" | "down" | "flat", "detail": string }],
+  "discrepancies": string[],
+  "suggested_actions": string[],
+  "linked_documents": [{ "label": string, "relation": string }]
+}
+Rules:
+- Tone: a calm, specific operations analyst. The headline is one sentence.
+- Money in Rand, formatted like "R 8,240.00". total_spend null if the document carries no total.
+- key_categories: the produce/category groups in the lines (e.g. "Citrus", "Root vegetables").
+- Use empty arrays when nothing applies. NEVER invent figures the data does not support.
+- linked_documents references the org's other documents where a relationship is plausible (e.g. the matching invoice for a statement).`;
+
+/**
+ * Generate a cached operational analyst briefing for a document. Returns the
+ * coerced AiSummary; callers cache it on documents.ai_summary.
+ */
+export async function summariseDocument(context: {
+  filename: string;
+  documentType: string | null;
+  extracted: unknown;
+  siblings: { filename: string; document_type: string | null; supplier: string | null }[];
+}): Promise<AiSummary> {
+  const userContent = JSON.stringify({
+    document: { filename: context.filename, document_type: context.documentType, extracted: context.extracted },
+    org_recent_documents: context.siblings,
+  });
+
+  const message = await client().messages.create({
+    model: MODEL,
+    max_tokens: 1500,
+    system: SUMMARY_SYSTEM,
+    messages: [{ role: 'user', content: userContent }],
+  });
+
+  const raw = textOf(message).trim().replace(/^```json\s*/i, '').replace(/```$/, '').trim();
+  const p = JSON.parse(raw) as Partial<AiSummary>;
+  return {
+    headline: typeof p.headline === 'string' ? p.headline : 'Operational summary unavailable.',
+    total_spend: typeof p.total_spend === 'string' ? p.total_spend : null,
+    supplier: typeof p.supplier === 'string' ? p.supplier : null,
+    key_categories: Array.isArray(p.key_categories) ? p.key_categories : [],
+    price_movements: Array.isArray(p.price_movements) ? p.price_movements : [],
+    discrepancies: Array.isArray(p.discrepancies) ? p.discrepancies : [],
+    suggested_actions: Array.isArray(p.suggested_actions) ? p.suggested_actions : [],
+    linked_documents: Array.isArray(p.linked_documents) ? p.linked_documents : [],
+    generated_at: new Date().toISOString(),
+    model: MODEL,
+  };
 }

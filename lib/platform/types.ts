@@ -33,7 +33,14 @@ export type AppIconKey =
 
 export type OrgTier = 'start' | 'build' | 'scale';
 export type UserRole = 'owner' | 'admin' | 'member';
-export type DocumentStatus = 'pending' | 'extracted' | 'reviewed' | 'error';
+export type DocumentStatus =
+  | 'pending'
+  | 'extracted'
+  | 'reviewed'
+  | 'error'
+  | 'approved'
+  | 'rejected'
+  | 'archived';
 export type DocumentType =
   | 'invoice'
   | 'statement'
@@ -110,10 +117,18 @@ export interface Document {
   filename: string;
   document_type: DocumentType | null;
   status: DocumentStatus;
+  starred: boolean;
   confidence: number | null;
   extracted_data: ExtractedData | null;
   storage_path: string | null;
   uploaded_by: string | null;
+  approved_by: string | null;
+  approved_at: string | null;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+  archived_at: string | null;
+  /** Cached AI operational summary (typed as AiSummary in lib/platform/docu/types). */
+  ai_summary: Record<string, unknown> | null;
   created_at: string;
   updated_at: string;
 }
@@ -132,4 +147,94 @@ export interface DocumentFolder {
   color: string | null;
   created_by: string | null;
   created_at: string;
+}
+
+// ---------------------------------------------------------------------------
+// ProcurePulse — procurement intelligence (live stock derived from Doc-U)
+// ---------------------------------------------------------------------------
+
+/** Live stock status, derived from on-hand vs the low-stock threshold. */
+export type StockStatus = 'in_stock' | 'low' | 'out';
+
+export type PpNotificationKind =
+  | 'low_stock'
+  | 'new_direct_doc'
+  | 'new_market_statement'
+  | 'price_change'
+  | 'reorder';
+
+/** A tracked product and its live level (`pp_stock_items`). */
+export interface StockItem {
+  id: string;
+  org_id: string;
+  name: string;
+  category: string | null;
+  /** Pack / weight, e.g. "300g · 12/box". */
+  pack: string | null;
+  /** Counting unit — boxes / punnets / bunches / units. */
+  unit: string;
+  on_hand: number;
+  low_threshold: number;
+  avg_unit_price: number | null;
+  currency: string;
+  /** Signed % change vs last week. */
+  trend_pct: number | null;
+  cheapest_supplier: string | null;
+  /** The Doc-U document that last fed this line. */
+  source_document_id: string | null;
+  /** Level chart series. */
+  stock_history: number[] | null;
+  /** Price chart series. */
+  price_history: number[] | null;
+  updated_at: string;
+  created_at: string;
+}
+
+/** A supplier's latest price for a stock item (`pp_item_suppliers`). */
+export interface ItemSupplierPrice {
+  id: string;
+  org_id: string;
+  stock_item_id: string;
+  supplier_name: string;
+  price: number;
+  created_at: string;
+}
+
+/** A received/used stock movement (`pp_movements`). */
+export interface StockMovement {
+  id: string;
+  org_id: string;
+  stock_item_id: string;
+  change: number;
+  reason: string | null;
+  source_label: string | null;
+  source_document_id: string | null;
+  occurred_at: string;
+  created_at: string;
+}
+
+/** A ProcurePulse notification (`pp_notifications`). */
+export interface PpNotification {
+  id: string;
+  org_id: string;
+  kind: PpNotificationKind;
+  title: string;
+  body: string | null;
+  stock_item_id: string | null;
+  document_id: string | null;
+  read: boolean;
+  created_at: string;
+}
+
+/** Per-org ProcurePulse settings (`pp_settings`). */
+export interface PpSettings {
+  org_id: string;
+  notify_low_stock: boolean;
+  notify_direct_docs: boolean;
+  notify_market_statements: boolean;
+  notify_price_spikes: boolean;
+  weekly_summary: boolean;
+  default_supplier: string | null;
+  quiet_hours: string | null;
+  updated_at: string;
 }
