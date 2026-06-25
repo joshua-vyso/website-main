@@ -1,22 +1,26 @@
-import { ModuleSkeleton } from '@/components/platform/ModuleSkeleton';
+import { getPlatformSession, createServerSupabase } from '@/lib/platform/supabase-server';
+import { PriceListsView, type PriceListRow } from '@/components/platform/pricepilot/PriceListsView';
+import type { PlPriceList } from '@/lib/platform/pricepilot';
 
-export default function PricePilotPriceListsPage() {
-  return (
-    <ModuleSkeleton
-      title="Price lists"
-      subtitle="Build customer price lists from live stock prices with custom margins."
-      capabilities={[
-        'Fetch each product’s base price from the ProcurePulse catalogue.',
-        'Set a custom margin per item — or per customer — to derive the sell price.',
-        'Per-customer parameter rules auto-add lines (e.g. crushed garlic for Sandton Sun).',
-        'Daily / weekly / monthly variants per the customer’s agreed pricing status.',
-        'Batch-send price lists on a schedule — to all customers or only a selected set.',
-      ]}
-      links={[
-        { label: 'ProcurePulse · Products', href: '/app/procurepulse/products' },
-        { label: 'OrderFlow · Customers', href: '/app/orderflow/customers' },
-        { label: 'PricePilot · Recent sales', href: '/app/pricepilot/recent-sales' },
-      ]}
-    />
-  );
+export default async function PricePilotPriceListsPage() {
+  const session = await getPlatformSession();
+  const orgId = session?.org?.id ?? '';
+  const db = await createServerSupabase();
+
+  const [{ data: lists }, { data: customers }] = await Promise.all([
+    db.from('pl_price_lists').select('*').eq('org_id', orgId).order('created_at', { ascending: false }),
+    db.from('of_customers').select('id, name').eq('org_id', orgId).order('name'),
+  ]);
+
+  const custName = new Map(((customers ?? []) as { id: string; name: string }[]).map((c) => [c.id, c.name]));
+  const rows: PriceListRow[] = ((lists ?? []) as PlPriceList[]).map((l) => ({
+    id: l.id,
+    name: l.name,
+    customer_name: (l.customer_id && custName.get(l.customer_id)) || 'All customers',
+    default_margin_pct: l.default_margin_pct,
+    cadence: l.cadence,
+    created_at: l.created_at,
+  }));
+
+  return <PriceListsView lists={rows} customers={(customers ?? []) as { id: string; name: string }[]} />;
 }
