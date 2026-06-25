@@ -67,6 +67,25 @@ export function Sidebar() {
         })}
       </nav>
 
+      <div className="px-3 pb-1">
+        <Link
+          href="/app/notifications"
+          className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] font-medium transition-colors ${
+            pathname === '/app/notifications' || pathname.startsWith('/app/notifications/')
+              ? 'bg-[#E6F0FB] text-[#1A1C1E]'
+              : 'text-[#1A1C1E] hover:bg-black/[0.03]'
+          }`}
+        >
+          <span className="flex h-[26px] w-[26px] items-center justify-center" aria-hidden>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+              <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+            </svg>
+          </span>
+          <span className="flex-1">Notifications</span>
+        </Link>
+      </div>
+
       <div className="border-t border-[#E7E7E2] p-3">
         <div className="mb-2 flex items-center gap-3 px-1">
           <div

@@ -10,6 +10,7 @@ import {
   StockStatusPill,
   TrendText,
 } from '@/components/platform/procurepulse/ui';
+import { AddStockButton } from '@/components/platform/procurepulse/AddStockButton';
 
 export default async function ProcurePulseStockList() {
   const session = await getPlatformSession();
@@ -26,7 +27,12 @@ export default async function ProcurePulseStockList() {
       <PageHead
         title="Live stock"
         subtitle="Real-time levels built from your Doc-U documents"
-        right={<LiveChip />}
+        right={
+          <>
+            <LiveChip />
+            <AddStockButton />
+          </>
+        }
       />
 
       <div className="mt-4 mb-4 flex items-center gap-2">

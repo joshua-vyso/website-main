@@ -236,5 +236,7 @@ export interface PpSettings {
   weekly_summary: boolean;
   default_supplier: string | null;
   quiet_hours: string | null;
+  /** Org-defined units of measurement, on top of the built-ins (web-only column). */
+  custom_units: string[] | null;
   updated_at: string;
 }

@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { getPlatformSession, createServerSupabase } from '@/lib/platform/supabase-server';
 import { fetchSettings, fetchStock } from '@/lib/platform/procurepulse-queries';
 import { PageHead, Stepper, Toggle } from '@/components/platform/procurepulse/ui';
+import { UnitsCard } from '@/components/platform/procurepulse/UnitsCard';
 
 export default async function ProcurePulseSettings() {
   const session = await getPlatformSession();
@@ -122,6 +123,8 @@ export default async function ProcurePulseSettings() {
             ))}
           </div>
         </div>
+
+        <UnitsCard initialCustom={settings?.custom_units ?? []} />
       </div>
     </div>
   );

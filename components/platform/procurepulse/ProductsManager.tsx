@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/platform/supabase-browser';
 import { usePlatform } from '@/lib/platform/session';
+import { crossesDimension } from '@/lib/platform/procurepulse/units';
 import { PageHead } from './ui';
 import type { StockItem } from '@/lib/platform/types';
 
@@ -46,11 +47,13 @@ function rowChanged(a: Row, b: Row): boolean {
  * products; full undo/redo of the working set; one "Save changes" diffs the
  * working set against the server and persists inserts / updates / deletes.
  */
-export function ProductsManager({ items }: { items: StockItem[] }) {
+export function ProductsManager({ items, units }: { items: StockItem[]; units: string[] }) {
   const router = useRouter();
   const { org } = usePlatform();
 
   const [working, setWorking] = useState<Row[]>(() => items.map(toRow));
+  const [recalcBusy, setRecalcBusy] = useState<Set<string>>(new Set());
+  const [recalcMsg, setRecalcMsg] = useState<string | null>(null);
   const [baseline, setBaseline] = useState<Map<string, Row>>(
     () => new Map(items.map((s) => [s.id, toRow(s)])),
   );
@@ -162,6 +165,7 @@ export function ProductsManager({ items }: { items: StockItem[] }) {
               unit: r.unit.trim(),
               low_threshold: r.low_threshold,
               avg_unit_price: r.avg_unit_price,
+              on_hand: r.on_hand,
             })
             .eq('id', r.id),
         ),
@@ -199,6 +203,53 @@ export function ProductsManager({ items }: { items: StockItem[] }) {
     router.refresh();
   }
 
+  /**
+   * Recompute on_hand when a product's unit crosses the count/weight boundary
+   * (e.g. boxes → kg). The server reads the feeding documents' extracted weights
+   * and rescales on_hand; we reconcile the row + baseline so it stays clean.
+   */
+  async function recalcUnit(id: string, fromUnit: string, toUnit: string) {
+    if (recalcBusy.has(id)) return;
+    setRecalcBusy((s) => new Set(s).add(id));
+    setRecalcMsg(null);
+    const res = await fetch('/api/procurepulse/convert-unit', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ stockItemId: id, fromUnit, toUnit }),
+    })
+      .then((r) => r.json())
+      .catch(() => null);
+    setRecalcBusy((s) => {
+      const n = new Set(s);
+      n.delete(id);
+      return n;
+    });
+    if (res?.ok) {
+      const newOnHand = typeof res.newOnHand === 'number' ? res.newOnHand : undefined;
+      setWorking((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, unit: toUnit, ...(newOnHand != null ? { on_hand: newOnHand } : {}) } : r)),
+      );
+      setBaseline((prev) => {
+        const m = new Map(prev);
+        const b = m.get(id);
+        if (b) m.set(id, { ...b, unit: toUnit, ...(newOnHand != null ? { on_hand: newOnHand } : {}) });
+        return m;
+      });
+      // Recalc is an immediate server commit — drop history so Undo can't
+      // resurrect a unit/on_hand pair that no longer matches the database.
+      setPast([]);
+      setFuture([]);
+      lastEdit.current = null;
+      setRecalcMsg(
+        res.recalculated
+          ? `Recalculated ${toUnit} from ${res.docsUsed} document${res.docsUsed === 1 ? '' : 's'} → ${newOnHand} ${toUnit}.`
+          : 'Unit relabelled.',
+      );
+    } else {
+      setRecalcMsg('No document weights to recalculate from — the unit will save as a relabel (on-hand unchanged).');
+    }
+  }
+
   // Filter + paginate (working is the source of truth; filter by name).
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
@@ -210,7 +261,7 @@ export function ProductsManager({ items }: { items: StockItem[] }) {
 
   const cell =
     'h-9 w-full rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:border-[#1E5E54]/40 focus:outline-none';
-  const COLS = 'grid grid-cols-[minmax(180px,1fr)_120px_110px_120px_84px_40px] gap-2 items-center';
+  const COLS = 'grid grid-cols-[minmax(170px,1fr)_120px_104px_104px_128px_40px] gap-2 items-center';
 
   return (
     <div>
@@ -293,49 +344,88 @@ export function ProductsManager({ items }: { items: StockItem[] }) {
             {working.length === 0 ? 'No products yet — add your first.' : 'No products match your search.'}
           </div>
         ) : (
-          pageRows.map((r) => (
-            <div key={r.id} className={`${COLS} border-b border-[#F0F0EC] px-4 py-2 last:border-b-0`}>
-              <input
-                className={cell}
-                value={r.name}
-                placeholder="Product name"
-                onChange={(e) => editField(r.id, 'name', e.target.value)}
-              />
-              <input
-                className={cell}
-                value={r.unit}
-                placeholder="kg, box, ea…"
-                onChange={(e) => editField(r.id, 'unit', e.target.value)}
-              />
-              <input
-                className={`${cell} text-right`}
-                inputMode="numeric"
-                value={String(r.low_threshold)}
-                onChange={(e) => editField(r.id, 'low_threshold', Number(e.target.value.replace(/[^0-9.]/g, '')) || 0)}
-              />
-              <input
-                className={`${cell} text-right`}
-                inputMode="decimal"
-                value={r.avg_unit_price == null ? '' : String(r.avg_unit_price)}
-                placeholder="—"
-                onChange={(e) => {
-                  const v = e.target.value.replace(/[^0-9.]/g, '');
-                  editField(r.id, 'avg_unit_price', v === '' ? null : Number(v));
-                }}
-              />
-              <span className="text-right text-[13px] text-[#9A9DA1]">{r.on_hand}</span>
-              <button
-                type="button"
-                onClick={() => deleteRow(r.id)}
-                aria-label={`Delete ${r.name || 'product'}`}
-                className="flex h-9 w-9 items-center justify-center rounded-lg text-[#9A9DA1] transition-colors hover:bg-[#FCEBEB] hover:text-[#A32D2D]"
-              >
-                ✕
-              </button>
-            </div>
-          ))
+          pageRows.map((r) => {
+            const base = baseline.get(r.id);
+            const baseUnit = base?.unit ?? '';
+            // A unit change that crosses count↔weight can recompute on_hand from
+            // docs — but only once the NAME is saved, since the server matches
+            // document lines against the persisted product name.
+            const pending =
+              !r.id.startsWith('new-') &&
+              (base?.name ?? '') === r.name &&
+              baseUnit &&
+              r.unit &&
+              r.unit.trim().toLowerCase() !== baseUnit.trim().toLowerCase() &&
+              crossesDimension(baseUnit, r.unit);
+            return (
+              <div key={r.id} className={`${COLS} border-b border-[#F0F0EC] px-4 py-2 last:border-b-0`}>
+                <input
+                  className={cell}
+                  value={r.name}
+                  placeholder="Product name"
+                  onChange={(e) => editField(r.id, 'name', e.target.value)}
+                />
+                <input
+                  className={cell}
+                  value={r.unit}
+                  placeholder="unit"
+                  list="pp-units-list"
+                  onChange={(e) => editField(r.id, 'unit', e.target.value)}
+                />
+                <input
+                  className={`${cell} text-right`}
+                  inputMode="numeric"
+                  value={String(r.low_threshold)}
+                  onChange={(e) => editField(r.id, 'low_threshold', Number(e.target.value.replace(/[^0-9.]/g, '')) || 0)}
+                />
+                <input
+                  className={`${cell} text-right`}
+                  inputMode="decimal"
+                  value={r.avg_unit_price == null ? '' : String(r.avg_unit_price)}
+                  placeholder="—"
+                  onChange={(e) => {
+                    const v = e.target.value.replace(/[^0-9.]/g, '');
+                    editField(r.id, 'avg_unit_price', v === '' ? null : Number(v));
+                  }}
+                />
+                <span className="flex items-center justify-end gap-1.5 text-[13px] text-[#9A9DA1]">
+                  {pending ? (
+                    <button
+                      type="button"
+                      onClick={() => void recalcUnit(r.id, baseUnit, r.unit)}
+                      disabled={recalcBusy.has(r.id)}
+                      title={`Recalculate stock from documents (${baseUnit} → ${r.unit})`}
+                      className="rounded-md bg-[#E9EFEC] px-1.5 py-0.5 text-[11px] font-medium text-[#1E5E54] transition-colors hover:bg-[#d9e6e0] disabled:opacity-50"
+                    >
+                      {recalcBusy.has(r.id) ? '…' : '↻ recalc'}
+                    </button>
+                  ) : null}
+                  <span>{r.on_hand}</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => deleteRow(r.id)}
+                  aria-label={`Delete ${r.name || 'product'}`}
+                  className="flex h-9 w-9 items-center justify-center rounded-lg text-[#9A9DA1] transition-colors hover:bg-[#FCEBEB] hover:text-[#A32D2D]"
+                >
+                  ✕
+                </button>
+              </div>
+            );
+          })
         )}
       </div>
+
+      {/* Unit suggestions for the typeable unit fields */}
+      <datalist id="pp-units-list">
+        {units.map((u) => (
+          <option key={u} value={u} />
+        ))}
+      </datalist>
+
+      {recalcMsg ? (
+        <p className="mt-3 rounded-xl bg-[#E9EFEC] px-3 py-2 text-center text-[12px] text-[#0F4C44]">{recalcMsg}</p>
+      ) : null}
 
       {/* Pagination */}
       {pageCount > 1 ? (
