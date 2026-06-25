@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/platform/supabase-browser';
 import { usePlatform } from '@/lib/platform/session';
 import { crossesDimension } from '@/lib/platform/procurepulse/units';
+import { UnitCombobox } from './UnitCombobox';
 import { PageHead } from './ui';
 import type { StockItem } from '@/lib/platform/types';
 
@@ -365,12 +366,11 @@ export function ProductsManager({ items, units }: { items: StockItem[]; units: s
                   placeholder="Product name"
                   onChange={(e) => editField(r.id, 'name', e.target.value)}
                 />
-                <input
-                  className={cell}
+                <UnitCombobox
                   value={r.unit}
-                  placeholder="unit"
-                  list="pp-units-list"
-                  onChange={(e) => editField(r.id, 'unit', e.target.value)}
+                  units={units}
+                  className={cell}
+                  onChange={(v) => editField(r.id, 'unit', v)}
                 />
                 <input
                   className={`${cell} text-right`}
@@ -415,13 +415,6 @@ export function ProductsManager({ items, units }: { items: StockItem[]; units: s
           })
         )}
       </div>
-
-      {/* Unit suggestions for the typeable unit fields */}
-      <datalist id="pp-units-list">
-        {units.map((u) => (
-          <option key={u} value={u} />
-        ))}
-      </datalist>
 
       {recalcMsg ? (
         <p className="mt-3 rounded-xl bg-[#E9EFEC] px-3 py-2 text-center text-[12px] text-[#0F4C44]">{recalcMsg}</p>
