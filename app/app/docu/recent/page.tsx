@@ -1,11 +1,12 @@
 import { redirect } from 'next/navigation';
 import { getPlatformSession, createServerSupabase } from '@/lib/platform/supabase-server';
-import { RecentView } from '@/components/platform/docu/RecentView';
-import type { DocumentWithSupplier } from '@/lib/platform/types';
+import { InboxView } from '@/components/platform/InboxView';
+import type { DocumentFolder, DocumentWithSupplier } from '@/lib/platform/types';
 
 /**
- * Recent documents — added today / earlier this week (by created_at). Only those
- * two sections; the full archive lives on the Documents tab.
+ * Recent documents — added today / earlier this week (by created_at). Renders the
+ * inbox in 'recent' grouping mode, so it carries the same Upload / Select /
+ * Filter / Sort controls; the full archive lives on the Documents tab.
  */
 export default async function DocuRecentPage() {
   const session = await getPlatformSession();
@@ -25,17 +26,37 @@ export default async function DocuRecentPage() {
   }
 
   const supabase = await createServerSupabase();
-  // Last ~14 days covers "today + this week" with margin; the view buckets by
-  // local-time day boundaries on the client.
-  const since = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
-  const { data } = await supabase
-    .from('documents')
-    .select('*, supplier:suppliers(id,name,initials)')
-    .eq('org_id', session.org?.id ?? '')
-    .gte('created_at', since)
-    .order('created_at', { ascending: false });
+  const orgId = session.org?.id ?? '';
+  // Last 7 days covers "today + this week"; the view buckets by local-time day
+  // boundaries on the client (Today vs the rest).
+  const since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const [{ data }, { data: folderData }] = await Promise.all([
+    supabase
+      .from('documents')
+      .select('*, supplier:suppliers(id,name,initials)')
+      .eq('org_id', orgId)
+      .gte('created_at', since)
+      .order('created_at', { ascending: false }),
+    supabase
+      .from('document_folders')
+      .select('*')
+      .eq('org_id', orgId)
+      .order('name', { ascending: true }),
+  ]);
 
   const docs = (data ?? []) as DocumentWithSupplier[];
+  const folders = (folderData ?? []) as DocumentFolder[];
 
-  return <RecentView docs={docs} />;
+  return (
+    <InboxView
+      docs={docs}
+      folders={folders}
+      title="Recent"
+      subtitle="Documents added to Doc-U today and earlier this week"
+      groupMode="recent"
+      hideStats
+      emptyTitle="Nothing added recently"
+      emptyBody="Documents you add this week will show here. See everything in the Documents tab."
+    />
+  );
 }

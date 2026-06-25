@@ -5,6 +5,8 @@ import Link from 'next/link';
 import { DocuNav } from './DocuNav';
 import { DocumentStatsCards } from './DocumentStatsCards';
 import { UploadBubble } from './UploadBubble';
+import { NewFolderButton } from './NewFolderButton';
+import { FolderCardMenu } from './FolderCardMenu';
 import { buildFolderTiles, type FolderTile } from '@/lib/platform/docu/folders';
 import type { DocumentFolder, DocumentWithSupplier } from '@/lib/platform/types';
 
@@ -100,6 +102,7 @@ export function FolderGridView({
               </svg>
             </button>
           </div>
+          <NewFolderButton />
           <div className="relative">
             <button
               type="button"
@@ -138,42 +141,59 @@ export function FolderGridView({
 
 function FolderCard({ tile }: { tile: FolderTile }) {
   return (
-    <Link
-      href={`/app/docu/folder/${tile.key}`}
-      className="group flex flex-col gap-4 rounded-2xl border border-[#E7E7E2] bg-white p-5 transition-colors hover:border-[#1E5E54]/30 hover:bg-[#FAFAF8]"
-    >
-      <div className="flex items-start justify-between">
+    <div className="group relative flex flex-col gap-4 rounded-2xl border border-[#E7E7E2] bg-white p-5 transition-colors hover:border-[#1E5E54]/30 hover:bg-[#FAFAF8]">
+      <Link
+        href={`/app/docu/folder/${tile.key}`}
+        aria-label={`Open ${tile.name}`}
+        className="absolute inset-0 z-0 rounded-2xl"
+      />
+      <div className="pointer-events-none relative z-10 flex items-start justify-between">
         <FolderIcon color={tile.color} />
-        <span className="text-[20px] font-bold leading-none text-[#1A1C1E]">{tile.count}</span>
+        <span className="flex items-center gap-1">
+          <span className="text-[20px] font-bold leading-none text-[#1A1C1E]">{tile.count}</span>
+          {tile.kind === 'custom' ? (
+            <span className="pointer-events-auto">
+              <FolderCardMenu folderId={tile.key} name={tile.name} color={tile.color} />
+            </span>
+          ) : null}
+        </span>
       </div>
-      <div className="min-w-0">
+      <div className="pointer-events-none relative z-10 min-w-0">
         <p className="truncate text-[15px] font-semibold text-[#1A1C1E]">{tile.name}</p>
         <p className="mt-0.5 text-[12px] text-[#9A9DA1]">
           {tile.count} document{tile.count === 1 ? '' : 's'}
           {tile.kind === 'custom' ? ' · custom folder' : ''}
         </p>
       </div>
-    </Link>
+    </div>
   );
 }
 
 function FolderRow({ tile, first }: { tile: FolderTile; first: boolean }) {
   return (
-    <Link
-      href={`/app/docu/folder/${tile.key}`}
-      className={`flex items-center gap-3 px-5 py-3.5 transition-colors hover:bg-[#FAFAF8] ${
+    <div
+      className={`group relative flex items-center gap-3 px-5 py-3.5 transition-colors hover:bg-[#FAFAF8] ${
         first ? '' : 'border-t border-[#F0F0EC]'
       }`}
     >
-      <FolderIcon color={tile.color} />
-      <span className="min-w-0 flex-1">
-        <span className="block truncate text-[14px] font-medium text-[#1A1C1E]">{tile.name}</span>
-        <span className="block text-[12px] text-[#9A9DA1]">
-          {tile.kind === 'custom' ? 'Custom folder' : tile.kind === 'all' ? 'Everything in Doc-U' : 'Default folder'}
+      <Link href={`/app/docu/folder/${tile.key}`} aria-label={`Open ${tile.name}`} className="absolute inset-0 z-0" />
+      <span className="pointer-events-none relative z-10 flex min-w-0 flex-1 items-center gap-3">
+        <FolderIcon color={tile.color} />
+        <span className="min-w-0">
+          <span className="block truncate text-[14px] font-medium text-[#1A1C1E]">{tile.name}</span>
+          <span className="block text-[12px] text-[#9A9DA1]">
+            {tile.kind === 'custom' ? 'Custom folder' : tile.kind === 'all' ? 'Everything in Doc-U' : 'Default folder'}
+          </span>
         </span>
       </span>
-      <span className="text-[14px] font-semibold text-[#1A1C1E]">{tile.count}</span>
-      <span className="text-[#C9CCC8]" aria-hidden>›</span>
-    </Link>
+      <span className="pointer-events-none relative z-10 text-[14px] font-semibold text-[#1A1C1E]">{tile.count}</span>
+      {tile.kind === 'custom' ? (
+        <span className="pointer-events-auto relative z-10">
+          <FolderCardMenu folderId={tile.key} name={tile.name} color={tile.color} />
+        </span>
+      ) : (
+        <span className="relative z-10 text-[#C9CCC8]" aria-hidden>›</span>
+      )}
+    </div>
   );
 }

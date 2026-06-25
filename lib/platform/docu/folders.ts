@@ -7,6 +7,18 @@
 import { DOC_TYPES, isDefaultFolderName } from '@/lib/platform/documents';
 import type { DocumentFolder, DocumentType, DocumentWithSupplier } from '@/lib/platform/types';
 
+/** Palette offered when creating or recolouring a custom folder. */
+export const FOLDER_COLORS: readonly string[] = [
+  '#1E5E54', // teal
+  '#0C447C', // blue
+  '#0F6E56', // green
+  '#854F0B', // amber
+  '#5B4FD6', // indigo
+  '#C0345A', // rose
+  '#B5651D', // clay
+  '#5F6368', // slate
+];
+
 export type FolderKind = 'all' | 'default' | 'custom';
 
 export interface FolderTile {

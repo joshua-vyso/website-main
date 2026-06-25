@@ -28,6 +28,9 @@ export function InboxView({
   backLabel,
   hideFilter = false,
   hideStats = false,
+  groupMode = 'month',
+  emptyTitle,
+  emptyBody,
 }: {
   docs: DocumentWithSupplier[];
   folders?: DocumentFolder[];
@@ -40,6 +43,11 @@ export function InboxView({
   hideFilter?: boolean;
   /** Folder view: KPI cards live on the hub, not inside a folder. */
   hideStats?: boolean;
+  /** 'recent' groups rows into Today / This week instead of month tiles. */
+  groupMode?: 'month' | 'recent';
+  /** Custom empty-state copy (e.g. the Recent view). */
+  emptyTitle?: string;
+  emptyBody?: string;
 }) {
   const router = useRouter();
   const [search, setSearch] = useState('');
@@ -98,6 +106,30 @@ export function InboxView({
       return sortDir === 'desc' ? tb - ta : ta - tb;
     });
   }, [localDocs, search, activeType, activeFolderId, sortDir]);
+
+  // Recent view: bucket the filtered rows into Today vs earlier (this week) by
+  // date ADDED. Computed after mount so day boundaries use the viewer's local
+  // time and there's no SSR/CSR hydration mismatch. `null` until mounted.
+  const [recentNow, setRecentNow] = useState<number | null>(null);
+  useEffect(() => {
+    if (groupMode === 'recent') setRecentNow(Date.now());
+  }, [groupMode]);
+  const recentGroups = useMemo(() => {
+    if (groupMode !== 'recent' || recentNow == null) return null;
+    const d = new Date(recentNow);
+    const startOfToday = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+    const today: DocumentWithSupplier[] = [];
+    const week: DocumentWithSupplier[] = [];
+    for (const doc of rows) {
+      const t = new Date(doc.created_at).getTime();
+      if (!Number.isNaN(t) && t >= startOfToday) today.push(doc);
+      else week.push(doc);
+    }
+    const g: { key: string; label: string; docs: DocumentWithSupplier[] }[] = [];
+    if (today.length) g.push({ key: 'today', label: 'Today', docs: today });
+    if (week.length) g.push({ key: 'week', label: 'This week', docs: week });
+    return g;
+  }, [groupMode, recentNow, rows]);
 
   // Selectable = the currently-shown rows that have finished extracting.
   const selectableIds = useMemo(
@@ -207,21 +239,25 @@ export function InboxView({
         </div>
       )}
 
-      {/* Table or new-user empty state */}
+      {/* Table or empty state */}
       {localDocs.length === 0 ? (
         <div className="mt-6 rounded-2xl border border-dashed border-[#E7E7E2] bg-white px-8 py-14 text-center">
-          <h2 className="text-[18px] font-semibold text-[#1A1C1E]">No documents yet</h2>
+          <h2 className="text-[18px] font-semibold text-[#1A1C1E]">
+            {emptyTitle ?? 'No documents yet'}
+          </h2>
           <p className="mx-auto mt-1 max-w-md text-[14px] text-[#5F6368]">
-            Upload your first document and Doc-U will extract the details automatically. Your
-            stats above will fill in as documents come through.
+            {emptyBody ??
+              'Upload your first document and Doc-U will extract the details automatically. Your stats above will fill in as documents come through.'}
           </p>
-          <button
-            type="button"
-            onClick={() => setUploadOpen(true)}
-            className="mt-5 inline-flex h-10 items-center rounded-xl bg-[#D9730D] px-5 text-[14px] font-medium text-white transition-colors hover:bg-[#C2650B]"
-          >
-            Upload your first document
-          </button>
+          {groupMode === 'recent' ? null : (
+            <button
+              type="button"
+              onClick={() => setUploadOpen(true)}
+              className="mt-5 inline-flex h-10 items-center rounded-xl bg-[#D9730D] px-5 text-[14px] font-medium text-white transition-colors hover:bg-[#C2650B]"
+            >
+              Upload your first document
+            </button>
+          )}
         </div>
       ) : (
         <>
@@ -301,6 +337,21 @@ export function InboxView({
                   Try: {SEARCH_EXAMPLES.slice(1).join(' · ')}
                 </p>
               </div>
+            ) : groupMode === 'recent' ? (
+              recentNow == null ? (
+                <div className="space-y-3">
+                  <div className="h-14 animate-pulse rounded-2xl border border-[#E7E7E2] bg-[#FAFAF8]" />
+                  <div className="h-14 animate-pulse rounded-2xl border border-[#E7E7E2] bg-[#FAFAF8]" />
+                </div>
+              ) : (
+                <DocumentTable
+                  groups={recentGroups ?? []}
+                  allDocs={localDocs}
+                  selectMode={selectMode}
+                  selected={selected}
+                  onToggleSelect={toggleSelect}
+                />
+              )
             ) : (
               <DocumentTable
                 rows={rows}
