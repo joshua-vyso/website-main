@@ -47,7 +47,7 @@ export const MODULES: readonly ModuleDefinition[] = [
     label: 'PricePilot',
     description: 'Pricing recommendations',
     icon: 'margin',
-    status: 'soon',
+    status: 'active',
     screens: { mobile: '/pricepilot', desktop: '/app/pricepilot' },
   },
   {
@@ -95,7 +95,7 @@ export const MODULES: readonly ModuleDefinition[] = [
     label: 'OrderFlow',
     description: 'Order management',
     icon: 'dash',
-    status: 'soon',
+    status: 'active',
     screens: { mobile: '/orderflow', desktop: '/app/orderflow' },
   },
 ] as const;

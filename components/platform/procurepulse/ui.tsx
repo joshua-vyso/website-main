@@ -13,6 +13,7 @@ import type { StockStatus } from '@/lib/platform/types';
 /** Horizontal sub-navigation across the ProcurePulse desktop screens. */
 const TABS = [
   { label: 'Dashboard', href: '/app/procurepulse' },
+  { label: 'Products', href: '/app/procurepulse/products' },
   { label: 'Live stock', href: '/app/procurepulse/stock' },
   { label: 'Alerts', href: '/app/procurepulse/alerts' },
   { label: 'Notifications', href: '/app/procurepulse/notifications' },

@@ -1,10 +1,6 @@
 import { redirect } from 'next/navigation';
-import { getPlatformSession } from '@/lib/platform/supabase-server';
-import { ComingSoon } from '@/components/platform/ComingSoon';
 
-export default async function OrderFlowPage() {
-  const session = await getPlatformSession();
-  if (!session) redirect('/login');
-
-  return <ComingSoon moduleKey="orderflow" />;
+/** OrderFlow index → Orders. */
+export default function OrderFlowIndex() {
+  redirect('/app/orderflow/orders');
 }

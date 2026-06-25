@@ -116,8 +116,8 @@ export function FolderCardMenu({
             className="fixed inset-0 z-[60] cursor-default"
           />
           <div
-            style={{ position: 'fixed', top: pos.top, left: pos.left }}
-            className="z-[70] w-[200px] rounded-xl border border-[#E7E7E2] bg-white p-1.5 shadow-[0_12px_40px_-12px_rgba(26,28,30,0.25)]"
+            style={{ position: 'fixed', top: pos.top, left: pos.left, backgroundColor: '#ffffff' }}
+            className="z-[70] w-[200px] rounded-xl border border-[#D7D7D2] bg-white p-1.5 shadow-[0_18px_50px_-8px_rgba(26,28,30,0.5)] ring-1 ring-black/[0.06]"
           >
             {mode === 'menu' ? (
               <>
