@@ -4,6 +4,15 @@
 --
 -- HOW TO APPLY: paste into the Supabase dashboard SQL editor and run once.
 
+-- 0. Widen the feature_key CHECK constraint to the full current module list.
+--    (The original constraint predates orderflow/pricepilot, so it rejects them.)
+ALTER TABLE org_features DROP CONSTRAINT IF EXISTS org_features_feature_key_check;
+ALTER TABLE org_features ADD CONSTRAINT org_features_feature_key_check
+  CHECK (feature_key IN (
+    'docu', 'procurepulse', 'pricepilot', 'marginview', 'wastelog',
+    'shiftboard', 'suppliers', 'orderflow', 'reportgen'
+  ));
+
 -- 1. Flip any existing (disabled) rows on.
 UPDATE org_features
 SET enabled = true
