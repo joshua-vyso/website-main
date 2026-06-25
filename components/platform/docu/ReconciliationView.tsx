@@ -31,21 +31,24 @@ function rowTime(r: Row): number {
 export function ReconciliationView({ statements }: { statements: DocumentWithSupplier[] }) {
   const router = useRouter();
 
-  // Live updates — refresh on mount, on focus/visibility, and on an interval.
+  // The server already rendered fresh data, so there's no mount-time refresh.
+  // We refresh when the user returns to the tab (so a statement uploaded/parsed
+  // elsewhere shows up), and ONLY poll on an interval while something is still
+  // extracting — an idle reconciliation tab makes zero background server hits.
+  const hasPending = statements.some((s) => s.status === 'pending');
   useEffect(() => {
-    router.refresh();
     const refresh = () => {
       if (document.visibilityState === 'visible') router.refresh();
     };
     window.addEventListener('focus', refresh);
     document.addEventListener('visibilitychange', refresh);
-    const iv = setInterval(refresh, 15000);
+    const iv = hasPending ? setInterval(refresh, 5000) : undefined;
     return () => {
       window.removeEventListener('focus', refresh);
       document.removeEventListener('visibilitychange', refresh);
-      clearInterval(iv);
+      if (iv) clearInterval(iv);
     };
-  }, [router]);
+  }, [router, hasPending]);
 
   const groups = useMemo(() => {
     const rows: Row[] = statements

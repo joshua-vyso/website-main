@@ -1,3 +1,4 @@
+import { cache } from 'react';
 import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { SUPABASE_URL, SUPABASE_ANON_KEY, supabaseConfigured } from './env';
@@ -40,8 +41,13 @@ const emptyFeatures = (): Record<FeatureKey, boolean> =>
 /**
  * Resolve the authenticated platform session (user + profile + org + features),
  * or null when unauthenticated/unconfigured. The /app layout uses this to guard.
+ *
+ * Wrapped in React `cache()` so the layout + page (+ nested layout) all share a
+ * SINGLE execution per request instead of each re-running the auth → profile →
+ * org/features round-trips. This deduped ~8 redundant queries per ProcurePulse
+ * navigation down to one set.
  */
-export async function getPlatformSession(): Promise<PlatformSession | null> {
+export const getPlatformSession = cache(async (): Promise<PlatformSession | null> => {
   if (!supabaseConfigured) return null;
   const supabase = await createServerSupabase();
 
@@ -73,4 +79,4 @@ export async function getPlatformSession(): Promise<PlatformSession | null> {
   }
 
   return { userId: user.id, email: user.email ?? '', profile: profile ?? null, org, features };
-}
+});

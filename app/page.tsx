@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import dynamic                     from "next/dynamic";
 import { BounceDot }               from "@/components/BounceDot";
 import { Navbar }                  from "@/components/Navbar";
 import { HeroSection }             from "@/components/HeroSection";
@@ -11,7 +12,14 @@ import { PricingSection }          from "@/components/sections/PricingSection";
 import { TrustStrip }              from "@/components/sections/TrustStrip";
 import { ContactSection }          from "@/components/sections/ContactSection";
 import { SiteFooter }              from "@/components/sections/SiteFooter";
-import { WebGLShaderBackground }   from "@/components/WebGLShaderBackground";
+
+// The WebGL background pulls in three.js (~650KB) and only runs in the browser,
+// so it's lazy-loaded (ssr:false) — it no longer blocks the homepage's initial
+// JS/first paint, and streams in just behind the intro animation.
+const WebGLShaderBackground = dynamic(
+  () => import("@/components/WebGLShaderBackground").then((m) => m.WebGLShaderBackground),
+  { ssr: false },
+);
 
 const SECTIONS: [React.ComponentType, string][] = [
   [HeroSection,      "hero"        ],

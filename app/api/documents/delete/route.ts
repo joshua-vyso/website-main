@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { resolveUser, AI_CORS_HEADERS } from '@/lib/ai/auth';
-import { orgHasProcurePulse, unfeedDocumentFromProcurePulse } from '@/lib/platform/procurepulse-feed';
+import { unfeedDocumentFromProcurePulse } from '@/lib/platform/procurepulse-feed';
 import type { Document } from '@/lib/platform/types';
 
 export const maxDuration = 60;
@@ -28,41 +28,42 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'documentIds is required' }, { status: 400, headers: AI_CORS_HEADERS });
   }
 
-  // Only documents the caller can see (RLS already scopes to their org).
-  const { data: docs } = await supabase
-    .from('documents')
-    .select('id, org_id, storage_path')
-    .in('id', ids);
-  const rows = (docs as Pick<Document, 'id' | 'org_id' | 'storage_path'>[] | null) ?? [];
-  if (rows.length === 0) {
-    return NextResponse.json({ deleted: 0 }, { headers: AI_CORS_HEADERS });
-  }
-
-  const orgId = rows[0].org_id;
-  const hasPP = orgId ? await orgHasProcurePulse(supabase, orgId) : false;
-
-  // Reverse ProcurePulse contribution before the rows go (best-effort).
-  if (hasPP) {
-    for (const r of rows) {
-      try {
-        await unfeedDocumentFromProcurePulse(supabase, r.id);
-      } catch {
-        /* never block deletion on an unfeed hiccup */
-      }
+  // Reverse each document's ProcurePulse contribution before the rows go
+  // (movements are FK'd to the document, so this must run first). Each call
+  // no-ops cheaply when the doc fed no stock or the org lacks ProcurePulse (RLS
+  // returns no movements), so the old separate feature-flag check is gone.
+  //
+  // These run SEQUENTIALLY on purpose: two documents in one bulk delete can feed
+  // the same surviving stock item, and unfeed does a non-atomic read-modify-write
+  // of on_hand. Running them concurrently would let both read the same level and
+  // lose one subtraction (under-reversing stock). Each unfeed is now set-based
+  // and index-served, so sequential is still fast.
+  for (const id of ids) {
+    try {
+      await unfeedDocumentFromProcurePulse(supabase, id);
+    } catch {
+      /* never block deletion on an unfeed hiccup */
     }
   }
 
-  // Remove storage objects (batch), then the rows.
+  // Delete the rows and read back their storage paths in ONE round-trip
+  // (RETURNING), replacing the old up-front SELECT. RLS scopes this to the
+  // caller's org, so unknown/foreign ids simply return nothing.
+  const { data: deleted, error: delErr } = await supabase
+    .from('documents')
+    .delete()
+    .in('id', ids)
+    .select('storage_path');
+  if (delErr) {
+    return NextResponse.json({ error: delErr.message }, { status: 500, headers: AI_CORS_HEADERS });
+  }
+  const rows = (deleted as Pick<Document, 'storage_path'>[] | null) ?? [];
+
+  // Storage objects can't be removed from SQL — clean them up after the rows.
   const paths = rows.map((r) => r.storage_path).filter((p): p is string => Boolean(p));
   if (paths.length > 0) {
     await supabase.storage.from('documents').remove(paths);
   }
 
-  const idsToDelete = rows.map((r) => r.id);
-  const { error: delErr } = await supabase.from('documents').delete().in('id', idsToDelete);
-  if (delErr) {
-    return NextResponse.json({ error: delErr.message }, { status: 500, headers: AI_CORS_HEADERS });
-  }
-
-  return NextResponse.json({ deleted: idsToDelete.length }, { headers: AI_CORS_HEADERS });
+  return NextResponse.json({ deleted: rows.length }, { headers: AI_CORS_HEADERS });
 }

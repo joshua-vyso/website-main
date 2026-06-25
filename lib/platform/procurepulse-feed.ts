@@ -95,33 +95,44 @@ export async function unfeedDocumentFromProcurePulse(
   for (const m of moves as { stock_item_id: string; change: number }[]) {
     byItem.set(m.stock_item_id, (byItem.get(m.stock_item_id) ?? 0) + Number(m.change));
   }
+  const itemIds = [...byItem.keys()];
 
+  // Drop this document's movements first…
   await supabase.from('pp_movements').delete().eq('source_document_id', documentId);
 
-  for (const [id, contrib] of byItem) {
-    // If this item has no movements left, it has no source anymore — remove it
-    // entirely (cascades its supplier prices) so deleting the last feeding
-    // document doesn't leave a zombie zero-stock item behind.
-    const { data: remaining } = await supabase
-      .from('pp_movements')
-      .select('id')
-      .eq('stock_item_id', id)
-      .limit(1);
-    if (!remaining || remaining.length === 0) {
-      await supabase.from('pp_stock_items').delete().eq('id', id);
-      continue;
-    }
-    // Otherwise it's still fed by other documents — just reverse on_hand.
+  // …then, in ONE query, find which touched items still have movements from
+  // other documents. Items absent from that set are now orphaned. (Replaces the
+  // old per-item "any movements left?" probe — 1 round-trip instead of M.)
+  const { data: survivorRows } = await supabase
+    .from('pp_movements')
+    .select('stock_item_id')
+    .in('stock_item_id', itemIds);
+  const survivors = new Set((survivorRows ?? []).map((r) => (r as { stock_item_id: string }).stock_item_id));
+
+  // Orphaned items have no source anymore — remove them in one bulk delete
+  // (cascades their supplier prices) so the last feeding document leaves no
+  // zombie zero-stock item behind.
+  const orphanIds = itemIds.filter((id) => !survivors.has(id));
+  if (orphanIds.length > 0) {
+    await supabase.from('pp_stock_items').delete().in('id', orphanIds);
+  }
+
+  // Survivors are still fed by other documents — reverse their on_hand. Read all
+  // current levels in one query, then fire the clamped updates in parallel.
+  const survivorIds = itemIds.filter((id) => survivors.has(id));
+  if (survivorIds.length > 0) {
     const { data: cur } = await supabase
       .from('pp_stock_items')
-      .select('on_hand')
-      .eq('id', id)
-      .maybeSingle();
-    if (cur) {
-      const next = Math.max(0, Number((cur as { on_hand: number }).on_hand) - contrib);
-      await supabase.from('pp_stock_items').update({ on_hand: next }).eq('id', id);
-    }
+      .select('id, on_hand')
+      .in('id', survivorIds);
+    await Promise.all(
+      ((cur ?? []) as { id: string; on_hand: number }[]).map((row) => {
+        const next = Math.max(0, Number(row.on_hand) - (byItem.get(row.id) ?? 0));
+        return supabase.from('pp_stock_items').update({ on_hand: next }).eq('id', row.id);
+      }),
+    );
   }
+
   return { itemsReversed: byItem.size };
 }
 

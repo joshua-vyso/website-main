@@ -40,11 +40,19 @@ export function InboxView({
   const [confirmBulk, setConfirmBulk] = useState(false);
   const [bulkBusy, setBulkBusy] = useState(false);
 
+  // Local mirror of the server docs so bulk delete/review reflect INSTANTLY
+  // (optimistic) instead of waiting for a full server refetch. Re-seeded
+  // whenever the server prop changes (a refresh reconciles to server truth).
+  const [localDocs, setLocalDocs] = useState(docs);
+  useEffect(() => {
+    setLocalDocs(docs);
+  }, [docs]);
+
   // While any document is still extracting (status 'pending'), poll the server
   // component so rows flip from "Extracting…" to their result live. The budget
   // resets whenever the pending set changes (e.g. a new upload), and caps at
   // ~2 min so a permanently-stuck pending row can't poll forever.
-  const pendingKey = docs
+  const pendingKey = localDocs
     .filter((d) => d.status === 'pending')
     .map((d) => d.id)
     .sort()
@@ -55,29 +63,29 @@ export function InboxView({
     pollsRef.current = 0;
     const iv = setInterval(() => {
       pollsRef.current += 1;
-      if (pollsRef.current > 40) {
+      if (pollsRef.current > 20) {
         clearInterval(iv);
         return;
       }
       router.refresh();
-    }, 3000);
+    }, 6000);
     return () => clearInterval(iv);
   }, [pendingKey, router]);
 
   const rows = useMemo(() => {
     const parsed = parseSearch(search);
-    let result = applySearch(docs, parsed);
+    let result = applySearch(localDocs, parsed);
     if (activeType) result = result.filter((d) => d.document_type === activeType);
     if (activeFolderId) result = result.filter((d) => d.folder_id === activeFolderId);
     if (parsed.flag) {
-      result = result.filter((d) => deriveFlags(d, docs).some((f) => f.kind === parsed.flag));
+      result = result.filter((d) => deriveFlags(d, localDocs).some((f) => f.kind === parsed.flag));
     }
     return [...result].sort((a, b) => {
       const ta = new Date(a.created_at).getTime();
       const tb = new Date(b.created_at).getTime();
       return sortDir === 'desc' ? tb - ta : ta - tb;
     });
-  }, [docs, search, activeType, activeFolderId, sortDir]);
+  }, [localDocs, search, activeType, activeFolderId, sortDir]);
 
   // Selectable = the currently-shown rows that have finished extracting.
   const selectableIds = useMemo(
@@ -101,24 +109,34 @@ export function InboxView({
   }
   async function bulkDelete() {
     if (selected.size === 0) return;
+    const ids = [...selected];
     setBulkBusy(true);
+    // Drop the rows immediately so deletion feels instant…
+    setLocalDocs((prev) => prev.filter((d) => !selected.has(d.id)));
+    exitSelect();
     await fetch('/api/documents/delete', {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
-      body: JSON.stringify({ documentIds: [...selected] }),
-    }).catch(() => {});
-    router.refresh();
+      body: JSON.stringify({ documentIds: ids }),
+    }).catch(() => null);
     setBulkBusy(false);
-    exitSelect();
+    // …then reconcile with server truth (re-seeds localDocs, restoring the rows
+    // if the delete failed).
+    router.refresh();
   }
   async function bulkReview() {
     if (selected.size === 0) return;
+    const ids = [...selected];
     setBulkBusy(true);
-    const supabase = createClient();
-    if (supabase) await supabase.from('documents').update({ status: 'reviewed' }).in('id', [...selected]);
-    router.refresh();
-    setBulkBusy(false);
+    // Flip the rows to 'reviewed' immediately.
+    setLocalDocs((prev) =>
+      prev.map((d) => (selected.has(d.id) ? { ...d, status: 'reviewed' as const } : d)),
+    );
     exitSelect();
+    const supabase = createClient();
+    if (supabase) await supabase.from('documents').update({ status: 'reviewed' }).in('id', ids);
+    setBulkBusy(false);
+    router.refresh();
   }
 
   return (
@@ -140,7 +158,7 @@ export function InboxView({
             aria-label="Search documents"
             className="h-10 w-72 rounded-xl border border-[#E7E7E2] bg-white px-4 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none"
           />
-          {docs.length > 0 ? (
+          {localDocs.length > 0 ? (
             <button
               type="button"
               onClick={() => (selectMode ? exitSelect() : setSelectMode(true))}
@@ -164,11 +182,11 @@ export function InboxView({
 
       {/* KPI grid */}
       <div className="mt-6">
-        <DocumentStatsCards docs={docs} />
+        <DocumentStatsCards docs={localDocs} />
       </div>
 
       {/* Table or new-user empty state */}
-      {docs.length === 0 ? (
+      {localDocs.length === 0 ? (
         <div className="mt-6 rounded-2xl border border-dashed border-[#E7E7E2] bg-white px-8 py-14 text-center">
           <h2 className="text-[18px] font-semibold text-[#1A1C1E]">No documents yet</h2>
           <p className="mx-auto mt-1 max-w-md text-[14px] text-[#5F6368]">
@@ -187,7 +205,7 @@ export function InboxView({
         <>
           <div className="mt-6">
             <DocumentFilters
-              docs={docs}
+              docs={localDocs}
               folders={folders}
               activeType={activeType}
               onTypeChange={setActiveType}
@@ -263,7 +281,7 @@ export function InboxView({
             ) : (
               <DocumentTable
                 rows={rows}
-                allDocs={docs}
+                allDocs={localDocs}
                 selectMode={selectMode}
                 selected={selected}
                 onToggleSelect={toggleSelect}

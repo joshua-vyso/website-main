@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { StatusPill, ConfidenceText } from '@/components/platform/ui';
 import { documentTypeLabel } from '@/lib/platform/documents';
 import { deriveFlags } from '@/lib/platform/docu/flags';
+import type { DocumentFlag } from '@/lib/platform/docu/types';
 import type { DocumentWithSupplier } from '@/lib/platform/types';
 import { FlagsList } from './FlagsList';
 import { DocumentRowMenu } from './DocumentRowMenu';
@@ -78,19 +79,19 @@ function ExtractingRow({ doc }: { doc: DocumentWithSupplier }) {
  */
 function DocRow({
   doc,
-  allDocs,
+  flags,
   selectMode,
   selected,
   onToggle,
 }: {
   doc: DocumentWithSupplier;
-  allDocs: DocumentWithSupplier[];
+  /** Precomputed once by the table — avoids re-deriving per row on every render. */
+  flags: DocumentFlag[];
   selectMode: boolean;
   selected: boolean;
   onToggle: (id: string) => void;
 }) {
   if (doc.status === 'pending') return <ExtractingRow doc={doc} />;
-  const flags = deriveFlags(doc, allDocs);
 
   if (selectMode) {
     return (
@@ -179,17 +180,32 @@ export function DocumentTable({
   selected?: Set<string>;
   onToggleSelect?: (id: string) => void;
 }) {
-  // Group preserving the incoming (already-sorted) order.
-  const groups: { key: string; docs: DocumentWithSupplier[] }[] = [];
-  const byKey = new Map<string, number>();
-  for (const doc of rows) {
-    const k = monthKey(doc.created_at);
-    if (!byKey.has(k)) {
-      byKey.set(k, groups.length);
-      groups.push({ key: k, docs: [] });
+  // Group preserving the incoming (already-sorted) order. Memoized so it isn't
+  // rebuilt on every unrelated re-render (search keystroke, poll, toggle).
+  const groups = useMemo(() => {
+    const out: { key: string; docs: DocumentWithSupplier[] }[] = [];
+    const byKey = new Map<string, number>();
+    for (const doc of rows) {
+      const k = monthKey(doc.created_at);
+      if (!byKey.has(k)) {
+        byKey.set(k, out.length);
+        out.push({ key: k, docs: [] });
+      }
+      out[byKey.get(k)!].docs.push(doc);
     }
-    groups[byKey.get(k)!].docs.push(doc);
-  }
+    return out;
+  }, [rows]);
+
+  // Per-row flags computed ONCE per (rows, allDocs) change instead of per row on
+  // every render — duplicate-invoice detection scans allDocs, so this was the
+  // dominant O(n²) render cost on large inboxes.
+  const flagsById = useMemo(() => {
+    const map = new Map<string, DocumentFlag[]>();
+    for (const doc of rows) {
+      if (doc.status !== 'pending') map.set(doc.id, deriveFlags(doc, allDocs));
+    }
+    return map;
+  }, [rows, allDocs]);
 
   // The most recent real month among the CURRENTLY visible groups is open by
   // default. Recomputed every render (from the live, filtered `groups`) so that
@@ -253,7 +269,7 @@ export function DocumentTable({
                   <DocRow
                     key={doc.id}
                     doc={doc}
-                    allDocs={allDocs}
+                    flags={flagsById.get(doc.id) ?? []}
                     selectMode={selectMode}
                     selected={selected?.has(doc.id) ?? false}
                     onToggle={onToggleSelect ?? (() => {})}

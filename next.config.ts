@@ -7,6 +7,12 @@ const nextConfig: NextConfig = {
   turbopack: {
     root: __dirname,
   },
+  // Only pull the modules actually used from these large barrel-export packages
+  // (the animation runtime is on every marketing page). No-ops for any listed
+  // package that isn't a barrel.
+  experimental: {
+    optimizePackageImports: ['framer-motion', 'motion'],
+  },
   async redirects() {
     return [
       // Canonical host: redirect www.vyso.co.za → vyso.co.za (preserve path),

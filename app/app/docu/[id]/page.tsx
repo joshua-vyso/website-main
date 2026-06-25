@@ -42,10 +42,13 @@ export default async function DocumentReviewPage({
     );
   }
 
-  // Sibling org documents power the cross-document intelligence (duplicate
-  // detection, supplier history, relationships); folders power the folder
-  // picker. Keep the same document select shape.
-  const [{ data: siblingData }, { data: folderData }] = await Promise.all([
+  // Everything the detail page needs, fetched in PARALLEL (they have no
+  // dependency on each other): sibling org documents power the cross-document
+  // intelligence (duplicate detection, supplier history, relationships); folders
+  // power the folder picker; pp_movements gives the ProcurePulse fed-item count
+  // (RLS returns nothing for orgs without the feature); the signed URL is the
+  // preview source. Previously these last two ran sequentially after the batch.
+  const [{ data: siblingData }, { data: folderData }, { data: fedMoves }, signedRes] = await Promise.all([
     supabase
       .from('documents')
       .select('*, supplier:suppliers(id,name,initials)')
@@ -56,27 +59,20 @@ export default async function DocumentReviewPage({
       .select('*')
       .eq('org_id', doc.org_id)
       .order('name', { ascending: true }),
+    supabase.from('pp_movements').select('stock_item_id').eq('source_document_id', doc.id),
+    doc.storage_path
+      ? supabase.storage.from('documents').createSignedUrl(doc.storage_path, 600)
+      : Promise.resolve({ data: null }),
   ]);
   const orgDocs = (siblingData as DocumentWithSupplier[] | null) ?? [];
   const folders = (folderData as DocumentFolder[] | null) ?? [];
 
-  // How many DISTINCT ProcurePulse stock items this document feeds (its live
-  // contribution). RLS returns nothing for orgs without the procurepulse feature.
-  const { data: fedMoves } = await supabase
-    .from('pp_movements')
-    .select('stock_item_id')
-    .eq('source_document_id', doc.id);
   const fedItemCount = new Set(
     (fedMoves as { stock_item_id: string }[] | null)?.map((m) => m.stock_item_id) ?? [],
   ).size;
 
-  let originalUrl: string | null = null;
-  if (doc.storage_path) {
-    const { data: signed } = await supabase.storage
-      .from('documents')
-      .createSignedUrl(doc.storage_path, 600);
-    originalUrl = signed?.signedUrl ?? null;
-  }
+  const originalUrl =
+    (signedRes as { data: { signedUrl?: string } | null }).data?.signedUrl ?? null;
 
   // Detect image vs PDF by filename extension (the row carries no mime type).
   const ext = (doc.filename || doc.storage_path || '')
