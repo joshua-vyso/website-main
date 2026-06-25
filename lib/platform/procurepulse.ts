@@ -56,11 +56,18 @@ export function trendLabel(pct: number | null | undefined): string {
   return `${pct > 0 ? '▲' : '▼'} ${Math.abs(Math.round(pct))}%`;
 }
 
-/** Rand formatter. `compact` → "R 248k"; otherwise "R 3,284". */
+/** Rand formatter. `compact` → "R 248k" / "R 1.2M"; otherwise "R 3,284". */
 export function rand(n: number | null | undefined, opts?: { compact?: boolean }): string {
   if (n == null) return '—';
   if (opts?.compact && Math.abs(n) >= 1000) {
-    return `R ${(n / 1000).toFixed(Math.abs(n) >= 100000 ? 0 : 1)}k`;
+    const decimals = Math.abs(n) >= 100_000 ? 0 : 1;
+    const k = Number((n / 1000).toFixed(decimals));
+    // Anything that would read as ≥ 1,000k rolls over to millions ("R 1.2M").
+    if (Math.abs(k) >= 1000) {
+      const m = n / 1_000_000;
+      return `R ${m.toFixed(Math.abs(m) >= 10 ? 0 : 1)}M`;
+    }
+    return `R ${k.toFixed(decimals)}k`;
   }
   return `R ${Math.round(n).toLocaleString('en-ZA')}`;
 }

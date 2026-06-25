@@ -1,22 +1,42 @@
-import { ModuleSkeleton } from '@/components/platform/ModuleSkeleton';
+import { getPlatformSession, createServerSupabase } from '@/lib/platform/supabase-server';
+import { InvoicingView, type InvoiceRow } from '@/components/platform/orderflow/InvoicingView';
+import type { OfOrder } from '@/lib/platform/orderflow';
 
-export default function OrderFlowInvoicingPage() {
-  return (
-    <ModuleSkeleton
-      title="Invoicing"
-      subtitle="Auto-generate invoices from orders and the product catalogue."
-      capabilities={[
-        'Generate an invoice from an order in one click, line items pre-filled from the catalogue.',
-        'Pull sell prices from PricePilot price lists, with per-customer margins applied.',
-        'Honour each customer’s agreed pricing status (daily / weekly / monthly).',
-        'Printed or scanned invoices import through Doc-U and match back to the order here.',
-        'Export / send invoices to customers; mark paid and feed PricePilot sales.',
-      ]}
-      links={[
-        { label: 'OrderFlow · Orders', href: '/app/orderflow/orders' },
-        { label: 'PricePilot · Price lists', href: '/app/pricepilot/price-lists' },
-        { label: 'ProcurePulse · Products', href: '/app/procurepulse/products' },
-      ]}
-    />
-  );
+type ItemAgg = { order_id: string; qty: number; unit_price: number };
+
+export default async function OrderFlowInvoicingPage() {
+  const session = await getPlatformSession();
+  const orgId = session?.org?.id ?? '';
+  const db = await createServerSupabase();
+
+  const [{ data: orders }, { data: items }, { data: customers }] = await Promise.all([
+    db
+      .from('of_orders')
+      .select('*')
+      .eq('org_id', orgId)
+      .in('status', ['confirmed', 'invoiced', 'paid'])
+      .order('created_at', { ascending: false }),
+    db.from('of_order_items').select('order_id, qty, unit_price').eq('org_id', orgId),
+    db.from('of_customers').select('id, name').eq('org_id', orgId),
+  ]);
+
+  const byOrder = new Map<string, number>();
+  for (const it of (items ?? []) as ItemAgg[]) {
+    byOrder.set(it.order_id, (byOrder.get(it.order_id) ?? 0) + (Number(it.qty) || 0) * (Number(it.unit_price) || 0));
+  }
+  const custName = new Map(((customers ?? []) as { id: string; name: string }[]).map((c) => [c.id, c.name]));
+  const orderList = (orders ?? []) as OfOrder[];
+
+  const rows: InvoiceRow[] = orderList.map((o) => ({
+    id: o.id,
+    customer_name: (o.customer_id && custName.get(o.customer_id)) || 'No customer',
+    status: o.status,
+    invoice_number: o.invoice_number,
+    total: byOrder.get(o.id) ?? 0,
+    created_at: o.created_at,
+  }));
+
+  const startSeq = orderList.filter((o) => o.invoice_number).length + 1;
+
+  return <InvoicingView rows={rows} startSeq={startSeq} />;
 }
