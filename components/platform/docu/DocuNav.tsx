@@ -4,19 +4,24 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const TABS = [
-  { href: '/app/docu', label: 'Documents' },
-  { href: '/app/docu/reconciliation', label: 'Reconciliation' },
-];
+  { href: '/app/docu', label: 'Documents', match: 'documents' },
+  { href: '/app/docu/recent', label: 'Recent', match: 'recent' },
+  { href: '/app/docu/reconciliation', label: 'Reconciliation', match: 'reconciliation' },
+] as const;
 
-/** Top tabs for the Doc-U section (Documents · Reconciliation). */
+/** Top tabs for the Doc-U section (Documents · Recent · Reconciliation). */
 export function DocuNav() {
-  const pathname = usePathname();
-  const isRecon = pathname?.startsWith('/app/docu/reconciliation') ?? false;
+  const pathname = usePathname() ?? '';
+  const current = pathname.startsWith('/app/docu/recent')
+    ? 'recent'
+    : pathname.startsWith('/app/docu/reconciliation')
+      ? 'reconciliation'
+      : 'documents'; // /app/docu, /app/docu/folder/*, /app/docu/[id], awaiting/confidence/flagged
 
   return (
     <div className="flex items-center gap-5 border-b border-[#E7E7E2]">
       {TABS.map((t) => {
-        const active = t.href === '/app/docu/reconciliation' ? isRecon : !isRecon;
+        const active = t.match === current;
         return (
           <Link
             key={t.href}

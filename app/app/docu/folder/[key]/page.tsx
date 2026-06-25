@@ -1,9 +1,17 @@
 import { redirect } from 'next/navigation';
 import { getPlatformSession, createServerSupabase } from '@/lib/platform/supabase-server';
-import { FolderGridView } from '@/components/platform/docu/FolderGridView';
+import { InboxView } from '@/components/platform/InboxView';
+import { resolveFolderKey, scopeDocsToFolder } from '@/lib/platform/docu/folders';
 import type { DocumentFolder, DocumentWithSupplier } from '@/lib/platform/types';
 
-export default async function DocuInboxPage() {
+/**
+ * A single folder's documents — the month-organised inbox scoped to one folder
+ * (a default document type, a custom folder, or "all"). Reached from the
+ * Documents folder grid.
+ */
+export default async function DocuFolderPage({ params }: { params: Promise<{ key: string }> }) {
+  const { key } = await params;
+
   const session = await getPlatformSession();
   if (!session) redirect('/login');
 
@@ -35,8 +43,24 @@ export default async function DocuInboxPage() {
       .order('name', { ascending: true }),
   ]);
 
-  const docs = (data ?? []) as DocumentWithSupplier[];
+  const allDocs = (data ?? []) as DocumentWithSupplier[];
   const folders = (folderData ?? []) as DocumentFolder[];
 
-  return <FolderGridView docs={docs} folders={folders} />;
+  const resolved = resolveFolderKey(key, folders);
+  if (!resolved.valid) redirect('/app/docu');
+
+  const scoped = scopeDocsToFolder(allDocs, resolved);
+
+  return (
+    <InboxView
+      docs={scoped}
+      folders={folders}
+      title={resolved.title}
+      subtitle={`${scoped.length} document${scoped.length === 1 ? '' : 's'} in this folder`}
+      backHref="/app/docu"
+      backLabel="All folders"
+      hideFilter
+      hideStats
+    />
+  );
 }

@@ -22,6 +22,7 @@ export function DocumentFilters({
   onFolderChange,
   sortDir,
   onSortToggle,
+  hideFilter = false,
 }: {
   docs: DocumentWithSupplier[];
   folders: DocumentFolder[];
@@ -31,6 +32,8 @@ export function DocumentFilters({
   onFolderChange: (id: string | null) => void;
   sortDir: 'desc' | 'asc';
   onSortToggle: () => void;
+  /** Folder view: hide the type/folder filter, keep only Sort. */
+  hideFilter?: boolean;
 }) {
   const router = useRouter();
   const { org, userId } = usePlatform();
@@ -107,7 +110,10 @@ export function DocumentFilters({
 
   return (
     <div className="flex flex-wrap items-center justify-between gap-3">
-      <div className="relative flex flex-wrap items-center gap-2">
+      {hideFilter ? (
+        <div />
+      ) : (
+        <div className="relative flex flex-wrap items-center gap-2">
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
@@ -227,7 +233,8 @@ export function DocumentFilters({
             </div>
           </>
         ) : null}
-      </div>
+        </div>
+      )}
 
       <button
         type="button"

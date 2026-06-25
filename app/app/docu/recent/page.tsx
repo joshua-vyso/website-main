@@ -1,9 +1,13 @@
 import { redirect } from 'next/navigation';
 import { getPlatformSession, createServerSupabase } from '@/lib/platform/supabase-server';
-import { FolderGridView } from '@/components/platform/docu/FolderGridView';
-import type { DocumentFolder, DocumentWithSupplier } from '@/lib/platform/types';
+import { RecentView } from '@/components/platform/docu/RecentView';
+import type { DocumentWithSupplier } from '@/lib/platform/types';
 
-export default async function DocuInboxPage() {
+/**
+ * Recent documents — added today / earlier this week (by created_at). Only those
+ * two sections; the full archive lives on the Documents tab.
+ */
+export default async function DocuRecentPage() {
   const session = await getPlatformSession();
   if (!session) redirect('/login');
 
@@ -21,22 +25,17 @@ export default async function DocuInboxPage() {
   }
 
   const supabase = await createServerSupabase();
-  const orgId = session.org?.id ?? '';
-  const [{ data }, { data: folderData }] = await Promise.all([
-    supabase
-      .from('documents')
-      .select('*, supplier:suppliers(id,name,initials)')
-      .eq('org_id', orgId)
-      .order('created_at', { ascending: false }),
-    supabase
-      .from('document_folders')
-      .select('*')
-      .eq('org_id', orgId)
-      .order('name', { ascending: true }),
-  ]);
+  // Last ~14 days covers "today + this week" with margin; the view buckets by
+  // local-time day boundaries on the client.
+  const since = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
+  const { data } = await supabase
+    .from('documents')
+    .select('*, supplier:suppliers(id,name,initials)')
+    .eq('org_id', session.org?.id ?? '')
+    .gte('created_at', since)
+    .order('created_at', { ascending: false });
 
   const docs = (data ?? []) as DocumentWithSupplier[];
-  const folders = (folderData ?? []) as DocumentFolder[];
 
-  return <FolderGridView docs={docs} folders={folders} />;
+  return <RecentView docs={docs} />;
 }

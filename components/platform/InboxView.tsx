@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useMemo, useRef, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { DocumentStatsCards } from './docu/DocumentStatsCards';
 import { DocumentFilters } from './docu/DocumentFilters';
@@ -23,11 +24,22 @@ export function InboxView({
   folders = [],
   title,
   subtitle,
+  backHref,
+  backLabel,
+  hideFilter = false,
+  hideStats = false,
 }: {
   docs: DocumentWithSupplier[];
   folders?: DocumentFolder[];
   title: string;
   subtitle: string;
+  /** When set, renders a "‹ {backLabel}" breadcrumb above the title (folder view). */
+  backHref?: string;
+  backLabel?: string;
+  /** Folder view: the type/folder filter is redundant (already scoped). */
+  hideFilter?: boolean;
+  /** Folder view: KPI cards live on the hub, not inside a folder. */
+  hideStats?: boolean;
 }) {
   const router = useRouter();
   const [search, setSearch] = useState('');
@@ -146,6 +158,14 @@ export function InboxView({
       {/* Header */}
       <div className="mt-6 flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
         <div className="min-w-[12rem] flex-1">
+          {backHref ? (
+            <Link
+              href={backHref}
+              className="mb-1.5 inline-flex items-center gap-1 text-[13px] text-[#5F6368] transition-colors hover:text-[#1A1C1E]"
+            >
+              <span aria-hidden>‹</span> {backLabel ?? 'Back'}
+            </Link>
+          ) : null}
           <h1 className="text-[26px] font-bold leading-tight text-[#1A1C1E]">{title}</h1>
           <p className="mt-1 text-[14px] text-[#5F6368]">{subtitle}</p>
         </div>
@@ -180,10 +200,12 @@ export function InboxView({
         </div>
       </div>
 
-      {/* KPI grid */}
-      <div className="mt-6">
-        <DocumentStatsCards docs={localDocs} />
-      </div>
+      {/* KPI grid — hidden inside a folder (the hub carries the org-wide KPIs) */}
+      {hideStats ? null : (
+        <div className="mt-6">
+          <DocumentStatsCards docs={localDocs} />
+        </div>
+      )}
 
       {/* Table or new-user empty state */}
       {localDocs.length === 0 ? (
@@ -213,6 +235,7 @@ export function InboxView({
               onFolderChange={setActiveFolderId}
               sortDir={sortDir}
               onSortToggle={() => setSortDir((d) => (d === 'desc' ? 'asc' : 'desc'))}
+              hideFilter={hideFilter}
             />
           </div>
           {selectMode ? (

@@ -162,59 +162,78 @@ function DocRow({
   );
 }
 
+/** A collapsible section of the table (a month, or a custom Recent bucket). */
+export interface DocGroup {
+  key: string;
+  label: string;
+  docs: DocumentWithSupplier[];
+}
+
 /**
- * The documents table, grouped into collapsible month tiles (most recent open
- * by default). `rows` are already filtered/sorted by InboxView; `allDocs` is the
- * full set so per-row flags (e.g. duplicate-invoice) derive across the org.
+ * The documents table, rendered as collapsible tiles. By default it groups
+ * `rows` into month tiles (most recent open). Pass `groups` to supply your own
+ * sections instead (e.g. Today / This week on the Recent page) — those open by
+ * default. `allDocs` is the full set so per-row flags (duplicate-invoice) derive
+ * across the org.
  */
 export function DocumentTable({
   rows,
+  groups: customGroups,
   allDocs,
   selectMode = false,
   selected,
   onToggleSelect,
 }: {
-  rows: DocumentWithSupplier[];
+  rows?: DocumentWithSupplier[];
+  groups?: DocGroup[];
   allDocs: DocumentWithSupplier[];
   selectMode?: boolean;
   selected?: Set<string>;
   onToggleSelect?: (id: string) => void;
 }) {
+  // The flat row set (for flag derivation) and the display sections. With custom
+  // groups we use them as-is; otherwise we month-group `rows`.
+  const flatRows = useMemo(
+    () => (customGroups ? customGroups.flatMap((g) => g.docs) : (rows ?? [])),
+    [customGroups, rows],
+  );
+
   // Group preserving the incoming (already-sorted) order. Memoized so it isn't
   // rebuilt on every unrelated re-render (search keystroke, poll, toggle).
-  const groups = useMemo(() => {
-    const out: { key: string; docs: DocumentWithSupplier[] }[] = [];
+  const groups = useMemo<DocGroup[]>(() => {
+    if (customGroups) return customGroups;
+    const out: DocGroup[] = [];
     const byKey = new Map<string, number>();
-    for (const doc of rows) {
+    for (const doc of rows ?? []) {
       const k = monthKey(doc.created_at);
       if (!byKey.has(k)) {
         byKey.set(k, out.length);
-        out.push({ key: k, docs: [] });
+        out.push({ key: k, label: monthLabel(k), docs: [] });
       }
       out[byKey.get(k)!].docs.push(doc);
     }
     return out;
-  }, [rows]);
+  }, [customGroups, rows]);
 
   // Per-row flags computed ONCE per (rows, allDocs) change instead of per row on
   // every render — duplicate-invoice detection scans allDocs, so this was the
   // dominant O(n²) render cost on large inboxes.
   const flagsById = useMemo(() => {
     const map = new Map<string, DocumentFlag[]>();
-    for (const doc of rows) {
+    for (const doc of flatRows) {
       if (doc.status !== 'pending') map.set(doc.id, deriveFlags(doc, allDocs));
     }
     return map;
-  }, [rows, allDocs]);
+  }, [flatRows, allDocs]);
 
-  // The most recent real month among the CURRENTLY visible groups is open by
-  // default. Recomputed every render (from the live, filtered `groups`) so that
-  // filtering never leaves every tile collapsed. User toggles are stored as
-  // per-month overrides that win over the default.
+  // Custom groups all open by default; month tiles open the most recent dated
+  // month. Recomputed every render (from the live groups) so filtering never
+  // leaves every tile collapsed. User toggles win as per-key overrides.
   const datedKeys = groups.map((g) => g.key).filter((k) => k !== 'unknown').sort();
   const defaultOpenKey = datedKeys.length ? datedKeys[datedKeys.length - 1] : groups[0]?.key;
   const [overrides, setOverrides] = useState<Record<string, boolean>>({});
-  const isOpenFor = (k: string) => overrides[k] ?? k === defaultOpenKey;
+  const isOpenFor = (k: string) =>
+    overrides[k] ?? (customGroups ? true : k === defaultOpenKey);
 
   if (groups.length === 0) {
     return (
@@ -245,7 +264,7 @@ export function DocumentTable({
                 >
                   ▾
                 </span>
-                <span className="text-[14px] font-semibold text-[#1A1C1E]">{monthLabel(g.key)}</span>
+                <span className="text-[14px] font-semibold text-[#1A1C1E]">{g.label}</span>
               </span>
               <span className="text-[12px] text-[#9A9DA1]">
                 {g.docs.length} document{g.docs.length === 1 ? '' : 's'}
