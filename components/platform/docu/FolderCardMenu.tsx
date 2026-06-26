@@ -123,18 +123,18 @@ export function FolderCardMenu({
             className="fixed inset-0 z-[9998] cursor-default"
           />
           <div
-            style={{ position: 'fixed', top: pos.top, left: pos.left, backgroundColor: '#ffffff' }}
-            className="z-[9999] w-[200px] rounded-xl border border-[#D7D7D2] bg-white p-1.5 shadow-[0_18px_50px_-8px_rgba(26,28,30,0.5)] ring-1 ring-black/[0.06]"
+            style={{ position: 'fixed', top: pos.top, left: pos.left }}
+            className="z-[9999] w-[208px] rounded-2xl border border-[#E4E4DF] bg-white p-2 shadow-[0_18px_50px_-8px_rgba(26,28,30,0.28)] ring-1 ring-black/[0.04]"
           >
             {mode === 'menu' ? (
               <>
-                <button type="button" onClick={() => setMode('rename')} className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-[13px] text-[#1A1C1E] transition-colors hover:bg-[#FAFAF8]">
+                <button type="button" onClick={() => setMode('rename')} className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-[14px] text-[#1A1C1E] transition-colors hover:bg-[#F4F4F1]">
                   Rename
                 </button>
-                <button type="button" onClick={() => setMode('color')} className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-[13px] text-[#1A1C1E] transition-colors hover:bg-[#FAFAF8]">
+                <button type="button" onClick={() => setMode('color')} className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-[14px] text-[#1A1C1E] transition-colors hover:bg-[#F4F4F1]">
                   Recolour
                 </button>
-                <button type="button" onClick={() => setMode('delete')} className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-[13px] text-[#A32D2D] transition-colors hover:bg-[#FCEBEB]">
+                <button type="button" onClick={() => setMode('delete')} className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-[14px] text-[#A32D2D] transition-colors hover:bg-[#FCEBEB]">
                   Delete
                 </button>
               </>

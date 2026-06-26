@@ -19,6 +19,7 @@ export function UnitCombobox({
   className?: string;
 }) {
   const ref = useRef<HTMLInputElement>(null);
+  const dropRef = useRef<HTMLDivElement>(null);
   const [open, setOpen] = useState(false);
   const [pos, setPos] = useState<{ top: number; left: number; width: number }>({ top: 0, left: 0, width: 0 });
 
@@ -28,15 +29,21 @@ export function UnitCombobox({
     setOpen(true);
   }
 
-  // Fixed positioning detaches on scroll/resize — just close.
+  // Fixed positioning detaches when an ancestor/page scrolls — close then. But
+  // scrolling INSIDE the dropdown's own list must NOT dismiss it (that was the
+  // bug: the capture-phase listener fired on the menu's own scroll).
   useEffect(() => {
     if (!open) return;
-    const onScroll = () => setOpen(false);
+    const onScroll = (e: Event) => {
+      if (dropRef.current && e.target instanceof Node && dropRef.current.contains(e.target)) return;
+      setOpen(false);
+    };
+    const onResize = () => setOpen(false);
     window.addEventListener('scroll', onScroll, true);
-    window.addEventListener('resize', onScroll);
+    window.addEventListener('resize', onResize);
     return () => {
       window.removeEventListener('scroll', onScroll, true);
-      window.removeEventListener('resize', onScroll);
+      window.removeEventListener('resize', onResize);
     };
   }, [open]);
 
@@ -69,6 +76,7 @@ export function UnitCombobox({
 
       {open && list.length > 0 ? (
         <div
+          ref={dropRef}
           style={{ position: 'fixed', top: pos.top, left: pos.left, width: Math.max(pos.width, 120) }}
           className="z-[70] max-h-[220px] overflow-y-auto rounded-xl border border-[#D7D7D2] bg-white p-1 shadow-[0_18px_50px_-8px_rgba(26,28,30,0.4)]"
         >
