@@ -304,6 +304,7 @@ export async function feedDocumentToProcurePulse(
   // 2. Apply the current line items.
   const newByItem = new Map<string, number>();
   const priceByItem = new Map<string, number>();
+  const unitByItem = new Map<string, string>();
   let itemsAffected = 0;
   let movementsWritten = 0;
 
@@ -312,6 +313,8 @@ export async function feedDocumentToProcurePulse(
     if (!name) continue;
 
     const price = parsePrice(li.unit_price);
+    // Counting unit as captured/corrected in Doc-U review (boxes / punnets / …).
+    const lineUnit = (li.unit ?? '').trim();
 
     // A confirmed alias wins; otherwise match an existing item by name
     // (case-insensitive, literal — likeEscape stops "%"/"_" acting as wildcards),
@@ -333,7 +336,7 @@ export async function feedDocumentToProcurePulse(
           org_id: doc.org_id,
           name,
           pack: buildPack(li.weight, li.units_per_box),
-          unit: 'boxes',
+          unit: lineUnit || 'boxes',
           on_hand: 0,
           low_threshold: 0,
           avg_unit_price: price,
@@ -345,6 +348,9 @@ export async function feedDocumentToProcurePulse(
       if (createErr || !created) continue; // RLS/feature-gate or bad row — skip
       itemId = (created as { id: string }).id;
     }
+
+    // The document is the authority on the counting unit it was received in.
+    if (lineUnit) unitByItem.set(itemId, lineUnit);
 
     const qty = parseNum(li.quantity) ?? 0;
     if (qty > 0) {
@@ -366,8 +372,13 @@ export async function feedDocumentToProcurePulse(
     itemsAffected += 1;
   }
 
-  // 3. Reconcile each touched item: on_hand += (new − prior), price, kg, supplier.
-  const touched = new Set<string>([...priorByItem.keys(), ...newByItem.keys(), ...priceByItem.keys()]);
+  // 3. Reconcile each touched item: on_hand += (new − prior), price, unit, kg, supplier.
+  const touched = new Set<string>([
+    ...priorByItem.keys(),
+    ...newByItem.keys(),
+    ...priceByItem.keys(),
+    ...unitByItem.keys(),
+  ]);
   const touchedIds = [...touched];
 
   // Batch-read the touched items' current level + name in one query (replaces the
@@ -392,6 +403,8 @@ export async function feedDocumentToProcurePulse(
     // Clamp to >= 0 — stock should never read negative even if data drifts.
     if (row) patch.on_hand = Math.max(0, Number(row.on_hand) + delta);
     if (priceByItem.has(id)) patch.avg_unit_price = priceByItem.get(id);
+    // The doc's counting unit (e.g. punnets) corrects a previously-defaulted unit.
+    if (unitByItem.has(id)) patch.unit = unitByItem.get(id);
     // kg/unit recomputed from all current feeding docs (value, or null when no
     // weight data remains — which correctly clears a stale figure).
     if (kgById.has(id)) patch.kg_per_unit = kgById.get(id);

@@ -20,7 +20,7 @@ function ConfidenceChip({ confidence }: { confidence: number }) {
   );
 }
 
-const COLS = 'grid grid-cols-[1fr_80px_56px_72px_92px_104px_28px] gap-2 items-center';
+const COLS = 'grid grid-cols-[1fr_64px_48px_70px_56px_76px_88px_24px] gap-2 items-center';
 
 export function ExtractionEditor({
   id,
@@ -142,6 +142,7 @@ export function ExtractionEditor({
               <span>Description</span>
               <span>Weight (kg)</span>
               <span>Qty</span>
+              <span>Unit</span>
               <span>Units/box</span>
               <span>Unit price</span>
               <span>Amount</span>
@@ -153,6 +154,7 @@ export function ExtractionEditor({
                   <input className={cellCls} value={l.description ?? ''} onChange={(e) => updateLine(i, 'description', e.target.value)} />
                   <input className={cellCls} value={l.weight ?? ''} onChange={(e) => updateLine(i, 'weight', e.target.value)} />
                   <input className={`${cellCls} text-right`} value={l.quantity ?? ''} onChange={(e) => updateLine(i, 'quantity', e.target.value)} />
+                  <input className={cellCls} value={l.unit ?? ''} placeholder="boxes" onChange={(e) => updateLine(i, 'unit', e.target.value)} />
                   <input className={`${cellCls} text-right`} value={l.units_per_box ?? ''} onChange={(e) => updateLine(i, 'units_per_box', e.target.value)} />
                   <input className={`${cellCls} text-right`} value={l.unit_price ?? ''} onChange={(e) => updateLine(i, 'unit_price', e.target.value)} />
                   <input className={`${cellCls} text-right`} value={l.amount ?? ''} onChange={(e) => updateLine(i, 'amount', e.target.value)} />

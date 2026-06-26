@@ -100,6 +100,8 @@ export interface ExtractedLineItem {
   units_per_box?: string;
   /** Total kilograms for the line = weight × quantity (Doc-U computes it). */
   total_kg?: string;
+  /** Counting unit the quantity is measured in: boxes / punnets / bags / kg … */
+  unit?: string;
   unit_price?: string;
   amount?: string;
   confidence: number;

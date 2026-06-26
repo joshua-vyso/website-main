@@ -42,6 +42,7 @@ export interface ExtractedLineItem {
   quantity?: string;
   units_per_box?: string;
   total_kg?: string;
+  unit?: string;
   unit_price?: string;
   amount?: string;
   confidence: number;
@@ -83,6 +84,7 @@ Respond with ONLY a JSON object (no prose, no markdown code fences) of exactly t
       "quantity": string,
       "units_per_box": string,
       "total_kg": string,
+      "unit": string,
       "unit_price": string,
       "amount": string,
       "confidence": number
@@ -111,6 +113,7 @@ Rules:
     - weight = the pack/unit weight CONVERTED TO KILOGRAMS, as a plain decimal number with NO unit: "300G" -> "0.3", "500G" -> "0.5", "6KG" -> "6", "18KG" -> "18". "" if no weight is shown.
     - units_per_box = the number of punnets/units packed per box when the line clearly encodes it. For "BABY BUTTERNUT,300G PUNNE,*,0,*,12,*" that is "12". "" if not indicated.
 - total_kg = the TOTAL kilograms for the line = weight × quantity, as a plain decimal string (e.g. weight="0.3", quantity="40" -> total_kg="12"; weight="6", quantity="2" -> total_kg="12"). weight is already the per-pack weight in kg, so do NOT multiply by units_per_box. "" if weight or quantity is missing.
+- unit = the COUNTING unit that quantity is measured in, as a short lowercase plural noun, read from the pack/commodity descriptor: "PUNNE"/"PUNNET" -> "punnets", "BOX" -> "boxes", "POCKET" -> "pockets", "BAG" -> "bags", "BUNCH" -> "bunches", "CRATE" -> "crates", "TRAY" -> "trays", "PKT"/"PACKET" -> "packets". If the row is priced/counted by weight, use "kg". Default to "boxes" only when there is genuinely no packaging cue.
 - quantity, unit_price and amount come from the QTY, UNIT PRICE and TOTAL columns of that row — NOT from the commodity string.
 - Ignore non-product rows: pallets, deposits, card fees, charges, balances, subtotals, grand totals, banking details.
 - Output numbers as plain strings (keep decimals; omit currency symbols). All confidence values 0-100.`;
