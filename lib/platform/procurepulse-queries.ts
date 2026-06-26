@@ -10,6 +10,8 @@ import type {
   ProcurePulseActivityEvent,
   ProductAlias,
   ProductUnit,
+  Recipe,
+  RecipeIngredient,
   ReorderRequest,
   StockItem,
   StockMovement,
@@ -135,6 +137,37 @@ export async function fetchStockOrders(db: DB, orgId: string, limit = 60): Promi
     .order('created_at', { ascending: false })
     .limit(limit);
   return (data ?? []) as StockOrder[];
+}
+
+/** All recipes for an org (newest first). Tolerant of the table not existing yet. */
+export async function fetchRecipes(db: DB, orgId: string): Promise<Recipe[]> {
+  const { data } = await db
+    .from('pp_recipes')
+    .select('*')
+    .eq('org_id', orgId)
+    .order('created_at', { ascending: false });
+  return (data ?? []) as Recipe[];
+}
+
+export async function fetchRecipe(db: DB, id: string): Promise<Recipe | null> {
+  const { data } = await db.from('pp_recipes').select('*').eq('id', id).maybeSingle();
+  return (data as Recipe) ?? null;
+}
+
+/** Every recipe ingredient for an org — used to roll up list-page KPIs. */
+export async function fetchRecipeIngredients(db: DB, orgId: string): Promise<RecipeIngredient[]> {
+  const { data } = await db.from('pp_recipe_ingredients').select('*').eq('org_id', orgId);
+  return (data ?? []) as RecipeIngredient[];
+}
+
+/** Ingredient lines for a single recipe. */
+export async function fetchIngredientsForRecipe(db: DB, recipeId: string): Promise<RecipeIngredient[]> {
+  const { data } = await db
+    .from('pp_recipe_ingredients')
+    .select('*')
+    .eq('recipe_id', recipeId)
+    .order('product_name', { ascending: true });
+  return (data ?? []) as RecipeIngredient[];
 }
 
 /** Recent stock activity events for the dashboard feed. Tolerant of missing table. */

@@ -7,6 +7,8 @@
 import type {
   ItemSupplierPrice,
   PpNotificationKind,
+  Recipe,
+  RecipeIngredient,
   StockItem,
   StockStatus,
 } from './types';
@@ -235,4 +237,130 @@ export function buildMatrix(items: StockItem[], prices: ItemSupplierPrice[]): Pr
       return { item, cells, saving: min != null && max != null ? max - min : 0 };
     });
   return { suppliers, rows };
+}
+
+// ---------------------------------------------------------------------------
+// Recipes (production planning from live stock)
+// ---------------------------------------------------------------------------
+
+export type RecipeReadiness = 'ready' | 'blocked' | 'unknown';
+
+/** One ingredient's live availability against the stock item it draws from. */
+export interface IngredientAvailability {
+  ingredient: RecipeIngredient;
+  stockItem: StockItem | null;
+  /** Whether the line is linked to a tracked stock item. */
+  linked: boolean;
+  /** Units on hand of the linked stock item (0 when unlinked). */
+  onHand: number;
+  /** Units this ingredient consumes per batch. */
+  perBatch: number;
+  /**
+   * Batches this ingredient alone could supply: `floor(onHand / perBatch)`.
+   * `Infinity` (non-constraining) when unlinked or perBatch ≤ 0 — we can't
+   * judge availability, so it shouldn't drag the whole recipe to zero.
+   */
+  possibleBatches: number;
+}
+
+export function ingredientAvailability(
+  ingredient: RecipeIngredient,
+  stockItem: StockItem | null | undefined,
+): IngredientAvailability {
+  const perBatch = ingredient.qty_per_batch > 0 ? ingredient.qty_per_batch : 0;
+  const linked = !!stockItem;
+  const onHand = stockItem?.on_hand ?? 0;
+  const possibleBatches = linked && perBatch > 0 ? Math.floor(onHand / perBatch) : Infinity;
+  return { ingredient, stockItem: stockItem ?? null, linked, onHand, perBatch, possibleBatches };
+}
+
+export interface RecipeBatchPlan {
+  availabilities: IngredientAvailability[];
+  /** Max batches producible now; `null` when nothing constrains it (empty / all unlinked). */
+  batches: number | null;
+  /** The ingredient that caps production (smallest finite possibleBatches). */
+  limiting: IngredientAvailability | null;
+  readiness: RecipeReadiness;
+  /** Stock cost of one batch = Σ perBatch × avg_unit_price over linked ingredients. */
+  costPerBatch: number;
+}
+
+/**
+ * Live max-batches for a recipe from its ingredients and a stock snapshot.
+ * `batches` is governed by the most-constrained *linked* ingredient; unlinked or
+ * zero-per-batch lines are surfaced (via `availabilities`) but don't constrain.
+ */
+export function maxRecipeBatches(
+  ingredients: RecipeIngredient[],
+  stockByItem: Map<string, StockItem>,
+): RecipeBatchPlan {
+  const availabilities = ingredients.map((ing) =>
+    ingredientAvailability(ing, ing.stock_item_id ? stockByItem.get(ing.stock_item_id) : null),
+  );
+  const costPerBatch = availabilities.reduce(
+    (s, a) => s + a.perBatch * (a.stockItem?.avg_unit_price ?? 0),
+    0,
+  );
+  const constraining = availabilities.filter((a) => Number.isFinite(a.possibleBatches));
+  if (constraining.length === 0) {
+    return { availabilities, batches: null, limiting: null, readiness: 'unknown', costPerBatch };
+  }
+  let limiting = constraining[0];
+  for (const a of constraining) if (a.possibleBatches < limiting.possibleBatches) limiting = a;
+  const batches = limiting.possibleBatches;
+  return {
+    availabilities,
+    batches,
+    limiting,
+    readiness: batches > 0 ? 'ready' : 'blocked',
+    costPerBatch,
+  };
+}
+
+export interface RecipeWithPlan {
+  recipe: Recipe;
+  plan: RecipeBatchPlan;
+  ingredientCount: number;
+}
+
+export interface RecipeKpis {
+  activeRecipes: number;
+  blocked: number;
+  /** Stock cost to make one batch of every recipe. */
+  costOneBatchEach: number;
+  /** Product name used across the most recipes (— when there are none). */
+  mostUsedIngredient: string;
+  mostUsedCount: number;
+}
+
+/** Roll a set of recipes + their ingredients against stock into list-page KPIs. */
+export function computeRecipeKpis(plans: RecipeWithPlan[], ingredients: RecipeIngredient[]): RecipeKpis {
+  const blocked = plans.filter((p) => p.plan.readiness === 'blocked').length;
+  const costOneBatchEach = plans.reduce((s, p) => s + p.plan.costPerBatch, 0);
+
+  // Most-used ingredient: count distinct recipes a normalized product name appears in.
+  const recipesByName = new Map<string, { label: string; recipes: Set<string> }>();
+  for (const ing of ingredients) {
+    const key = (ing.product_name ?? '').trim().toLowerCase();
+    if (!key) continue;
+    const entry = recipesByName.get(key) ?? { label: ing.product_name.trim(), recipes: new Set() };
+    entry.recipes.add(ing.recipe_id);
+    recipesByName.set(key, entry);
+  }
+  let mostUsedIngredient = '—';
+  let mostUsedCount = 0;
+  for (const { label, recipes } of recipesByName.values()) {
+    if (recipes.size > mostUsedCount) {
+      mostUsedCount = recipes.size;
+      mostUsedIngredient = label;
+    }
+  }
+
+  return {
+    activeRecipes: plans.length,
+    blocked,
+    costOneBatchEach,
+    mostUsedIngredient,
+    mostUsedCount,
+  };
 }
