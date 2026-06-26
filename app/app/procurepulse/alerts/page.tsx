@@ -8,6 +8,7 @@ import {
   PpButton,
   StockStatusPill,
 } from '@/components/platform/procurepulse/ui';
+import { AlertRowActions } from '@/components/platform/procurepulse/AlertRowActions';
 import type { ItemSupplierPrice } from '@/lib/platform/types';
 
 export default async function ProcurePulseAlerts() {
@@ -95,19 +96,14 @@ export default async function ProcurePulseAlerts() {
                     <span className="text-[#9A9DA1]">No quote</span>
                   )}
                 </div>
-                <div className="flex w-[170px] items-center gap-2">
-                  <button
-                    type="button"
-                    className="rounded-lg bg-[#1E5E54] px-3.5 py-1.5 text-[12px] font-medium text-white"
-                  >
-                    Reorder
-                  </button>
-                  <button
-                    type="button"
-                    className="rounded-lg border border-[#D7DAD8] px-3.5 py-1.5 text-[12px] font-medium text-[#5F6368]"
-                  >
-                    Snooze
-                  </button>
+                <div className="w-[170px]">
+                  <AlertRowActions
+                    stockItemId={a.item.id}
+                    productName={a.item.name}
+                    qty={a.suggested}
+                    unit={a.item.unit}
+                    supplier={cheapest?.supplier_name ?? null}
+                  />
                 </div>
               </div>
             );
