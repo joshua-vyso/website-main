@@ -82,7 +82,10 @@ export function ExtractionEditor({
           status: nextStatus,
           extracted_data: {
             ...(extractedData ?? {}),
-            fields: draft,
+            // The dedicated supplier below is the single source of truth — strip any
+            // legacy supplier-labeled field so it can't resurrect a cleared/corrected
+            // value via inferSupplierFromDoc's fields[] fallback.
+            fields: draft.filter((f) => !isSupplierLabel(f.label)),
             line_items: lines,
             supplier: supplier.trim() || null,
           },
