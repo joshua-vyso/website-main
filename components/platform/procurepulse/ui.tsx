@@ -240,6 +240,61 @@ export function Sparkline({
   );
 }
 
+/** Donut chart from labelled, coloured slices (pure SVG; segments via dash-arrays). */
+export function DonutChart({
+  segments,
+  size = 150,
+  thickness = 24,
+  centerLabel,
+  centerSub,
+}: {
+  segments: { label: string; value: number; color: string }[];
+  size?: number;
+  thickness?: number;
+  centerLabel?: string;
+  centerSub?: string;
+}) {
+  const total = segments.reduce((s, x) => s + x.value, 0);
+  const r = (size - thickness) / 2;
+  const c = 2 * Math.PI * r;
+  let offset = 0;
+  return (
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        <g transform={`rotate(-90 ${size / 2} ${size / 2})`}>
+          <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#F0F0EC" strokeWidth={thickness} />
+          {total > 0 &&
+            segments.map((s, i) => {
+              const frac = s.value / total;
+              const dash = frac * c;
+              const el = (
+                <circle
+                  key={i}
+                  cx={size / 2}
+                  cy={size / 2}
+                  r={r}
+                  fill="none"
+                  stroke={s.color}
+                  strokeWidth={thickness}
+                  strokeDasharray={`${dash} ${c - dash}`}
+                  strokeDashoffset={-offset}
+                />
+              );
+              offset += dash;
+              return el;
+            })}
+        </g>
+      </svg>
+      {centerLabel ? (
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="text-[22px] font-bold leading-none text-[#1A1C1E]">{centerLabel}</span>
+          {centerSub ? <span className="mt-1 text-[11px] text-[#9A9DA1]">{centerSub}</span> : null}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 // ---------------------------------------------------------------------------
 // Settings primitives (visual)
 // ---------------------------------------------------------------------------

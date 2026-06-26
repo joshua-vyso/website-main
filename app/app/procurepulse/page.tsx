@@ -4,19 +4,18 @@ import { getPlatformSession, createServerSupabase } from '@/lib/platform/supabas
 import {
   fetchStock,
   fetchNotifications,
-  fetchPrices,
   fetchThresholds,
   fetchRecentMovements,
 } from '@/lib/platform/procurepulse-queries';
 import {
   computeAlerts,
   computeKpis,
-  buildDraftOrder,
+  stockByCategory,
   freshnessStatus,
   rand,
   NOTIFICATION_KINDS,
 } from '@/lib/platform/procurepulse';
-import { AreaChart, KpiCard, LiveChip, PageHead } from '@/components/platform/procurepulse/ui';
+import { AreaChart, DonutChart, KpiCard, LiveChip, PageHead } from '@/components/platform/procurepulse/ui';
 
 /** Friendly labels for the stock-movement reasons (no wastage in ProcurePulse). */
 const MOVEMENT_LABEL: Record<string, string> = {
@@ -56,10 +55,9 @@ export default async function ProcurePulseDashboard() {
   const orgId = session.org?.id ?? '';
 
   const db = await createServerSupabase();
-  const [items, notifs, prices, thresholds, movements] = await Promise.all([
+  const [items, notifs, thresholds, movements] = await Promise.all([
     fetchStock(db, orgId),
     fetchNotifications(db, orgId),
-    fetchPrices(db, orgId),
     fetchThresholds(db, orgId),
     fetchRecentMovements(db, orgId, 7),
   ]);
@@ -87,7 +85,7 @@ export default async function ProcurePulseDashboard() {
 
   const kpis = computeKpis(items);
   const alerts = computeAlerts(items).slice(0, 4);
-  const draft = buildDraftOrder(items, prices);
+  const categories = stockByCategory(items);
 
   // Freshness risk: items whose freshness threshold is configured AND status is
   // aging/expired. Age tracking lands with movements/counts, so this reads 0 until
@@ -130,13 +128,36 @@ export default async function ProcurePulseDashboard() {
     <div className="space-y-5">
       <PageHead title="ProcurePulse" subtitle="Stock intelligence" right={<LiveChip />} />
 
-      <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-6">
+      <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-5">
         <KpiCard label="Stock value" value={rand(kpis.stockValue, { compact: true })} />
         <KpiCard label="Items low" value={String(kpis.itemsLow)} accent="#854F0B" />
         <KpiCard label="Out of stock" value={String(kpis.outOfStock)} accent="#A32D2D" />
-        <KpiCard label="Est. next order" value={rand(draft.total, { compact: true })} accent="#1E5E54" />
         <KpiCard label="Freshness risk" value={String(freshnessRisk)} accent={freshnessRisk > 0 ? '#854F0B' : undefined} />
         <KpiCard label="Count variance" value="—" />
+      </div>
+
+      <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
+        <div className="text-[14px] font-medium text-[#1A1C1E]">Stock by category</div>
+        <div className="mt-4 flex flex-col items-center gap-6 sm:flex-row">
+          <DonutChart
+            segments={categories}
+            centerLabel={String(items.length)}
+            centerSub={items.length === 1 ? 'product' : 'products'}
+          />
+          <div className="grid w-full flex-1 grid-cols-1 gap-x-6 gap-y-2.5 sm:grid-cols-2">
+            {categories.map((c) => (
+              <div key={c.label} className="flex items-center justify-between gap-3">
+                <div className="flex min-w-0 items-center gap-2">
+                  <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: c.color }} />
+                  <span className="truncate text-[13px] text-[#1A1C1E]">{c.label}</span>
+                </div>
+                <span className="shrink-0 text-[13px] text-[#5F6368]">
+                  {c.value} · {Math.round((c.value / items.length) * 100)}%
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.6fr_1fr]">

@@ -364,3 +364,43 @@ export function computeRecipeKpis(plans: RecipeWithPlan[], ingredients: RecipeIn
     mostUsedCount,
   };
 }
+
+// ---------------------------------------------------------------------------
+// Stock composition (Dashboard category breakdown)
+// ---------------------------------------------------------------------------
+
+/** Donut colours per produce category (aligned to the categorise taxonomy). */
+export const CATEGORY_COLORS: Record<string, string> = {
+  Fruit: '#BA7517',
+  Vegetables: '#1D9E75',
+  Herbs: '#1E5E54',
+  'Salad & Leafy Greens': '#0F6E56',
+  Mushrooms: '#854F0B',
+  Other: '#9A9DA1',
+  Uncategorised: '#D7DAD8',
+};
+
+export interface CategorySlice {
+  label: string;
+  value: number;
+  color: string;
+}
+
+/**
+ * Group stock items into category slices by product count. Items with no category
+ * fall under "Uncategorised", which is always sorted last; the rest go largest-first.
+ */
+export function stockByCategory(items: Pick<StockItem, 'category'>[]): CategorySlice[] {
+  const counts = new Map<string, number>();
+  for (const it of items) {
+    const label = (it.category ?? '').trim() || 'Uncategorised';
+    counts.set(label, (counts.get(label) ?? 0) + 1);
+  }
+  return [...counts.entries()]
+    .map(([label, value]) => ({ label, value, color: CATEGORY_COLORS[label] ?? '#C4C4BE' }))
+    .sort((a, b) => {
+      if (a.label === 'Uncategorised') return 1;
+      if (b.label === 'Uncategorised') return -1;
+      return b.value - a.value;
+    });
+}
