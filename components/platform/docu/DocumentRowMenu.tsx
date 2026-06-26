@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/platform/supabase-browser';
 
@@ -20,10 +21,14 @@ export function DocumentRowMenu({ id, filename }: { id: string; filename: string
   const [value, setValue] = useState(filename);
   const [busy, setBusy] = useState(false);
   const [pos, setPos] = useState<{ top: number; left: number }>({ top: 0, left: 0 });
+  // The portal target only exists on the client — gate it until mounted.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   function openMenu() {
     const r = btnRef.current?.getBoundingClientRect();
-    if (r) setPos({ top: r.bottom + 6, left: Math.min(r.left, window.innerWidth - 200) });
+    // Right-align to the kebab so the menu covers the row, not the link text.
+    if (r) setPos({ top: r.bottom + 6, left: Math.max(8, Math.min(r.right - 208, window.innerWidth - 216)) });
     setValue(filename);
     setMode('menu');
     setOpen(true);
@@ -81,93 +86,96 @@ export function DocumentRowMenu({ id, filename }: { id: string; filename: string
         </svg>
       </button>
 
-      {open ? (
-        <>
-          <button
-            type="button"
-            aria-label="Close menu"
-            onClick={close}
-            className="fixed inset-0 z-[60] cursor-default"
-          />
-          <div
-            style={{ position: 'fixed', top: pos.top, left: pos.left, backgroundColor: '#ffffff' }}
-            className="z-[70] w-[190px] rounded-xl border border-[#D7D7D2] bg-white p-1.5 shadow-[0_18px_50px_-8px_rgba(26,28,30,0.5)] ring-1 ring-black/[0.06]"
-          >
-            {mode === 'menu' ? (
-              <>
-                <button
-                  type="button"
-                  onClick={() => setMode('rename')}
-                  className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-[13px] text-[#1A1C1E] transition-colors hover:bg-[#FAFAF8]"
-                >
-                  Rename
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setMode('delete')}
-                  className="flex w-full items-center gap-2 rounded-lg px-2.5 py-1.5 text-left text-[13px] text-[#A32D2D] transition-colors hover:bg-[#FCEBEB]"
-                >
-                  Delete
-                </button>
-              </>
-            ) : mode === 'rename' ? (
-              <div className="p-1">
-                <input
-                  autoFocus
-                  value={value}
-                  onChange={(e) => setValue(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') void rename();
-                    if (e.key === 'Escape') close();
-                  }}
-                  aria-label="New document name"
-                  className="h-8 w-full rounded-lg border border-[#1E5E54]/40 bg-white px-2 text-[13px] text-[#1A1C1E] focus:outline-none"
-                />
-                <div className="mt-1.5 flex justify-end gap-1.5">
-                  <button
-                    type="button"
-                    onClick={close}
-                    className="rounded-lg px-2.5 py-1 text-[12px] text-[#5F6368] hover:bg-[#FAFAF8]"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => void rename()}
-                    disabled={busy || !value.trim()}
-                    className="rounded-lg bg-[#1E5E54] px-2.5 py-1 text-[12px] font-medium text-white hover:bg-[#184D45] disabled:opacity-40"
-                  >
-                    {busy ? '…' : 'Save'}
-                  </button>
-                </div>
+      {open && mounted
+        ? createPortal(
+            <>
+              <button
+                type="button"
+                aria-label="Close menu"
+                onClick={close}
+                className="fixed inset-0 z-[9998] cursor-default"
+              />
+              <div
+                style={{ position: 'fixed', top: pos.top, left: pos.left }}
+                className="z-[9999] w-[208px] rounded-2xl border border-[#E4E4DF] bg-white p-2 shadow-[0_18px_50px_-8px_rgba(26,28,30,0.28)] ring-1 ring-black/[0.04]"
+              >
+                {mode === 'menu' ? (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setMode('rename')}
+                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-[14px] text-[#1A1C1E] transition-colors hover:bg-[#F4F4F1]"
+                    >
+                      Rename
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setMode('delete')}
+                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-[14px] text-[#A32D2D] transition-colors hover:bg-[#FCEBEB]"
+                    >
+                      Delete
+                    </button>
+                  </>
+                ) : mode === 'rename' ? (
+                  <div className="p-1">
+                    <input
+                      autoFocus
+                      value={value}
+                      onChange={(e) => setValue(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') void rename();
+                        if (e.key === 'Escape') close();
+                      }}
+                      aria-label="New document name"
+                      className="h-9 w-full rounded-lg border border-[#1E5E54]/40 bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:outline-none"
+                    />
+                    <div className="mt-2 flex justify-end gap-1.5">
+                      <button
+                        type="button"
+                        onClick={close}
+                        className="rounded-lg px-3 py-1.5 text-[12px] text-[#5F6368] hover:bg-[#F4F4F1]"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void rename()}
+                        disabled={busy || !value.trim()}
+                        className="rounded-lg bg-[#1E5E54] px-3 py-1.5 text-[12px] font-medium text-white hover:bg-[#184D45] disabled:opacity-40"
+                      >
+                        {busy ? '…' : 'Save'}
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-1.5">
+                    <p className="px-1 text-[12px] leading-snug text-[#5F6368]">
+                      Delete this document? This can&apos;t be undone.
+                    </p>
+                    <div className="mt-2 flex justify-end gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => setMode('menu')}
+                        className="rounded-lg px-3 py-1.5 text-[12px] text-[#5F6368] hover:bg-[#F4F4F1]"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => void remove()}
+                        disabled={busy}
+                        className="rounded-lg bg-[#A32D2D] px-3 py-1.5 text-[12px] font-medium text-white hover:bg-[#8f2727] disabled:opacity-40"
+                      >
+                        {busy ? '…' : 'Delete'}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div className="p-1.5">
-                <p className="px-1 text-[12px] leading-snug text-[#5F6368]">
-                  Delete this document? This can&apos;t be undone.
-                </p>
-                <div className="mt-2 flex justify-end gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => setMode('menu')}
-                    className="rounded-lg px-2.5 py-1 text-[12px] text-[#5F6368] hover:bg-[#FAFAF8]"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => void remove()}
-                    disabled={busy}
-                    className="rounded-lg bg-[#A32D2D] px-2.5 py-1 text-[12px] font-medium text-white hover:bg-[#8f2727] disabled:opacity-40"
-                  >
-                    {busy ? '…' : 'Delete'}
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </>
-      ) : null}
+            </>,
+            document.body,
+          )
+        : null}
     </>
   );
 }
