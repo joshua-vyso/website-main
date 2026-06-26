@@ -2,8 +2,10 @@ import { redirect } from 'next/navigation';
 import { getPlatformSession, createServerSupabase } from '@/lib/platform/supabase-server';
 import { fetchStock } from '@/lib/platform/procurepulse-queries';
 import { computeAlerts } from '@/lib/platform/procurepulse';
+import { computeKgPerUnit } from '@/lib/platform/procurepulse-feed';
 import { LiveChip, PageHead } from '@/components/platform/procurepulse/ui';
 import { AddStockButton } from '@/components/platform/procurepulse/AddStockButton';
+import { LiveStockAutoSync } from '@/components/platform/procurepulse/LiveStockAutoSync';
 import {
   LiveStockView,
   type RecentActivity,
@@ -17,6 +19,17 @@ export default async function ProcurePulseStockList() {
   const db = await createServerSupabase();
   const items = await fetchStock(db, orgId);
   const lowCount = computeAlerts(items).length;
+
+  // Stock on hand (kg) = on_hand × kg-per-unit, derived live from the feeding
+  // documents' extracted weights (weight × qty) — so it works even before the
+  // kg_per_unit column/backfill lands. Persisted value wins when present.
+  const kgMap = await computeKgPerUnit(db, items.map((i) => ({ id: i.id, name: i.name })));
+  for (const it of items) {
+    if (it.kg_per_unit == null) {
+      const kg = kgMap.get(it.id);
+      if (kg != null) it.kg_per_unit = kg;
+    }
+  }
 
   // Recent activity — the most recent quantity that moved per product, pulled
   // from OrderFlow order lines (newest first; first hit per item wins). Tolerant
@@ -39,6 +52,7 @@ export default async function ProcurePulseStockList() {
 
   return (
     <div>
+      <LiveStockAutoSync />
       <PageHead
         title="Live stock"
         subtitle="Real-time levels built from your Doc-U documents"

@@ -55,5 +55,19 @@ export async function POST(req: Request) {
   if (error) {
     return NextResponse.json({ error: friendly(error) }, { status: 500, headers: AI_CORS_HEADERS });
   }
+
+  // The stock unit is the product's canonical unit module-wide — mirror it onto
+  // pp_stock_items.unit so Live stock, Reordering, recipes etc. all read one value.
+  const byUnit = new Map<string, string[]>();
+  for (const r of rows) {
+    if (!r.stock_unit) continue;
+    const arr = byUnit.get(r.stock_unit) ?? [];
+    arr.push(r.stock_item_id);
+    byUnit.set(r.stock_unit, arr);
+  }
+  for (const [unit, ids] of byUnit) {
+    await db.from('pp_stock_items').update({ unit }).in('id', ids);
+  }
+
   return NextResponse.json({ ok: true, saved: rows.length }, { headers: AI_CORS_HEADERS });
 }

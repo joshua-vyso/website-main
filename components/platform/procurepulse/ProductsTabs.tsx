@@ -3,17 +3,17 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { PageHead } from './ui';
-import { ProductsManager } from './ProductsManager';
+import { ProductsOverview } from './ProductsOverview';
 import { ProductMatching } from './ProductMatching';
 import { ProductThresholds } from './ProductThresholds';
 import { ProductUnits } from './ProductUnits';
 import type { ProductUnit, StockItem, StockThreshold } from '@/lib/platform/types';
 import type { MatchCandidate } from '@/lib/platform/procurepulse/matching';
 
-type Tab = 'live' | 'thresholds' | 'units';
+type Tab = 'overview' | 'thresholds' | 'units';
 
 const TABS: { key: Tab; label: string }[] = [
-  { key: 'live', label: 'Live Stock' },
+  { key: 'overview', label: 'Products' },
   { key: 'thresholds', label: 'Thresholds' },
   { key: 'units', label: 'Units' },
 ];
@@ -33,7 +33,7 @@ export function ProductsTabs({
   thresholds: StockThreshold[];
   productUnits: ProductUnit[];
 }) {
-  const [tab, setTab] = useState<Tab>('live');
+  const [tab, setTab] = useState<Tab>('overview');
 
   return (
     <div>
@@ -69,9 +69,9 @@ export function ProductsTabs({
       </div>
 
       <div className="mt-5">
-        {tab === 'live' ? (
+        {tab === 'overview' ? (
           <>
-            <ProductsManager items={items} units={units} embedded />
+            <ProductsOverview items={items} thresholds={thresholds} />
             <div className="mt-8">
               <ProductMatching candidates={candidates} aiEnabled={aiEnabled} />
             </div>

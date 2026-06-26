@@ -160,7 +160,7 @@ export function LiveStockView({
           <div className="flex-1">Product</div>
           <div className="w-[140px] text-right">Stock on hand (kg)</div>
           <div className="w-[120px] text-right">Units on hand</div>
-          <div className="w-[100px]">Stock status</div>
+          <div className="w-[110px] pl-5">Stock status</div>
           <div className="w-[140px] text-right">Recent activity</div>
           <div className="w-[90px] text-right">Updated</div>
           <div className="w-[140px] pl-4">Category</div>
@@ -192,7 +192,7 @@ export function LiveStockView({
                 <div className="w-[120px] text-right text-[#5F6368]">
                   {fmtQty(item.on_hand)} {item.unit}
                 </div>
-                <div className="w-[100px]">
+                <div className="w-[110px] pl-5">
                   <StockStatusPill status={stockStatus(item)} />
                 </div>
                 <div className="w-[140px] text-right">

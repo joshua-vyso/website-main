@@ -13,6 +13,7 @@ import type {
   ReorderRequest,
   StockItem,
   StockMovement,
+  StockOrder,
   StockThreshold,
 } from './types';
 
@@ -108,6 +109,17 @@ export async function fetchThresholds(db: DB, orgId: string): Promise<StockThres
 export async function fetchProductUnits(db: DB, orgId: string): Promise<ProductUnit[]> {
   const { data } = await db.from('pp_product_units').select('*').eq('org_id', orgId);
   return (data ?? []) as ProductUnit[];
+}
+
+/** Stock orders created from the Reordering page. Tolerant of missing table. */
+export async function fetchStockOrders(db: DB, orgId: string, limit = 60): Promise<StockOrder[]> {
+  const { data } = await db
+    .from('pp_stock_orders')
+    .select('*')
+    .eq('org_id', orgId)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  return (data ?? []) as StockOrder[];
 }
 
 /** Recent stock activity events for the dashboard feed. Tolerant of missing table. */

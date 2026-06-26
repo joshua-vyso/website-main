@@ -353,7 +353,7 @@ export interface StockOrder {
   /** draft | sent | completed | cancelled */
   status: string;
   total: number | null;
-  estimate_sent_at: string | null;
+  item_count: number;
   created_by: string | null;
   created_at: string;
   updated_at: string;
