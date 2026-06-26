@@ -110,6 +110,24 @@ export function ReorderView({
       const json = (await res.json().catch(() => ({}))) as { error?: string; items?: number; total?: number };
       if (!res.ok) setMsg(json?.error ?? 'Could not send the order.');
       else {
+        // Also add the suggested low-stock lines to the team's open reorder
+        // requests (the manual ones are already there). Deduped server-side.
+        const suggested = order.groups.flatMap((g) =>
+          g.lines.map((l) => ({
+            stock_item_id: l.item.id,
+            product_name: l.item.name,
+            qty: l.qty,
+            unit: l.item.unit,
+            supplier: l.supplier,
+          })),
+        );
+        if (suggested.length > 0) {
+          await fetch('/api/procurepulse/reorder-request', {
+            method: 'POST',
+            headers: { 'content-type': 'application/json' },
+            body: JSON.stringify({ lines: suggested }),
+          }).catch(() => {});
+        }
         setMsg(`Sent to team — ${json.items} item${json.items === 1 ? '' : 's'}, ${rand(json.total ?? 0)}.`);
         router.refresh();
       }

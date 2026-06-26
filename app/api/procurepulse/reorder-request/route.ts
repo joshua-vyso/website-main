@@ -24,6 +24,81 @@ function friendly(error: { code?: string; message?: string } | null): string {
  * Org scope is enforced by RLS on pp_reorder_requests; we also stamp org_id +
  * created_by from the session so the WITH CHECK passes.
  */
+interface BatchLine {
+  product_name?: string;
+  stock_item_id?: string | null;
+  qty?: number | string;
+  unit?: string | null;
+  supplier?: string | null;
+}
+
+/** Dedupe key for an open request: the stock item if linked, else the lowercased name. */
+function reqKey(stockItemId: string | null, name: string): string {
+  return stockItemId ? `id:${stockItemId}` : `name:${name.toLowerCase()}`;
+}
+
+/**
+ * Create many open reorder requests at once, skipping items that already have an
+ * open request (so "Send to team" is idempotent across repeated clicks).
+ */
+async function batchCreate(orgId: string, userId: string, lines: BatchLine[]): Promise<Response> {
+  const clean = lines
+    .map((l) => ({
+      stock_item_id: (l.stock_item_id ?? null) || null,
+      product_name: (l.product_name ?? '').trim(),
+      qty: Number(l.qty),
+      unit: l.unit?.trim() || null,
+      supplier: l.supplier?.trim() || null,
+    }))
+    .filter((l) => l.product_name);
+  if (clean.length === 0) {
+    return NextResponse.json({ ok: true, created: 0 }, { headers: AI_CORS_HEADERS });
+  }
+
+  const db = await createServerSupabase();
+
+  // What's already open, so we don't duplicate.
+  const { data: openRows, error: readErr } = await db
+    .from('pp_reorder_requests')
+    .select('stock_item_id, product_name')
+    .eq('org_id', orgId)
+    .eq('status', 'open');
+  if (readErr) {
+    return NextResponse.json({ error: friendly(readErr) }, { status: 500, headers: AI_CORS_HEADERS });
+  }
+  const seen = new Set(
+    ((openRows ?? []) as { stock_item_id: string | null; product_name: string }[]).map((r) =>
+      reqKey(r.stock_item_id, r.product_name),
+    ),
+  );
+
+  const rows: Record<string, unknown>[] = [];
+  for (const l of clean) {
+    const key = reqKey(l.stock_item_id, l.product_name);
+    if (seen.has(key)) continue; // already an open request for this item
+    seen.add(key); // also de-dupe within this batch
+    rows.push({
+      org_id: orgId,
+      stock_item_id: l.stock_item_id,
+      product_name: l.product_name,
+      qty: Number.isFinite(l.qty) && l.qty > 0 ? l.qty : 0,
+      unit: l.unit,
+      supplier: l.supplier,
+      status: 'open',
+      created_by: userId,
+    });
+  }
+  if (rows.length === 0) {
+    return NextResponse.json({ ok: true, created: 0 }, { headers: AI_CORS_HEADERS });
+  }
+
+  const { error } = await db.from('pp_reorder_requests').insert(rows);
+  if (error) {
+    return NextResponse.json({ error: friendly(error) }, { status: 500, headers: AI_CORS_HEADERS });
+  }
+  return NextResponse.json({ ok: true, created: rows.length }, { headers: AI_CORS_HEADERS });
+}
+
 export async function POST(req: Request) {
   const session = await getPlatformSession();
   if (!session?.org?.id) {
@@ -37,7 +112,16 @@ export async function POST(req: Request) {
     unit?: string | null;
     supplier?: string | null;
     note?: string | null;
+    lines?: BatchLine[];
   };
+
+  // Batch mode — used by "Send to team" to drop the basket into the team's
+  // open reorder requests. Skips anything already open for the same item/name
+  // so repeated sends don't pile up duplicates.
+  if (Array.isArray(body.lines)) {
+    return batchCreate(session.org.id, session.userId, body.lines);
+  }
+
   const name = (body.product_name ?? '').trim();
   if (!name) {
     return NextResponse.json({ error: 'product_name is required' }, { status: 400, headers: AI_CORS_HEADERS });
