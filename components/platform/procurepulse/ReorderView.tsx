@@ -60,6 +60,7 @@ export function ReorderView({
   const [note, setNote] = useState('');
   const [busy, setBusy] = useState(false);
   const [sending, setSending] = useState(false);
+  const [reordering, setReordering] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
 
   // Group order history by week (newest week first); most recent week starts open.
@@ -135,6 +136,46 @@ export function ReorderView({
       setMsg('Could not reach the server.');
     } finally {
       setSending(false);
+    }
+  }
+
+  // Reorder all suggested low-stock lines: file them as open reorder requests
+  // (deduped server-side), so they land in "Your reorder requests" without the
+  // full send-to-team flow.
+  async function reorderAllSuggested() {
+    if (reordering) return;
+    const lines = order.groups.flatMap((g) =>
+      g.lines.map((l) => ({
+        stock_item_id: l.item.id,
+        product_name: l.item.name,
+        qty: l.qty,
+        unit: l.item.unit,
+        supplier: l.supplier,
+      })),
+    );
+    if (lines.length === 0) return;
+    setReordering(true);
+    setMsg(null);
+    try {
+      const res = await fetch('/api/procurepulse/reorder-request', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ lines }),
+      });
+      const json = (await res.json().catch(() => ({}))) as { error?: string; created?: number };
+      if (!res.ok) setMsg(json?.error ?? 'Could not add the items.');
+      else {
+        setMsg(
+          json.created
+            ? `Added ${json.created} item${json.created === 1 ? '' : 's'} to your reorder requests.`
+            : 'Those items are already in your reorder requests.',
+        );
+        router.refresh();
+      }
+    } catch {
+      setMsg('Could not reach the server.');
+    } finally {
+      setReordering(false);
     }
   }
 
@@ -216,9 +257,21 @@ export function ReorderView({
       <div className="space-y-4">
         {/* Suggested from low stock */}
         <div className="overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
-          <div className="flex items-center justify-between border-b border-[#E7E7E2] px-4 py-3">
+          <div className="flex items-center justify-between gap-3 border-b border-[#E7E7E2] px-4 py-3">
             <div className="text-[14px] font-semibold text-[#1A1C1E]">Suggested from low stock</div>
-            <div className="text-[12px] text-[#9A9DA1]">{order.itemCount} item{order.itemCount === 1 ? '' : 's'}</div>
+            <div className="flex items-center gap-3">
+              <span className="text-[12px] text-[#9A9DA1]">{order.itemCount} item{order.itemCount === 1 ? '' : 's'}</span>
+              {order.itemCount > 0 ? (
+                <button
+                  type="button"
+                  onClick={() => void reorderAllSuggested()}
+                  disabled={reordering}
+                  className="rounded-lg bg-[#1E5E54] px-3 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:opacity-50"
+                >
+                  {reordering ? 'Adding…' : `Reorder all · ${order.itemCount}`}
+                </button>
+              ) : null}
+            </div>
           </div>
 
           {order.groups.length === 0 ? (
