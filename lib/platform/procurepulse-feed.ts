@@ -425,17 +425,24 @@ export async function feedDocumentToProcurePulse(
     }
   }
 
-  // 4. Notify ProcurePulse that a document was synced.
+  // 4. Notify ProcurePulse that a document was synced, and log a stock-activity
+  //    event for the dashboard feed (best-effort — tolerant of either table).
   if (itemsAffected > 0) {
     const kind = doc.document_type === 'statement' ? 'new_market_statement' : 'new_direct_doc';
+    const title = `${itemsAffected} item${itemsAffected === 1 ? '' : 's'} updated from ${doc.filename}`;
+    const body = supplierName ? `Synced from ${supplierName} via Doc-U` : 'Synced from Doc-U';
     await supabase.from('pp_notifications').insert({
       org_id: doc.org_id,
       kind,
-      title: `${itemsAffected} item${itemsAffected === 1 ? '' : 's'} updated from ${doc.filename}`,
-      body: supplierName ? `Synced from ${supplierName} via Doc-U` : 'Synced from Doc-U',
+      title,
+      body,
       document_id: doc.id,
       read: false,
     });
+    await supabase
+      .from('procurepulse_activity_events')
+      .insert({ org_id: doc.org_id, type: 'document_sync', title, body, ref_id: doc.id })
+      .then(undefined, () => undefined);
   }
 
   return { fed: true, itemsAffected, movementsWritten };

@@ -1,15 +1,22 @@
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getPlatformSession, createServerSupabase } from '@/lib/platform/supabase-server';
-import { fetchStock, fetchNotifications } from '@/lib/platform/procurepulse-queries';
-import { computeAlerts, computeKpis, rand, NOTIFICATION_KINDS } from '@/lib/platform/procurepulse';
 import {
-  AreaChart,
-  DocBadge,
-  KpiCard,
-  LiveChip,
-  PageHead,
-} from '@/components/platform/procurepulse/ui';
+  fetchStock,
+  fetchNotifications,
+  fetchPrices,
+  fetchThresholds,
+  fetchActivityEvents,
+} from '@/lib/platform/procurepulse-queries';
+import {
+  computeAlerts,
+  computeKpis,
+  buildDraftOrder,
+  freshnessStatus,
+  rand,
+  NOTIFICATION_KINDS,
+} from '@/lib/platform/procurepulse';
+import { AreaChart, KpiCard, LiveChip, PageHead } from '@/components/platform/procurepulse/ui';
 
 export default async function ProcurePulseDashboard() {
   const session = await getPlatformSession();
@@ -17,9 +24,12 @@ export default async function ProcurePulseDashboard() {
   const orgId = session.org?.id ?? '';
 
   const db = await createServerSupabase();
-  const [items, notifs] = await Promise.all([
+  const [items, notifs, prices, thresholds, activity] = await Promise.all([
     fetchStock(db, orgId),
     fetchNotifications(db, orgId),
+    fetchPrices(db, orgId),
+    fetchThresholds(db, orgId),
+    fetchActivityEvents(db, orgId, 6),
   ]);
 
   if (items.length === 0) {
@@ -44,25 +54,46 @@ export default async function ProcurePulseDashboard() {
   }
 
   const kpis = computeKpis(items);
-  const alerts = computeAlerts(items).slice(0, 3);
+  const alerts = computeAlerts(items).slice(0, 4);
+  const draft = buildDraftOrder(items, prices);
+
+  // Freshness risk: items whose freshness threshold is configured AND status is
+  // aging/expired. Age tracking lands with movements/counts, so this reads 0 until
+  // there's age data — the tile is wired and lights up then.
+  const freshById = new Map(
+    thresholds.filter((t) => t.freshness_value != null).map((t) => [t.stock_item_id, t]),
+  );
+  const freshnessRisk = items.filter((it) => {
+    const t = freshById.get(it.id);
+    if (!t) return false;
+    return freshnessStatus(null, t.freshness_value) !== 'fresh';
+  }).length;
+
   const series = [0.86, 0.88, 0.84, 0.92, 0.9, 0.95, 0.97, 1].map((m) =>
     Math.round(kpis.stockValue * m),
   );
-  const docNotifs = notifs
-    .filter((n) => n.kind === 'new_direct_doc' || n.kind === 'new_market_statement')
-    .slice(0, 2);
+
   const recentNotifs = notifs.slice(0, 5);
   const NOTIF_FALLBACK = { bg: '#F0F0EC', fg: '#5F6368', label: 'Update' };
 
+  // Stock activity feed — real events when present, else derived from recent
+  // notifications (doc syncs, price changes, reorders) so it isn't empty.
+  const activityFeed =
+    activity.length > 0
+      ? activity.map((e) => ({ id: e.id, title: e.title, body: e.body }))
+      : notifs.slice(0, 6).map((n) => ({ id: n.id, title: n.title, body: n.body }));
+
   return (
     <div className="space-y-5">
-      <PageHead title="ProcurePulse" subtitle="Procurement intelligence" right={<LiveChip />} />
+      <PageHead title="ProcurePulse" subtitle="Stock intelligence" right={<LiveChip />} />
 
-      <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-3.5 sm:grid-cols-3 lg:grid-cols-6">
         <KpiCard label="Stock value" value={rand(kpis.stockValue, { compact: true })} />
         <KpiCard label="Items low" value={String(kpis.itemsLow)} accent="#854F0B" />
         <KpiCard label="Out of stock" value={String(kpis.outOfStock)} accent="#A32D2D" />
-        <KpiCard label="Spend this week" value={rand(kpis.spendWeek, { compact: true })} />
+        <KpiCard label="Est. next order" value={rand(draft.total, { compact: true })} accent="#1E5E54" />
+        <KpiCard label="Freshness risk" value={String(freshnessRisk)} accent={freshnessRisk > 0 ? '#854F0B' : undefined} />
+        <KpiCard label="Count variance" value="—" />
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.6fr_1fr]">
@@ -78,49 +109,49 @@ export default async function ProcurePulseDashboard() {
 
         <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
           <div className="text-[14px] font-medium text-[#1A1C1E]">Needs attention</div>
-          <div className="mt-3 space-y-3.5">
-            {alerts.map((a) => (
-              <div key={a.item.id} className="flex items-center justify-between gap-3">
-                <div className="min-w-0">
-                  <div className="text-[13px] font-medium text-[#1A1C1E]">{a.item.name}</div>
-                  <div
-                    className="text-[12px]"
-                    style={{ color: a.status === 'out' ? '#A32D2D' : '#854F0B' }}
-                  >
-                    {a.status === 'out'
-                      ? 'Out of stock'
-                      : `${a.item.on_hand} ${a.item.unit} left · below ${a.item.low_threshold}`}
+          <div className="mt-3 space-y-3">
+            {alerts.length === 0 ? (
+              <p className="text-[13px] text-[#9A9DA1]">Everything is well stocked.</p>
+            ) : (
+              alerts.map((a) => (
+                <div key={a.item.id} className="flex items-center justify-between gap-3">
+                  <div className="min-w-0">
+                    <div className="text-[13px] font-medium text-[#1A1C1E]">{a.item.name}</div>
+                    <div className="text-[12px]" style={{ color: a.status === 'out' ? '#A32D2D' : '#854F0B' }}>
+                      {a.status === 'out'
+                        ? `Out of stock · order ${a.suggested} ${a.item.unit}`
+                        : `${a.item.on_hand} ${a.item.unit} left, below ${a.item.low_threshold} · order ${a.suggested}`}
+                    </div>
                   </div>
+                  <Link
+                    href="/app/procurepulse/reorder"
+                    className="shrink-0 rounded-lg bg-[#1E5E54] px-3.5 py-2 text-[13px] font-medium text-white"
+                  >
+                    Order
+                  </Link>
                 </div>
-                <Link
-                  href="/app/procurepulse/reorder"
-                  className="shrink-0 rounded-lg bg-[#1E5E54] px-3.5 py-2 text-[13px] font-medium text-white"
-                >
-                  Reorder
-                </Link>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
-          <div className="text-[14px] font-medium text-[#1A1C1E]">Recent documents</div>
+          <div className="text-[14px] font-medium text-[#1A1C1E]">Stock activity</div>
           <div className="mt-3 space-y-3.5">
-            {docNotifs.length === 0 ? (
-              <p className="text-[13px] text-[#9A9DA1]">No documents have fed stock yet.</p>
+            {activityFeed.length === 0 ? (
+              <p className="text-[13px] text-[#9A9DA1]">No stock activity yet.</p>
             ) : (
-              docNotifs.map((n) => (
-                <div key={n.id} className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#E3F0ED]">
+              activityFeed.map((e) => (
+                <div key={e.id} className="flex items-start gap-3">
+                  <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#E3F0ED]">
                     <span className="h-[15px] w-[15px] rounded-[3px] bg-[#1E5E54]" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="text-[13px] font-medium text-[#1A1C1E]">{n.title}</div>
-                    <div className="text-[12px] text-[#9A9DA1]">{n.body}</div>
+                    <div className="text-[13px] font-medium text-[#1A1C1E]">{e.title}</div>
+                    {e.body ? <div className="text-[12px] text-[#9A9DA1]">{e.body}</div> : null}
                   </div>
-                  <DocBadge />
                 </div>
               ))
             )}
@@ -145,10 +176,7 @@ export default async function ProcurePulseDashboard() {
                 const k = NOTIFICATION_KINDS[n.kind] ?? NOTIF_FALLBACK;
                 return (
                   <div key={n.id} className="flex items-start gap-3">
-                    <div
-                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
-                      style={{ backgroundColor: k.bg }}
-                    >
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg" style={{ backgroundColor: k.bg }}>
                       <span className="h-3 w-3 rounded-[3px]" style={{ backgroundColor: k.fg }} />
                     </div>
                     <div className="min-w-0 flex-1">

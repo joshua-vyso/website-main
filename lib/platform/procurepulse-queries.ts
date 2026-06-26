@@ -7,6 +7,7 @@ import type {
   ItemSupplierPrice,
   PpNotification,
   PpSettings,
+  ProcurePulseActivityEvent,
   ProductAlias,
   ProductUnit,
   ReorderRequest,
@@ -107,4 +108,19 @@ export async function fetchThresholds(db: DB, orgId: string): Promise<StockThres
 export async function fetchProductUnits(db: DB, orgId: string): Promise<ProductUnit[]> {
   const { data } = await db.from('pp_product_units').select('*').eq('org_id', orgId);
   return (data ?? []) as ProductUnit[];
+}
+
+/** Recent stock activity events for the dashboard feed. Tolerant of missing table. */
+export async function fetchActivityEvents(
+  db: DB,
+  orgId: string,
+  limit = 8,
+): Promise<ProcurePulseActivityEvent[]> {
+  const { data } = await db
+    .from('procurepulse_activity_events')
+    .select('*')
+    .eq('org_id', orgId)
+    .order('occurred_at', { ascending: false })
+    .limit(limit);
+  return (data ?? []) as ProcurePulseActivityEvent[];
 }

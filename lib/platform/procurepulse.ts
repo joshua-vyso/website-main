@@ -126,6 +126,26 @@ export function computeAlerts(items: StockItem[]): StockAlert[] {
 }
 
 // ---------------------------------------------------------------------------
+// Forecast / freshness helpers (reusable across the stock-intelligence pages)
+// ---------------------------------------------------------------------------
+
+export type FreshnessStatus = 'fresh' | 'aging' | 'expired';
+
+/** Freshness state from an item's age vs its freshness threshold (same unit). */
+export function freshnessStatus(age: number | null, threshold: number | null): FreshnessStatus {
+  if (age == null || threshold == null || threshold <= 0) return 'fresh';
+  if (age >= threshold) return 'expired';
+  if (age >= threshold * 0.7) return 'aging';
+  return 'fresh';
+}
+
+/** Days of cover at a given daily usage; null when usage is unknown/zero. */
+export function daysOfCover(onHand: number, dailyUsage: number | null | undefined): number | null {
+  if (!dailyUsage || dailyUsage <= 0) return null;
+  return Math.round((onHand / dailyUsage) * 10) / 10;
+}
+
+// ---------------------------------------------------------------------------
 // Draft purchase order (Reorder)
 // ---------------------------------------------------------------------------
 
