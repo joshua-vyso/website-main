@@ -17,6 +17,8 @@ const EXTRACT_MODEL = process.env.ANTHROPIC_EXTRACT_MODEL || 'claude-haiku-4-5';
 // The operational summary is a short (≤500 char) briefing, not deep reasoning,
 // so it runs on the fast/cheap Haiku tier. Override with ANTHROPIC_SUMMARY_MODEL.
 const SUMMARY_MODEL = process.env.ANTHROPIC_SUMMARY_MODEL || 'claude-haiku-4-5';
+// Product categorisation is a simple label-per-name task — Haiku tier.
+const CATEGORISE_MODEL = process.env.ANTHROPIC_CATEGORISE_MODEL || 'claude-haiku-4-5';
 
 export const aiConfigured = Boolean(apiKey);
 
@@ -251,4 +253,64 @@ export async function summariseDocument(context: {
     generated_at: new Date().toISOString(),
     model: SUMMARY_MODEL,
   };
+}
+
+// ---------------------------------------------------------------------------
+// Product categorisation (ProcurePulse)
+// ---------------------------------------------------------------------------
+
+/** The fixed produce taxonomy Claude must choose from. */
+export const PRODUCE_CATEGORIES = [
+  'Fruit',
+  'Vegetables',
+  'Herbs',
+  'Salad & Leafy Greens',
+  'Mushrooms',
+  'Other',
+] as const;
+
+const CATEGORISE_SYSTEM = `You categorise fresh-produce products for a South African fruit & vegetable wholesaler.
+For EACH product, assign exactly one category from this fixed list:
+- "Fruit" — apples, bananas, citrus, berries, melons, grapes, stone fruit, avocado, pineapple, mango, etc.
+- "Vegetables" — potatoes, onions, carrots, tomatoes, butternut, pumpkin, peppers, cabbage, broccoli, cauliflower, green beans, sweetcorn, beetroot, ginger, garlic, etc.
+- "Herbs" — basil, coriander, parsley, mint, rosemary, thyme, dill, chives, etc.
+- "Salad & Leafy Greens" — lettuce, spinach, rocket, mixed leaves, kale, microgreens, watercress, etc.
+- "Mushrooms" — button, portabellini, oyster, shiitake, brown, white mushrooms, etc.
+- "Other" — anything that is not fresh produce or is genuinely unclear (eggs, packaging, pallets, deposits, etc.).
+Respond with ONLY a JSON object (no prose, no markdown code fences) mapping each product id to its category:
+{ "<id>": "Fruit", "<id>": "Vegetables", ... }
+Every id you are given MUST appear exactly once. Use ONLY the six category strings above, spelled exactly as shown.`;
+
+/**
+ * Assign a produce category to each product by name. Returns a partial map of
+ * id → category (only ids the model returned a valid category for). Runs on the
+ * Haiku tier — cheap, fast, and accurate enough for a fixed six-way label.
+ */
+export async function categoriseProducts(
+  items: { id: string; name: string }[],
+): Promise<Record<string, string>> {
+  if (items.length === 0) return {};
+
+  const message = await client().messages.create({
+    model: CATEGORISE_MODEL,
+    max_tokens: 8000,
+    system: CATEGORISE_SYSTEM,
+    messages: [{ role: 'user', content: JSON.stringify(items.map((i) => ({ id: i.id, name: i.name }))) }],
+  });
+
+  let parsed: Record<string, unknown> = {};
+  try {
+    const raw = textOf(message).trim().replace(/^```json\s*/i, '').replace(/```$/, '').trim();
+    parsed = JSON.parse(raw) as Record<string, unknown>;
+  } catch {
+    parsed = {};
+  }
+
+  const allowed = new Set<string>(PRODUCE_CATEGORIES);
+  const out: Record<string, string> = {};
+  for (const it of items) {
+    const c = parsed[it.id];
+    if (typeof c === 'string' && allowed.has(c)) out[it.id] = c;
+  }
+  return out;
 }
