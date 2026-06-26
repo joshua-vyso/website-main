@@ -121,7 +121,15 @@ export function OrdersView({
         unit: l.unit.trim() || null,
         unit_price: Number(l.unit_price) || 0,
       }));
-    if (rows.length) await supabase.from('of_order_items').insert(rows);
+    if (rows.length) {
+      await supabase.from('of_order_items').insert(rows);
+      // Reflect the sale in ProcurePulse stock (negative movement + on-hand drop).
+      await fetch('/api/orderflow/order-stock', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ orderId: order.id, action: 'apply' }),
+      }).catch(() => {});
+    }
     setBusy(false);
     resetBuilder();
     router.refresh();

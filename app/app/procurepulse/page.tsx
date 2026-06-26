@@ -31,6 +31,7 @@ const MOVEMENT_LABEL: Record<string, string> = {
   used: 'Used',
   reorder: 'Reorder',
   transfer: 'Transfer',
+  sale: 'Sold',
 };
 
 function fmtQty(n: number): string {

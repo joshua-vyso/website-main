@@ -26,7 +26,7 @@ const TABS = [
 export function PpSubnav() {
   const pathname = usePathname();
   return (
-    <nav className="flex flex-wrap gap-1.5">
+    <nav className="flex items-center gap-5 overflow-x-auto border-b border-[#E7E7E2]">
       {TABS.map((t) => {
         const active =
           t.href === '/app/procurepulse'
@@ -36,10 +36,10 @@ export function PpSubnav() {
           <Link
             key={t.href}
             href={t.href}
-            className={`rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors ${
+            className={`-mb-px shrink-0 border-b-2 pb-2.5 pt-1 text-[14px] transition-colors ${
               active
-                ? 'bg-[#1A1C1E] text-white'
-                : 'border border-[#E7E7E2] bg-white text-[#5F6368] hover:bg-black/[0.03]'
+                ? 'border-[#1E5E54] font-medium text-[#1A1C1E]'
+                : 'border-transparent text-[#5F6368] hover:text-[#1A1C1E]'
             }`}
           >
             {t.label}

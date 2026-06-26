@@ -50,6 +50,12 @@ export function OrderDetail({
     const supabase = createClient();
     if (!supabase) return;
     setBusy(true);
+    // Put the sold stock back before the order (and its lines) disappear.
+    await fetch('/api/orderflow/order-stock', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ orderId: order.id, action: 'reverse' }),
+    }).catch(() => {});
     await supabase.from('of_orders').delete().eq('id', order.id);
     router.push('/app/orderflow/orders');
     router.refresh();
