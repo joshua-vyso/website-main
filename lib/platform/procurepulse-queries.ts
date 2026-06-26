@@ -7,6 +7,7 @@ import type {
   ItemSupplierPrice,
   PpNotification,
   PpSettings,
+  ProductAlias,
   ReorderRequest,
   StockItem,
   StockMovement,
@@ -82,4 +83,14 @@ export async function fetchReorderRequests(
     .eq('status', status)
     .order('created_at', { ascending: false });
   return (data ?? []) as ReorderRequest[];
+}
+
+/**
+ * Confirmed/dismissed product-name aliases for an org. Tolerant of the table not
+ * existing yet (data → null → empty list) so the Products page renders before the
+ * pp-name-aliases migration lands.
+ */
+export async function fetchProductAliases(db: DB, orgId: string): Promise<ProductAlias[]> {
+  const { data } = await db.from('pp_name_aliases').select('*').eq('org_id', orgId);
+  return (data ?? []) as ProductAlias[];
 }

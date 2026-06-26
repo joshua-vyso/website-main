@@ -71,7 +71,7 @@ function buildPack(weight: string | undefined, unitsPerBox: string | undefined):
  * removed or a later weightless doc arrives). Batched: two reads total regardless
  * of item count. Returns id → kg/unit (or null when no usable weight data remains).
  */
-async function computeKgPerUnit(
+export async function computeKgPerUnit(
   supabase: SupabaseClient,
   items: { id: string; name: string }[],
 ): Promise<Map<string, number | null>> {
@@ -278,6 +278,29 @@ export async function feedDocumentToProcurePulse(
     await supabase.from('pp_movements').delete().eq('source_document_id', doc.id);
   }
 
+  // Confirmed product-name aliases — a human has linked these raw descriptions to
+  // a canonical stock item, so route them straight there (no ilike, no duplicate).
+  // Tolerant of the pp_name_aliases table not existing yet (null → empty map).
+  const aliasMap = new Map<string, string>();
+  {
+    const { data: aliasRows } = await supabase
+      .from('pp_name_aliases')
+      .select('raw_name, stock_item_id')
+      .eq('org_id', doc.org_id)
+      .eq('status', 'confirmed');
+    for (const a of (aliasRows ?? []) as { raw_name: string; stock_item_id: string | null }[]) {
+      if (a.stock_item_id) aliasMap.set(a.raw_name.trim().toLowerCase(), a.stock_item_id);
+    }
+    // Drop aliases whose target item was since deleted, so a line never routes to
+    // a dead id (which would FK-fail the movement insert). One bulk check.
+    const targetIds = [...new Set(aliasMap.values())];
+    if (targetIds.length > 0) {
+      const { data: alive } = await supabase.from('pp_stock_items').select('id').in('id', targetIds);
+      const aliveSet = new Set(((alive ?? []) as { id: string }[]).map((r) => r.id));
+      for (const [k, v] of aliasMap) if (!aliveSet.has(v)) aliasMap.delete(k);
+    }
+  }
+
   // 2. Apply the current line items.
   const newByItem = new Map<string, number>();
   const priceByItem = new Map<string, number>();
@@ -290,16 +313,19 @@ export async function feedDocumentToProcurePulse(
 
     const price = parsePrice(li.unit_price);
 
-    // Match an existing item by name (case-insensitive, literal) within the org,
-    // else create. likeEscape stops "%"/"_" in a name acting as LIKE wildcards.
-    const { data: existing } = await supabase
-      .from('pp_stock_items')
-      .select('id')
-      .eq('org_id', doc.org_id)
-      .ilike('name', likeEscape(name))
-      .maybeSingle();
-
-    let itemId = (existing as { id?: string } | null)?.id ?? null;
+    // A confirmed alias wins; otherwise match an existing item by name
+    // (case-insensitive, literal — likeEscape stops "%"/"_" acting as wildcards),
+    // else create.
+    let itemId = aliasMap.get(name.toLowerCase()) ?? null;
+    if (!itemId) {
+      const { data: existing } = await supabase
+        .from('pp_stock_items')
+        .select('id')
+        .eq('org_id', doc.org_id)
+        .ilike('name', likeEscape(name))
+        .maybeSingle();
+      itemId = (existing as { id?: string } | null)?.id ?? null;
+    }
     if (!itemId) {
       const { data: created, error: createErr } = await supabase
         .from('pp_stock_items')

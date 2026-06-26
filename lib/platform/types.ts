@@ -213,6 +213,22 @@ export interface ReorderRequest {
   updated_at: string;
 }
 
+/** A confirmed/dismissed product-name link (`pp_name_aliases`). */
+export interface ProductAlias {
+  id: string;
+  org_id: string;
+  raw_name: string;
+  normalized_name: string | null;
+  suggested_name: string | null;
+  custom_name: string | null;
+  stock_item_id: string | null;
+  /** confirmed | dismissed */
+  status: string;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 /** A supplier's latest price for a stock item (`pp_item_suppliers`). */
 export interface ItemSupplierPrice {
   id: string;
