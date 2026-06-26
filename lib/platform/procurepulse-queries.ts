@@ -57,6 +57,21 @@ export async function fetchMovements(db: DB, itemId: string): Promise<StockMovem
   return (data ?? []) as StockMovement[];
 }
 
+/** Most-recent stock movements across the org — for the dashboard activity feed. */
+export async function fetchRecentMovements(
+  db: DB,
+  orgId: string,
+  limit = 8,
+): Promise<StockMovement[]> {
+  const { data } = await db
+    .from('pp_movements')
+    .select('*')
+    .eq('org_id', orgId)
+    .order('occurred_at', { ascending: false })
+    .limit(limit);
+  return (data ?? []) as StockMovement[];
+}
+
 export async function fetchNotifications(db: DB, orgId: string): Promise<PpNotification[]> {
   const { data } = await db
     .from('pp_notifications')

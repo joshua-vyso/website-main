@@ -6,7 +6,7 @@ import {
   fetchNotifications,
   fetchPrices,
   fetchThresholds,
-  fetchActivityEvents,
+  fetchRecentMovements,
 } from '@/lib/platform/procurepulse-queries';
 import {
   computeAlerts,
@@ -18,18 +18,49 @@ import {
 } from '@/lib/platform/procurepulse';
 import { AreaChart, KpiCard, LiveChip, PageHead } from '@/components/platform/procurepulse/ui';
 
+/** Friendly labels for the stock-movement reasons (no wastage in ProcurePulse). */
+const MOVEMENT_LABEL: Record<string, string> = {
+  received: 'Received',
+  document_sync: 'Received',
+  order_received: 'Order received',
+  manual_adjustment: 'Adjusted',
+  adjustment: 'Adjusted',
+  count_adjustment: 'Count adjustment',
+  recipe_reserved: 'Reserved for recipe',
+  recipe_consumed: 'Used in recipe',
+  used: 'Used',
+  reorder: 'Reorder',
+  transfer: 'Transfer',
+};
+
+function fmtQty(n: number): string {
+  return Number.isInteger(n) ? String(n) : n.toFixed(1);
+}
+
+function timeAgo(iso: string): string {
+  const t = new Date(iso).getTime();
+  if (Number.isNaN(t)) return '';
+  const m = Math.floor((Date.now() - t) / 60000);
+  if (m < 1) return 'just now';
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `${h}h ago`;
+  const d = Math.floor(h / 24);
+  return `${d}d ago`;
+}
+
 export default async function ProcurePulseDashboard() {
   const session = await getPlatformSession();
   if (!session) redirect('/login');
   const orgId = session.org?.id ?? '';
 
   const db = await createServerSupabase();
-  const [items, notifs, prices, thresholds, activity] = await Promise.all([
+  const [items, notifs, prices, thresholds, movements] = await Promise.all([
     fetchStock(db, orgId),
     fetchNotifications(db, orgId),
     fetchPrices(db, orgId),
     fetchThresholds(db, orgId),
-    fetchActivityEvents(db, orgId, 6),
+    fetchRecentMovements(db, orgId, 7),
   ]);
 
   if (items.length === 0) {
@@ -76,12 +107,23 @@ export default async function ProcurePulseDashboard() {
   const recentNotifs = notifs.slice(0, 5);
   const NOTIF_FALLBACK = { bg: '#F0F0EC', fg: '#5F6368', label: 'Update' };
 
-  // Stock activity feed — real events when present, else derived from recent
-  // notifications (doc syncs, price changes, reorders) so it isn't empty.
-  const activityFeed =
-    activity.length > 0
-      ? activity.map((e) => ({ id: e.id, title: e.title, body: e.body }))
-      : notifs.slice(0, 6).map((n) => ({ id: n.id, title: n.title, body: n.body }));
+  // Stock activity — recent stock MOVEMENTS (the actual stock changes). Document
+  // extraction events live in Notifications, not here. Wastage is never shown.
+  const itemById = new Map(items.map((i) => [i.id, i]));
+  const activityFeed = movements
+    .filter((m) => m.reason !== 'waste')
+    .map((m) => {
+      const it = itemById.get(m.stock_item_id);
+      const change = Number(m.change) || 0;
+      return {
+        id: m.id,
+        name: it?.name ?? 'Stock item',
+        unit: it?.unit ?? '',
+        change,
+        label: MOVEMENT_LABEL[m.reason ?? ''] ?? 'Stock change',
+        when: timeAgo(m.occurred_at),
+      };
+    });
 
   return (
     <div className="space-y-5">
@@ -144,13 +186,29 @@ export default async function ProcurePulseDashboard() {
               <p className="text-[13px] text-[#9A9DA1]">No stock activity yet.</p>
             ) : (
               activityFeed.map((e) => (
-                <div key={e.id} className="flex items-start gap-3">
-                  <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#E3F0ED]">
-                    <span className="h-[15px] w-[15px] rounded-[3px] bg-[#1E5E54]" />
+                <div key={e.id} className="flex items-center gap-3">
+                  <div
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg"
+                    style={{ backgroundColor: e.change >= 0 ? '#E1F5EE' : '#FCEBEB' }}
+                  >
+                    <span
+                      className="h-[15px] w-[15px] rounded-[3px]"
+                      style={{ backgroundColor: e.change >= 0 ? '#0F6E56' : '#A32D2D' }}
+                    />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="text-[13px] font-medium text-[#1A1C1E]">{e.title}</div>
-                    {e.body ? <div className="text-[12px] text-[#9A9DA1]">{e.body}</div> : null}
+                    <div className="truncate text-[13px] font-medium text-[#1A1C1E]">{e.name}</div>
+                    <div className="text-[12px] text-[#9A9DA1]">
+                      {e.label}
+                      {e.when ? ` · ${e.when}` : ''}
+                    </div>
+                  </div>
+                  <div
+                    className="shrink-0 text-[13px] font-medium"
+                    style={{ color: e.change >= 0 ? '#0F6E56' : '#A32D2D' }}
+                  >
+                    {e.change >= 0 ? '+' : ''}
+                    {fmtQty(e.change)} {e.unit}
                   </div>
                 </div>
               ))
