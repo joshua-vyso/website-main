@@ -7,6 +7,7 @@ import type {
   ItemSupplierPrice,
   PpNotification,
   PpSettings,
+  ReorderRequest,
   StockItem,
   StockMovement,
 } from './types';
@@ -63,4 +64,22 @@ export async function fetchNotifications(db: DB, orgId: string): Promise<PpNotif
 export async function fetchSettings(db: DB, orgId: string): Promise<PpSettings | null> {
   const { data } = await db.from('pp_settings').select('*').eq('org_id', orgId).maybeSingle();
   return (data as PpSettings) ?? null;
+}
+
+/**
+ * Manual reorder requests for an org. Tolerant of the table not existing yet
+ * (data → null → empty list) so the page renders before the migration lands.
+ */
+export async function fetchReorderRequests(
+  db: DB,
+  orgId: string,
+  status = 'open',
+): Promise<ReorderRequest[]> {
+  const { data } = await db
+    .from('pp_reorder_requests')
+    .select('*')
+    .eq('org_id', orgId)
+    .eq('status', status)
+    .order('created_at', { ascending: false });
+  return (data ?? []) as ReorderRequest[];
 }

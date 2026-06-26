@@ -98,6 +98,8 @@ export interface ExtractedLineItem {
   weight?: string;
   quantity?: string;
   units_per_box?: string;
+  /** Total kilograms for the line = weight × quantity (Doc-U computes it). */
+  total_kg?: string;
   unit_price?: string;
   amount?: string;
   confidence: number;
@@ -176,6 +178,9 @@ export interface StockItem {
   on_hand: number;
   low_threshold: number;
   avg_unit_price: number | null;
+  /** Weighted avg kilograms per counting unit, derived by the Doc-U feed.
+   *  Null when no weight data exists. kg on hand = on_hand × kg_per_unit. */
+  kg_per_unit: number | null;
   currency: string;
   /** Signed % change vs last week. */
   trend_pct: number | null;
@@ -188,6 +193,24 @@ export interface StockItem {
   price_history: number[] | null;
   updated_at: string;
   created_at: string;
+}
+
+/** A manual reorder request the user adds on the Reordering page
+ *  (`pp_reorder_requests`). Sits alongside the auto-suggested draft PO. */
+export interface ReorderRequest {
+  id: string;
+  org_id: string;
+  stock_item_id: string | null;
+  product_name: string;
+  qty: number;
+  unit: string | null;
+  supplier: string | null;
+  note: string | null;
+  /** open | ordered | fulfilled | cancelled */
+  status: string;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
 }
 
 /** A supplier's latest price for a stock item (`pp_item_suppliers`). */

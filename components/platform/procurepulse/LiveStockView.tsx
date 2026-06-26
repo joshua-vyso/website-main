@@ -158,12 +158,12 @@ export function LiveStockView({
       <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
         <div className="flex items-center border-b border-[#E7E7E2] pb-2.5 text-[12px] font-medium text-[#9A9DA1]">
           <div className="flex-1">Product</div>
-          <div className="w-[120px]">Pack</div>
-          <div className="w-[150px]">Category</div>
-          <div className="w-[110px] text-right">On hand</div>
-          <div className="w-[90px]">Status</div>
-          <div className="w-[150px] text-right">Recent activity</div>
-          <div className="w-[100px] text-right">Updated</div>
+          <div className="w-[140px] text-right">Stock on hand (kg)</div>
+          <div className="w-[120px] text-right">Units on hand</div>
+          <div className="w-[100px]">Stock status</div>
+          <div className="w-[140px] text-right">Recent activity</div>
+          <div className="w-[90px] text-right">Updated</div>
+          <div className="w-[140px] pl-4">Category</div>
         </div>
 
         {filtered.length === 0 ? (
@@ -180,15 +180,22 @@ export function LiveStockView({
                 className="flex items-center border-t border-[#EFEFEC] py-3.5 text-[13px] text-[#1A1C1E] hover:bg-black/[0.02]"
               >
                 <div className="flex-1 font-medium">{item.name}</div>
-                <div className="w-[120px] text-[#5F6368]">{item.pack ?? '—'}</div>
-                <div className="w-[150px] text-[#5F6368]">{item.category?.trim() || '—'}</div>
-                <div className="w-[110px] text-right">
-                  {item.on_hand} {item.unit}
+                <div className="w-[140px] text-right">
+                  {item.kg_per_unit != null && item.kg_per_unit > 0 ? (
+                    <span className="font-medium text-[#1A1C1E]">
+                      {fmtQty(item.on_hand * item.kg_per_unit)} kg
+                    </span>
+                  ) : (
+                    <span className="text-[#C2C4C0]">—</span>
+                  )}
                 </div>
-                <div className="w-[90px]">
+                <div className="w-[120px] text-right text-[#5F6368]">
+                  {fmtQty(item.on_hand)} {item.unit}
+                </div>
+                <div className="w-[100px]">
                   <StockStatusPill status={stockStatus(item)} />
                 </div>
-                <div className="w-[150px] text-right">
+                <div className="w-[140px] text-right">
                   {r ? (
                     <span className="text-[#3C3F43]">
                       {fmtQty(r.qty)} {r.unit ?? item.unit}
@@ -197,7 +204,8 @@ export function LiveStockView({
                     <span className="text-[#C2C4C0]">No orders yet</span>
                   )}
                 </div>
-                <div className="w-[100px] text-right text-[#9A9DA1]">{timeAgo(item.updated_at)}</div>
+                <div className="w-[90px] text-right text-[#9A9DA1]">{timeAgo(item.updated_at)}</div>
+                <div className="w-[140px] pl-4 text-[#5F6368]">{item.category?.trim() || '—'}</div>
               </Link>
             );
           })

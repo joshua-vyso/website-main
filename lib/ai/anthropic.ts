@@ -39,6 +39,7 @@ export interface ExtractedLineItem {
   weight?: string;
   quantity?: string;
   units_per_box?: string;
+  total_kg?: string;
   unit_price?: string;
   amount?: string;
   confidence: number;
@@ -79,6 +80,7 @@ Respond with ONLY a JSON object (no prose, no markdown code fences) of exactly t
       "weight": string,
       "quantity": string,
       "units_per_box": string,
+      "total_kg": string,
       "unit_price": string,
       "amount": string,
       "confidence": number
@@ -106,6 +108,7 @@ Rules:
     - description = the produce name, cleaned and Title Case (e.g. "Baby Butternut", "Oranges Navel"). Drop packaging words, grade codes, asterisks, and stray numeric codes.
     - weight = the pack/unit weight CONVERTED TO KILOGRAMS, as a plain decimal number with NO unit: "300G" -> "0.3", "500G" -> "0.5", "6KG" -> "6", "18KG" -> "18". "" if no weight is shown.
     - units_per_box = the number of punnets/units packed per box when the line clearly encodes it. For "BABY BUTTERNUT,300G PUNNE,*,0,*,12,*" that is "12". "" if not indicated.
+- total_kg = the TOTAL kilograms for the line = weight × quantity, as a plain decimal string (e.g. weight="0.3", quantity="40" -> total_kg="12"; weight="6", quantity="2" -> total_kg="12"). weight is already the per-pack weight in kg, so do NOT multiply by units_per_box. "" if weight or quantity is missing.
 - quantity, unit_price and amount come from the QTY, UNIT PRICE and TOTAL columns of that row — NOT from the commodity string.
 - Ignore non-product rows: pallets, deposits, card fees, charges, balances, subtotals, grand totals, banking details.
 - Output numbers as plain strings (keep decimals; omit currency symbols). All confidence values 0-100.`;

@@ -64,6 +64,99 @@ function buildPack(weight: string | undefined, unitsPerBox: string | undefined):
   return null;
 }
 
+/**
+ * Recompute the weighted-average kilograms-per-unit for a set of stock items from
+ * ALL of their CURRENT feeding documents (read after movements have been applied/
+ * reversed, so it reflects the live source set — fixing stale kg after a doc is
+ * removed or a later weightless doc arrives). Batched: two reads total regardless
+ * of item count. Returns id → kg/unit (or null when no usable weight data remains).
+ */
+async function computeKgPerUnit(
+  supabase: SupabaseClient,
+  items: { id: string; name: string }[],
+): Promise<Map<string, number | null>> {
+  const result = new Map<string, number | null>();
+  if (items.length === 0) return result;
+  const ids = items.map((i) => i.id);
+
+  const { data: moves } = await supabase
+    .from('pp_movements')
+    .select('stock_item_id, source_document_id')
+    .in('stock_item_id', ids);
+
+  const docIdsByItem = new Map<string, Set<string>>();
+  const allDocIds = new Set<string>();
+  for (const m of (moves ?? []) as { stock_item_id: string; source_document_id: string | null }[]) {
+    if (!m.source_document_id) continue;
+    let set = docIdsByItem.get(m.stock_item_id);
+    if (!set) {
+      set = new Set();
+      docIdsByItem.set(m.stock_item_id, set);
+    }
+    set.add(m.source_document_id);
+    allDocIds.add(m.source_document_id);
+  }
+
+  const linesByDoc = new Map<string, ExtractedLineItem[]>();
+  if (allDocIds.size > 0) {
+    const { data: docs } = await supabase
+      .from('documents')
+      .select('id, extracted_data')
+      .in('id', [...allDocIds]);
+    for (const d of (docs ?? []) as {
+      id: string;
+      extracted_data: { line_items?: ExtractedLineItem[] } | null;
+    }[]) {
+      linesByDoc.set(d.id, d.extracted_data?.line_items ?? []);
+    }
+  }
+
+  for (const it of items) {
+    const docSet = docIdsByItem.get(it.id);
+    const target = it.name.trim().toLowerCase();
+    let totalQty = 0;
+    let totalKg = 0;
+    if (docSet) {
+      for (const docId of docSet) {
+        for (const li of linesByDoc.get(docId) ?? []) {
+          if ((li.description ?? '').trim().toLowerCase() !== target) continue;
+          const q = parseNum(li.quantity);
+          if (q == null || q <= 0) continue;
+          const w = parseNum(li.weight);
+          const tkg = parseNum(li.total_kg);
+          // Prefer the canonical per-pack weight (× qty); fall back to total_kg.
+          const kg = w != null && w > 0 ? q * w : tkg != null && tkg > 0 ? tkg : null;
+          if (kg != null && kg > 0) {
+            totalQty += q;
+            totalKg += kg;
+          }
+        }
+      }
+    }
+    result.set(it.id, totalQty > 0 ? totalKg / totalQty : null);
+  }
+  return result;
+}
+
+/**
+ * Update a stock item, tolerating the kg_per_unit column not existing yet (the
+ * add-kg-per-unit.sql migration may not be applied). If — and only if — the write
+ * fails specifically because of that column, retry without it so the core
+ * on_hand/price write still lands and self-heals once the migration is applied.
+ */
+async function applyStockPatch(
+  supabase: SupabaseClient,
+  id: string,
+  patch: Record<string, unknown>,
+): Promise<void> {
+  const { error } = await supabase.from('pp_stock_items').update(patch).eq('id', id);
+  if (error && 'kg_per_unit' in patch && /kg_per_unit/i.test(error.message ?? '')) {
+    const { kg_per_unit: _omit, ...rest } = patch;
+    void _omit;
+    await supabase.from('pp_stock_items').update(rest).eq('id', id);
+  }
+}
+
 /** Is the ProcurePulse feature enabled for this org? (cheap pre-check) */
 export async function orgHasProcurePulse(supabase: SupabaseClient, orgId: string): Promise<boolean> {
   const { data } = await supabase
@@ -117,18 +210,24 @@ export async function unfeedDocumentFromProcurePulse(
     await supabase.from('pp_stock_items').delete().in('id', orphanIds);
   }
 
-  // Survivors are still fed by other documents — reverse their on_hand. Read all
-  // current levels in one query, then fire the clamped updates in parallel.
+  // Survivors are still fed by other documents — reverse their on_hand and
+  // recompute kg/unit from their REMAINING feeding docs (this doc's movements are
+  // already gone, so a stale kg from the removed doc gets corrected/cleared).
   const survivorIds = itemIds.filter((id) => survivors.has(id));
   if (survivorIds.length > 0) {
     const { data: cur } = await supabase
       .from('pp_stock_items')
-      .select('id, on_hand')
+      .select('id, name, on_hand')
       .in('id', survivorIds);
+    const rows = (cur ?? []) as { id: string; name: string; on_hand: number }[];
+    const kgById = await computeKgPerUnit(
+      supabase,
+      rows.map((r) => ({ id: r.id, name: r.name })),
+    );
     await Promise.all(
-      ((cur ?? []) as { id: string; on_hand: number }[]).map((row) => {
+      rows.map((row) => {
         const next = Math.max(0, Number(row.on_hand) - (byItem.get(row.id) ?? 0));
-        return supabase.from('pp_stock_items').update({ on_hand: next }).eq('id', row.id);
+        return applyStockPatch(supabase, row.id, { on_hand: next, kg_per_unit: kgById.get(row.id) ?? null });
       }),
     );
   }
@@ -241,22 +340,37 @@ export async function feedDocumentToProcurePulse(
     itemsAffected += 1;
   }
 
-  // 3. Reconcile each touched item: on_hand += (new − prior), price, supplier.
+  // 3. Reconcile each touched item: on_hand += (new − prior), price, kg, supplier.
   const touched = new Set<string>([...priorByItem.keys(), ...newByItem.keys(), ...priceByItem.keys()]);
+  const touchedIds = [...touched];
+
+  // Batch-read the touched items' current level + name in one query (replaces the
+  // old per-item on_hand probe), then recompute kg/unit across ALL their feeding
+  // docs — movements now reflect this feed, so the average is current, not stale.
+  const { data: touchedRows } = touchedIds.length
+    ? await supabase.from('pp_stock_items').select('id, name, on_hand').in('id', touchedIds)
+    : { data: [] };
+  const rowById = new Map(
+    ((touchedRows ?? []) as { id: string; name: string; on_hand: number }[]).map((r) => [r.id, r]),
+  );
+  const kgById = await computeKgPerUnit(
+    supabase,
+    [...rowById.values()].map((r) => ({ id: r.id, name: r.name })),
+  );
+
   for (const id of touched) {
     const delta = (newByItem.get(id) ?? 0) - (priorByItem.get(id) ?? 0);
-
-    const { data: cur } = await supabase
-      .from('pp_stock_items')
-      .select('on_hand')
-      .eq('id', id)
-      .maybeSingle();
+    const row = rowById.get(id);
 
     const patch: Record<string, unknown> = { source_document_id: doc.id };
     // Clamp to >= 0 — stock should never read negative even if data drifts.
-    if (cur) patch.on_hand = Math.max(0, Number((cur as { on_hand: number }).on_hand) + delta);
+    if (row) patch.on_hand = Math.max(0, Number(row.on_hand) + delta);
     if (priceByItem.has(id)) patch.avg_unit_price = priceByItem.get(id);
-    await supabase.from('pp_stock_items').update(patch).eq('id', id);
+    // kg/unit recomputed from all current feeding docs (value, or null when no
+    // weight data remains — which correctly clears a stale figure).
+    if (kgById.has(id)) patch.kg_per_unit = kgById.get(id);
+
+    await applyStockPatch(supabase, id, patch);
 
     // Supplier price: upsert this supplier's latest price, then recompute cheapest.
     if (supplierName && priceByItem.has(id)) {
