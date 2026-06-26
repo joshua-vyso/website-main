@@ -213,7 +213,7 @@ export interface ReorderRequest {
   updated_at: string;
 }
 
-/** A confirmed/dismissed product-name link (`pp_name_aliases`). */
+/** A confirmed/dismissed/pending product-name link (`pp_name_aliases`). */
 export interface ProductAlias {
   id: string;
   org_id: string;
@@ -221,9 +221,17 @@ export interface ProductAlias {
   normalized_name: string | null;
   suggested_name: string | null;
   custom_name: string | null;
+  /** The suggested / confirmed canonical target item. */
   stock_item_id: string | null;
-  /** confirmed | dismissed */
+  /** pending | confirmed | dismissed */
   status: string;
+  /** exact | ai | manual (Phase 2). */
+  method: string | null;
+  /** AI confidence 0..100 (Phase 2). */
+  confidence: number | null;
+  ai_rationale: string | null;
+  /** The discovered (fed) item a pending suggestion is FOR (Phase 2). */
+  discovered_item_id: string | null;
   created_by: string | null;
   created_at: string;
   updated_at: string;

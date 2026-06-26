@@ -195,12 +195,13 @@ export async function DELETE(req: Request) {
   }
 
   const db = await createServerSupabase();
+  // Note: stock_item_id is intentionally NOT set — on update it preserves a pending
+  // AI row's suggested target; on a fresh dismiss it defaults to null.
   const { error } = await db.from('pp_name_aliases').upsert(
     {
       org_id: session.org.id,
       raw_name: rawName,
       normalized_name: normalizeName(rawName),
-      stock_item_id: body.itemId || null,
       status: 'dismissed',
       created_by: session.userId,
       updated_at: new Date().toISOString(),

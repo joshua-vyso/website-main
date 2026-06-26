@@ -19,6 +19,8 @@ const EXTRACT_MODEL = process.env.ANTHROPIC_EXTRACT_MODEL || 'claude-haiku-4-5';
 const SUMMARY_MODEL = process.env.ANTHROPIC_SUMMARY_MODEL || 'claude-haiku-4-5';
 // Product categorisation is a simple label-per-name task — Haiku tier.
 const CATEGORISE_MODEL = process.env.ANTHROPIC_CATEGORISE_MODEL || 'claude-haiku-4-5';
+// Product-name matching: pick the right canonical from a short candidate list.
+const MATCH_MODEL = process.env.ANTHROPIC_MATCH_MODEL || 'claude-haiku-4-5';
 
 export const aiConfigured = Boolean(apiKey);
 
@@ -316,4 +318,67 @@ export async function categoriseProducts(
     if (typeof c === 'string' && allowed.has(c)) out[it.id] = c;
   }
   return out;
+}
+
+// ---------------------------------------------------------------------------
+// Product-name matching (ProcurePulse — Phase 2 AI suggestions)
+// ---------------------------------------------------------------------------
+
+export interface MatchSuggestionInput {
+  id: string;
+  name: string;
+  candidates: { id: string; name: string }[];
+}
+export interface MatchSuggestion {
+  id: string;
+  /** chosen candidate id, or null when none is clearly the same product */
+  targetId: string | null;
+  confidence: number; // 0..100
+  reason: string;
+}
+
+const MATCH_SYSTEM = `You reconcile messy market-statement product names with a fruit & vegetable wholesaler's canonical catalogue.
+For EACH discovered product you get a short list of candidate canonical products. Choose the ONE candidate that is the SAME physical product, or null if none clearly is.
+Be conservative — match only when it is genuinely the same item. Different colour / variety / cut / grade / size are DIFFERENT products and must NOT be matched (e.g. "Onions Red" ≠ "Onions White"; "Butternut Whole" ≠ "Butternut Cubed"). Spelling, punctuation, abbreviation, plural and unit-suffix differences for the SAME product ARE matches (e.g. "Cabbage White Quartered" = "Cabbage (W) quarter-cut").
+Respond with ONLY a JSON array (no prose, no code fences):
+[ { "id": "<discovered id>", "targetId": "<candidate id or null>", "confidence": <0-100>, "reason": "<short>" } ]
+Every discovered id MUST appear exactly once. targetId MUST be one of that item's candidate ids, or null.`;
+
+/**
+ * Ask Claude (Haiku) to pick the best canonical match for each discovered product
+ * from its candidate list. Suggestions only — the caller never auto-links; a human
+ * confirms. Returns one entry per input id (coerced; unknown/invalid → null target).
+ */
+export async function suggestProductMatches(items: MatchSuggestionInput[]): Promise<MatchSuggestion[]> {
+  if (items.length === 0) return [];
+
+  const message = await client().messages.create({
+    model: MATCH_MODEL,
+    max_tokens: 8000,
+    system: MATCH_SYSTEM,
+    messages: [{ role: 'user', content: JSON.stringify(items) }],
+  });
+
+  let parsed: unknown = [];
+  try {
+    const raw = textOf(message).trim().replace(/^```json\s*/i, '').replace(/```$/, '').trim();
+    parsed = JSON.parse(raw);
+  } catch {
+    parsed = [];
+  }
+  const rows = Array.isArray(parsed) ? (parsed as Record<string, unknown>[]) : [];
+  const byId = new Map(rows.map((r) => [String(r.id), r]));
+
+  return items.map((it) => {
+    const r = byId.get(it.id);
+    const allowed = new Set(it.candidates.map((c) => c.id));
+    const target = r && typeof r.targetId === 'string' && allowed.has(r.targetId) ? r.targetId : null;
+    const confRaw = r && typeof r.confidence === 'number' ? r.confidence : 0;
+    return {
+      id: it.id,
+      targetId: target,
+      confidence: Math.max(0, Math.min(100, Math.round(confRaw))),
+      reason: r && typeof r.reason === 'string' ? r.reason.slice(0, 200) : '',
+    };
+  });
 }

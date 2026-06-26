@@ -80,6 +80,10 @@ export interface MatchCandidate {
   /** The reference item this likely duplicates (merge target hint). */
   targetItemId: string;
   score: number;
+  /** How the match was found: a deterministic exact-normalized cluster, or an AI suggestion. */
+  method: 'exact' | 'ai';
+  /** Short model rationale (AI suggestions only). */
+  rationale?: string | null;
 }
 
 /**
@@ -126,9 +130,61 @@ export function buildMatchCandidates(
         suggestedName: canonical.name,
         targetItemId: canonical.id,
         score: 1,
+        method: 'exact',
       });
     }
   }
 
   return out.sort((a, b) => a.discoveredName.localeCompare(b.discoveredName));
+}
+
+/** A discovered item plus the fuzzy canonical candidates an AI should choose among. */
+export interface FuzzyTarget {
+  item: MatchItem;
+  candidates: { id: string; name: string; score: number }[];
+}
+
+// Low floor: just enough shared signal to be worth asking the model about (it makes
+// the final call). Kept low so hard cases ("Cabbage White Quartered" vs "Cabbage (W)
+// quater-cut") still reach the AI; the top-N cap bounds how many candidates it sees.
+const FUZZY_FLOOR = 0.2;
+
+/**
+ * Build the work-list for AI matching (Phase 2): each Doc-U-fed item whose
+ * normalized name is UNIQUE (so exact matching didn't already pair it) and isn't
+ * already aliased, together with its top fuzzy canonical candidates. The model
+ * then picks the right one (or none) per item — we never auto-link.
+ */
+export function buildFuzzyTargets(
+  items: MatchItem[],
+  excludeRawNames: Set<string>,
+  excludeItemIds: Set<string> = new Set(),
+  topN = 5,
+): FuzzyTarget[] {
+  const norm = items.map((it) => ({ ...it, n: normalizeName(it.name) }));
+  const countByNorm = new Map<string, number>();
+  for (const x of norm) if (x.n) countByNorm.set(x.n, (countByNorm.get(x.n) ?? 0) + 1);
+
+  const out: FuzzyTarget[] = [];
+  for (const a of norm) {
+    if (!a.n) continue;
+    if (a.source_document_id == null) continue; // only fed items are "discovered"
+    if ((countByNorm.get(a.n) ?? 0) > 1) continue; // exact cluster → Phase 1 owns it
+    if (excludeItemIds.has(a.id)) continue; // already has an alias under some name
+    if (excludeRawNames.has(a.name.trim().toLowerCase())) continue;
+
+    const candidates: { id: string; name: string; score: number }[] = [];
+    for (const b of norm) {
+      if (b.id === a.id || !b.n) continue;
+      const score = diceCoefficient(a.n, b.n);
+      if (score >= FUZZY_FLOOR && score < 1) candidates.push({ id: b.id, name: b.name, score });
+    }
+    if (candidates.length === 0) continue;
+    candidates.sort((x, y) => y.score - x.score);
+    out.push({
+      item: { id: a.id, name: a.name, source_document_id: a.source_document_id },
+      candidates: candidates.slice(0, topN),
+    });
+  }
+  return out;
 }
