@@ -67,7 +67,10 @@ export function resolveSupplier(raw: string | null | undefined): SupplierMatch {
   return { canonical: null, confidence: 0, matched: false, raw };
 }
 
-/** Infer a supplier for a document from its extracted "Supplier" field. */
+/** Infer a supplier for a document — the dedicated extracted supplier wins, then
+ *  any "Supplier"/"From"/"Vendor" field. resolveSupplier still canonicalises known
+ *  aliases; an unknown name passes through verbatim (canonical null but raw set). */
 export function inferSupplierFromDoc(doc: Pick<Document, 'extracted_data'>): SupplierMatch {
-  return resolveSupplier(findFieldValue(doc, 'supplier', 'from', 'vendor'));
+  const extracted = doc.extracted_data?.supplier?.trim();
+  return resolveSupplier(extracted || findFieldValue(doc, 'supplier', 'from', 'vendor'));
 }

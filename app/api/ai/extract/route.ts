@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import type { SupabaseClient } from '@supabase/supabase-js';
 import { resolveUser, AI_CORS_HEADERS } from '@/lib/ai/auth';
 import { extractDocument, aiConfigured } from '@/lib/ai/anthropic';
 import { feedDocumentToProcurePulse, orgHasProcurePulse } from '@/lib/platform/procurepulse-feed';
@@ -9,6 +10,40 @@ export const maxDuration = 60;
 
 export async function OPTIONS() {
   return new NextResponse(null, { headers: AI_CORS_HEADERS });
+}
+
+/** Build initials for a supplier name ("Bacca Valley (Pty) Ltd" → "BV"). */
+function supplierInitials(name: string): string {
+  const words = name.replace(/\(.*?\)/g, ' ').split(/\s+/).filter(Boolean);
+  return words.slice(0, 2).map((w) => w[0]?.toUpperCase() ?? '').join('') || name.slice(0, 2).toUpperCase();
+}
+
+/**
+ * Resolve an extracted supplier name to a suppliers row id for the org, creating
+ * the row when it's new. Matches case-insensitively on the trading name so the
+ * same counterparty across documents reuses one supplier. Returns the id.
+ */
+async function resolveSupplierId(
+  supabase: SupabaseClient,
+  orgId: string,
+  name: string,
+): Promise<string> {
+  const trimmed = name.trim();
+  const { data: existing } = await supabase
+    .from('suppliers')
+    .select('id')
+    .eq('org_id', orgId)
+    .ilike('name', trimmed)
+    .maybeSingle();
+  if (existing) return (existing as { id: string }).id;
+
+  const { data: created, error } = await supabase
+    .from('suppliers')
+    .insert({ org_id: orgId, name: trimmed, initials: supplierInitials(trimmed) })
+    .select('id')
+    .single();
+  if (error || !created) throw error ?? new Error('Could not create supplier');
+  return (created as { id: string }).id;
 }
 
 /**
@@ -63,13 +98,32 @@ export async function POST(req: Request) {
   }
 
   const documentType = doc.document_type ?? result.document_type;
+
+  // Resolve (or create) the extracted supplier into a suppliers row and link the
+  // document, so the inbox, supplier intel and the ProcurePulse feed all see a
+  // real counterparty. Best-effort — never block extraction on this.
+  let supplierId = doc.supplier_id;
+  if (result.supplier) {
+    try {
+      supplierId = await resolveSupplierId(supabase, doc.org_id, result.supplier);
+    } catch {
+      /* keep the existing supplier_id */
+    }
+  }
+
   const { error: updateErr } = await supabase
     .from('documents')
     .update({
       status: 'extracted',
       confidence: result.overall_confidence,
-      extracted_data: { fields: result.fields, line_items: result.line_items, summary: result.summary },
+      extracted_data: {
+        fields: result.fields,
+        line_items: result.line_items,
+        summary: result.summary,
+        supplier: result.supplier,
+      },
       document_type: documentType,
+      ...(supplierId && supplierId !== doc.supplier_id ? { supplier_id: supplierId } : {}),
     })
     .eq('id', doc.id);
   if (updateErr) {
@@ -86,8 +140,12 @@ export async function POST(req: Request) {
         org_id: doc.org_id,
         filename: doc.filename,
         document_type: documentType,
-        supplier_id: doc.supplier_id,
-        extracted_data: { fields: result.fields, line_items: result.line_items },
+        supplier_id: supplierId,
+        extracted_data: {
+          fields: result.fields,
+          line_items: result.line_items,
+          supplier: result.supplier,
+        },
       });
     }
   } catch {

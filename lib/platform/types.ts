@@ -102,6 +102,9 @@ export interface ExtractedLineItem {
   total_kg?: string;
   /** Counting unit the quantity is measured in: boxes / punnets / bags / kg … */
   unit?: string;
+  /** Per-line seller/agent — set only on multi-vendor docs (e.g. a market
+   *  statement's AGENT column); empty on single-supplier invoices. */
+  supplier?: string;
   unit_price?: string;
   amount?: string;
   confidence: number;
@@ -111,6 +114,8 @@ export interface ExtractedLineItem {
 export interface ExtractedData {
   fields: ExtractedField[];
   line_items?: ExtractedLineItem[];
+  /** The selling/issuing party extracted from the document header (the counterparty). */
+  supplier?: string | null;
 }
 
 export interface Document {

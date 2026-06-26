@@ -254,9 +254,10 @@ export async function feedDocumentToProcurePulse(
     return { ...base, reason: 'no-line-items' };
   }
 
-  // Supplier name (for price provenance + movement label).
-  let supplierName: string | null = null;
-  if (doc.supplier_id) {
+  // Document-level supplier (for price provenance + movement label). The supplier
+  // extracted in Doc-U review is authoritative; fall back to a linked suppliers row.
+  let supplierName: string | null = (doc.extracted_data?.supplier ?? '').trim() || null;
+  if (!supplierName && doc.supplier_id) {
     const { data: sup } = await supabase
       .from('suppliers')
       .select('name')
@@ -305,6 +306,9 @@ export async function feedDocumentToProcurePulse(
   const newByItem = new Map<string, number>();
   const priceByItem = new Map<string, number>();
   const unitByItem = new Map<string, string>();
+  // Effective seller per item: a per-line AGENT (market statement) wins over the
+  // document-level supplier, so each product's price is attributed to who sold it.
+  const supplierByItem = new Map<string, string>();
   let itemsAffected = 0;
   let movementsWritten = 0;
 
@@ -315,6 +319,8 @@ export async function feedDocumentToProcurePulse(
     const price = parsePrice(li.unit_price);
     // Counting unit as captured/corrected in Doc-U review (boxes / punnets / …).
     const lineUnit = (li.unit ?? '').trim();
+    // Per-line seller (a market statement's AGENT) — else the document supplier.
+    const lineSupplier = (li.supplier ?? '').trim() || supplierName;
 
     // A confirmed alias wins; otherwise match an existing item by name
     // (case-insensitive, literal — likeEscape stops "%"/"_" acting as wildcards),
@@ -351,6 +357,7 @@ export async function feedDocumentToProcurePulse(
 
     // The document is the authority on the counting unit it was received in.
     if (lineUnit) unitByItem.set(itemId, lineUnit);
+    if (lineSupplier) supplierByItem.set(itemId, lineSupplier);
 
     const qty = parseNum(li.quantity) ?? 0;
     if (qty > 0) {
@@ -359,7 +366,7 @@ export async function feedDocumentToProcurePulse(
         stock_item_id: itemId,
         change: qty,
         reason: 'received',
-        source_label: supplierName ?? doc.filename,
+        source_label: lineSupplier ?? doc.filename,
         source_document_id: doc.id,
       });
       if (!moveErr) {
@@ -411,21 +418,23 @@ export async function feedDocumentToProcurePulse(
 
     await applyStockPatch(supabase, id, patch);
 
-    // Supplier price: upsert this supplier's latest price, then recompute cheapest.
-    if (supplierName && priceByItem.has(id)) {
+    // Supplier price: upsert THIS item's seller's latest price (per-line agent if
+    // present, else the document supplier), then recompute the cheapest supplier.
+    const itemSupplier = supplierByItem.get(id) ?? supplierName;
+    if (itemSupplier && priceByItem.has(id)) {
       const price = priceByItem.get(id)!;
       const { data: existingSup } = await supabase
         .from('pp_item_suppliers')
         .select('id')
         .eq('stock_item_id', id)
-        .eq('supplier_name', supplierName)
+        .eq('supplier_name', itemSupplier)
         .maybeSingle();
       if (existingSup) {
         await supabase.from('pp_item_suppliers').update({ price }).eq('id', (existingSup as { id: string }).id);
       } else {
         await supabase
           .from('pp_item_suppliers')
-          .insert({ org_id: doc.org_id, stock_item_id: id, supplier_name: supplierName, price });
+          .insert({ org_id: doc.org_id, stock_item_id: id, supplier_name: itemSupplier, price });
       }
       const { data: cheapest } = await supabase
         .from('pp_item_suppliers')

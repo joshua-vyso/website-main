@@ -43,6 +43,9 @@ export interface ExtractedLineItem {
   units_per_box?: string;
   total_kg?: string;
   unit?: string;
+  /** Per-line seller/agent — only on docs where each row has its own vendor
+   *  (e.g. a market statement's AGENT column). Empty on single-supplier invoices. */
+  supplier?: string;
   unit_price?: string;
   amount?: string;
   confidence: number;
@@ -58,6 +61,8 @@ export type ExtractedDocType =
 
 export interface ExtractionResult {
   document_type: ExtractedDocType;
+  /** The selling/issuing party (the counterparty the document is FROM), or null. */
+  supplier: string | null;
   fields: ExtractedField[];
   line_items: ExtractedLineItem[];
   summary: StatementSummary | null;
@@ -77,6 +82,7 @@ Extract ONLY the product line items — do NOT extract header/summary/account/ba
 Respond with ONLY a JSON object (no prose, no markdown code fences) of exactly this shape:
 {
   "document_type": "invoice" | "statement" | "delivery_note" | "price_list" | "order",
+  "supplier": string | null,
   "line_items": [
     {
       "description": string,
@@ -85,6 +91,7 @@ Respond with ONLY a JSON object (no prose, no markdown code fences) of exactly t
       "units_per_box": string,
       "total_kg": string,
       "unit": string,
+      "supplier": string,
       "unit_price": string,
       "amount": string,
       "confidence": number
@@ -106,6 +113,7 @@ Respond with ONLY a JSON object (no prose, no markdown code fences) of exactly t
   "overall_confidence": number
 }
 Rules:
+- "supplier" (top level): the SELLING / ISSUING party — the business this document is FROM and that is owed the money. Read it dynamically from anywhere on the page; do not assume a fixed position. It is the letterhead / logo entity, typically the one printed with a VAT registration number and/or its own banking details. It is NOT the recipient: never return the party under "Bill To", "Ship To", "Sold To", "Customer", "Account", "Deliver To", or the account holder named in a statement header — that is the buyer. Return the cleaned trading name in Title Case, keeping a legal suffix if shown (e.g. "Bacca Valley (Pty) Ltd", "Country Mushrooms (Pty) Ltd"). For a fresh-produce MARKET statement, the document-level supplier is the MARKET named in the page header (e.g. "Johannesburg Fresh Produce Market"). Use null only if no issuing party appears anywhere.
 - "summary": if the document has a TRANSACTION SUMMARY / account-totals block (opening balance, closing/system balance, total purchases, VAT, pallet refunds/usage, payments, audit error), extract those figures as plain NUMBERS — strip currency symbols and thousands separators, keep the sign as printed (money out may be negative). Map: opening_balance, payments (or "net financial transactions" if no explicit payments line → put it in net_financial_transactions), total_purchases, total_pallet_refunds (pallet refunds/deposits), total_pallet_usage (pallet usage fee), vat ("VAT included in above transactions"), total_charges, closing_balance ("system closing balance"), audit_error. statement_date = the date printed next to the closing balance / "as at" date, exactly as shown (e.g. "23/MAY/2026"). If there is NO totals block, set "summary" to null.
 - Include EVERY product row across ALL pages and ALL "PURCHASES ON CARD ID" sections. Do not skip or summarise rows.
 - The commodity cell is often a messy comma-separated string like "BABY BUTTERNUT,300G PUNNE,*,0,*,12,*" or "ORANGES,6KG POCKET,NAVEL,2,M,*". From it derive:
@@ -114,6 +122,7 @@ Rules:
     - units_per_box = the number of punnets/units packed per box when the line clearly encodes it. For "BABY BUTTERNUT,300G PUNNE,*,0,*,12,*" that is "12". "" if not indicated.
 - total_kg = the TOTAL kilograms for the line = weight × quantity, as a plain decimal string (e.g. weight="0.3", quantity="40" -> total_kg="12"; weight="6", quantity="2" -> total_kg="12"). weight is already the per-pack weight in kg, so do NOT multiply by units_per_box. "" if weight or quantity is missing.
 - unit = the COUNTING unit that quantity is measured in, as a short lowercase plural noun, read from the pack/commodity descriptor: "PUNNE"/"PUNNET" -> "punnets", "BOX" -> "boxes", "POCKET" -> "pockets", "BAG" -> "bags", "BUNCH" -> "bunches", "CRATE" -> "crates", "TRAY" -> "trays", "PKT"/"PACKET" -> "packets". If the row is priced/counted by weight, use "kg". Default to "boxes" only when there is genuinely no packaging cue.
+- "supplier" (per line): set ONLY when the line table has a per-row seller column — most often a market statement's "AGENT" column, where each commodity row is supplied by a different market agent/vendor (e.g. "WENPRO MARKET A", "C L DE VILLIERS", "R S A MARKET AG", "DAPPER AGENCIES", "BOTHA ROODT"). Copy that agent/vendor name into the line's "supplier", cleaned to Title Case and de-truncated to the full trading name where obvious (e.g. "Wenpro Market Agents", "R S A Market Agents", "Botha Roodt"). Leave it "" on ordinary single-supplier invoices/delivery notes where every line shares the one top-level supplier.
 - quantity, unit_price and amount come from the QTY, UNIT PRICE and TOTAL columns of that row — NOT from the commodity string.
 - Ignore non-product rows: pallets, deposits, card fees, charges, balances, subtotals, grand totals, banking details.
 - Output numbers as plain strings (keep decimals; omit currency symbols). All confidence values 0-100.`;
@@ -162,6 +171,8 @@ export async function extractDocument(params: {
   const parsed = JSON.parse(raw) as Partial<ExtractionResult>;
   return {
     document_type: parsed.document_type ?? null,
+    supplier:
+      typeof parsed.supplier === 'string' && parsed.supplier.trim() ? parsed.supplier.trim() : null,
     fields: Array.isArray(parsed.fields) ? parsed.fields : [],
     line_items: Array.isArray(parsed.line_items) ? parsed.line_items : [],
     summary: coerceSummary(parsed.summary),

@@ -22,6 +22,11 @@ function ConfidenceChip({ confidence }: { confidence: number }) {
 
 const COLS = 'grid grid-cols-[1fr_64px_48px_70px_56px_76px_88px_24px] gap-2 items-center';
 
+/** A legacy extracted field that represents the supplier — superseded by the
+ *  dedicated Supplier field above, so it's folded in and hidden from the grid. */
+const isSupplierLabel = (label: string): boolean =>
+  /supplier|vendor/i.test(label) || label.trim().toLowerCase() === 'from';
+
 export function ExtractionEditor({
   id,
   status,
@@ -39,6 +44,11 @@ export function ExtractionEditor({
   const router = useRouter();
   const [draft, setDraft] = useState<ExtractedField[]>(() => fields.map((f) => ({ ...f })));
   const [lines, setLines] = useState<ExtractedLineItem[]>(() => lineItems.map((l) => ({ ...l })));
+  // The dedicated supplier field. Falls back to a legacy "Supplier"/"Vendor"/"From"
+  // field for documents extracted before supplier capture existed.
+  const [supplier, setSupplier] = useState<string>(
+    () => extractedData?.supplier ?? fields.find((f) => isSupplierLabel(f.label))?.value ?? '',
+  );
   const [busy, setBusy] = useState(false);
 
   const needsReview = useMemo(
@@ -70,7 +80,12 @@ export function ExtractionEditor({
         // Merge so the parsed statement summary + custom type survive a review.
         .update({
           status: nextStatus,
-          extracted_data: { ...(extractedData ?? {}), fields: draft, line_items: lines },
+          extracted_data: {
+            ...(extractedData ?? {}),
+            fields: draft,
+            line_items: lines,
+            supplier: supplier.trim() || null,
+          },
         })
         .eq('id', id);
     }
@@ -99,10 +114,29 @@ export function ExtractionEditor({
       </div>
 
       <div className="px-6 py-5">
-        {/* Summary fields (legacy docs only — products-only extraction returns no fields) */}
-        {draft.length > 0 && (
+        {/* Supplier — the selling party. Extracted from the document header; editable
+            here so a missed or mis-read counterparty can be corrected before it feeds
+            ProcurePulse's per-product supplier prices. */}
+        <div className="mb-5">
+          <label htmlFor="doc-supplier" className="mb-1.5 block text-[13px] text-[#5F6368]">
+            Supplier
+          </label>
+          <input
+            id="doc-supplier"
+            type="text"
+            value={supplier}
+            onChange={(e) => setSupplier(e.target.value)}
+            placeholder="e.g. Bacca Valley (Pty) Ltd — or the market agent"
+            className="h-10 w-full max-w-md rounded-xl border border-[#E7E7E2] bg-white px-3.5 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none"
+          />
+        </div>
+
+        {/* Summary fields (legacy docs only — products-only extraction returns no fields).
+            The supplier field is hidden here; it's edited via the dedicated input above. */}
+        {draft.some((f) => !isSupplierLabel(f.label)) && (
           <div className="grid grid-cols-2 gap-x-4 gap-y-5">
             {draft.map((field, index) => {
+              if (isSupplierLabel(field.label)) return null;
               const low = field.confidence < FIELD_REVIEW_THRESHOLD;
               return (
                 <div key={`${field.label}-${index}`} className="min-w-0">

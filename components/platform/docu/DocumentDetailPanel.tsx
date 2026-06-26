@@ -55,7 +55,7 @@ export function DocumentDetailPanel({
 
   const flags = deriveFlags(doc, orgDocs);
   const match = inferSupplierFromDoc(doc);
-  const supplierName = doc.supplier?.name ?? match.canonical ?? 'Unknown supplier';
+  const supplierName = doc.supplier?.name ?? match.canonical ?? match.raw ?? 'Unknown supplier';
   const intel = deriveSupplierIntelligence(doc.supplier_id, supplierName, orgDocs);
   const missing = getMissingDocs(doc);
   const initialSummary = (doc.ai_summary as AiSummary | null) ?? null;
