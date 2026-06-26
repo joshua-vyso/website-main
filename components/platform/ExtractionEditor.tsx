@@ -258,11 +258,11 @@ export function ExtractionEditor({
         </button>
         <button
           type="button"
-          disabled={busy || status === 'reviewed'}
+          disabled={busy}
           onClick={() => persist('reviewed')}
           className="inline-flex h-10 items-center rounded-xl bg-[#D9730D] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#C2650B] disabled:opacity-60"
         >
-          {status === 'reviewed' ? 'Confirmed' : 'Save & confirm'}
+          {busy ? 'Saving…' : status === 'reviewed' ? 'Save changes' : 'Save & confirm'}
         </button>
       </div>
     </div>
