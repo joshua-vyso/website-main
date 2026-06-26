@@ -16,7 +16,6 @@ const TABS = [
   { label: 'Products', href: '/app/procurepulse/products' },
   { label: 'Live stock', href: '/app/procurepulse/stock' },
   { label: 'Alerts', href: '/app/procurepulse/alerts' },
-  { label: 'Notifications', href: '/app/procurepulse/notifications' },
   { label: 'Intelligence', href: '/app/procurepulse/intelligence' },
   { label: 'Settings', href: '/app/procurepulse/settings' },
 ];

@@ -2,7 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getPlatformSession, createServerSupabase } from '@/lib/platform/supabase-server';
 import { fetchStock, fetchNotifications } from '@/lib/platform/procurepulse-queries';
-import { computeAlerts, computeKpis, rand } from '@/lib/platform/procurepulse';
+import { computeAlerts, computeKpis, rand, NOTIFICATION_KINDS } from '@/lib/platform/procurepulse';
 import {
   AreaChart,
   DocBadge,
@@ -51,6 +51,8 @@ export default async function ProcurePulseDashboard() {
   const docNotifs = notifs
     .filter((n) => n.kind === 'new_direct_doc' || n.kind === 'new_market_statement')
     .slice(0, 2);
+  const recentNotifs = notifs.slice(0, 5);
+  const NOTIF_FALLBACK = { bg: '#F0F0EC', fg: '#5F6368', label: 'Update' };
 
   return (
     <div className="space-y-5">
@@ -102,25 +104,62 @@ export default async function ProcurePulseDashboard() {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
-        <div className="text-[14px] font-medium text-[#1A1C1E]">Recent documents</div>
-        <div className="mt-3 space-y-3.5">
-          {docNotifs.length === 0 ? (
-            <p className="text-[13px] text-[#9A9DA1]">No documents have fed stock yet.</p>
-          ) : (
-            docNotifs.map((n) => (
-              <div key={n.id} className="flex items-center gap-3">
-                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#E3F0ED]">
-                  <span className="h-[15px] w-[15px] rounded-[3px] bg-[#1E5E54]" />
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
+          <div className="text-[14px] font-medium text-[#1A1C1E]">Recent documents</div>
+          <div className="mt-3 space-y-3.5">
+            {docNotifs.length === 0 ? (
+              <p className="text-[13px] text-[#9A9DA1]">No documents have fed stock yet.</p>
+            ) : (
+              docNotifs.map((n) => (
+                <div key={n.id} className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#E3F0ED]">
+                    <span className="h-[15px] w-[15px] rounded-[3px] bg-[#1E5E54]" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="text-[13px] font-medium text-[#1A1C1E]">{n.title}</div>
+                    <div className="text-[12px] text-[#9A9DA1]">{n.body}</div>
+                  </div>
+                  <DocBadge />
                 </div>
-                <div className="min-w-0 flex-1">
-                  <div className="text-[13px] font-medium text-[#1A1C1E]">{n.title}</div>
-                  <div className="text-[12px] text-[#9A9DA1]">{n.body}</div>
-                </div>
-                <DocBadge />
-              </div>
-            ))
-          )}
+              ))
+            )}
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
+          <div className="flex items-center justify-between">
+            <div className="text-[14px] font-medium text-[#1A1C1E]">Notifications</div>
+            <Link
+              href="/app/procurepulse/notifications"
+              className="text-[12px] font-medium text-[#1E5E54] hover:underline"
+            >
+              Show all
+            </Link>
+          </div>
+          <div className="mt-3 space-y-3">
+            {recentNotifs.length === 0 ? (
+              <p className="text-[13px] text-[#9A9DA1]">No notifications yet.</p>
+            ) : (
+              recentNotifs.map((n) => {
+                const k = NOTIFICATION_KINDS[n.kind] ?? NOTIF_FALLBACK;
+                return (
+                  <div key={n.id} className="flex items-start gap-3">
+                    <div
+                      className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+                      style={{ backgroundColor: k.bg }}
+                    >
+                      <span className="h-3 w-3 rounded-[3px]" style={{ backgroundColor: k.fg }} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="truncate text-[13px] font-medium text-[#1A1C1E]">{n.title}</div>
+                      {n.body ? <div className="truncate text-[12px] text-[#9A9DA1]">{n.body}</div> : null}
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
         </div>
       </div>
     </div>
