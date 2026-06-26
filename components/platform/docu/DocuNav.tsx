@@ -7,16 +7,19 @@ const TABS = [
   { href: '/app/docu', label: 'Documents', match: 'documents' },
   { href: '/app/docu/recent', label: 'Recent', match: 'recent' },
   { href: '/app/docu/reconciliation', label: 'Reconciliation', match: 'reconciliation' },
+  { href: '/app/docu/settings', label: 'Settings', match: 'settings' },
 ] as const;
 
-/** Top tabs for the Doc-U section (Documents · Recent · Reconciliation). */
+/** Top tabs for the Doc-U section (Documents · Recent · Reconciliation · Settings). */
 export function DocuNav() {
   const pathname = usePathname() ?? '';
   const current = pathname.startsWith('/app/docu/recent')
     ? 'recent'
     : pathname.startsWith('/app/docu/reconciliation')
       ? 'reconciliation'
-      : 'documents'; // /app/docu, /app/docu/folder/*, /app/docu/[id], awaiting/confidence/flagged
+      : pathname.startsWith('/app/docu/settings')
+        ? 'settings'
+        : 'documents'; // /app/docu, /app/docu/folder/*, /app/docu/[id], awaiting/confidence/flagged
 
   return (
     <div className="flex items-center gap-5 border-b border-[#E7E7E2]">

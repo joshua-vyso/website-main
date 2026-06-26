@@ -37,6 +37,7 @@ export function DocumentDetailPanel({
   folders,
   features,
   fedItemCount,
+  orgUnits,
   originalUrl,
   isImage,
 }: {
@@ -45,6 +46,7 @@ export function DocumentDetailPanel({
   folders: DocumentFolder[];
   features: Record<FeatureKey, boolean>;
   fedItemCount: number;
+  orgUnits: string[];
   originalUrl: string | null;
   isImage: boolean;
 }) {
@@ -139,6 +141,7 @@ export function DocumentDetailPanel({
           fields={fields}
           lineItems={lineItems}
           extractedData={extracted}
+          orgUnits={orgUnits}
         />
         <div className="lg:self-stretch">
           <div className="lg:sticky lg:top-6">{preview}</div>

@@ -33,6 +33,7 @@ export function ExtractionEditor({
   fields,
   lineItems,
   extractedData,
+  orgUnits = [],
 }: {
   id: string;
   status: DocumentStatus;
@@ -40,8 +41,19 @@ export function ExtractionEditor({
   lineItems: ExtractedLineItem[];
   /** The doc's full extracted_data, so saving preserves summary / custom_type. */
   extractedData?: DocuExtractedData | null;
+  /** The organisation's measurement units — the unit column is a dropdown of these
+   *  (managed in Workspace settings), not free text. */
+  orgUnits?: string[];
 }) {
   const router = useRouter();
+
+  // Options for a line's unit dropdown: the org units, plus the line's current
+  // value if it isn't one of them (so an already-extracted unit is never dropped).
+  const unitOptions = (current?: string | null): string[] => {
+    const cur = (current ?? '').trim();
+    if (cur && !orgUnits.some((u) => u.toLowerCase() === cur.toLowerCase())) return [...orgUnits, cur];
+    return orgUnits;
+  };
   const [draft, setDraft] = useState<ExtractedField[]>(() => fields.map((f) => ({ ...f })));
   const [lines, setLines] = useState<ExtractedLineItem[]>(() => lineItems.map((l) => ({ ...l })));
   // The dedicated supplier field. Falls back to a legacy "Supplier"/"Vendor"/"From"
@@ -191,7 +203,19 @@ export function ExtractionEditor({
                   <input className={cellCls} value={l.description ?? ''} onChange={(e) => updateLine(i, 'description', e.target.value)} />
                   <input className={cellCls} value={l.weight ?? ''} onChange={(e) => updateLine(i, 'weight', e.target.value)} />
                   <input className={`${cellCls} text-right`} value={l.quantity ?? ''} onChange={(e) => updateLine(i, 'quantity', e.target.value)} />
-                  <input className={cellCls} value={l.unit ?? ''} placeholder="boxes" onChange={(e) => updateLine(i, 'unit', e.target.value)} />
+                  <select
+                    className={`${cellCls} cursor-pointer pr-1`}
+                    value={l.unit ?? ''}
+                    onChange={(e) => updateLine(i, 'unit', e.target.value)}
+                    aria-label="Unit"
+                  >
+                    <option value="">unit</option>
+                    {unitOptions(l.unit).map((u) => (
+                      <option key={u} value={u}>
+                        {u}
+                      </option>
+                    ))}
+                  </select>
                   <input className={`${cellCls} text-right`} value={l.units_per_box ?? ''} onChange={(e) => updateLine(i, 'units_per_box', e.target.value)} />
                   <input className={`${cellCls} text-right`} value={l.unit_price ?? ''} onChange={(e) => updateLine(i, 'unit_price', e.target.value)} />
                   <input className={`${cellCls} text-right`} value={l.amount ?? ''} onChange={(e) => updateLine(i, 'amount', e.target.value)} />

@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getPlatformSession, createServerSupabase } from '@/lib/platform/supabase-server';
 import { DocumentDetailPanel } from '@/components/platform/docu/DocumentDetailPanel';
+import { allUnits } from '@/lib/platform/procurepulse/units';
 import type { DocumentFolder, DocumentWithSupplier } from '@/lib/platform/types';
 
 export default async function DocumentReviewPage({
@@ -48,24 +49,29 @@ export default async function DocumentReviewPage({
   // power the folder picker; pp_movements gives the ProcurePulse fed-item count
   // (RLS returns nothing for orgs without the feature); the signed URL is the
   // preview source. Previously these last two ran sequentially after the batch.
-  const [{ data: siblingData }, { data: folderData }, { data: fedMoves }, signedRes] = await Promise.all([
-    supabase
-      .from('documents')
-      .select('*, supplier:suppliers(id,name,initials)')
-      .eq('org_id', doc.org_id)
-      .order('created_at', { ascending: false }),
-    supabase
-      .from('document_folders')
-      .select('*')
-      .eq('org_id', doc.org_id)
-      .order('name', { ascending: true }),
-    supabase.from('pp_movements').select('stock_item_id').eq('source_document_id', doc.id),
-    doc.storage_path
-      ? supabase.storage.from('documents').createSignedUrl(doc.storage_path, 600)
-      : Promise.resolve({ data: null }),
-  ]);
+  const [{ data: siblingData }, { data: folderData }, { data: fedMoves }, { data: settingsData }, signedRes] =
+    await Promise.all([
+      supabase
+        .from('documents')
+        .select('*, supplier:suppliers(id,name,initials)')
+        .eq('org_id', doc.org_id)
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('document_folders')
+        .select('*')
+        .eq('org_id', doc.org_id)
+        .order('name', { ascending: true }),
+      supabase.from('pp_movements').select('stock_item_id').eq('source_document_id', doc.id),
+      // The org's measurement units (workspace-managed) feed the unit dropdown.
+      // Tolerant of pp_settings not existing → built-in units only.
+      supabase.from('pp_settings').select('custom_units').eq('org_id', doc.org_id).maybeSingle(),
+      doc.storage_path
+        ? supabase.storage.from('documents').createSignedUrl(doc.storage_path, 600)
+        : Promise.resolve({ data: null }),
+    ]);
   const orgDocs = (siblingData as DocumentWithSupplier[] | null) ?? [];
   const folders = (folderData as DocumentFolder[] | null) ?? [];
+  const orgUnits = allUnits((settingsData as { custom_units?: string[] | null } | null)?.custom_units);
 
   const fedItemCount = new Set(
     (fedMoves as { stock_item_id: string }[] | null)?.map((m) => m.stock_item_id) ?? [],
@@ -94,6 +100,7 @@ export default async function DocumentReviewPage({
         folders={folders}
         features={session.features}
         fedItemCount={fedItemCount ?? 0}
+        orgUnits={orgUnits}
         originalUrl={originalUrl}
         isImage={isImage}
       />
