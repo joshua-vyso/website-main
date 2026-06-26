@@ -3,12 +3,13 @@ import {
   fetchStock,
   fetchSettings,
   fetchProductAliases,
+  fetchThresholds,
+  fetchProductUnits,
 } from '@/lib/platform/procurepulse-queries';
 import { allUnits } from '@/lib/platform/procurepulse/units';
 import { buildMatchCandidates, type MatchCandidate } from '@/lib/platform/procurepulse/matching';
 import { aiConfigured } from '@/lib/ai/anthropic';
-import { ProductsManager } from '@/components/platform/procurepulse/ProductsManager';
-import { ProductMatching } from '@/components/platform/procurepulse/ProductMatching';
+import { ProductsTabs } from '@/components/platform/procurepulse/ProductsTabs';
 
 /** Products catalogue — edit names, units, thresholds, base prices; add/delete;
  *  plus a product-matching section to reconcile duplicate / mismatched names. */
@@ -16,10 +17,12 @@ export default async function ProductsPage() {
   const session = await getPlatformSession();
   const orgId = session?.org?.id ?? '';
   const db = await createServerSupabase();
-  const [items, settings, aliases] = await Promise.all([
+  const [items, settings, aliases, thresholds, productUnits] = await Promise.all([
     fetchStock(db, orgId),
     fetchSettings(db, orgId),
     fetchProductAliases(db, orgId),
+    fetchThresholds(db, orgId),
+    fetchProductUnits(db, orgId),
   ]);
 
   // Exclude every already-ruled name (confirmed / dismissed / pending) from the
@@ -58,9 +61,13 @@ export default async function ProductsPage() {
   const candidates = [...exactCandidates, ...aiCandidates.filter((c) => !exactItemIds.has(c.itemId))];
 
   return (
-    <div className="space-y-8">
-      <ProductsManager items={items} units={allUnits(settings?.custom_units)} />
-      <ProductMatching candidates={candidates} aiEnabled={aiConfigured} />
-    </div>
+    <ProductsTabs
+      items={items}
+      units={allUnits(settings?.custom_units)}
+      candidates={candidates}
+      aiEnabled={aiConfigured}
+      thresholds={thresholds}
+      productUnits={productUnits}
+    />
   );
 }

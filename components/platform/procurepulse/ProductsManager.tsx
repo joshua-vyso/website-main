@@ -48,7 +48,16 @@ function rowChanged(a: Row, b: Row): boolean {
  * products; full undo/redo of the working set; one "Save changes" diffs the
  * working set against the server and persists inserts / updates / deletes.
  */
-export function ProductsManager({ items, units }: { items: StockItem[]; units: string[] }) {
+export function ProductsManager({
+  items,
+  units,
+  embedded = false,
+}: {
+  items: StockItem[];
+  units: string[];
+  /** When rendered inside the Products tab shell, the shell owns the page header. */
+  embedded?: boolean;
+}) {
   const router = useRouter();
   const { org } = usePlatform();
 
@@ -266,19 +275,21 @@ export function ProductsManager({ items, units }: { items: StockItem[]; units: s
 
   return (
     <div>
-      <PageHead
-        title="Products"
-        subtitle="Your master catalogue — feeds ProcurePulse stock, PricePilot pricing and OrderFlow invoices"
-        right={
-          <Link
-            href="/app/orderflow/orders"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-[#D7DAD8] bg-white px-3.5 py-2.5 text-[14px] font-medium text-[#5F6368] transition-colors hover:border-[#1E5E54]/30"
-          >
-            Create order in OrderFlow
-            <span aria-hidden>→</span>
-          </Link>
-        }
-      />
+      {embedded ? null : (
+        <PageHead
+          title="Products"
+          subtitle="Your master catalogue — feeds ProcurePulse stock, PricePilot pricing and OrderFlow invoices"
+          right={
+            <Link
+              href="/app/orderflow/orders"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#D7DAD8] bg-white px-3.5 py-2.5 text-[14px] font-medium text-[#5F6368] transition-colors hover:border-[#1E5E54]/30"
+            >
+              Create order in OrderFlow
+              <span aria-hidden>→</span>
+            </Link>
+          }
+        />
+      )}
 
       {/* Toolbar */}
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
@@ -336,7 +347,7 @@ export function ProductsManager({ items, units }: { items: StockItem[]; units: s
           <span>Product name</span>
           <span>Unit</span>
           <span>Low threshold</span>
-          <span>Base price (R)</span>
+          <span>Latest cost (R)</span>
           <span className="text-right">On hand</span>
           <span />
         </div>

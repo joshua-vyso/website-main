@@ -14,9 +14,12 @@ import type { StockStatus } from '@/lib/platform/types';
 const TABS = [
   { label: 'Dashboard', href: '/app/procurepulse' },
   { label: 'Products', href: '/app/procurepulse/products' },
+  { label: 'Stock orders', href: '/app/procurepulse/reorder' },
+  { label: 'Recipes', href: '/app/procurepulse/recipes' },
   { label: 'Live stock', href: '/app/procurepulse/stock' },
-  { label: 'Alerts', href: '/app/procurepulse/alerts' },
+  { label: 'Counts', href: '/app/procurepulse/counts' },
   { label: 'Intelligence', href: '/app/procurepulse/intelligence' },
+  { label: 'Alerts', href: '/app/procurepulse/alerts' },
   { label: 'Settings', href: '/app/procurepulse/settings' },
 ];
 

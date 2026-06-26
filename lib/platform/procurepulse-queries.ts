@@ -8,9 +8,11 @@ import type {
   PpNotification,
   PpSettings,
   ProductAlias,
+  ProductUnit,
   ReorderRequest,
   StockItem,
   StockMovement,
+  StockThreshold,
 } from './types';
 
 type DB = Awaited<ReturnType<typeof createServerSupabase>>;
@@ -93,4 +95,16 @@ export async function fetchReorderRequests(
 export async function fetchProductAliases(db: DB, orgId: string): Promise<ProductAlias[]> {
   const { data } = await db.from('pp_name_aliases').select('*').eq('org_id', orgId);
   return (data ?? []) as ProductAlias[];
+}
+
+/** Per-product stock/freshness thresholds. Tolerant of the table not existing yet. */
+export async function fetchThresholds(db: DB, orgId: string): Promise<StockThreshold[]> {
+  const { data } = await db.from('pp_stock_thresholds').select('*').eq('org_id', orgId);
+  return (data ?? []) as StockThreshold[];
+}
+
+/** Per-product unit setup. Tolerant of the table not existing yet. */
+export async function fetchProductUnits(db: DB, orgId: string): Promise<ProductUnit[]> {
+  const { data } = await db.from('pp_product_units').select('*').eq('org_id', orgId);
+  return (data ?? []) as ProductUnit[];
 }

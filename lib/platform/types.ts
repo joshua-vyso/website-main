@@ -247,12 +247,27 @@ export interface ItemSupplierPrice {
   created_at: string;
 }
 
-/** A received/used stock movement (`pp_movements`). */
+/**
+ * The append-only stock-movement vocabulary. Stock intelligence only — there is
+ * NO wastage reason here (wastage is a separate Vyso module). Legacy rows may
+ * still carry 'received'/'adjustment'; new writes use these typed reasons.
+ */
+export type MovementReason =
+  | 'document_sync'
+  | 'manual_adjustment'
+  | 'count_adjustment'
+  | 'order_received'
+  | 'recipe_reserved'
+  | 'recipe_consumed'
+  | 'transfer';
+
+/** A stock movement (`pp_movements`) — the append-only stock ledger. */
 export interface StockMovement {
   id: string;
   org_id: string;
   stock_item_id: string;
   change: number;
+  /** A MovementReason for new rows; legacy rows may carry other strings. */
   reason: string | null;
   source_label: string | null;
   source_document_id: string | null;
@@ -286,4 +301,145 @@ export interface PpSettings {
   /** Org-defined units of measurement, on top of the built-ins (web-only column). */
   custom_units: string[] | null;
   updated_at: string;
+}
+
+// ---------------------------------------------------------------------------
+// Stock-intelligence models (ProcurePulse rebuild). All org-scoped via RLS.
+// ---------------------------------------------------------------------------
+
+/** How a product is measured/converted across purchase, stock and recipe (`pp_product_units`). */
+export interface ProductUnit {
+  id: string;
+  org_id: string;
+  stock_item_id: string;
+  purchase_unit: string | null;
+  stock_unit: string | null;
+  recipe_unit: string | null;
+  /** Multiply a purchase unit by this to get stock units. */
+  conversion_factor: number | null;
+  updated_at: string;
+}
+
+/** A reusable unit conversion (`pp_unit_conversions`). */
+export interface UnitConversion {
+  id: string;
+  org_id: string;
+  from_unit: string;
+  to_unit: string;
+  factor: number;
+}
+
+/** Stock, freshness + reorder thresholds for a product (`pp_stock_thresholds`). */
+export interface StockThreshold {
+  id: string;
+  org_id: string;
+  stock_item_id: string;
+  low_threshold: number | null;
+  par_level: number | null;
+  lead_time_days: number | null;
+  freshness_value: number | null;
+  /** 'hours' | 'days' */
+  freshness_unit: string | null;
+  alerts_enabled: boolean;
+  notes: string | null;
+  updated_at: string;
+}
+
+/** A stock replenishment order (`pp_stock_orders`). */
+export interface StockOrder {
+  id: string;
+  org_id: string;
+  supplier: string | null;
+  /** draft | sent | completed | cancelled */
+  status: string;
+  total: number | null;
+  estimate_sent_at: string | null;
+  created_by: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/** A line on a stock order (`pp_stock_order_items`). */
+export interface StockOrderItem {
+  id: string;
+  org_id: string;
+  order_id: string;
+  stock_item_id: string | null;
+  product_name: string;
+  qty: number;
+  unit: string | null;
+  unit_price: number | null;
+  line_total: number | null;
+}
+
+/** A production recipe (`pp_recipes`). */
+export interface Recipe {
+  id: string;
+  org_id: string;
+  name: string;
+  output_product: string | null;
+  output_qty: number | null;
+  output_unit: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+/** An ingredient line of a recipe (`pp_recipe_ingredients`). */
+export interface RecipeIngredient {
+  id: string;
+  org_id: string;
+  recipe_id: string;
+  stock_item_id: string | null;
+  product_name: string;
+  qty_per_batch: number;
+  unit: string | null;
+}
+
+/** A cycle/stock count (`pp_stock_counts`). */
+export interface StockCount {
+  id: string;
+  org_id: string;
+  /** open | completed */
+  status: string;
+  counted_by: string | null;
+  counted_at: string | null;
+  created_at: string;
+}
+
+/** A counted line within a stock count (`pp_stock_count_items`). */
+export interface StockCountItem {
+  id: string;
+  org_id: string;
+  count_id: string;
+  stock_item_id: string | null;
+  product_name: string;
+  system_qty: number;
+  counted_qty: number;
+  variance: number;
+}
+
+/** A point-in-time supplier price observation (`pp_supplier_price_history`). */
+export interface SupplierPriceHistory {
+  id: string;
+  org_id: string;
+  stock_item_id: string;
+  supplier_name: string;
+  price: number;
+  source_document_id: string | null;
+  observed_at: string;
+}
+
+/** A ProcurePulse activity event for the dashboard feed (`procurepulse_activity_events`). */
+export interface ProcurePulseActivityEvent {
+  id: string;
+  org_id: string;
+  /** document_sync | manual_adjustment | count_adjustment | order_received | recipe_reserved | recipe_consumed | transfer | price_update */
+  type: string;
+  title: string;
+  body: string | null;
+  stock_item_id: string | null;
+  ref_id: string | null;
+  occurred_at: string;
+  created_at: string;
 }
