@@ -13,6 +13,9 @@ export interface PlPriceList {
   customer_id: string | null;
   default_margin_pct: number;
   cadence: PriceCadence;
+  /** Customer-pricing validity window (added by pl-validity.sql; null/undefined = always-on). */
+  valid_from?: string | null;
+  valid_until?: string | null;
   created_at: string;
 }
 
@@ -310,6 +313,66 @@ export function pricingInsight(i: InsightInputs): string {
   return `Pricing looks healthy — your catalogue averages ${Math.round(
     i.avgMargin,
   )}% margin, at or above your ${Math.round(i.target)}% target across the board.`;
+}
+
+// ---------------------------------------------------------------------------
+// Customer pricing — price-list validity window + expiry status
+// ---------------------------------------------------------------------------
+
+export type ValidityStatus = 'active' | 'scheduled' | 'expiring' | 'expired' | 'none';
+
+export interface Validity {
+  status: ValidityStatus;
+  /** Days until expiry (negative if already expired); null when there's no end date. */
+  daysUntilExpiry: number | null;
+  label: string;
+}
+
+export const VALIDITY_STYLE: Record<ValidityStatus, { bg: string; fg: string; label: string }> = {
+  active: { bg: '#E1F5EE', fg: '#0F6E56', label: 'Active' },
+  scheduled: { bg: '#E6F1FB', fg: '#0C447C', label: 'Scheduled' },
+  expiring: { bg: '#FBEEDA', fg: '#854F0B', label: 'Expiring soon' },
+  expired: { bg: '#FCEBEB', fg: '#A32D2D', label: 'Expired' },
+  none: { bg: '#F0F0EC', fg: '#5F6368', label: 'No expiry' },
+};
+
+/** Days within which an upcoming expiry counts as "expiring soon". */
+export const EXPIRY_SOON_DAYS = 14;
+
+function fmtDay(s: string): string {
+  const [y, m, d] = s.split('-').map(Number);
+  if (!y || !m || !d) return s;
+  return new Date(y, m - 1, d).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+/** Validity + expiry status for a price list, evaluated against `today` (day granularity). */
+export function priceListValidity(
+  list: { valid_from?: string | null; valid_until?: string | null },
+  today: Date = new Date(),
+): Validity {
+  const todayMid = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+  const parse = (s: string) => {
+    const [y, m, d] = s.split('-').map(Number);
+    return new Date(y, m - 1, d).getTime();
+  };
+  const from = list.valid_from ? parse(list.valid_from) : null;
+  const until = list.valid_until ? parse(list.valid_until) : null;
+
+  if (from != null && from > todayMid) {
+    return { status: 'scheduled', daysUntilExpiry: null, label: `Starts ${fmtDay(list.valid_from!)}` };
+  }
+  if (until == null) return { status: 'none', daysUntilExpiry: null, label: 'No expiry' };
+
+  const days = Math.round((until - todayMid) / 86_400_000);
+  if (days < 0) return { status: 'expired', daysUntilExpiry: days, label: `Expired ${fmtDay(list.valid_until!)}` };
+  if (days <= EXPIRY_SOON_DAYS) {
+    return {
+      status: 'expiring',
+      daysUntilExpiry: days,
+      label: days === 0 ? 'Expires today' : `Expires in ${days} day${days === 1 ? '' : 's'}`,
+    };
+  }
+  return { status: 'active', daysUntilExpiry: days, label: `Valid until ${fmtDay(list.valid_until!)}` };
 }
 
 /** Rand, plain. */

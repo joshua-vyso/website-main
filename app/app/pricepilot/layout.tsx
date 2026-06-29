@@ -6,6 +6,7 @@ const TABS = [
   { label: 'Dashboard', href: '/app/pricepilot' },
   { label: 'Products', href: '/app/pricepilot/products' },
   { label: 'Price lists', href: '/app/pricepilot/price-lists' },
+  { label: 'Customers', href: '/app/pricepilot/customers' },
   { label: 'Recommendations', href: '/app/pricepilot/recommendations' },
   { label: 'Recent sales', href: '/app/pricepilot/recent-sales' },
   { label: 'Sales hub', href: '/app/pricepilot/sales-hub' },
