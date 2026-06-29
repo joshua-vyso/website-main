@@ -264,19 +264,30 @@ Rules:
 - Parse messy, conversational text: "hi can I get 5 strawberries and 2 boxes blueberries pls 🙏" -> two line items. Ignore greetings, small talk, delivery addresses, dates and totals.
 - Output all numbers as plain strings (no currency symbols); all confidence values 0-100.`;
 
-/** Parse an uploaded customer order (WhatsApp / email / handwritten / typed). */
+/** Parse an uploaded customer order (WhatsApp / email / handwritten / typed). When
+ *  `products` (the org's catalogue names) is given, the model resolves abbreviations
+ *  and varieties to the exact catalogue name so pricing can match it. */
 export async function extractOrderDocument(params: {
   base64: string;
   mediaType: string;
   filename: string;
+  products?: string[];
 }): Promise<OrderExtractionResult> {
+  const catalogue =
+    params.products && params.products.length
+      ? `\n\nMATCH TO CATALOGUE: when an ordered item clearly corresponds to one of the business's products below, set "description" to that EXACT product name — resolve abbreviations, plurals and varieties (e.g. "broc" -> "Broccoli", "toms" -> "Tomatoes", "green apple"/"granny smith" -> whichever apple in the list it is). If an item doesn't clearly match any product, keep the customer's own wording. PRODUCTS: ${params.products.slice(0, 400).join(', ')}.`
+      : '';
+
   const message = await client().messages.create({
     model: EXTRACT_MODEL,
     max_tokens: 4000,
     messages: [
       {
         role: 'user',
-        content: [fileBlockFor(params), { type: 'text', text: `${ORDER_EXTRACT_INSTRUCTION}\n\nFilename: ${params.filename}` }],
+        content: [
+          fileBlockFor(params),
+          { type: 'text', text: `${ORDER_EXTRACT_INSTRUCTION}${catalogue}\n\nFilename: ${params.filename}` },
+        ],
       },
     ],
   });

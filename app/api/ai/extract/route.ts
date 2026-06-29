@@ -88,9 +88,19 @@ export async function POST(req: Request) {
   // ORDER documents (uploaded customer orders — WhatsApp/email/handwritten) use a
   // different reader and build an OrderFlow order instead of feeding stock.
   if (doc.document_type === 'order') {
+    // Give the order reader the org's catalogue so it resolves abbreviations and
+    // varieties ("broc" → "Broccoli", "green apple" → "Apples Granny Smith") to the
+    // exact product name — which the pricing match then prices.
+    const { data: catalogueRows } = await supabase
+      .from('pp_stock_items')
+      .select('name')
+      .eq('org_id', doc.org_id)
+      .order('name', { ascending: true });
+    const products = ((catalogueRows ?? []) as { name: string }[]).map((r) => r.name).filter(Boolean);
+
     let order;
     try {
-      order = await extractOrderDocument({ base64, mediaType, filename: doc.filename });
+      order = await extractOrderDocument({ base64, mediaType, filename: doc.filename, products });
     } catch (err) {
       await supabase.from('documents').update({ status: 'error' }).eq('id', doc.id);
       return NextResponse.json(

@@ -57,7 +57,48 @@ const num = (v: unknown): number | null => {
   const n = Number(s);
   return Number.isFinite(n) ? n : null;
 };
-const likeEscape = (s: string): string => s.replace(/[%_\\]/g, (m) => `\\${m}`);
+
+export interface StockLite {
+  id: string;
+  name: string;
+  avg_unit_price: number | null;
+  unit: string | null;
+}
+
+/**
+ * Match a free-text order line ("Broc", "toms", "green apple") to a catalogue
+ * product. Tries exact → length-guarded containment → token overlap with prefix
+ * matching (so "broc" hits "Broccoli"). Returns null when nothing is close — a
+ * genuinely unknown product shouldn't be force-matched to the wrong item.
+ */
+export function matchStockItem(name: string, items: StockLite[]): StockLite | null {
+  const n = normName(name);
+  if (!n) return null;
+  for (const it of items) if (normName(it.name) === n) return it;
+
+  let containBest: { it: StockLite; ratio: number } | null = null;
+  for (const it of items) {
+    const inm = normName(it.name);
+    if (!inm || !(inm.includes(n) || n.includes(inm))) continue;
+    const ratio = Math.min(n.length, inm.length) / Math.max(n.length, inm.length);
+    if (ratio >= 0.55 && (!containBest || ratio > containBest.ratio)) containBest = { it, ratio };
+  }
+  if (containBest) return containBest.it;
+
+  const tokens = n.split(' ').filter(Boolean);
+  let tokenBest: { it: StockLite; score: number } | null = null;
+  for (const it of items) {
+    const itTokens = normName(it.name).split(' ').filter(Boolean);
+    if (!itTokens.length) continue;
+    let overlap = 0;
+    for (const t of tokens) {
+      if (t.length >= 3 && itTokens.some((x) => x === t || x.startsWith(t) || t.startsWith(x))) overlap += 1;
+    }
+    const score = overlap / Math.max(tokens.length, itTokens.length);
+    if (overlap > 0 && score >= 0.5 && (!tokenBest || score > tokenBest.score)) tokenBest = { it, score };
+  }
+  return tokenBest?.it ?? null;
+}
 
 export interface SyncResult {
   ok: boolean;
@@ -183,19 +224,20 @@ export async function syncOrderFromDocument(
     }
   }
 
+  // Catalogue (loaded once) for fuzzy product matching of each ordered line.
+  const { data: stockRows } = await db
+    .from('pp_stock_items')
+    .select('id, name, avg_unit_price, unit')
+    .eq('org_id', orgId);
+  const stockItems = (stockRows ?? []) as StockLite[];
+
   const items: { stock_item_id: string | null; name: string; qty: number; unit: string | null; unit_price: number }[] = [];
   let unpricedLines = 0;
   for (const li of lines) {
     const name = (li.description ?? '').trim();
     if (!name) continue;
     const qty = num(li.quantity) ?? 0;
-    const { data: stock } = await db
-      .from('pp_stock_items')
-      .select('id, avg_unit_price, unit')
-      .eq('org_id', orgId)
-      .ilike('name', likeEscape(name))
-      .maybeSingle();
-    const s = stock as { id: string; avg_unit_price: number | null; unit: string | null } | null;
+    const s = matchStockItem(name, stockItems);
     const basePrice = s?.avg_unit_price != null ? Number(s.avg_unit_price) : null;
     let unitPrice = num(li.unit_price);
     let priced = unitPrice != null; // a real price came off the document
