@@ -204,6 +204,122 @@ function coerceSummary(raw: unknown): StatementSummary | null {
   return hasAny ? out : null;
 }
 
+// ---------------------------------------------------------------------------
+// Order extraction (OrderFlow — uploaded customer orders)
+// ---------------------------------------------------------------------------
+
+export interface OrderExtractionResult {
+  /** The buying customer's name (WhatsApp contact / email sender / note), or null. */
+  customer_name: string | null;
+  /** 0–100 confidence that customer_name was read correctly. */
+  customer_confidence: number;
+  line_items: ExtractedLineItem[];
+  overall_confidence: number;
+}
+
+/** A document/image content block for the model from a base64 file. */
+function fileBlockFor(params: { base64: string; mediaType: string; filename: string }): Anthropic.ContentBlockParam {
+  const isPdf =
+    params.mediaType === 'application/pdf' || params.filename.toLowerCase().endsWith('.pdf');
+  return isPdf
+    ? { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: params.base64 } }
+    : {
+        type: 'image',
+        source: {
+          type: 'base64',
+          media_type: (params.mediaType || 'image/jpeg') as
+            | 'image/jpeg'
+            | 'image/png'
+            | 'image/gif'
+            | 'image/webp',
+          data: params.base64,
+        },
+      };
+}
+
+const ORDER_EXTRACT_INSTRUCTION = `You are Doc-U's ORDER reader for an SME food & wholesale business in South Africa.
+The attached file is a CUSTOMER ORDER — it may be a WhatsApp screenshot, an email, a photo of a handwritten note, or a typed list. Read it (handwriting included) and return WHO is ordering and WHAT they want.
+Respond with ONLY a JSON object (no prose, no markdown code fences) of exactly this shape:
+{
+  "customer_name": string | null,
+  "customer_confidence": number,
+  "line_items": [
+    { "description": string, "quantity": string, "unit": string, "unit_price": string, "confidence": number }
+  ],
+  "overall_confidence": number
+}
+Rules:
+- "customer_name" = who PLACED the order. Read it from the most reliable cue:
+    - WhatsApp screenshot: the CONTACT NAME in the chat header at the very top of the screen. NOT a phone number if a saved name is shown, NOT "you", and NEVER the business receiving the order. If only a phone number is shown, return that number.
+    - Email: the SENDER's display name. If only an email address is shown, derive a name from the local-part before "@", title-cased and split on "."/"_"/"-" (e.g. "john.smith@shop.co.za" -> "John Smith").
+    - Handwritten / typed note: a name by "from", "customer", "client", a shop name, or the sign-off.
+  Return the cleaned name in Title Case. Use null only if there is genuinely no name anywhere.
+- "customer_confidence" (0-100): how sure you are the name is right. A clear WhatsApp contact header or email sender display name is high (85-100); a name guessed from a phone number or an ambiguous scrawl is low (<60).
+- "line_items" = every product the customer is asking for. For each:
+    - description = the produce/product, cleaned and Title Case (e.g. "Strawberries", "Mixed Veg", "Baby Marrow").
+    - quantity = how many, digits only as a string ("5" from "5 boxes", "10" from "10x").
+    - unit = the counting unit as a short lowercase plural noun read from the text: "boxes","punnets","bags","kg","crates","trays","bunches","packets","pockets". "" if none is stated.
+    - unit_price = the price PER UNIT only if the customer actually wrote one, else "" (orders usually have no prices).
+    - confidence = 0-100 for that line.
+- Parse messy, conversational text: "hi can I get 5 strawberries and 2 boxes blueberries pls 🙏" -> two line items. Ignore greetings, small talk, delivery addresses, dates and totals.
+- Output all numbers as plain strings (no currency symbols); all confidence values 0-100.`;
+
+/** Parse an uploaded customer order (WhatsApp / email / handwritten / typed). */
+export async function extractOrderDocument(params: {
+  base64: string;
+  mediaType: string;
+  filename: string;
+}): Promise<OrderExtractionResult> {
+  const message = await client().messages.create({
+    model: EXTRACT_MODEL,
+    max_tokens: 4000,
+    messages: [
+      {
+        role: 'user',
+        content: [fileBlockFor(params), { type: 'text', text: `${ORDER_EXTRACT_INSTRUCTION}\n\nFilename: ${params.filename}` }],
+      },
+    ],
+  });
+
+  let parsed: Partial<OrderExtractionResult> = {};
+  try {
+    const raw = textOf(message).trim().replace(/^```json\s*/i, '').replace(/```$/, '').trim();
+    parsed = JSON.parse(raw) as Partial<OrderExtractionResult>;
+  } catch {
+    parsed = {};
+  }
+
+  const clampPct = (v: unknown): number => {
+    const n = typeof v === 'number' ? v : 0;
+    return Math.max(0, Math.min(100, Math.round(Number.isFinite(n) ? n : 0)));
+  };
+  const lines: ExtractedLineItem[] = Array.isArray(parsed.line_items)
+    ? parsed.line_items
+        .map((l) => {
+          const r = (l ?? {}) as unknown as Record<string, unknown>;
+          const str = (v: unknown) => (typeof v === 'string' ? v.trim() : '');
+          return {
+            description: str(r.description),
+            quantity: str(r.quantity),
+            unit: str(r.unit),
+            unit_price: str(r.unit_price),
+            confidence: clampPct(r.confidence),
+          } as ExtractedLineItem;
+        })
+        .filter((l) => l.description)
+    : [];
+
+  return {
+    customer_name:
+      typeof parsed.customer_name === 'string' && parsed.customer_name.trim()
+        ? parsed.customer_name.trim()
+        : null,
+    customer_confidence: clampPct(parsed.customer_confidence),
+    line_items: lines,
+    overall_confidence: clampPct(parsed.overall_confidence),
+  };
+}
+
 /** Generic prompt → text helper for any module (summaries, drafting, Q&A). */
 export async function runPrompt(prompt: string, system?: string): Promise<string> {
   const message = await client().messages.create({

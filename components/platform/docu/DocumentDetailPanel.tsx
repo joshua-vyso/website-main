@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { ConfidenceText, StatusPill } from '@/components/platform/ui';
 import { ExtractionEditor } from '@/components/platform/ExtractionEditor';
+import { OrderReviewEditor, type CustomerLite, type LinkedOrder } from './OrderReviewEditor';
 import { ApprovalActions } from './ApprovalActions';
 import { DocumentRename } from './DocumentRename';
 import { FolderPicker } from './FolderPicker';
@@ -38,6 +39,8 @@ export function DocumentDetailPanel({
   features,
   fedItemCount,
   orgUnits,
+  customers,
+  linkedOrder,
   originalUrl,
   isImage,
 }: {
@@ -47,6 +50,8 @@ export function DocumentDetailPanel({
   features: Record<FeatureKey, boolean>;
   fedItemCount: number;
   orgUnits: string[];
+  customers: CustomerLite[];
+  linkedOrder: LinkedOrder | null;
   originalUrl: string | null;
   isImage: boolean;
 }) {
@@ -135,14 +140,23 @@ export function DocumentDetailPanel({
           The preview cell stretches to the row height and holds a sticky child,
           so the preview stays in view while the long list scrolls the page. */}
       <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-2">
-        <ExtractionEditor
-          id={doc.id}
-          status={doc.status}
-          fields={fields}
-          lineItems={lineItems}
-          extractedData={extracted}
-          orgUnits={orgUnits}
-        />
+        {doc.document_type === 'order' ? (
+          <OrderReviewEditor
+            documentId={doc.id}
+            extractedData={extracted}
+            customers={customers}
+            linkedOrder={linkedOrder}
+          />
+        ) : (
+          <ExtractionEditor
+            id={doc.id}
+            status={doc.status}
+            fields={fields}
+            lineItems={lineItems}
+            extractedData={extracted}
+            orgUnits={orgUnits}
+          />
+        )}
         <div className="lg:self-stretch">
           <div className="lg:sticky lg:top-6">{preview}</div>
         </div>

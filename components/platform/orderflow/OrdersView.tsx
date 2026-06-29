@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/platform/supabase-browser';
 import { usePlatform } from '@/lib/platform/session';
 import { ORDER_STATUS_STYLE, zar, type OrderStatus } from '@/lib/platform/orderflow';
+import { PublishOrderButton } from './PublishOrderButton';
 
 export interface OrderRow {
   id: string;
@@ -144,13 +145,16 @@ export function OrdersView({
           <h1 className="text-[26px] font-bold text-[#1A1C1E]">Orders</h1>
           <p className="mt-1 text-[14px] text-[#5F6368]">Build orders from your products, then invoice them</p>
         </div>
-        <button
-          type="button"
-          onClick={() => setOpen(true)}
-          className="inline-flex h-10 items-center rounded-xl bg-[#1E5E54] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#184D45]"
-        >
-          + New order
-        </button>
+        <div className="flex items-center gap-2.5">
+          <PublishOrderButton />
+          <button
+            type="button"
+            onClick={() => setOpen(true)}
+            className="inline-flex h-10 items-center rounded-xl bg-[#1E5E54] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#184D45]"
+          >
+            + New order
+          </button>
+        </div>
       </div>
 
       {/* Orders list */}

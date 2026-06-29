@@ -116,6 +116,11 @@ export interface ExtractedData {
   line_items?: ExtractedLineItem[];
   /** The selling/issuing party extracted from the document header (the counterparty). */
   supplier?: string | null;
+  /** For uploaded customer ORDERS (document_type='order'): the buying customer's
+   *  name read from a WhatsApp contact header / email sender / handwritten note. */
+  customer_name?: string | null;
+  /** Confidence (0–100) that customer_name was read correctly. */
+  customer_confidence?: number | null;
 }
 
 export interface Document {

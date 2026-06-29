@@ -24,6 +24,8 @@ export interface OfOrder {
   status: OrderStatus;
   invoice_number: string | null;
   notes: string | null;
+  /** The Doc-U document this order was created from (uploaded customer order), or null. */
+  source_document_id?: string | null;
   created_at: string;
 }
 

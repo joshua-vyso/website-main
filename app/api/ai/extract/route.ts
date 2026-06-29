@@ -1,8 +1,9 @@
 import { NextResponse } from 'next/server';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { resolveUser, AI_CORS_HEADERS } from '@/lib/ai/auth';
-import { extractDocument, aiConfigured } from '@/lib/ai/anthropic';
+import { extractDocument, extractOrderDocument, aiConfigured } from '@/lib/ai/anthropic';
 import { feedDocumentToProcurePulse, orgHasProcurePulse } from '@/lib/platform/procurepulse-feed';
+import { syncOrderFromDocument } from '@/lib/platform/orderflow-from-doc';
 import type { Document } from '@/lib/platform/types';
 
 // Multi-page statements with many line items can take a while to parse.
@@ -83,6 +84,59 @@ export async function POST(req: Request) {
 
   const base64 = Buffer.from(await file.arrayBuffer()).toString('base64');
   const mediaType = file.type || (doc.filename.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'image/jpeg');
+
+  // ORDER documents (uploaded customer orders — WhatsApp/email/handwritten) use a
+  // different reader and build an OrderFlow order instead of feeding stock.
+  if (doc.document_type === 'order') {
+    let order;
+    try {
+      order = await extractOrderDocument({ base64, mediaType, filename: doc.filename });
+    } catch (err) {
+      await supabase.from('documents').update({ status: 'error' }).eq('id', doc.id);
+      return NextResponse.json(
+        { error: err instanceof Error ? err.message : 'Extraction failed' },
+        { status: 500, headers: AI_CORS_HEADERS },
+      );
+    }
+
+    // A model/JSON failure reads as empty — surface it (error + retry in the inbox)
+    // rather than silently filing a blank order. Mirrors the non-order path.
+    if (!order.customer_name && order.line_items.length === 0) {
+      await supabase.from('documents').update({ status: 'error' }).eq('id', doc.id);
+      return NextResponse.json(
+        { error: 'Could not read an order from this document.' },
+        { status: 422, headers: AI_CORS_HEADERS },
+      );
+    }
+
+    const { error: updErr } = await supabase
+      .from('documents')
+      .update({
+        status: 'extracted',
+        confidence: order.overall_confidence,
+        document_type: 'order',
+        extracted_data: {
+          fields: [],
+          line_items: order.line_items,
+          customer_name: order.customer_name,
+          customer_confidence: order.customer_confidence,
+        },
+      })
+      .eq('id', doc.id);
+    if (updErr) {
+      return NextResponse.json({ error: updErr.message }, { status: 500, headers: AI_CORS_HEADERS });
+    }
+
+    // Build the OrderFlow order — auto-invoices when the customer is confidently
+    // matched, else holds as a draft for review (best-effort; never fail extraction).
+    let orderSync = null;
+    try {
+      orderSync = await syncOrderFromDocument(supabase, { documentId: doc.id, orgId: doc.org_id });
+    } catch {
+      /* swallow — extraction already succeeded */
+    }
+    return NextResponse.json({ ok: true, order, orderSync }, { headers: AI_CORS_HEADERS });
+  }
 
   let result;
   try {
