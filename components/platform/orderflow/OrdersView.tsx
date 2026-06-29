@@ -54,10 +54,46 @@ export function OrdersView({
   const { org } = usePlatform();
   const [open, setOpen] = useState(false);
   const [customerId, setCustomerId] = useState('');
+  const [customerQuery, setCustomerQuery] = useState('');
+  const [customerOpen, setCustomerOpen] = useState(false);
+  const [creatingCustomer, setCreatingCustomer] = useState(false);
+  const [customerList, setCustomerList] = useState<CustomerLite[]>(customers);
   const [lines, setLines] = useState<Line[]>([]);
   const [query, setQuery] = useState('');
   const [busy, setBusy] = useState(false);
   const tempRef = useState(() => ({ n: 0 }))[0];
+
+  const custMatches = useMemo(() => {
+    const q = customerQuery.trim().toLowerCase();
+    const base = q ? customerList.filter((c) => c.name.toLowerCase().includes(q)) : customerList;
+    return base.slice(0, 8);
+  }, [customerList, customerQuery]);
+  const custExact = customerList.some((c) => c.name.trim().toLowerCase() === customerQuery.trim().toLowerCase());
+
+  function pickCustomer(c: CustomerLite) {
+    setCustomerId(c.id);
+    setCustomerQuery(c.name);
+    setCustomerOpen(false);
+  }
+  async function createCustomer(name: string) {
+    const n = name.trim();
+    if (!n || creatingCustomer) return;
+    const supabase = createClient();
+    if (!supabase || !org?.id) return;
+    setCreatingCustomer(true);
+    const { data, error } = await supabase
+      .from('of_customers')
+      .insert({ org_id: org.id, name: n })
+      .select('id, name')
+      .single();
+    setCreatingCustomer(false);
+    if (error || !data) return;
+    const c = data as CustomerLite;
+    setCustomerList((prev) => [...prev, c]);
+    setCustomerId(c.id);
+    setCustomerQuery(c.name);
+    setCustomerOpen(false);
+  }
 
   const matches = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -93,6 +129,8 @@ export function OrdersView({
   function resetBuilder() {
     setOpen(false);
     setCustomerId('');
+    setCustomerQuery('');
+    setCustomerOpen(false);
     setLines([]);
     setQuery('');
   }
@@ -208,14 +246,50 @@ export function OrdersView({
             </div>
 
             <label className="mb-1 block text-[12px] text-[#5F6368]">Customer</label>
-            <select className={`${cell} mb-4 h-10 w-full`} value={customerId} onChange={(e) => setCustomerId(e.target.value)}>
-              <option value="">Select a customer…</option>
-              {customers.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+            <div className="relative mb-4">
+              <input
+                className={`${cell} h-10 w-full`}
+                value={customerQuery}
+                onChange={(e) => {
+                  setCustomerQuery(e.target.value);
+                  setCustomerId('');
+                  setCustomerOpen(true);
+                }}
+                onFocus={() => setCustomerOpen(true)}
+                onBlur={() => setTimeout(() => setCustomerOpen(false), 150)}
+                placeholder="Search customers or type a new name…"
+              />
+              {customerOpen && (custMatches.length > 0 || (customerQuery.trim() && !custExact)) ? (
+                <div className="absolute left-0 right-0 top-full z-20 mt-1 max-h-[200px] overflow-y-auto rounded-xl border border-[#E7E7E2] bg-white py-1 shadow-[0_12px_40px_-12px_rgba(26,28,30,0.25)]">
+                  {custMatches.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        pickCustomer(c);
+                      }}
+                      className="block w-full truncate px-3 py-2 text-left text-[13px] text-[#1A1C1E] transition-colors hover:bg-[#FAFAF8]"
+                    >
+                      {c.name}
+                    </button>
+                  ))}
+                  {customerQuery.trim() && !custExact ? (
+                    <button
+                      type="button"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        void createCustomer(customerQuery);
+                      }}
+                      disabled={creatingCustomer}
+                      className="block w-full truncate border-t border-[#F0F0EC] px-3 py-2 text-left text-[13px] font-medium text-[#1E5E54] transition-colors hover:bg-[#FAFAF8] disabled:opacity-50"
+                    >
+                      {creatingCustomer ? 'Creating…' : `+ Create “${customerQuery.trim()}”`}
+                    </button>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
 
             <label className="mb-1 block text-[12px] text-[#5F6368]">Line items</label>
             <div className="relative mb-2">
