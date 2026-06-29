@@ -200,7 +200,10 @@ function Breakdown({ metric, ...p }: ProfitSnapshotProps & { metric: MetricKey }
             </div>
             {opex == null ? (
               <p className="pt-1 text-[12px] text-[#9A9DA1]">
-                Set your monthly operating costs to see net profit. (Targets editor — coming in the next update.)
+                <Link href="/app/pricepilot/targets" className="font-medium text-[#1E5E54] hover:underline">
+                  Set your monthly operating costs
+                </Link>{' '}
+                to see net profit.
               </p>
             ) : null}
           </div>

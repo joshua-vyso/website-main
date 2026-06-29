@@ -214,6 +214,19 @@ export default async function PricePilotDashboardPage() {
         <LiveChip label="Live pricing" />
       </div>
 
+      {!targets ? (
+        <Link
+          href="/app/pricepilot/targets"
+          className="mt-5 flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-[#FBEEDA] bg-[#FFFBF4] px-5 py-3.5 transition-colors hover:border-[#EFD9AE]"
+        >
+          <span className="text-[13px] text-[#7A6A4F]">
+            <span className="font-semibold text-[#854F0B]">Set your pricing targets</span> to unlock profit tracking,
+            health scoring and tailored opportunities.
+          </span>
+          <span className="text-[13px] font-medium text-[#854F0B]">Set targets →</span>
+        </Link>
+      ) : null}
+
       {/* Hero — pricing health + AI insight */}
       <div className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-3">
         <div className="flex flex-col items-center justify-center rounded-2xl border border-[#E7E7E2] bg-white p-6 text-center">

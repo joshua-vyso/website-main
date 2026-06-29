@@ -8,6 +8,7 @@ const TABS = [
   { label: 'Recent sales', href: '/app/pricepilot/recent-sales' },
   { label: 'Sales hub', href: '/app/pricepilot/sales-hub' },
   { label: 'Complaints', href: '/app/pricepilot/complaints' },
+  { label: 'Targets', href: '/app/pricepilot/targets' },
 ];
 
 /** PricePilot chrome: sub-nav across its screens. */
