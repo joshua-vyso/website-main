@@ -1,15 +1,8 @@
 import Link from 'next/link';
 import { getPlatformSession, createServerSupabase } from '@/lib/platform/supabase-server';
 import { KpiCard, LiveChip } from '@/components/platform/procurepulse/ui';
-import {
-  ScoreRing,
-  MarginBars,
-  StatTile,
-  TargetMeter,
-  Panel,
-  MarginTrendCard,
-  type TrendSeries,
-} from '@/components/platform/pricepilot/ui';
+import { ScoreRing, MarginBars, Panel, MarginTrendCard, type TrendSeries } from '@/components/platform/pricepilot/ui';
+import { ProfitSnapshot, type BreakdownOrder } from '@/components/platform/pricepilot/ProfitSnapshot';
 import {
   zar,
   pickBaseList,
@@ -84,7 +77,7 @@ export default async function PricePilotDashboardPage() {
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
 
   const allLines: (SaleLine & { ts: number })[] = [];
-  const revenueByOrder = new Map<string, number>();
+  const orderAgg = new Map<string, { rev: number; costableRev: number; cost: number }>();
   const monthlyUnitsByItem = new Map<string, number>();
   for (const it of (orderItems ?? []) as ItemRow[]) {
     const ts = orderTs.get(it.order_id);
@@ -94,11 +87,39 @@ export default async function PricePilotDashboardPage() {
     const unitCost = it.stock_item_id ? costByItem.get(it.stock_item_id) ?? null : null;
     const cost = unitCost != null ? qty * unitCost : null;
     allLines.push({ ts, revenue, cost });
-    revenueByOrder.set(it.order_id, (revenueByOrder.get(it.order_id) ?? 0) + revenue);
+    const a = orderAgg.get(it.order_id) ?? { rev: 0, costableRev: 0, cost: 0 };
+    a.rev += revenue;
+    if (cost != null) {
+      a.costableRev += revenue;
+      a.cost += cost;
+    }
+    orderAgg.set(it.order_id, a);
     if (ts >= monthStart && it.stock_item_id) {
       monthlyUnitsByItem.set(it.stock_item_id, (monthlyUnitsByItem.get(it.stock_item_id) ?? 0) + qty);
     }
   }
+
+  // Per-order profit breakdown for this month (powers the expandable snapshot tiles).
+  // Only orders with line activity (orderAgg) — keeps the row list and count aligned
+  // with the line-level tile totals (no phantom zero-line orders).
+  const monthOrders: BreakdownOrder[] = sales
+    .filter((o) => (orderTs.get(o.id) ?? 0) >= monthStart && orderAgg.has(o.id))
+    .map((o) => {
+      const a = orderAgg.get(o.id)!;
+      const profit = a.costableRev - a.cost;
+      return {
+        id: o.id,
+        invoice: o.invoice_number ?? 'Invoice',
+        customer: (o.customer_id && custName.get(o.customer_id)) || 'No customer',
+        date: o.created_at,
+        revenue: a.rev, // full invoice revenue (Revenue tile reconciles to this)
+        costableRev: a.costableRev, // revenue of costed lines (cost/profit/margin reconcile to this)
+        cost: a.cost,
+        profit,
+        margin: a.costableRev > 0 ? (profit / a.costableRev) * 100 : null,
+        uncosted: a.rev - a.costableRev > 0.005,
+      };
+    });
 
   const monthLines = allLines.filter((l) => l.ts >= monthStart);
   const revenueThisMonth = monthLines.reduce((s, l) => s + l.revenue, 0);
@@ -182,8 +203,6 @@ export default async function PricePilotDashboardPage() {
   };
 
   const recent = sales.slice(0, 5);
-  const revPct = targets?.monthly_revenue_target ? (revenueThisMonth / Number(targets.monthly_revenue_target)) * 100 : null;
-  const gpPct = targets?.monthly_gross_profit_target ? (grossProfit / Number(targets.monthly_gross_profit_target)) * 100 : null;
 
   return (
     <div>
@@ -236,49 +255,22 @@ export default async function PricePilotDashboardPage() {
         </div>
       </div>
 
-      {/* Revenue & profit snapshot */}
-      <h2 className="mt-8 text-[15px] font-semibold text-[#1A1C1E]">Revenue &amp; profit · this month</h2>
-      <div className="mt-3 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatTile
-          label="Revenue"
-          value={zar(revenueThisMonth)}
-          sub={
-            revPct != null ? (
-              <>
-                <span>{Math.round(revPct)}% of {zar(Number(targets!.monthly_revenue_target))} target</span>
-                <TargetMeter pct={revPct} />
-              </>
-            ) : (
-              'No revenue target set'
-            )
-          }
-        />
-        <StatTile
-          label="Gross profit"
-          value={zar(grossProfit)}
-          subColor="#0F6E56"
-          sub={
-            gpPct != null ? (
-              <>
-                <span>{Math.round(gpPct)}% of {zar(Number(targets!.monthly_gross_profit_target))} target</span>
-                <TargetMeter pct={gpPct} color="#0F6E56" />
-              </>
-            ) : (
-              'On costed sales'
-            )
-          }
-        />
-        <StatTile
-          label="Avg margin (realized)"
-          value={realizedMargin != null ? `${Math.round(realizedMargin)}%` : '—'}
-          sub={`Target ${Math.round(target)}%`}
-          subColor={realizedMargin != null && realizedMargin >= target ? '#0F6E56' : '#854F0B'}
-        />
-        <StatTile
-          label="Est. net profit"
-          value={netProfit != null ? zar(netProfit) : '—'}
-          sub={opex != null ? `after ${zar(opex)} opex` : 'Add operating costs to targets'}
-          subColor={netProfit != null && netProfit >= 0 ? '#0F6E56' : netProfit != null ? '#A32D2D' : undefined}
+      {/* Revenue & profit snapshot — tiles expand to the per-order breakdown */}
+      <div className="mt-8 flex items-center gap-2">
+        <h2 className="text-[15px] font-semibold text-[#1A1C1E]">Revenue &amp; profit · this month</h2>
+        <span className="text-[12px] text-[#9A9DA1]">— tap a tile for the breakdown</span>
+      </div>
+      <div className="mt-3">
+        <ProfitSnapshot
+          revenue={revenueThisMonth}
+          grossProfit={grossProfit}
+          realizedMargin={realizedMargin}
+          netProfit={netProfit}
+          opex={opex}
+          target={target}
+          revenueTarget={targets?.monthly_revenue_target != null ? Number(targets.monthly_revenue_target) : null}
+          gpTarget={targets?.monthly_gross_profit_target != null ? Number(targets.monthly_gross_profit_target) : null}
+          orders={monthOrders}
         />
       </div>
 
@@ -386,7 +378,7 @@ export default async function PricePilotDashboardPage() {
                     <span className="font-medium">{o.invoice_number ?? 'Invoice'}</span>{' '}
                     <span className="text-[#9A9DA1]">{(o.customer_id && custName.get(o.customer_id)) || ''}</span>
                   </span>
-                  <span className="shrink-0 font-medium text-[#1A1C1E]">{zar(revenueByOrder.get(o.id) ?? 0)}</span>
+                  <span className="shrink-0 font-medium text-[#1A1C1E]">{zar(orderAgg.get(o.id)?.rev ?? 0)}</span>
                 </Link>
               ))}
             </div>
