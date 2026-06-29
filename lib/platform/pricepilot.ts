@@ -316,6 +316,66 @@ export function pricingInsight(i: InsightInputs): string {
 }
 
 // ---------------------------------------------------------------------------
+// Analytics — realized-sales aggregation by customer / category / product
+// ---------------------------------------------------------------------------
+
+/** Running accumulator while grouping sale lines by some dimension. */
+export interface SalesAgg {
+  key: string;
+  label: string;
+  revenue: number; // full revenue (all lines)
+  costableRev: number; // revenue of lines with a known cost
+  cost: number; // cost of those lines
+  units: number;
+}
+
+export interface AnalyticsRow {
+  key: string;
+  label: string;
+  revenue: number;
+  profit: number;
+  margin: number | null;
+  units: number;
+  /** Share of the window's total gross profit (0–100). */
+  contributionPct: number;
+}
+
+export interface AnalyticsTotals {
+  revenue: number;
+  profit: number;
+  margin: number | null;
+}
+
+/** Finalize a set of aggregates into sorted rows + totals (margin on costed revenue). */
+export function finalizeAggs(aggs: SalesAgg[]): { rows: AnalyticsRow[]; totals: AnalyticsTotals } {
+  const totalCostableRev = aggs.reduce((s, a) => s + a.costableRev, 0);
+  const totalCost = aggs.reduce((s, a) => s + a.cost, 0);
+  const totalProfit = totalCostableRev - totalCost;
+  const totalRevenue = aggs.reduce((s, a) => s + a.revenue, 0);
+  // Contribution share uses the sum of positive profits as denominator, so shares
+  // stay in 0–100 and sum to 100% even when some rows are loss-making.
+  const totalPositiveProfit = aggs.reduce((s, a) => s + Math.max(0, a.costableRev - a.cost), 0);
+  const rows = aggs
+    .map((a) => {
+      const profit = a.costableRev - a.cost;
+      return {
+        key: a.key,
+        label: a.label,
+        revenue: a.revenue,
+        profit,
+        units: a.units,
+        margin: a.costableRev > 0 ? (profit / a.costableRev) * 100 : null,
+        contributionPct: profit > 0 && totalPositiveProfit > 0 ? (profit / totalPositiveProfit) * 100 : 0,
+      };
+    })
+    .sort((x, y) => y.profit - x.profit);
+  return {
+    rows,
+    totals: { revenue: totalRevenue, profit: totalProfit, margin: totalCostableRev > 0 ? (totalProfit / totalCostableRev) * 100 : null },
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Customer pricing — price-list validity window + expiry status
 // ---------------------------------------------------------------------------
 
