@@ -316,6 +316,72 @@ export function pricingInsight(i: InsightInputs): string {
 }
 
 // ---------------------------------------------------------------------------
+// Version history — published snapshots of a price list (pl_price_list_versions)
+// ---------------------------------------------------------------------------
+
+export interface VersionOverride {
+  stock_item_id: string;
+  margin_pct: number;
+}
+
+export interface PlVersion {
+  id: string;
+  org_id: string;
+  price_list_id: string;
+  version_no: number;
+  default_margin_pct: number;
+  overrides: VersionOverride[];
+  note: string | null;
+  created_by: string | null;
+  created_at: string;
+}
+
+export interface MarginSnapshot {
+  defaultMargin: number;
+  overrides: VersionOverride[];
+}
+
+export interface OverrideDiff {
+  stock_item_id: string;
+  kind: 'added' | 'removed' | 'changed';
+  from: number | null; // effective margin before
+  to: number | null; // effective margin after
+}
+
+/** Effective margin of a product under a snapshot (override if set, else the default). */
+function effMargin(snap: MarginSnapshot, byItem: Map<string, number>, id: string): number {
+  return byItem.has(id) ? byItem.get(id)! : snap.defaultMargin;
+}
+
+/** Diff two margin snapshots: default-margin change + per-product override changes. */
+export function diffSnapshots(a: MarginSnapshot, b: MarginSnapshot): { defaultChanged: boolean; overrides: OverrideDiff[] } {
+  const aMap = new Map(a.overrides.map((o) => [o.stock_item_id, Number(o.margin_pct)]));
+  const bMap = new Map(b.overrides.map((o) => [o.stock_item_id, Number(o.margin_pct)]));
+  const ids = new Set<string>([...aMap.keys(), ...bMap.keys()]);
+  const overrides: OverrideDiff[] = [];
+  for (const id of ids) {
+    const inA = aMap.has(id);
+    const inB = bMap.has(id);
+    const from = effMargin(a, aMap, id);
+    const to = effMargin(b, bMap, id);
+    if (inA && inB) {
+      if (aMap.get(id) !== bMap.get(id)) overrides.push({ stock_item_id: id, kind: 'changed', from, to });
+    } else if (!inA && inB) {
+      overrides.push({ stock_item_id: id, kind: 'added', from, to });
+    } else if (inA && !inB) {
+      overrides.push({ stock_item_id: id, kind: 'removed', from, to });
+    }
+  }
+  return { defaultChanged: Number(a.defaultMargin) !== Number(b.defaultMargin), overrides };
+}
+
+/** Whether two snapshots are identical (used to detect unpublished changes). */
+export function snapshotsEqual(a: MarginSnapshot, b: MarginSnapshot): boolean {
+  const d = diffSnapshots(a, b);
+  return !d.defaultChanged && d.overrides.length === 0;
+}
+
+// ---------------------------------------------------------------------------
 // Analytics — realized-sales aggregation by customer / category / product
 // ---------------------------------------------------------------------------
 

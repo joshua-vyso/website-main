@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { getPlatformSession, createServerSupabase } from '@/lib/platform/supabase-server';
 import { PriceListDetail } from '@/components/platform/pricepilot/PriceListDetail';
-import type { PlPriceList, PlOverride } from '@/lib/platform/pricepilot';
+import { VersionHistory } from '@/components/platform/pricepilot/VersionHistory';
+import type { PlPriceList, PlOverride, PlVersion, MarginSnapshot } from '@/lib/platform/pricepilot';
 
 export default async function PriceListDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -9,11 +10,14 @@ export default async function PriceListDetailPage({ params }: { params: Promise<
   const orgId = session?.org?.id ?? '';
   const db = await createServerSupabase();
 
-  const [{ data: listRow }, { data: products }, { data: overrideRows }] = await Promise.all([
-    db.from('pl_price_lists').select('*').eq('id', id).maybeSingle(),
-    db.from('pp_stock_items').select('id, name, unit, avg_unit_price').eq('org_id', orgId).order('name').limit(2000),
-    db.from('pl_overrides').select('stock_item_id, margin_pct').eq('price_list_id', id),
-  ]);
+  const [{ data: listRow }, { data: products }, { data: overrideRows }, { data: versionRows }, { data: profileRows }] =
+    await Promise.all([
+      db.from('pl_price_lists').select('*').eq('id', id).maybeSingle(),
+      db.from('pp_stock_items').select('id, name, unit, avg_unit_price').eq('org_id', orgId).order('name').limit(2000),
+      db.from('pl_overrides').select('stock_item_id, margin_pct').eq('price_list_id', id),
+      db.from('pl_price_list_versions').select('*').eq('price_list_id', id).order('version_no', { ascending: false }),
+      db.from('profiles').select('*').eq('org_id', orgId),
+    ]);
 
   const list = listRow as PlPriceList | null;
   if (!list) {
@@ -40,12 +44,42 @@ export default async function PriceListDetailPage({ params }: { params: Promise<
     overrides[o.stock_item_id] = Number(o.margin_pct);
   }
 
+  // Version history extras (degrade gracefully before pl-versions.sql is applied).
+  const versions = ((versionRows ?? []) as PlVersion[]).map((v) => ({
+    ...v,
+    default_margin_pct: Number(v.default_margin_pct),
+    overrides: Array.isArray(v.overrides) ? v.overrides.map((o) => ({ stock_item_id: o.stock_item_id, margin_pct: Number(o.margin_pct) })) : [],
+  }));
+  const live: MarginSnapshot = {
+    defaultMargin: Number(list.default_margin_pct) || 0,
+    overrides: Object.entries(overrides).map(([stock_item_id, margin_pct]) => ({ stock_item_id, margin_pct })),
+  };
+  const authors: Record<string, string> = {};
+  for (const p of (profileRows ?? []) as Record<string, unknown>[]) {
+    const pid = p.id ? String(p.id) : '';
+    if (!pid) continue;
+    const raw = (p.full_name || p.name || p.email || '') as string;
+    authors[pid] = raw ? String(raw).split('@')[0] : 'Team';
+  }
+  const productNames: Record<string, string> = {};
+  for (const p of (products ?? []) as { id: string; name: string }[]) productNames[p.id] = p.name;
+
   return (
-    <PriceListDetail
-      list={list}
-      customerName={customerName}
-      products={(products ?? []) as { id: string; name: string; unit: string | null; avg_unit_price: number | null }[]}
-      overrides={overrides}
-    />
+    <div>
+      <PriceListDetail
+        list={list}
+        customerName={customerName}
+        products={(products ?? []) as { id: string; name: string; unit: string | null; avg_unit_price: number | null }[]}
+        overrides={overrides}
+      />
+      <VersionHistory
+        priceListId={list.id}
+        orgId={list.org_id}
+        live={live}
+        versions={versions}
+        authors={authors}
+        productNames={productNames}
+      />
+    </div>
   );
 }
