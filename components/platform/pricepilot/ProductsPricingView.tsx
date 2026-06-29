@@ -181,7 +181,11 @@ export function ProductsPricingView({
                   const ss = STATUS_STYLE[st];
                   return (
                     <tr key={r.id} className="border-b border-[#F6F6F2] last:border-0 hover:bg-[#FAFAF8]">
-                      <td className="px-5 py-3 font-medium text-[#1A1C1E]">{r.name}</td>
+                      <td className="px-5 py-3 font-medium text-[#1A1C1E]">
+                        <Link href={`/app/pricepilot/products/${r.id}`} className="hover:text-[#1E5E54]">
+                          {r.name}
+                        </Link>
+                      </td>
                       <td className="px-3 py-3 text-[#5F6368]">{r.category ?? '—'}</td>
                       <td className="px-3 py-3 text-right tabular-nums text-[#5F6368]">
                         {r.cost != null ? zar2(r.cost) : '—'}
