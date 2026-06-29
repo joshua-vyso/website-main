@@ -146,6 +146,7 @@ export function DocumentDetailPanel({
             extractedData={extracted}
             customers={customers}
             linkedOrder={linkedOrder}
+            orgUnits={orgUnits}
           />
         ) : (
           <ExtractionEditor

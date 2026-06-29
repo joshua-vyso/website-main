@@ -46,14 +46,24 @@ export function OrderReviewEditor({
   extractedData,
   customers,
   linkedOrder,
+  orgUnits = [],
 }: {
   documentId: string;
   extractedData: DocuExtractedData | null;
   customers: CustomerLite[];
   linkedOrder: LinkedOrder | null;
+  orgUnits?: string[];
 }) {
   const router = useRouter();
   const { org } = usePlatform();
+
+  // Unit options for a line: the org's units, plus the line's current value when
+  // it isn't one of them (so an extracted unit is never silently dropped).
+  const unitOptions = (current?: string): string[] => {
+    const cur = (current ?? '').trim();
+    if (cur && !orgUnits.some((u) => u.toLowerCase() === cur.toLowerCase())) return [...orgUnits, cur];
+    return orgUnits;
+  };
 
   const extractedName = extractedData?.customer_name ?? '';
   const extractedConf = extractedData?.customer_confidence ?? null;
@@ -273,7 +283,19 @@ export function OrderReviewEditor({
               <div key={l.key} className="grid grid-cols-[1fr_64px_72px_84px_24px] items-center gap-2">
                 <input className={cell} value={l.description} onChange={(e) => updateLine(i, { description: e.target.value })} />
                 <input className={`${cell} text-right`} inputMode="numeric" value={l.quantity} onChange={(e) => updateLine(i, { quantity: e.target.value.replace(/[^0-9.]/g, '') })} />
-                <input className={cell} value={l.unit} onChange={(e) => updateLine(i, { unit: e.target.value })} />
+                <select
+                  className={`${cell} cursor-pointer pr-1`}
+                  value={l.unit}
+                  onChange={(e) => updateLine(i, { unit: e.target.value })}
+                  aria-label="Unit"
+                >
+                  <option value="">unit</option>
+                  {unitOptions(l.unit).map((u) => (
+                    <option key={u} value={u}>
+                      {u}
+                    </option>
+                  ))}
+                </select>
                 <input className={`${cell} text-right`} inputMode="decimal" placeholder="from list" value={l.unit_price} onChange={(e) => updateLine(i, { unit_price: sanitizeDecimal(e.target.value) })} />
                 <button
                   type="button"

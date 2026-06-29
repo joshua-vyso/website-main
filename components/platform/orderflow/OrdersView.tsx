@@ -45,13 +45,21 @@ export function OrdersView({
   orders,
   customers,
   products,
+  orgUnits = [],
 }: {
   orders: OrderRow[];
   customers: CustomerLite[];
   products: ProductLite[];
+  orgUnits?: string[];
 }) {
   const router = useRouter();
   const { org } = usePlatform();
+
+  const unitOptions = (current?: string): string[] => {
+    const cur = (current ?? '').trim();
+    if (cur && !orgUnits.some((u) => u.toLowerCase() === cur.toLowerCase())) return [...orgUnits, cur];
+    return orgUnits;
+  };
   const [open, setOpen] = useState(false);
   const [customerId, setCustomerId] = useState('');
   const [customerQuery, setCustomerQuery] = useState('');
@@ -325,7 +333,12 @@ export function OrdersView({
                   <div key={l.key} className="grid grid-cols-[1fr_64px_64px_84px_28px] items-center gap-2">
                     <input className={cell} value={l.name} onChange={(e) => updateLine(l.key, { name: e.target.value })} />
                     <input className={`${cell} text-right`} value={l.qty} inputMode="decimal" onChange={(e) => updateLine(l.key, { qty: e.target.value.replace(/[^0-9.]/g, '') })} placeholder="qty" />
-                    <input className={cell} value={l.unit} onChange={(e) => updateLine(l.key, { unit: e.target.value })} placeholder="unit" />
+                    <select className={`${cell} cursor-pointer pr-1`} value={l.unit} onChange={(e) => updateLine(l.key, { unit: e.target.value })} aria-label="Unit">
+                      <option value="">unit</option>
+                      {unitOptions(l.unit).map((u) => (
+                        <option key={u} value={u}>{u}</option>
+                      ))}
+                    </select>
                     <input className={`${cell} text-right`} value={l.unit_price} inputMode="decimal" onChange={(e) => updateLine(l.key, { unit_price: e.target.value.replace(/[^0-9.]/g, '') })} placeholder="price" />
                     <button type="button" onClick={() => removeLine(l.key)} aria-label="Remove line" className="flex h-9 w-7 items-center justify-center rounded-lg text-[#9A9DA1] hover:bg-[#FCEBEB] hover:text-[#A32D2D]">
                       ✕

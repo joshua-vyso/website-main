@@ -377,7 +377,10 @@ export async function summariseDocument(context: {
   const message = await client().messages.create({
     model: SUMMARY_MODEL,
     max_tokens: 600,
-    system: SUMMARY_SYSTEM,
+    // Mark the static system prompt as a cache breakpoint (GA — no beta header).
+    // NB: only caches once the prefix is ≥ the model minimum (4096 tokens on
+    // Haiku 4.5 / Opus 4.8); below that it's a silent no-op.
+    system: [{ type: 'text', text: SUMMARY_SYSTEM, cache_control: { type: 'ephemeral' } }],
     messages: [{ role: 'user', content: userContent }],
   });
 
@@ -440,7 +443,7 @@ export async function categoriseProducts(
   const message = await client().messages.create({
     model: CATEGORISE_MODEL,
     max_tokens: 8000,
-    system: CATEGORISE_SYSTEM,
+    system: [{ type: 'text', text: CATEGORISE_SYSTEM, cache_control: { type: 'ephemeral' } }],
     messages: [{ role: 'user', content: JSON.stringify(items.map((i) => ({ id: i.id, name: i.name }))) }],
   });
 
@@ -496,7 +499,7 @@ export async function suggestProductMatches(items: MatchSuggestionInput[]): Prom
   const message = await client().messages.create({
     model: MATCH_MODEL,
     max_tokens: 8000,
-    system: MATCH_SYSTEM,
+    system: [{ type: 'text', text: MATCH_SYSTEM, cache_control: { type: 'ephemeral' } }],
     messages: [{ role: 'user', content: JSON.stringify(items) }],
   });
 
