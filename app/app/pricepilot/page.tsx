@@ -75,6 +75,9 @@ export default async function PricePilotDashboardPage() {
 
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+  // Opportunity impact uses a rolling 30-day window so it matches the Products /
+  // Recommendations pages (which also use 30d); revenue/GP below stay month-to-date.
+  const oppSince = now.getTime() - 30 * 86_400_000;
 
   const allLines: (SaleLine & { ts: number })[] = [];
   const orderAgg = new Map<string, { rev: number; costableRev: number; cost: number }>();
@@ -94,7 +97,7 @@ export default async function PricePilotDashboardPage() {
       a.cost += cost;
     }
     orderAgg.set(it.order_id, a);
-    if (ts >= monthStart && it.stock_item_id) {
+    if (ts >= oppSince && it.stock_item_id) {
       monthlyUnitsByItem.set(it.stock_item_id, (monthlyUnitsByItem.get(it.stock_item_id) ?? 0) + qty);
     }
   }
@@ -259,7 +262,7 @@ export default async function PricePilotDashboardPage() {
             <InsightChip label="Below target" value={String(belowTarget.length)} />
             <InsightChip label="Opportunity" value={`${zar(marginOpportunity)}/mo`} />
             <Link
-              href="/app/pricepilot/price-lists"
+              href="/app/pricepilot/recommendations"
               className="ml-auto inline-flex items-center gap-1.5 rounded-lg bg-[#1E5E54] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45]"
             >
               Review pricing →
@@ -309,8 +312,8 @@ export default async function PricePilotDashboardPage() {
         <Panel
           title="Opportunity centre"
           right={
-            <Link href="/app/pricepilot/price-lists" className="text-[12px] font-medium text-[#1E5E54] hover:underline">
-              Manage pricing →
+            <Link href="/app/pricepilot/recommendations" className="text-[12px] font-medium text-[#1E5E54] hover:underline">
+              Review all →
             </Link>
           }
         >
@@ -323,7 +326,7 @@ export default async function PricePilotDashboardPage() {
               <p className="py-6 text-center text-[13px] text-[#9A9DA1]">
                 {pms.length === 0
                   ? 'No catalogue pricing yet — create a price list to surface opportunities.'
-                  : 'Every selling product is at or above target. Nothing to reprice right now. 🎉'}
+                  : 'Every product is at or above target. Nothing to reprice right now. 🎉'}
               </p>
             ) : (
               <div className="overflow-hidden rounded-xl border border-[#F0F0EC]">

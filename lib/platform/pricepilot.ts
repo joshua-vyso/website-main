@@ -221,6 +221,31 @@ export const PRIORITY_STYLE: Record<Opportunity['priority'], { bg: string; fg: s
   low: { bg: '#F0F0EC', fg: '#5F6368', label: 'Low' },
 };
 
+export type Confidence = 'high' | 'medium' | 'low';
+
+export const CONFIDENCE_STYLE: Record<Confidence, { bg: string; fg: string; label: string }> = {
+  high: { bg: '#E1F5EE', fg: '#0F6E56', label: 'High confidence' },
+  medium: { bg: '#FBEEDA', fg: '#854F0B', label: 'Medium confidence' },
+  low: { bg: '#F0F0EC', fg: '#5F6368', label: 'Low confidence' },
+};
+
+/** Deterministic confidence + plain-language reasoning for a suggested price change. */
+export function recommendationMeta(o: Opportunity): { confidence: Confidence; reason: string } {
+  const gap = o.suggestedMargin - o.currentMargin;
+  const confidence: Confidence = o.monthlyUnits >= 10 && gap >= 5 ? 'high' : o.monthlyUnits > 0 ? 'medium' : 'low';
+  const sold =
+    o.monthlyUnits > 0
+      ? `Sold ${Math.round(o.monthlyUnits)} ${o.monthlyUnits === 1 ? 'unit' : 'units'} in the last 30 days. `
+      : 'No sales in the last 30 days. ';
+  // Reason states the situation only — the live (possibly edited) rand impact is
+  // shown separately in the row, so we don't bake a figure in here that could disagree.
+  const close = o.monthlyUnits > 0 ? 'Raising it to target lifts gross profit on every sale.' : 'Worth repricing before it sells again.';
+  return {
+    confidence,
+    reason: `Currently ${Math.round(o.currentMargin)}% margin vs your ${Math.round(o.suggestedMargin)}% target. ${sold}${close}`,
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Realized margin (from sales) + the deterministic AI insight line
 // ---------------------------------------------------------------------------
