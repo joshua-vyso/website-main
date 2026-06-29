@@ -501,6 +501,87 @@ export function priceListValidity(
   return { status: 'active', daysUntilExpiry: days, label: `Valid until ${fmtDay(list.valid_until!)}` };
 }
 
+// ---------------------------------------------------------------------------
+// Smart notifications — deterministic alerts across the pricing surface
+// ---------------------------------------------------------------------------
+
+export type NotificationKind = 'contract_expired' | 'contract_expiring' | 'below_target' | 'cost_spike';
+export type NotificationSeverity = 'high' | 'medium' | 'low';
+
+export interface PpNotification {
+  id: string;
+  kind: NotificationKind;
+  severity: NotificationSeverity;
+  title: string;
+  body: string;
+  href: string;
+}
+
+export const NOTIF_SEVERITY_STYLE: Record<NotificationSeverity, { dot: string; bg: string; fg: string; label: string }> = {
+  high: { dot: '#A32D2D', bg: '#FCEBEB', fg: '#A32D2D', label: 'Action needed' },
+  medium: { dot: '#854F0B', bg: '#FBEEDA', fg: '#854F0B', label: 'Review' },
+  low: { dot: '#5F6368', bg: '#F0F0EC', fg: '#5F6368', label: 'Note' },
+};
+
+export interface NotificationInput {
+  expiringContracts: { customer: string; listName: string; listId: string; label: string; expired: boolean }[];
+  belowTargetCount: number;
+  marginOpportunity: number;
+  target: number;
+  costSpikes: { id: string; name: string; pctUp: number }[];
+}
+
+/** Build the pricing notification feed from already-computed signals. Sorted by severity. */
+export function computeNotifications(i: NotificationInput): PpNotification[] {
+  const out: PpNotification[] = [];
+  for (const c of i.expiringContracts) {
+    if (c.expired) {
+      out.push({
+        id: `exp-${c.listId}`,
+        kind: 'contract_expired',
+        severity: 'high',
+        title: `${c.customer}'s contract pricing has expired`,
+        body: `${c.listName} — ${c.label}. Renew the validity dates to keep it active.`,
+        href: '/app/pricepilot/customers',
+      });
+    } else {
+      out.push({
+        id: `expsoon-${c.listId}`,
+        kind: 'contract_expiring',
+        severity: 'medium',
+        title: `${c.customer}'s contract pricing expires soon`,
+        body: `${c.listName} — ${c.label}.`,
+        href: '/app/pricepilot/customers',
+      });
+    }
+  }
+  if (i.belowTargetCount > 0) {
+    out.push({
+      id: 'below-target',
+      kind: 'below_target',
+      severity: 'medium',
+      title: `${i.belowTargetCount} product${i.belowTargetCount === 1 ? ' is' : 's are'} below your ${Math.round(i.target)}% target margin`,
+      body:
+        i.marginOpportunity >= 1
+          ? `Raising them to target could add about ${zar(i.marginOpportunity)} in gross profit a month.`
+          : 'Review and reprice them.',
+      href: '/app/pricepilot/recommendations',
+    });
+  }
+  for (const s of i.costSpikes) {
+    out.push({
+      id: `spike-${s.id}`,
+      kind: 'cost_spike',
+      severity: s.pctUp >= 30 ? 'high' : 'medium',
+      title: `Cost up ${Math.round(s.pctUp)}% on ${s.name}`,
+      body: 'Your margin on this product has been squeezed — review its selling price.',
+      href: `/app/pricepilot/products/${s.id}`,
+    });
+  }
+  const rank: Record<NotificationSeverity, number> = { high: 0, medium: 1, low: 2 };
+  return out.sort((a, b) => rank[a.severity] - rank[b.severity]);
+}
+
 /** Rand, plain. */
 export function zar(n: number | null | undefined): string {
   if (n == null) return '—';

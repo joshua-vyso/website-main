@@ -3,6 +3,7 @@ import { getPlatformSession, createServerSupabase } from '@/lib/platform/supabas
 import { KpiCard, LiveChip } from '@/components/platform/procurepulse/ui';
 import { ScoreRing, MarginBars, Panel, MarginTrendCard, type TrendSeries } from '@/components/platform/pricepilot/ui';
 import { ProfitSnapshot, type BreakdownOrder } from '@/components/platform/pricepilot/ProfitSnapshot';
+import { NotificationList } from '@/components/platform/pricepilot/NotificationList';
 import {
   zar,
   pickBaseList,
@@ -14,6 +15,8 @@ import {
   computeOpportunities,
   pricingInsight,
   marginPctForLines,
+  priceListValidity,
+  computeNotifications,
   DEFAULT_TARGET_MARGIN,
   PRIORITY_STYLE,
   type PlPriceList,
@@ -138,6 +141,26 @@ export default async function PricePilotDashboardPage() {
   const marginOpportunity = opportunities.reduce((s, o) => s + o.monthlyImpact, 0);
   const revenueAtRisk = opportunities.reduce((s, o) => s + o.monthlyUnits * o.currentSell, 0);
 
+  // ---- Notifications (alerts strip) ----
+  const expiringContracts = priceLists
+    .filter((l) => l.customer_id)
+    .map((l) => ({ list: l, v: priceListValidity(l) }))
+    .filter(({ v }) => v.status === 'expiring' || v.status === 'expired')
+    .map(({ list, v }) => ({
+      customer: (list.customer_id && custName.get(list.customer_id)) || 'Customer',
+      listName: list.name,
+      listId: list.id,
+      label: v.label,
+      expired: v.status === 'expired',
+    }));
+  const notifications = computeNotifications({
+    expiringContracts,
+    belowTargetCount: belowTarget.length,
+    marginOpportunity,
+    target,
+    costSpikes: [], // cost-spike signals live on the full Notifications page
+  });
+
   // ---- Health + insight ----
   const health = pricingHealth({
     hasBaseList: !!base,
@@ -228,6 +251,18 @@ export default async function PricePilotDashboardPage() {
           </span>
           <span className="text-[13px] font-medium text-[#854F0B]">Set targets →</span>
         </Link>
+      ) : null}
+
+      {notifications.length > 0 ? (
+        <div className="mt-5">
+          <div className="mb-2 flex items-center justify-between">
+            <h2 className="text-[15px] font-semibold text-[#1A1C1E]">Alerts</h2>
+            <Link href="/app/pricepilot/notifications" className="text-[12px] font-medium text-[#1E5E54] hover:underline">
+              View all ({notifications.length}) →
+            </Link>
+          </div>
+          <NotificationList items={notifications.slice(0, 3)} compact />
+        </div>
       ) : null}
 
       {/* Hero — pricing health + AI insight */}
