@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { AppIcon } from '@/components/platform/AppIcon';
 import { AreaChart } from '@/components/platform/procurepulse/ui';
 import type { AppIconKey } from '@/lib/platform/types';
@@ -162,6 +162,85 @@ export function DataTable({ columns, rows, empty }: { columns: Column[]; rows: R
       </div>
     </div>
   );
+}
+
+// ---------------------------------------------------------------------------
+// Animated circular progress ring (premium feel; animates in on mount)
+// ---------------------------------------------------------------------------
+
+export function ProgressRing({
+  pct,
+  color,
+  size = 84,
+  thickness = 8,
+  children,
+}: {
+  pct: number;
+  color: string;
+  size?: number;
+  thickness?: number;
+  children?: ReactNode;
+}) {
+  const [shown, setShown] = useState(0);
+  useEffect(() => {
+    const t = setTimeout(() => setShown(pct), 60);
+    return () => clearTimeout(t);
+  }, [pct]);
+  const r = (size - thickness) / 2;
+  const c = 2 * Math.PI * r;
+  const dash = Math.max(0, Math.min(1, shown / 100)) * c;
+  return (
+    <div className="relative shrink-0" style={{ width: size, height: size }}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        <g transform={`rotate(-90 ${size / 2} ${size / 2})`}>
+          <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#F0F0EC" strokeWidth={thickness} />
+          <circle
+            cx={size / 2}
+            cy={size / 2}
+            r={r}
+            fill="none"
+            stroke={color}
+            strokeWidth={thickness}
+            strokeLinecap="round"
+            strokeDasharray={`${dash} ${c - dash}`}
+            style={{ transition: 'stroke-dasharray 0.7s cubic-bezier(0.22,1,0.36,1)' }}
+          />
+        </g>
+      </svg>
+      {children ? <div className="absolute inset-0 flex flex-col items-center justify-center">{children}</div> : null}
+    </div>
+  );
+}
+
+/**
+ * A number that animates to `value`. Animates from 0 on mount and from its
+ * CURRENT displayed value on later changes — so live readouts (e.g. dragging a
+ * slider) chase smoothly instead of snapping back to zero each tick.
+ */
+export function CountUp({ value, format, duration = 700, className }: { value: number; format: (n: number) => string; duration?: number; className?: string }) {
+  const [n, setN] = useState(0);
+  const fromRef = useRef(0);
+  const nRef = useRef(0);
+  useEffect(() => {
+    const from = fromRef.current;
+    const start = performance.now();
+    let raf = 0;
+    const tick = (t: number) => {
+      const p = Math.min(1, (t - start) / duration);
+      const eased = 1 - Math.pow(1 - p, 3);
+      const cur = from + (value - from) * eased;
+      nRef.current = cur;
+      setN(cur);
+      if (p < 1) raf = requestAnimationFrame(tick);
+      else fromRef.current = value;
+    };
+    raf = requestAnimationFrame(tick);
+    return () => {
+      cancelAnimationFrame(raf);
+      fromRef.current = nRef.current;
+    };
+  }, [value, duration]);
+  return <span className={className}>{format(n)}</span>;
 }
 
 // ---------------------------------------------------------------------------

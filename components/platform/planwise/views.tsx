@@ -2,19 +2,15 @@
 
 import { zar } from '@/lib/platform/orderflow';
 import { useToast } from '@/components/platform/orderflow/ui';
-import { ModuleHeader, PrimaryAction, SecondaryAction, KpiStrip, Kpi, SectionCard } from '@/components/platform/module-ui';
+import { ModuleHeader, PrimaryAction, SecondaryAction, KpiStrip, Kpi } from '@/components/platform/module-ui';
 import { MODULE_META } from '@/lib/platform/module-meta';
 import { BUDGET } from '@/lib/platform/planwise';
-import {
-  MonthlyGoalCard,
-  GoalSummaryCards,
-  RecommendationPanel,
-  MobileSnapshotCards,
-  BudgetTable,
-  ForecastCards,
-  ForecastCommentary,
-  ScenarioCards,
-} from './ui';
+import { MonthlyGoalCard, GoalSummaryCards, MobileSnapshotCards } from './ui';
+import { DecisionsPanel } from './DecisionsPanel';
+import { FinancialFlow } from './FinancialFlow';
+import { BudgetWorkspace } from './BudgetWorkspace';
+import { ForecastCardsRich, ForecastDrivers, ForecastInsight } from './Forecast';
+import { ScenariosWorkspace } from './Scenarios';
 
 const M = MODULE_META.planwise;
 
@@ -49,7 +45,8 @@ export function OverviewView() {
 
       <MonthlyGoalCard />
       <GoalSummaryCards />
-      <RecommendationPanel />
+      <DecisionsPanel />
+      <FinancialFlow />
       <MobileSnapshotCards />
     </div>
   );
@@ -61,11 +58,10 @@ export function BudgetView() {
     <div className="space-y-5">
       {node}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <PageTitle title="Budget" subtitle="Category budgets, profit impact and what to do about each" />
+        <PageTitle title="Budget" subtitle="Explore where your budget goes — hover and click to dig in" />
         <SecondaryAction onClick={() => show('Adjust budget (demo)')}>Adjust budget</SecondaryAction>
       </div>
-      <BudgetTable />
-      <p className="text-[12px] text-[#9A9DA1]">Profit impact and suggested actions will update automatically from ProcurePulse, OrderFlow and WasteWatch.</p>
+      <BudgetWorkspace />
     </div>
   );
 }
@@ -73,26 +69,21 @@ export function BudgetView() {
 export function ForecastView() {
   return (
     <div className="space-y-5">
-      <PageTitle title="Forecast" subtitle="Where the business is expected to finish this month" />
-      <ForecastCards />
-      <ForecastCommentary />
+      <PageTitle title="Forecast" subtitle="Where the business is expected to finish — and why" />
+      <ForecastCardsRich />
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
+        <ForecastDrivers />
+        <ForecastInsight />
+      </div>
     </div>
   );
 }
 
 export function ScenariosView() {
-  const { node, show } = useToast();
   return (
     <div className="space-y-5">
-      {node}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <PageTitle title="Scenarios" subtitle="“What if” plans and their projected outcome" />
-        <PrimaryAction onClick={() => show('New scenario (demo)')}>+ New scenario</PrimaryAction>
-      </div>
-      <ScenarioCards />
-      <SectionCard title="Coming soon">
-        <p className="text-[13px] text-[#5F6368]">Scenarios will become interactive — adjust an assumption and watch projected revenue and profit recalculate live from your real data.</p>
-      </SectionCard>
+      <PageTitle title="Scenarios" subtitle="Adjust the assumptions and watch the outcome recalculate live" />
+      <ScenariosWorkspace />
     </div>
   );
 }

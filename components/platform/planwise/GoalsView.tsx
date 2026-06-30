@@ -7,6 +7,7 @@ import { createClient } from '@/lib/platform/supabase-browser';
 import { usePlatform } from '@/lib/platform/session';
 import { MODULE_META, type VysoModuleKey } from '@/lib/platform/module-meta';
 import type { PlTargets } from '@/lib/platform/pricepilot';
+import { GoalsDashboard } from './GoalsDashboard';
 
 type FieldKey = 'monthly_revenue_target' | 'monthly_gross_profit_target' | 'monthly_opex' | 'target_margin_pct';
 
@@ -95,12 +96,20 @@ export function GoalsView({ initial, needsSetup }: { initial: PlTargets | null; 
   const inputEl = 'w-full bg-transparent py-2.5 text-[14px] text-[#1A1C1E] outline-none placeholder:text-[#C7C9C5]';
 
   return (
-    <div className="max-w-3xl space-y-5">
+    <div className="space-y-6">
       <div>
         <h1 className="text-[24px] font-bold leading-tight text-[#1A1C1E]">Goals</h1>
         <p className="mt-0.5 text-[14px] text-[#5F6368]">Define where you want the business to go. Vyso measures progress against these across every module.</p>
       </div>
 
+      <GoalsDashboard />
+
+      <div className="border-t border-[#F0F0EC] pt-5">
+        <h2 className="text-[15px] font-semibold text-[#1A1C1E]">Set your goals</h2>
+        <p className="mt-0.5 text-[13px] text-[#9A9DA1]">These power the progress above and feed the modules that act on them.</p>
+      </div>
+
+      <div className="max-w-3xl space-y-5">
       {needsSetup ? (
         <div className="rounded-2xl border border-[#FBEEDA] bg-[#FFFBF4] p-5">
           <h2 className="text-[14px] font-semibold text-[#854F0B]">One-time setup needed</h2>
@@ -159,6 +168,7 @@ export function GoalsView({ initial, needsSetup }: { initial: PlTargets | null; 
             </label>
           ))}
         </div>
+      </div>
       </div>
     </div>
   );
