@@ -8,8 +8,19 @@ import { BudgetTable } from './ui';
 
 const SIZE = 220;
 const THICK = 30;
-const R = 85;
-const C = 2 * Math.PI * R;
+const R = 85; // track radius (inner 70 / outer 100)
+const R_OUTER = 100;
+const R_INNER = 70;
+const START = -Math.PI / 2;
+const TAU = Math.PI * 2;
+const PAD = 0.018; // tiny gap between segments (radians)
+
+/** Annular-sector path — gap-free, clean doughnut segments (no dash-array seams). */
+function sectorPath(cx: number, cy: number, rO: number, rI: number, a0: number, a1: number) {
+  const pt = (r: number, a: number) => `${(cx + r * Math.cos(a)).toFixed(2)} ${(cy + r * Math.sin(a)).toFixed(2)}`;
+  const large = a1 - a0 > Math.PI ? 1 : 0;
+  return `M ${pt(rO, a0)} A ${rO} ${rO} 0 ${large} 1 ${pt(rO, a1)} L ${pt(rI, a1)} A ${rI} ${rI} 0 ${large} 0 ${pt(rI, a0)} Z`;
+}
 
 export function BudgetWorkspace() {
   const [hovered, setHovered] = useState<string | null>(null);
@@ -34,32 +45,26 @@ export function BudgetWorkspace() {
         <div className="flex items-center justify-center rounded-2xl border border-[#E7E7E2] bg-white p-6">
           <div className="relative" style={{ width: SIZE, height: SIZE }}>
             <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`}>
-              <g transform={`rotate(-90 ${SIZE / 2} ${SIZE / 2})`}>
-                <circle cx={SIZE / 2} cy={SIZE / 2} r={R} fill="none" stroke="#F4F4F1" strokeWidth={THICK} />
-                {segs.map((s) => {
-                  const isActive = active === s.cat;
-                  const dimmed = active != null && !isActive;
-                  return (
-                    <circle
-                      key={s.cat}
-                      cx={SIZE / 2}
-                      cy={SIZE / 2}
-                      r={R}
-                      fill="none"
-                      stroke={s.color}
-                      strokeWidth={isActive ? THICK + 8 : THICK}
-                      strokeDasharray={`${s.frac * C} ${C - s.frac * C}`}
-                      strokeDashoffset={-s.offset * C}
-                      opacity={dimmed ? 0.32 : 1}
-                      className="cursor-pointer"
-                      style={{ transition: 'opacity 0.25s ease, stroke-width 0.25s ease' }}
-                      onMouseEnter={() => setHovered(s.cat)}
-                      onMouseLeave={() => setHovered(null)}
-                      onClick={() => toggle(s.cat)}
-                    />
-                  );
-                })}
-              </g>
+              <circle cx={SIZE / 2} cy={SIZE / 2} r={R} fill="none" stroke="#F4F4F1" strokeWidth={THICK} />
+              {segs.map((s) => {
+                const isActive = active === s.cat;
+                const dimmed = active != null && !isActive;
+                const a0 = START + s.offset * TAU + PAD;
+                const a1 = START + (s.offset + s.frac) * TAU - PAD;
+                return (
+                  <path
+                    key={s.cat}
+                    d={sectorPath(SIZE / 2, SIZE / 2, isActive ? R_OUTER + 7 : R_OUTER, R_INNER, a0, a1)}
+                    fill={s.color}
+                    opacity={dimmed ? 0.32 : 1}
+                    className="cursor-pointer"
+                    style={{ transition: 'opacity 0.22s ease' }}
+                    onMouseEnter={() => setHovered(s.cat)}
+                    onMouseLeave={() => setHovered(null)}
+                    onClick={() => toggle(s.cat)}
+                  />
+                );
+              })}
             </svg>
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
               {activeRow ? (

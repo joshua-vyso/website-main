@@ -109,7 +109,8 @@ export function GoalsView({ initial, needsSetup }: { initial: PlTargets | null; 
         <p className="mt-0.5 text-[13px] text-[#9A9DA1]">These power the progress above and feed the modules that act on them.</p>
       </div>
 
-      <div className="max-w-3xl space-y-5">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px]">
+      <div className="space-y-5">
       {needsSetup ? (
         <div className="rounded-2xl border border-[#FBEEDA] bg-[#FFFBF4] p-5">
           <h2 className="text-[14px] font-semibold text-[#854F0B]">One-time setup needed</h2>
@@ -169,6 +170,36 @@ export function GoalsView({ initial, needsSetup }: { initial: PlTargets | null; 
           ))}
         </div>
       </div>
+      </div>
+      <GoalsSidePanel />
+      </div>
+    </div>
+  );
+}
+
+function GoalsSidePanel() {
+  const links: { goal: string; module: VysoModuleKey; note: string }[] = [
+    { goal: 'Revenue goal', module: 'orderflow', note: 'Measured against your OrderFlow sales' },
+    { goal: 'Profit & margin', module: 'pricepilot', note: 'PricePilot flags products below target' },
+    { goal: 'Expense ceiling', module: 'procurepulse', note: 'Spend visibility from ProcurePulse & Doc-U' },
+  ];
+  return (
+    <div className="h-fit rounded-2xl border border-[#E7E7E2] bg-[#FBFBF9] p-5 lg:sticky lg:top-6">
+      <h3 className="text-[15px] font-semibold text-[#1A1C1E]">How Vyso uses your goals</h3>
+      <p className="mt-1 text-[13px] text-[#5F6368]">Your goals become the benchmark every module measures against — and they feed the forecast and scenarios.</p>
+      <div className="mt-4 flex flex-col gap-3">
+        {links.map((l) => {
+          const m = MODULE_META[l.module];
+          return (
+            <div key={l.goal} className="flex items-start gap-2.5">
+              <span className="mt-0.5 shrink-0 rounded-md px-2 py-0.5 text-[11px] font-medium" style={{ backgroundColor: m.accent.bg, color: m.accent.fg }}>{m.name}</span>
+              <span className="text-[12px] text-[#5F6368]">{l.note}</span>
+            </div>
+          );
+        })}
+      </div>
+      <div className="mt-4 rounded-xl border border-[#F0F0EC] bg-white p-3 text-[12px] text-[#5F6368]">
+        Set these once — PlanWise keeps measuring and tells you exactly what needs to change.
       </div>
     </div>
   );
