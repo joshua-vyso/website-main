@@ -2,26 +2,44 @@
 
 import { useToast, RowActionsMenu } from '@/components/platform/orderflow/ui';
 import { Kpi } from '@/components/platform/module-ui';
-import { ATTENDANCE, EMPLOYEES } from '@/lib/platform/shiftboard';
 import { AttendanceBadge, DeptBadge } from './shared';
+import { useShiftBoard } from './context';
 
 export function Attendance() {
   const { node, show } = useToast();
+  const sb = useShiftBoard();
 
-  const clockedIn = ATTENDANCE.filter((a) => a.clockIn != null).length;
-  const late = ATTENDANCE.filter((a) => a.status === 'Late').length;
-  const absent = ATTENDANCE.filter((a) => a.status === 'Absent').length;
+  const clockedIn = sb.attendance.filter((a) => a.clockIn != null).length;
+  const late = sb.attendance.filter((a) => a.status === 'Late').length;
+  const absent = sb.attendance.filter((a) => a.status === 'Absent').length;
   // Overtime accrued this week (hours over contract) — the daily snapshot is mid-shift.
-  const overtime = EMPLOYEES.reduce((s, e) => s + Math.max(0, e.hoursThisWeek - e.contractedHours), 0);
-  const pending = ATTENDANCE.filter((a) => a.status === 'Manual review').length + 3;
+  const overtime = sb.employees.reduce((s, e) => s + Math.max(0, e.hoursThisWeek - e.contractedHours), 0);
+  const pending = sb.attendance.filter((a) => a.status === 'Manual review').length + (sb.attendance.length ? 3 : 0);
+
+  const header = (
+    <div>
+      <h1 className="text-[24px] font-bold leading-tight text-[#1A1C1E]">Attendance</h1>
+      <p className="mt-0.5 text-[14px] text-[#5F6368]">Clock-ins, hours worked and timesheet approvals</p>
+    </div>
+  );
+
+  if (sb.attendance.length === 0) {
+    return (
+      <div className="space-y-5">
+        {node}
+        {header}
+        <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
+          <p className="text-[15px] font-medium text-[#1A1C1E]">No attendance yet</p>
+          <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">Clock-ins, hours worked and timesheet approvals will appear here once staff start their shifts.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5">
       {node}
-      <div>
-        <h1 className="text-[24px] font-bold leading-tight text-[#1A1C1E]">Attendance</h1>
-        <p className="mt-0.5 text-[14px] text-[#5F6368]">Clock-ins, hours worked and timesheet approvals</p>
-      </div>
+      {header}
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         <Kpi label="Clocked in" value={String(clockedIn)} accent="#0F6E56" />
@@ -42,7 +60,7 @@ export function Attendance() {
               </tr>
             </thead>
             <tbody>
-              {ATTENDANCE.map((a) => (
+              {sb.attendance.map((a) => (
                 <tr key={a.employeeId} className="border-b border-[#F6F6F2] last:border-0 hover:bg-[#FAFAF8]">
                   <td className="px-3 py-3 font-medium text-[#1A1C1E]">{a.name}</td>
                   <td className="px-3 py-3"><DeptBadge department={a.department} /></td>

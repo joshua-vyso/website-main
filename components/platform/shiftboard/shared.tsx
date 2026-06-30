@@ -1,23 +1,26 @@
 'use client';
 
 import { ModuleWidgetCard } from '@/components/platform/module-ui';
-import { widgetsFor } from '@/lib/platform/module-widgets';
+import { widgetsFor, type ModuleWidget } from '@/lib/platform/module-widgets';
 import {
-  DEPARTMENT_COLOR,
   EMPLOYEE_STATUS_STYLE,
   COVERAGE_STYLE,
   ATTENDANCE_STYLE,
+  overviewStats,
+  departmentSnapshots,
   type DepartmentName,
   type EmployeeStatus,
   type CoverageStatus,
   type AttendanceStatus,
   type ShiftConflict,
 } from '@/lib/platform/shiftboard';
+import { useShiftBoard } from './context';
 
 export function DeptBadge({ department }: { department: DepartmentName }) {
+  const { deptColor } = useShiftBoard();
   return (
     <span className="inline-flex items-center gap-1.5 text-[13px] text-[#5F6368]">
-      <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: DEPARTMENT_COLOR[department] }} />
+      <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: deptColor(department) }} />
       {department}
     </span>
   );
@@ -64,12 +67,29 @@ export function SkillStars({ rating, color = '#1E5E54' }: { rating: number; colo
 }
 
 export function MobileSnapshotCards({ onAction }: { onAction?: (label: string) => void }) {
+  const sb = useShiftBoard();
+  // Override the static registry values with the org's live numbers so the
+  // companion-app preview matches the page KPIs.
+  const stats = overviewStats(sb);
+  const snaps = departmentSnapshots(sb.employees, sb.departments);
+  const worstShort = snaps.filter((s) => s.status === 'short').sort((a, b) => b.required - b.working - (a.required - a.working))[0];
+  const pendingLeave = sb.leave.filter((l) => l.status === 'Pending').length;
+  const override: Record<string, Partial<ModuleWidget>> = {
+    'shift-working': { value: String(stats.working), subtitle: `of ${stats.rostered} rostered` },
+    'shift-open': { value: String(stats.openShifts) },
+    'shift-ot': { value: String(stats.overtimeRisk) },
+    'shift-attendance': { value: String(stats.attendanceIssues) },
+    'shift-dispatch': worstShort
+      ? { title: `${worstShort.name} short today`, value: `−${worstShort.required - worstShort.working}`, subtitle: `${worstShort.working} of ${worstShort.required}` }
+      : { title: 'Departments', value: 'Covered', subtitle: 'all on target' },
+    'shift-leave': { value: String(pendingLeave) },
+  };
   return (
     <div>
       <h2 className="mb-2 text-[13px] font-semibold text-[#9A9DA1]">Mobile snapshot — widgets the companion app will surface</h2>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {widgetsFor('shiftboard').map((w) => (
-          <ModuleWidgetCard key={w.id} widget={w} onAction={(widget) => onAction?.(widget.actionLabel ?? widget.title)} />
+          <ModuleWidgetCard key={w.id} widget={{ ...w, ...override[w.id] }} onAction={(widget) => onAction?.(widget.actionLabel ?? widget.title)} />
         ))}
       </div>
     </div>

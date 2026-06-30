@@ -5,17 +5,9 @@ import { useToast } from '@/components/platform/orderflow/ui';
 import { ModuleHeader, PrimaryAction, Kpi, SectionCard, DataTable } from '@/components/platform/module-ui';
 import { MODULE_META } from '@/lib/platform/module-meta';
 import { zar } from '@/lib/platform/orderflow';
-import {
-  EMPLOYEES,
-  ROSTER,
-  DAYS,
-  DEPARTMENT_COLOR,
-  departmentSnapshots,
-  overviewStats,
-  OPERATIONAL_ALERTS,
-  type Shift,
-} from '@/lib/platform/shiftboard';
+import { DAYS, departmentSnapshots, overviewStats, operationalAlerts, type Shift } from '@/lib/platform/shiftboard';
 import { DeptBadge, StatusBadge, CoverageBadge, MobileSnapshotCards } from './shared';
+import { useShiftBoard } from './context';
 
 const M = MODULE_META.shiftboard;
 
@@ -27,13 +19,31 @@ function cellTone(s: Shift) {
 
 export function ShiftBoardOverview() {
   const { node, show } = useToast();
-  const s = overviewStats();
-  const snapshots = departmentSnapshots();
+  const sb = useShiftBoard();
+
+  const header = <ModuleHeader icon={M.icon} title={M.name} description="Who's working, where, on what — and whether you're properly staffed today." actions={<PrimaryAction onClick={() => show('Create shift (demo)')}>+ Create shift</PrimaryAction>} />;
+
+  if (sb.isEmpty) {
+    return (
+      <div className="space-y-5">
+        {node}
+        {header}
+        <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
+          <p className="text-[15px] font-medium text-[#1A1C1E]">No people set up yet</p>
+          <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">Add employees and departments to see who&rsquo;s on shift, staffing coverage and labour cost here.</p>
+        </div>
+      </div>
+    );
+  }
+
+  const s = overviewStats(sb);
+  const snapshots = departmentSnapshots(sb.employees, sb.departments);
+  const alerts = operationalAlerts(sb);
 
   return (
     <div className="space-y-5">
       {node}
-      <ModuleHeader icon={M.icon} title={M.name} description="Who's working, where, on what — and whether you're properly staffed today." actions={<PrimaryAction onClick={() => show('Create shift (demo)')}>+ Create shift</PrimaryAction>} />
+      {header}
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
         <Kpi label="Staff on shift today" value={String(s.rostered)} sub="rostered" />
@@ -45,7 +55,7 @@ export function ShiftBoardOverview() {
       </div>
 
       {/* Weekly roster */}
-      <SectionCard title="Weekly roster" right={<span className="text-[12px] text-[#9A9DA1]">{ROSTER.label}</span>}>
+      <SectionCard title="Weekly roster" right={<span className="text-[12px] text-[#9A9DA1]">{sb.roster.label}</span>}>
         <div className="overflow-x-auto">
           <table className="w-full text-[12px]">
             <thead>
@@ -55,10 +65,10 @@ export function ShiftBoardOverview() {
               </tr>
             </thead>
             <tbody>
-              {ROSTER.rows.map((r) => (
+              {sb.roster.rows.map((r) => (
                 <tr key={r.employeeId} className="border-t border-[#F0F0EC]">
                   <td className="px-2 py-2.5">
-                    <span className="flex items-center gap-2 text-[13px] font-medium text-[#1A1C1E]"><span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: DEPARTMENT_COLOR[r.department] }} />{r.name}</span>
+                    <span className="flex items-center gap-2 text-[13px] font-medium text-[#1A1C1E]"><span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: sb.deptColor(r.department) }} />{r.name}</span>
                   </td>
                   {r.days.map((sh, i) => {
                     const t = cellTone(sh);
@@ -79,7 +89,7 @@ export function ShiftBoardOverview() {
         <SectionCard title="Staff">
           <DataTable
             columns={[{ label: 'Name' }, { label: 'Department' }, { label: 'Status' }, { label: 'Next shift' }, { label: 'Hours / wk', align: 'right' }]}
-            rows={EMPLOYEES.map((e) => [
+            rows={sb.employees.map((e) => [
               <span key="n" className="font-medium text-[#1A1C1E]">{e.name}<span className="ml-1.5 text-[12px] font-normal text-[#9A9DA1]">{e.role}</span></span>,
               <DeptBadge key="d" department={e.department} />,
               <StatusBadge key="s" status={e.status} />,
@@ -109,7 +119,7 @@ export function ShiftBoardOverview() {
           {/* Operational alerts */}
           <SectionCard title="Operational alerts">
             <div className="flex flex-col gap-3">
-              {OPERATIONAL_ALERTS.map((a) => (
+              {alerts.map((a) => (
                 <div key={a.id} className="flex items-start gap-2.5 text-[13px]">
                   <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: a.tone === 'critical' ? '#A32D2D' : a.tone === 'warning' ? '#854F0B' : '#0C447C' }} />
                   <span className="min-w-0 flex-1 text-[#1A1C1E]">{a.text}</span>

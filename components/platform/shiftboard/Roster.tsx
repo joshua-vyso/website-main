@@ -4,23 +4,25 @@ import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useToast } from '@/components/platform/orderflow/ui';
 import { SectionCard } from '@/components/platform/module-ui';
-import { ROSTER, DAYS, DEPARTMENTS, DEPARTMENT_COLOR, type Shift, type DepartmentName } from '@/lib/platform/shiftboard';
+import { DAYS, type Shift } from '@/lib/platform/shiftboard';
 import { ConflictBadge } from './shared';
+import { useShiftBoard } from './context';
 
 const MODAL_RADIUS = { fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties;
 
 export function Roster() {
   const { node, show } = useToast();
+  const sb = useShiftBoard();
   const [view, setView] = useState<'week' | 'day'>('week');
   const [day, setDay] = useState(DAYS[0]);
-  const [dept, setDept] = useState<'all' | DepartmentName>('all');
+  const [dept, setDept] = useState<string>('all');
   const [search, setSearch] = useState('');
   const [aiOpen, setAiOpen] = useState(false);
 
   const rows = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return ROSTER.rows.filter((r) => (dept === 'all' || r.department === dept) && (!q || `${r.name} ${r.role}`.toLowerCase().includes(q)));
-  }, [dept, search]);
+    return sb.roster.rows.filter((r) => (dept === 'all' || r.department === dept) && (!q || `${r.name} ${r.role}`.toLowerCase().includes(q)));
+  }, [sb.roster, dept, search]);
 
   const sel = 'h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#1E5E54]';
   const dayIdx = DAYS.indexOf(day);
@@ -40,10 +42,10 @@ export function Roster() {
       <div className="flex flex-wrap items-center gap-2">
         <div className="inline-flex items-center gap-1 rounded-lg border border-[#D7DAD8] bg-white px-1 py-0.5">
           <button type="button" onClick={() => show('Previous week (demo)')} className="rounded-md px-2 py-1 text-[13px] text-[#9A9DA1] hover:text-[#1A1C1E]">‹</button>
-          <span className="px-1 text-[13px] font-medium text-[#1A1C1E]">{ROSTER.label}</span>
+          <span className="px-1 text-[13px] font-medium text-[#1A1C1E]">{sb.roster.label || 'This week'}</span>
           <button type="button" onClick={() => show('Next week (demo)')} className="rounded-md px-2 py-1 text-[13px] text-[#9A9DA1] hover:text-[#1A1C1E]">›</button>
         </div>
-        <select value={dept} onChange={(e) => setDept(e.target.value as 'all' | DepartmentName)} className={sel}><option value="all">All departments</option>{DEPARTMENTS.map((d) => <option key={d} value={d}>{d}</option>)}</select>
+        <select value={dept} onChange={(e) => setDept(e.target.value)} className={sel}><option value="all">All departments</option>{sb.departments.map((d) => <option key={d.name} value={d.name}>{d.name}</option>)}</select>
         <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search staff…" className="h-9 min-w-[180px] flex-1 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] outline-none placeholder:text-[#9A9DA1] focus:border-[#1E5E54]" />
         {view === 'day' ? (
           <select value={day} onChange={(e) => setDay(e.target.value)} className={sel}>{DAYS.map((d) => <option key={d} value={d}>{d}</option>)}</select>
@@ -74,7 +76,7 @@ export function Roster() {
                     <tr key={r.employeeId} className="border-t border-[#F0F0EC] align-top">
                       <td className="px-2 py-2">
                         <div className="text-[13px] font-medium text-[#1A1C1E]">{r.name}</div>
-                        <div className="flex items-center gap-1.5 text-[11px] text-[#9A9DA1]"><span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: DEPARTMENT_COLOR[r.department] }} />{r.department}</div>
+                        <div className="flex items-center gap-1.5 text-[11px] text-[#9A9DA1]"><span className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: sb.deptColor(r.department) }} />{r.department}</div>
                       </td>
                       {r.days.map((sh, i) => (<td key={i} className="px-1 py-1.5"><ShiftCell s={sh} onClick={() => show(`Edit shift (demo)`)} /></td>))}
                     </tr>
@@ -85,7 +87,7 @@ export function Roster() {
           </div>
         ) : (
           (() => {
-            const dayRows = rows.filter((r) => r.days[dayIdx].status === 'scheduled');
+            const dayRows = rows.filter((r) => r.days[dayIdx]?.status === 'scheduled');
             if (dayRows.length === 0) return <p className="py-8 text-center text-[13px] text-[#9A9DA1]">No one scheduled for {day} in this view.</p>;
             return (
               <div className="flex flex-col gap-2">
@@ -93,7 +95,7 @@ export function Roster() {
                   const sh = r.days[dayIdx];
                   return (
                     <div key={r.employeeId} onClick={() => show('Edit shift (demo)')} className="flex cursor-pointer items-center justify-between rounded-xl border border-[#F0F0EC] bg-white px-3.5 py-2.5 hover:border-[#1E5E54]/30">
-                      <span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: DEPARTMENT_COLOR[r.department] }} /><span className="text-[14px] font-medium text-[#1A1C1E]">{r.name}</span><span className="text-[12px] text-[#9A9DA1]">{r.department}</span></span>
+                      <span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: sb.deptColor(r.department) }} /><span className="text-[14px] font-medium text-[#1A1C1E]">{r.name}</span><span className="text-[12px] text-[#9A9DA1]">{r.department}</span></span>
                       <span className="flex items-center gap-3">{sh.conflict ? <ConflictBadge conflict={sh.conflict} /> : null}<span className="text-[13px] font-medium tabular-nums text-[#1A1C1E]">{sh.time}</span></span>
                     </div>
                   );
@@ -105,11 +107,11 @@ export function Roster() {
       </SectionCard>
 
       {/* Open shifts */}
-      <SectionCard title="Open shifts" right={<span className="text-[12px] text-[#9A9DA1]">{ROSTER.openShifts.length} unfilled</span>}>
+      <SectionCard title="Open shifts" right={<span className="text-[12px] text-[#9A9DA1]">{sb.roster.openShifts.length} unfilled</span>}>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          {ROSTER.openShifts.map((o, i) => (
+          {sb.roster.openShifts.map((o, i) => (
             <div key={i} className="rounded-xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] p-3.5">
-              <div className="flex items-center gap-2 text-[13px] font-medium text-[#1A1C1E]"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: DEPARTMENT_COLOR[o.department] }} />{o.department}</div>
+              <div className="flex items-center gap-2 text-[13px] font-medium text-[#1A1C1E]"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: sb.deptColor(o.department) }} />{o.department}</div>
               <div className="mt-1 text-[12px] text-[#9A9DA1]">{o.day} · {o.time}</div>
               <button type="button" onClick={() => show('Fill shift (demo)')} className="mt-2.5 w-full rounded-lg bg-[#1E5E54] px-3 py-1.5 text-[12px] font-medium text-white hover:bg-[#184D45]">Fill shift</button>
             </div>

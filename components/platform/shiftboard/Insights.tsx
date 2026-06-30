@@ -5,25 +5,36 @@ import { SectionCard } from '@/components/platform/module-ui';
 import { AreaChart, Sparkline } from '@/components/platform/procurepulse/ui';
 import { MODULE_META } from '@/lib/platform/module-meta';
 import { zar } from '@/lib/platform/orderflow';
-import {
-  LABOUR_COST_TREND,
-  OVERTIME_TREND,
-  DEPARTMENT_COVERAGE_HISTORY,
-  ATTENDANCE_TREND,
-  LABOUR_INSIGHTS,
-  DEPARTMENT_COLOR,
-  DAYS,
-} from '@/lib/platform/shiftboard';
+import { LABOUR_COST_TREND, OVERTIME_TREND, ATTENDANCE_TREND, LABOUR_INSIGHTS, DAYS, departmentSnapshots } from '@/lib/platform/shiftboard';
+import { useShiftBoard } from './context';
 
 export function LabourInsights() {
+  const sb = useShiftBoard();
   const totalOvertime = OVERTIME_TREND.reduce((s, n) => s + n, 0);
+  const coverage = departmentSnapshots(sb.employees, sb.departments);
+
+  const header = (
+    <div>
+      <h1 className="text-[24px] font-bold leading-tight text-[#1A1C1E]">Insights</h1>
+      <p className="mt-0.5 text-[14px] text-[#5F6368]">Labour cost, overtime, coverage and cross-module signals</p>
+    </div>
+  );
+
+  if (sb.isEmpty) {
+    return (
+      <div className="space-y-5">
+        {header}
+        <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
+          <p className="text-[15px] font-medium text-[#1A1C1E]">No insights yet</p>
+          <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">Labour-cost, overtime and coverage trends appear here once your people data builds up.</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="text-[24px] font-bold leading-tight text-[#1A1C1E]">Insights</h1>
-        <p className="mt-0.5 text-[14px] text-[#5F6368]">Labour cost, overtime, coverage and cross-module signals</p>
-      </div>
+      {header}
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <SectionCard title="Labour cost trend" right={<span className="text-[12px] text-[#9A9DA1]">{zar(LABOUR_COST_TREND[LABOUR_COST_TREND.length - 1])}/day</span>}>
@@ -33,23 +44,23 @@ export function LabourInsights() {
 
         <SectionCard title="Overtime trend" right={<span className="text-[12px] text-[#9A9DA1]">{totalOvertime}h this week</span>}>
           <AreaChart data={OVERTIME_TREND} color="#5B53C0" fill="#EAE7FB" height={120} />
-          <p className="mt-2 text-[12px] text-[#9A9DA1]">Overtime hours per day — concentrated late-week in Prep Kitchen.</p>
+          <p className="mt-2 text-[12px] text-[#9A9DA1]">Overtime hours per day — concentrated later in the week.</p>
         </SectionCard>
       </div>
 
-      <SectionCard title="Department coverage" right={<span className="text-[12px] text-[#9A9DA1]">avg staffed vs required (last 7 days)</span>}>
+      <SectionCard title="Department coverage" right={<span className="text-[12px] text-[#9A9DA1]">staffed vs required right now</span>}>
         <div className="flex flex-col gap-3">
-          {DEPARTMENT_COVERAGE_HISTORY.map((d) => {
-            const pct = Math.min(100, (d.avgStaffed / d.avgRequired) * 100);
-            const short = d.avgStaffed < d.avgRequired;
+          {coverage.map((d) => {
+            const pct = d.required ? Math.min(100, (d.working / d.required) * 100) : 100;
+            const short = d.working < d.required;
             return (
-              <div key={d.department} className="flex items-center gap-3">
-                <span className="flex w-32 shrink-0 items-center gap-2 text-[13px] text-[#1A1C1E]"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: DEPARTMENT_COLOR[d.department] }} />{d.department}</span>
+              <div key={d.name} className="flex items-center gap-3">
+                <span className="flex w-32 shrink-0 items-center gap-2 text-[13px] text-[#1A1C1E]"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: d.color }} />{d.name}</span>
                 <div className="h-2.5 flex-1 overflow-hidden rounded-full bg-[#F0F0EC]">
                   <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: short ? '#A32D2D' : '#0F6E56', transition: 'width 0.6s ease' }} />
                 </div>
-                <span className="w-24 text-right text-[12px] tabular-nums text-[#5F6368]">{d.avgStaffed.toFixed(1)} / {d.avgRequired}</span>
-                <span className="w-20 text-right text-[12px]" style={{ color: d.shortDays >= 3 ? '#A32D2D' : '#9A9DA1' }}>{d.shortDays} short days</span>
+                <span className="w-20 text-right text-[12px] tabular-nums text-[#5F6368]">{d.working} / {d.required}</span>
+                <span className="w-20 text-right text-[12px]" style={{ color: short ? '#A32D2D' : '#9A9DA1' }}>{short ? `short ${d.required - d.working}` : 'covered'}</span>
               </div>
             );
           })}

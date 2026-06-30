@@ -4,23 +4,25 @@ import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useToast } from '@/components/platform/orderflow/ui';
 import { Kpi, Badge } from '@/components/platform/module-ui';
-import { LEAVE_REQUESTS, LEAVE_TYPE_TONE, type LeaveRequest, type LeaveStatus } from '@/lib/platform/shiftboard';
+import { LEAVE_TYPE_TONE, type LeaveRequest, type LeaveStatus } from '@/lib/platform/shiftboard';
 import { DeptBadge } from './shared';
+import { useShiftBoard } from './context';
 
 const MODAL_RADIUS = { fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties;
 
 export function LeaveWorkspace() {
   const { node, show } = useToast();
+  const sb = useShiftBoard();
   // Local status overrides so approve/decline visibly change the card (mock).
   const [overrides, setOverrides] = useState<Record<string, LeaveStatus>>({});
   const [confirm, setConfirm] = useState<LeaveRequest | null>(null);
 
-  const requests = useMemo(() => LEAVE_REQUESTS.map((r) => ({ ...r, status: overrides[r.id] ?? r.status })), [overrides]);
+  const requests = useMemo(() => sb.leave.map((r) => ({ ...r, status: overrides[r.id] ?? r.status })), [sb.leave, overrides]);
 
   const pending = requests.filter((r) => r.status === 'Pending').length;
   const approvedThisMonth = requests.filter((r) => r.status === 'Approved').length;
-  const sickDays = LEAVE_REQUESTS.filter((r) => r.type === 'Sick leave').reduce((s, r) => s + r.days, 0);
-  const annualDays = LEAVE_REQUESTS.filter((r) => r.type === 'Annual leave').reduce((s, r) => s + r.days, 0);
+  const sickDays = sb.leave.filter((r) => r.type === 'Sick leave').reduce((s, r) => s + r.days, 0);
+  const annualDays = sb.leave.filter((r) => r.type === 'Annual leave').reduce((s, r) => s + r.days, 0);
   const coverageRisk = requests.filter((r) => r.status === 'Pending' && r.coverageRisk === 'high').length;
 
   function approve(r: LeaveRequest) {
@@ -52,6 +54,9 @@ export function LeaveWorkspace() {
         <Kpi label="Coverage risk" value={String(coverageRisk)} accent={coverageRisk > 0 ? '#A32D2D' : undefined} sub="high-impact" />
       </div>
 
+      {requests.length === 0 ? (
+        <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-10 text-center text-[13px] text-[#5F6368]">No leave requests right now.</div>
+      ) : null}
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
         {requests.map((r) => (
           <div key={r.id} className="rounded-2xl border border-[#E7E7E2] bg-white p-4">

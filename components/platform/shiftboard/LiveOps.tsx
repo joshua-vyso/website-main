@@ -2,15 +2,17 @@
 
 import { useToast } from '@/components/platform/orderflow/ui';
 import { SectionCard } from '@/components/platform/module-ui';
-import { departmentSnapshots, EMPLOYEES } from '@/lib/platform/shiftboard';
+import { departmentSnapshots } from '@/lib/platform/shiftboard';
 import { DeptBadge, StatusBadge, CoverageBadge } from './shared';
+import { useShiftBoard } from './context';
 
 const QUICK_ACTIONS = ['Assign staff', 'Reassign department', 'Mark on break', 'Mark absent', 'Add replacement'];
 
 export function LiveOps() {
   const { node, show } = useToast();
-  const snapshots = departmentSnapshots();
-  const active = EMPLOYEES.filter((e) => e.status === 'Working' || e.status === 'On break');
+  const sb = useShiftBoard();
+  const snapshots = departmentSnapshots(sb.employees, sb.departments);
+  const active = sb.employees.filter((e) => e.status === 'Working' || e.status === 'On break');
 
   return (
     <div className="space-y-5">

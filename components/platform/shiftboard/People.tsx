@@ -2,18 +2,19 @@
 
 import { useMemo, useState } from 'react';
 import { useToast, Drawer, RowActionsMenu } from '@/components/platform/orderflow/ui';
-import { EMPLOYEES, SKILL_NAMES, DEPARTMENTS, type Employee, type DepartmentName, type ActivityEvent } from '@/lib/platform/shiftboard';
+import { SKILL_NAMES, type Employee, type ActivityEvent } from '@/lib/platform/shiftboard';
 import { DeptBadge, StatusBadge, SkillStars } from './shared';
+import { useShiftBoard } from './context';
 
 function scoreColor(score: number) {
   return score >= 90 ? '#0F6E56' : score >= 80 ? '#854F0B' : '#A32D2D';
 }
 
 function activityFor(e: Employee): ActivityEvent[] {
-  const start = e.shiftTime.split('–')[0] ?? '08:00';
+  const start = e.shiftTime.split('–')[0] || '08:00';
   const events: ActivityEvent[] = [];
   if (e.status === 'On leave') return [{ time: '—', label: 'On approved leave', kind: 'clock' }];
-  if (e.status === 'Absent') return [{ time: e.shiftTime.split('–')[0] ?? '06:00', label: 'No clock-in recorded — marked absent', kind: 'clock' }];
+  if (e.status === 'Absent') return [{ time: e.shiftTime.split('–')[0] || '06:00', label: 'No clock-in recorded — marked absent', kind: 'clock' }];
   events.push({ time: start, label: 'Clocked in', kind: 'clock' });
   events.push({ time: start, label: `Assigned to ${e.currentDepartment ?? e.department}`, kind: 'assign' });
   if (e.currentRecipe) events.push({ time: addMin(start, 12), label: `Started recipe — ${e.currentRecipe}`, kind: 'recipe' });
@@ -31,16 +32,17 @@ function addMin(hhmm: string, mins: number) {
 
 export function People() {
   const { node, show } = useToast();
+  const sb = useShiftBoard();
   const [openId, setOpenId] = useState<string | null>(null);
-  const [dept, setDept] = useState<'all' | DepartmentName>('all');
+  const [dept, setDept] = useState<string>('all');
   const [search, setSearch] = useState('');
 
   const rows = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return EMPLOYEES.filter((e) => (dept === 'all' || e.department === dept) && (!q || `${e.name} ${e.role}`.toLowerCase().includes(q)));
-  }, [dept, search]);
+    return sb.employees.filter((e) => (dept === 'all' || e.department === dept) && (!q || `${e.name} ${e.role}`.toLowerCase().includes(q)));
+  }, [sb.employees, dept, search]);
 
-  const open = openId ? EMPLOYEES.find((e) => e.id === openId) ?? null : null;
+  const open = openId ? sb.employees.find((e) => e.id === openId) ?? null : null;
   const sel = 'h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#1E5E54]';
 
   return (
@@ -52,7 +54,7 @@ export function People() {
           <p className="mt-0.5 text-[14px] text-[#5F6368]">Profiles, skills, availability and device history</p>
         </div>
         <div className="flex items-center gap-2">
-          <select value={dept} onChange={(e) => setDept(e.target.value as 'all' | DepartmentName)} className={sel}><option value="all">All departments</option>{DEPARTMENTS.map((d) => <option key={d} value={d}>{d}</option>)}</select>
+          <select value={dept} onChange={(e) => setDept(e.target.value)} className={sel}><option value="all">All departments</option>{sb.departments.map((d) => <option key={d.name} value={d.name}>{d.name}</option>)}</select>
           <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search people…" className="h-9 min-w-[180px] rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] outline-none placeholder:text-[#9A9DA1] focus:border-[#1E5E54]" />
         </div>
       </div>
