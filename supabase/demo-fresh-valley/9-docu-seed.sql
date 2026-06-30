@@ -41,7 +41,7 @@ cross join (values
 -- Documents (18 scanned docs across June 2026). The bulk are supplier invoices
 -- and delivery notes from the SPEC supplier base; plus three statements, a price
 -- list and a customer order. Most are 'extracted' (awaiting review) with a couple
--- 'approved', one 'pending' (just uploaded, not yet extracted) and one 'error'
+-- 'reviewed', one 'pending' (just uploaded, not yet extracted) and one 'error'
 -- (low confidence) to populate the KPI roll-ups (total / awaiting / flagged).
 --
 -- folder_id resolves by joining document_folders on the folder name (natural key)
@@ -83,7 +83,7 @@ cross join (values
    '{"supplier":"Philippi Fresh Co-op","fields":[{"label":"Supplier","value":"Philippi Fresh Co-op","confidence":95},{"label":"Invoice number","value":"INV-7741","confidence":94},{"label":"Invoice date","value":"2026-06-29","confidence":93},{"label":"Total (incl. VAT)","value":"R 41 285.00","confidence":92},{"label":"VAT","value":"R 5 385.00","confidence":91}],"line_items":[{"description":"Baby Spinach (kg)","quantity":"240","unit":"kg","unit_price":"65.00","amount":"15600.00","confidence":94},{"description":"Lettuce-Iceberg (ea)","quantity":"600","unit":"ea","unit_price":"16.00","amount":"9600.00","confidence":92},{"description":"Cabbage (ea)","quantity":"800","unit":"ea","unit_price":"14.00","amount":"11200.00","confidence":91}]}',
    'demo/docu/philippi-fresh-coop-INV-7741.pdf', '2026-06-29T06:18:00Z'),
 
-  ('boland-citrus-INV-3320.pdf', 'invoice', 'approved', false, 95, 'Supplier invoices',
+  ('boland-citrus-INV-3320.pdf', 'invoice', 'reviewed', false, 95, 'Supplier invoices',
    '{"supplier":"Boland Citrus","fields":[{"label":"Supplier","value":"Boland Citrus","confidence":97},{"label":"Invoice number","value":"INV-3320","confidence":96},{"label":"Invoice date","value":"2026-06-26","confidence":95},{"label":"Total (incl. VAT)","value":"R 62 745.00","confidence":94},{"label":"VAT","value":"R 8 184.00","confidence":93}],"line_items":[{"description":"Oranges (box)","quantity":"180","unit":"box","unit_price":"180.00","amount":"32400.00","confidence":95},{"description":"Lemons (box)","quantity":"90","unit":"box","unit_price":"210.00","amount":"18900.00","confidence":94},{"description":"Naartjies (box)","quantity":"66","unit":"box","unit_price":"165.00","amount":"10890.00","confidence":93}]}',
    'demo/docu/boland-citrus-INV-3320.pdf', '2026-06-26T08:05:00Z'),
 
@@ -103,7 +103,7 @@ cross join (values
    '{"supplier":"Witzenberg Orchards","fields":[{"label":"Supplier","value":"Witzenberg Orchards","confidence":94},{"label":"Invoice number","value":"INV-8830","confidence":93},{"label":"Invoice date","value":"2026-06-28","confidence":92},{"label":"Total (incl. VAT)","value":"R 33 660.00","confidence":90}],"line_items":[{"description":"Apples-Red (box)","quantity":"60","unit":"box","unit_price":"326.00","amount":"19560.00","confidence":92},{"description":"Apples-Golden (box)","quantity":"50","unit":"box","unit_price":"285.00","amount":"14250.00","confidence":91}]}',
    'demo/docu/witzenberg-orchards-INV-8830.pdf', '2026-06-28T11:20:00Z'),
 
-  ('elgin-apple-co-INV-4471.pdf', 'invoice', 'approved', false, 95, 'Supplier invoices',
+  ('elgin-apple-co-INV-4471.pdf', 'invoice', 'reviewed', false, 95, 'Supplier invoices',
    '{"supplier":"Elgin Apple Co","fields":[{"label":"Supplier","value":"Elgin Apple Co","confidence":96},{"label":"Invoice number","value":"INV-4471","confidence":95},{"label":"Invoice date","value":"2026-06-25","confidence":95},{"label":"Total (incl. VAT)","value":"R 22 800.00","confidence":94}],"line_items":[{"description":"Apples-Green (box)","quantity":"60","unit":"box","unit_price":"270.00","amount":"16200.00","confidence":95},{"description":"Apples-Golden (box)","quantity":"23","unit":"box","unit_price":"285.00","amount":"6555.00","confidence":93}]}',
    'demo/docu/elgin-apple-co-INV-4471.pdf', '2026-06-25T08:50:00Z'),
 
@@ -137,7 +137,7 @@ cross join (values
    '{"supplier":"Ceres Fruit Growers","fields":[{"label":"Supplier","value":"Ceres Fruit Growers","confidence":96},{"label":"Statement period","value":"June 2026","confidence":95},{"label":"Closing balance","value":"R 742 000.00","confidence":94}],"summary":{"statement_date":"30/JUN/2026","opening_balance":698500.00,"payments":-700000.00,"total_purchases":742000.00,"total_pallet_refunds":0.00,"total_pallet_usage":0.00,"vat":96782.61,"total_charges":0.00,"closing_balance":740500.00,"net_financial_transactions":42000.00,"audit_error":0.00}}',
    'demo/docu/ceres-fruit-growers-STMT-2026-06.pdf', '2026-06-30T16:08:00Z'),
 
-  ('boland-citrus-STMT-2026-06.pdf', 'statement', 'approved', false, 95, 'Supplier statements',
+  ('boland-citrus-STMT-2026-06.pdf', 'statement', 'reviewed', false, 95, 'Supplier statements',
    '{"supplier":"Boland Citrus","fields":[{"label":"Supplier","value":"Boland Citrus","confidence":97},{"label":"Statement period","value":"June 2026","confidence":96},{"label":"Closing balance","value":"R 416 000.00","confidence":95}],"summary":{"statement_date":"30/JUN/2026","opening_balance":388200.00,"payments":-360000.00,"total_purchases":416000.00,"total_pallet_refunds":-1500.00,"total_pallet_usage":2200.00,"vat":54260.87,"total_charges":1800.00,"closing_balance":446700.00,"net_financial_transactions":58500.00,"audit_error":0.00}}',
    'demo/docu/boland-citrus-STMT-2026-06.pdf', '2026-06-30T16:15:00Z'),
 
