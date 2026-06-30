@@ -55,7 +55,7 @@ cross join (values
 delete from documents where org_id = (select id from organisations where name = 'Fresh Valley Produce' limit 1);
 
 insert into documents (
-  org_id, supplier_id, folder_id, filename, document_type, status, starred,
+  org_id, supplier_id, folder_id, filename, document_type, status,
   confidence, extracted_data, storage_path, uploaded_by, created_at
 )
 select
@@ -65,7 +65,6 @@ select
   v.filename,
   v.document_type,
   v.status,
-  v.starred,
   v.confidence,
   v.extracted_data::jsonb,
   v.storage_path,
