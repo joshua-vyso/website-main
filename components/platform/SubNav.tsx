@@ -4,8 +4,9 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 /**
- * Generic horizontal sub-navigation for a module's screens. The `rootHref` tab
- * (the module index) is matched exactly; the rest match by path prefix.
+ * Generic horizontal sub-navigation for a module's screens — the calm underline
+ * style shared with Doc-U: a thin baseline with the active tab underlined in teal.
+ * The `rootHref` tab (module index) is matched exactly; the rest match by prefix.
  */
 export function SubNav({
   tabs,
@@ -16,7 +17,7 @@ export function SubNav({
 }) {
   const pathname = usePathname() ?? '';
   return (
-    <nav className="flex flex-wrap gap-1.5">
+    <nav className="flex flex-wrap items-center gap-x-5 gap-y-1 border-b border-[#E7E7E2]">
       {tabs.map((t) => {
         const active =
           t.href === rootHref ? pathname === t.href : pathname === t.href || pathname.startsWith(`${t.href}/`);
@@ -24,10 +25,10 @@ export function SubNav({
           <Link
             key={t.href}
             href={t.href}
-            className={`rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors ${
+            className={`-mb-px border-b-2 pb-2.5 pt-1 text-[14px] transition-colors ${
               active
-                ? 'bg-[#1A1C1E] text-white'
-                : 'border border-[#E7E7E2] bg-white text-[#5F6368] hover:bg-black/[0.03]'
+                ? 'border-[#1E5E54] font-medium text-[#1A1C1E]'
+                : 'border-transparent text-[#5F6368] hover:text-[#1A1C1E]'
             }`}
           >
             {t.label}

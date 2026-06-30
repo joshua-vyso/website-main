@@ -26,7 +26,7 @@ const TABS = [
 export function PpSubnav() {
   const pathname = usePathname();
   return (
-    <nav className="flex items-center gap-5 overflow-x-auto border-b border-[#E7E7E2]">
+    <nav className="flex flex-wrap items-center gap-x-5 gap-y-1 border-b border-[#E7E7E2]">
       {TABS.map((t) => {
         const active =
           t.href === '/app/procurepulse'
