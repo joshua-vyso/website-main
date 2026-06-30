@@ -242,14 +242,14 @@ export default async function PricePilotDashboardPage() {
 
       {!targets ? (
         <Link
-          href="/app/pricepilot/targets"
+          href="/app/marginview/goals"
           className="mt-5 flex flex-wrap items-center justify-between gap-2 rounded-2xl border border-[#FBEEDA] bg-[#FFFBF4] px-5 py-3.5 transition-colors hover:border-[#EFD9AE]"
         >
           <span className="text-[13px] text-[#7A6A4F]">
-            <span className="font-semibold text-[#854F0B]">Set your pricing targets</span> to unlock profit tracking,
+            <span className="font-semibold text-[#854F0B]">Set your goals in PlanWise</span> to unlock profit tracking,
             health scoring and tailored opportunities.
           </span>
-          <span className="text-[13px] font-medium text-[#854F0B]">Set targets →</span>
+          <span className="text-[13px] font-medium text-[#854F0B]">Open PlanWise → Goals →</span>
         </Link>
       ) : null}
 

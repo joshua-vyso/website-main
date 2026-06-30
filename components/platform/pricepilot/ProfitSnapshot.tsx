@@ -200,7 +200,7 @@ function Breakdown({ metric, ...p }: ProfitSnapshotProps & { metric: MetricKey }
             </div>
             {opex == null ? (
               <p className="pt-1 text-[12px] text-[#9A9DA1]">
-                <Link href="/app/pricepilot/targets" className="font-medium text-[#1E5E54] hover:underline">
+                <Link href="/app/marginview/goals" className="font-medium text-[#1E5E54] hover:underline">
                   Set your monthly operating costs
                 </Link>{' '}
                 to see net profit.
