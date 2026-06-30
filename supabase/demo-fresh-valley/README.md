@@ -41,11 +41,10 @@ Supabase dashboard → **Authentication → Users → Add user**
 > Turn 'n Slice setup — they need **no schema step**, just the seed. Their rows
 > are org-scoped to Fresh Valley, so your existing data is untouched.
 
-> One thing to confirm once (ProcurePulse): the `pp_stock_items.stock_history` /
-> `price_history` columns are seeded as Postgres arrays (`array[...]`). If a row
-> errors on those, run `select pg_typeof(price_history) from pp_stock_items limit 1;`
-> — if it returns `jsonb` (not `numeric[]`), change those literals to `'[…]'::jsonb`.
-> The app's read pattern indicates `numeric[]`, so this should just work.
+> ProcurePulse note: `pp_stock_items.stock_history` / `price_history` are `jsonb`
+> columns. The seed builds the series as array literals and wraps them in
+> `to_jsonb(...)` in the SELECT so they cast correctly (a bare `array[...]` →
+> `ERROR: column is of type jsonb but expression is of type integer[]`).
 
 ## What's seeded
 

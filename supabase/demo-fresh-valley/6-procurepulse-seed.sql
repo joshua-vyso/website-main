@@ -35,7 +35,8 @@ insert into pp_stock_items (
 )
 select o.id, v.name, v.category, nullif(v.pack, ''), v.unit, v.on_hand, v.low_threshold,
        v.avg_unit_price, v.kg_per_unit, 'ZAR', v.trend_pct, v.cheapest_supplier,
-       v.stock_history, v.price_history
+       -- stock_history / price_history are jsonb columns; convert the array literals.
+       to_jsonb(v.stock_history), to_jsonb(v.price_history)
 from (select id from organisations where name = 'Fresh Valley Produce' limit 1) o
 cross join (values
   ('Apples-Golden (box)',          'Fruit',                  '12.5kg/box',   'box',        84,  20,  285.0, 12.5,    -3, 'Ceres Fruit Growers',    array[70,76,72,80,78,90,84],     array[292,290,288,288,286,285,285]),
