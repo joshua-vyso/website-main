@@ -4,7 +4,18 @@
  */
 
 export type PricingStatus = 'standard' | 'daily' | 'weekly' | 'monthly';
-export type OrderStatus = 'draft' | 'confirmed' | 'invoiced' | 'paid';
+export type OrderStatus =
+  | 'draft'
+  | 'confirmed'
+  | 'packed'
+  | 'delivered'
+  | 'invoiced'
+  | 'partially_paid'
+  | 'paid'
+  | 'cancelled';
+export type InvoiceStatus = 'draft' | 'sent' | 'viewed' | 'partially_paid' | 'paid' | 'overdue' | 'cancelled';
+export type PaymentStatus = 'unpaid' | 'partial' | 'paid';
+export type CustomerHealth = 'excellent' | 'stable' | 'at_risk' | 'needs_attention';
 
 export interface OfCustomer {
   id: string;
@@ -50,14 +61,69 @@ export const PRICING_STATUS_LABEL: Record<PricingStatus, string> = {
   monthly: 'Monthly prices',
 };
 
-export const ORDER_STATUSES: readonly OrderStatus[] = ['draft', 'confirmed', 'invoiced', 'paid'];
+export const ORDER_STATUSES: readonly OrderStatus[] = [
+  'draft',
+  'confirmed',
+  'packed',
+  'delivered',
+  'invoiced',
+  'partially_paid',
+  'paid',
+  'cancelled',
+];
 
-export const ORDER_STATUS_STYLE: Record<OrderStatus, { bg: string; fg: string; label: string }> = {
+type Style = { bg: string; fg: string; label: string };
+
+export const ORDER_STATUS_STYLE: Record<OrderStatus, Style> = {
   draft: { bg: '#F0F0EC', fg: '#5F6368', label: 'Draft' },
   confirmed: { bg: '#E6F1FB', fg: '#0C447C', label: 'Confirmed' },
+  packed: { bg: '#EDE9FB', fg: '#5B3FA8', label: 'Packed' },
+  delivered: { bg: '#E8F3E8', fg: '#2F6B2F', label: 'Delivered' },
   invoiced: { bg: '#FBEEDA', fg: '#854F0B', label: 'Invoiced' },
+  partially_paid: { bg: '#FBE9D6', fg: '#B45309', label: 'Part-paid' },
+  paid: { bg: '#E1F5EE', fg: '#0F6E56', label: 'Paid' },
+  cancelled: { bg: '#F3E7E7', fg: '#8A4A4A', label: 'Cancelled' },
+};
+
+export const INVOICE_STATUSES: readonly InvoiceStatus[] = [
+  'draft',
+  'sent',
+  'viewed',
+  'partially_paid',
+  'paid',
+  'overdue',
+  'cancelled',
+];
+
+export const INVOICE_STATUS_STYLE: Record<InvoiceStatus, Style> = {
+  draft: { bg: '#F0F0EC', fg: '#5F6368', label: 'Draft' },
+  sent: { bg: '#E6F1FB', fg: '#0C447C', label: 'Sent' },
+  viewed: { bg: '#EDE9FB', fg: '#5B3FA8', label: 'Viewed' },
+  partially_paid: { bg: '#FBE9D6', fg: '#B45309', label: 'Part-paid' },
+  paid: { bg: '#E1F5EE', fg: '#0F6E56', label: 'Paid' },
+  overdue: { bg: '#FCEBEB', fg: '#A32D2D', label: 'Overdue' },
+  cancelled: { bg: '#F3E7E7', fg: '#8A4A4A', label: 'Cancelled' },
+};
+
+export const PAYMENT_STATUS_STYLE: Record<PaymentStatus, Style> = {
+  unpaid: { bg: '#F0F0EC', fg: '#5F6368', label: 'Unpaid' },
+  partial: { bg: '#FBE9D6', fg: '#B45309', label: 'Partial' },
   paid: { bg: '#E1F5EE', fg: '#0F6E56', label: 'Paid' },
 };
+
+export const CUSTOMER_HEALTH_STYLE: Record<CustomerHealth, Style> = {
+  excellent: { bg: '#E1F5EE', fg: '#0F6E56', label: 'Excellent' },
+  stable: { bg: '#E6F1FB', fg: '#0C447C', label: 'Stable' },
+  at_risk: { bg: '#FBEEDA', fg: '#854F0B', label: 'At risk' },
+  needs_attention: { bg: '#FCEBEB', fg: '#A32D2D', label: 'Needs attention' },
+};
+
+/** Payment status implied by an order's status (no payments table yet). */
+export function paymentStatusOf(status: OrderStatus): PaymentStatus {
+  if (status === 'paid') return 'paid';
+  if (status === 'partially_paid') return 'partial';
+  return 'unpaid';
+}
 
 export function lineTotal(i: Pick<OfOrderItem, 'qty' | 'unit_price'>): number {
   return (Number(i.qty) || 0) * (Number(i.unit_price) || 0);
@@ -78,8 +144,14 @@ export function invoiceNumber(seq: number): string {
   return `INV-${String(seq).padStart(4, '0')}`;
 }
 
-/** Rand, plain. */
+/** Rand, plain (no cents) — e.g. "R 8 540". */
 export function zar(n: number | null | undefined): string {
   if (n == null) return '—';
-  return `R ${Math.round(n).toLocaleString('en-ZA')}`;
+  return `R ${Math.round(n).toLocaleString('en-ZA').replace(/,/g, ' ')}`;
+}
+
+/** Rand with cents — for invoice balances. */
+export function zar2(n: number | null | undefined): string {
+  if (n == null) return '—';
+  return `R ${Number(n).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/,/g, ' ')}`;
 }
