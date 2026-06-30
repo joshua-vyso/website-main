@@ -310,6 +310,18 @@ export function customerTag(c: { id: string; name: string }): string {
   return pick(TAGS, `tag-${c.id}`);
 }
 
+const PRODUCE = ['Tomatoes', 'Avocados', 'Blueberries', 'Baby spinach', 'Button mushrooms', 'Fresh basil', 'Lemons', 'Carrots', 'Wild rocket', 'Strawberries', 'Cherry tomatoes', 'Cucumber'];
+
+/** Mock "favourite products" for a customer (deterministic). */
+export function mockFavourites(c: { id: string }): string[] {
+  const out: string[] = [];
+  for (let i = 0; out.length < 3 && i < 8; i++) {
+    const p = PRODUCE[hash(`${c.id}-fav-${i}`) % PRODUCE.length];
+    if (!out.includes(p)) out.push(p);
+  }
+  return out;
+}
+
 export function mockContacts(c: { id: string; name: string; email: string | null; phone: string | null }): CustomerContact[] {
   const domain = `${slug(c.name).slice(0, 14) || 'customer'}.co.za`;
   const purchasing = personName(`pur-${c.id}`);
