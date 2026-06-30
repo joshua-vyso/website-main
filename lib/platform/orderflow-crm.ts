@@ -219,6 +219,25 @@ export function deriveInvoice(order: OrderLite, customerName: string, seq: numbe
   const issuedTs = new Date(order.created_at).getTime();
   const dueTs = issuedTs + terms * DAY;
   const total = order.total;
+
+  // Confirmed / packed / delivered orders are draft invoices — ready to issue.
+  if (order.status !== 'cancelled' && !isInvoiceable(order)) {
+    return {
+      id: order.id,
+      number: order.invoice_number ?? invoiceNumber(seq),
+      orderId: order.id,
+      customerId: order.customer_id,
+      customerName,
+      status: 'draft',
+      issued: new Date(issuedTs).toISOString(),
+      due: new Date(dueTs).toISOString(),
+      total,
+      paid: 0,
+      balance: total,
+      payments: [],
+    };
+  }
+
   const ps = paymentStatusOf(order.status);
 
   let paid = 0;
@@ -405,7 +424,7 @@ export function orderAttention(orders: (OrderLite & { customer_name: string })[]
       const dueTs = new Date(o.created_at).getTime() + terms * DAY;
       if (now > dueTs) {
         const days = Math.floor((now - dueTs) / DAY);
-        out.push({ id: `over-${o.id}`, severity: 'high', text: `${o.customer_name} has an invoice overdue by ${days} day${days === 1 ? '' : 's'}.`, href: `/app/orderflow/invoices/${o.id}` });
+        out.push({ id: `over-${o.id}`, severity: 'high', text: `${o.customer_name} has an invoice overdue by ${days} day${days === 1 ? '' : 's'}.`, href: `/app/orderflow/invoicing` });
       }
     }
   }
