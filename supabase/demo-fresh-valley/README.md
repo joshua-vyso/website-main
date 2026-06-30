@@ -30,8 +30,22 @@ Supabase dashboard → **Authentication → Users → Add user**
    - `3-planwise-seed.sql`
    - `4-supplysync-seed.sql`
    - `5-insightgen-seed.sql`
+   - `6-procurepulse-seed.sql`  ← real module (tables already exist; seed only)
+   - `7-orderflow-seed.sql`     ← real module
+   - `8-pricepilot-seed.sql`    ← real module
+   - `9-docu-seed.sql`          ← real module
 
-> Tip: you can paste all five schema files in one go, then all five seed files.
+> Tip: paste all the schema files in one go, then all the seed files.
+
+> The 4 real modules (6–9) reuse tables that already exist in your DB from the
+> Turn 'n Slice setup — they need **no schema step**, just the seed. Their rows
+> are org-scoped to Fresh Valley, so your existing data is untouched.
+
+> One thing to confirm once (ProcurePulse): the `pp_stock_items.stock_history` /
+> `price_history` columns are seeded as Postgres arrays (`array[...]`). If a row
+> errors on those, run `select pg_typeof(price_history) from pp_stock_items limit 1;`
+> — if it returns `jsonb` (not `numeric[]`), change those literals to `'[…]'::jsonb`.
+> The app's read pattern indicates `numeric[]`, so this should just work.
 
 ## What's seeded
 
@@ -42,6 +56,10 @@ Supabase dashboard → **Authentication → Users → Add user**
 | PlanWise | `pw_budget_lines`, `pw_goals`, `pw_forecast`, `pw_scenarios` | R7M revenue, ~78% COGS, 12-month forecast, what-if scenarios |
 | SupplySync | `ss_suppliers`, `ss_supplier_documents` | 12 fresh-produce suppliers with ratings, risk, compliance docs |
 | InsightGen | `ig_insights`, `ig_reports` | Cross-module AI insights + saved report definitions |
+| ProcurePulse | `pp_stock_items`, `pp_item_suppliers`, `pp_movements` | 30 produce lines with stock levels, low-stock alerts, per-supplier quotes, recent movements |
+| OrderFlow | `of_customers`, `of_orders`, `of_order_items` | 15 wholesale customers, ~30–40 orders across statuses (~R7M/mo) |
+| PricePilot | `pl_targets`, `pl_price_lists`, `pl_overrides` | Produce margin targets + current price list (reads sales from OrderFlow) |
+| Doc-U | `document_folders`, `documents` | Supplier invoices, delivery notes, statements, a WhatsApp order |
 
 ## Note
 

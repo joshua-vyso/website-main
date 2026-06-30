@@ -184,12 +184,14 @@ export function SupplySyncView({ data }: { data: SupplySyncData }) {
         </>
       )}
 
-      <div className="mt-5">
-        <h2 className="mb-2 text-[13px] font-semibold text-[#9A9DA1]">Mobile snapshot — widgets the companion app will surface</h2>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {widgetsFor('supplysync').map((w) => (<ModuleWidgetCard key={w.id} widget={w} onAction={() => toast(`${w.actionLabel} (demo)`)} />))}
+      {!empty ? (
+        <div className="mt-5">
+          <h2 className="mb-2 text-[13px] font-semibold text-[#9A9DA1]">Mobile snapshot — widgets the companion app will surface</h2>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+            {widgetsFor('supplysync').map((w) => (<ModuleWidgetCard key={w.id} widget={w} onAction={() => toast(`${w.actionLabel} (demo)`)} />))}
+          </div>
         </div>
-      </div>
+      ) : null}
     </div>
   );
 }
