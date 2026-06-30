@@ -244,6 +244,81 @@ export function CountUp({ value, format, duration = 700, className }: { value: n
 }
 
 // ---------------------------------------------------------------------------
+// Interactive doughnut — gap-free SVG sector paths, hover-expand + click-select
+// ---------------------------------------------------------------------------
+
+function sectorPath(cx: number, cy: number, rO: number, rI: number, a0: number, a1: number) {
+  const pt = (r: number, a: number) => `${(cx + r * Math.cos(a)).toFixed(2)} ${(cy + r * Math.sin(a)).toFixed(2)}`;
+  const large = a1 - a0 > Math.PI ? 1 : 0;
+  return `M ${pt(rO, a0)} A ${rO} ${rO} 0 ${large} 1 ${pt(rO, a1)} L ${pt(rI, a1)} A ${rI} ${rI} 0 ${large} 0 ${pt(rI, a0)} Z`;
+}
+
+export interface DonutSegment {
+  key: string;
+  value: number;
+  color: string;
+}
+
+export function InteractiveDonut({
+  segments,
+  activeKey,
+  onHover,
+  onSelect,
+  size = 200,
+  thickness = 30,
+  center,
+}: {
+  segments: DonutSegment[];
+  activeKey: string | null;
+  onHover: (key: string | null) => void;
+  onSelect: (key: string) => void;
+  size?: number;
+  thickness?: number;
+  center?: ReactNode;
+}) {
+  const total = segments.reduce((s, x) => s + x.value, 0) || 1;
+  const rOuter = (size - 20) / 2;
+  const rInner = rOuter - thickness;
+  const start = -Math.PI / 2;
+  const tau = Math.PI * 2;
+  const pad = 0.018;
+  let cum = 0;
+  const arcs = segments.map((s) => {
+    const frac = s.value / total;
+    const a = { ...s, offset: cum, frac };
+    cum += frac;
+    return a;
+  });
+  return (
+    <div className="relative shrink-0" style={{ width: size, height: size }}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        <circle cx={size / 2} cy={size / 2} r={(rOuter + rInner) / 2} fill="none" stroke="#F4F4F1" strokeWidth={thickness} />
+        {arcs.map((s) => {
+          const isActive = activeKey === s.key;
+          const dimmed = activeKey != null && !isActive;
+          const a0 = start + s.offset * tau + pad;
+          const a1 = start + (s.offset + s.frac) * tau - pad;
+          return (
+            <path
+              key={s.key}
+              d={sectorPath(size / 2, size / 2, isActive ? rOuter + 6 : rOuter, rInner, a0, a1)}
+              fill={s.color}
+              opacity={dimmed ? 0.32 : 1}
+              className="cursor-pointer"
+              style={{ transition: 'opacity 0.22s ease' }}
+              onMouseEnter={() => onHover(s.key)}
+              onMouseLeave={() => onHover(null)}
+              onClick={() => onSelect(s.key)}
+            />
+          );
+        })}
+      </svg>
+      {center ? <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">{center}</div> : null}
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Mobile-companion widget preview card
 // ---------------------------------------------------------------------------
 
