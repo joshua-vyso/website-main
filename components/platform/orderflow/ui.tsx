@@ -103,7 +103,7 @@ export function Drawer({
   return createPortal(
     // Portals mount on document.body, outside the platform subtree's --radius
     // override, so re-declare it here or rounded-lg/xl collapse to square corners.
-    <div className="fixed inset-0 z-[90]" style={{ ['--radius' as string]: '0.625rem' } as React.CSSProperties}>
+    <div className="fixed inset-0 z-[90]" style={{ fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties}>
       <div className="absolute inset-0 bg-[#1A1C1E]/20 backdrop-blur-[1px]" onClick={onClose} />
       <div
         className="absolute right-0 top-0 flex h-full flex-col bg-white shadow-[0_0_60px_-15px_rgba(26,28,30,0.4)]"
@@ -152,7 +152,7 @@ export function useToast() {
   const node =
     mounted && msg
       ? createPortal(
-          <div className="fixed bottom-6 left-1/2 z-[110] -translate-x-1/2 rounded-xl bg-[#1A1C1E] px-4 py-2.5 text-[13px] font-medium text-white shadow-[0_12px_40px_-12px_rgba(26,28,30,0.5)]" style={{ ['--radius' as string]: '0.625rem' } as React.CSSProperties}>
+          <div className="fixed bottom-6 left-1/2 z-[110] -translate-x-1/2 rounded-xl bg-[#1A1C1E] px-4 py-2.5 text-[13px] font-medium text-white shadow-[0_12px_40px_-12px_rgba(26,28,30,0.5)]" style={{ fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties}>
             {msg}
           </div>,
           document.body,
@@ -212,7 +212,7 @@ export function RowActionsMenu({ actions }: { actions: RowAction[] }) {
             <>
               <div className="fixed inset-0 z-[95]" onClick={() => setOpen(false)} />
               <div
-                style={{ position: 'fixed', top: pos.top, left: pos.left, zIndex: 96, ['--radius' as string]: '0.625rem' } as React.CSSProperties}
+                style={{ position: 'fixed', top: pos.top, left: pos.left, zIndex: 96, fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties}
                 className="w-[184px] overflow-hidden rounded-xl border border-[#E7E7E2] bg-white py-1 shadow-[0_12px_40px_-12px_rgba(26,28,30,0.25)]"
               >
                 {actions.map((a, i) => (

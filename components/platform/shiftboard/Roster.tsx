@@ -7,7 +7,7 @@ import { SectionCard } from '@/components/platform/module-ui';
 import { ROSTER, DAYS, DEPARTMENTS, DEPARTMENT_COLOR, type Shift, type DepartmentName } from '@/lib/platform/shiftboard';
 import { ConflictBadge } from './shared';
 
-const MODAL_RADIUS = { ['--radius' as string]: '0.625rem' } as React.CSSProperties;
+const MODAL_RADIUS = { fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties;
 
 export function Roster() {
   const { node, show } = useToast();

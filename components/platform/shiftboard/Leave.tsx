@@ -7,7 +7,7 @@ import { Kpi, Badge } from '@/components/platform/module-ui';
 import { LEAVE_REQUESTS, LEAVE_TYPE_TONE, type LeaveRequest, type LeaveStatus } from '@/lib/platform/shiftboard';
 import { DeptBadge } from './shared';
 
-const MODAL_RADIUS = { ['--radius' as string]: '0.625rem' } as React.CSSProperties;
+const MODAL_RADIUS = { fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties;
 
 export function LeaveWorkspace() {
   const { node, show } = useToast();

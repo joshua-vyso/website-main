@@ -27,7 +27,7 @@ export interface WasteCategoryDef {
 }
 
 const STORAGE_KEY = 'vyso.wastewatch.categories.v2';
-const RADIUS_STYLE = { ['--radius' as string]: '0.625rem' } as React.CSSProperties;
+const RADIUS_STYLE = { fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties;
 
 function seedDefaults(): WasteCategoryDef[] {
   return WASTE_CATEGORIES.map((name) => ({ id: `builtin:${name}`, name, color: CATEGORY_COLOR[name], custom: false, statKey: name }));

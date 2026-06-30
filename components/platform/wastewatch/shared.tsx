@@ -7,7 +7,7 @@ import { widgetsFor } from '@/lib/platform/module-widgets';
 import { DEVICE_STATUS_STYLE, CATEGORY_COLOR, WASTE_REASONS, type DeviceStatus, type WasteCategory } from '@/lib/platform/wastewatch';
 import { useCategories } from './categories';
 
-const MODAL_RADIUS = { ['--radius' as string]: '0.625rem' } as React.CSSProperties;
+const MODAL_RADIUS = { fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties;
 
 export function DeviceStatusBadge({ status }: { status: DeviceStatus }) {
   const s = DEVICE_STATUS_STYLE[status];
