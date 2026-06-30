@@ -3,7 +3,8 @@
 import { Drawer } from '@/components/platform/orderflow/ui';
 import { ModuleWidgetCard } from '@/components/platform/module-ui';
 import { widgetsFor } from '@/lib/platform/module-widgets';
-import { DEVICE_STATUS_STYLE, CATEGORY_COLOR, WASTE_CATEGORIES, WASTE_REASONS, type DeviceStatus, type WasteCategory } from '@/lib/platform/wastewatch';
+import { DEVICE_STATUS_STYLE, CATEGORY_COLOR, WASTE_REASONS, type DeviceStatus, type WasteCategory } from '@/lib/platform/wastewatch';
+import { useCategories } from './categories';
 
 export function DeviceStatusBadge({ status }: { status: DeviceStatus }) {
   const s = DEVICE_STATUS_STYLE[status];
@@ -56,6 +57,7 @@ export function MobileWidgets({ onAction }: { onAction?: () => void }) {
 }
 
 export function LogWasteDrawer({ open, onClose, onSaved }: { open: boolean; onClose: () => void; onSaved: () => void }) {
+  const { categories } = useCategories();
   const input = 'h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none';
   return (
     <Drawer
@@ -74,7 +76,7 @@ export function LogWasteDrawer({ open, onClose, onSaved }: { open: boolean; onCl
         <input className={input} placeholder="Item (e.g. Strawberries)" />
         <div className="grid grid-cols-2 gap-3">
           <input className={input} placeholder="Quantity" />
-          <select className={input}>{WASTE_CATEGORIES.map((c) => <option key={c}>{c}</option>)}</select>
+          <select className={input}>{categories.map((c) => <option key={c.name}>{c.name}</option>)}</select>
         </div>
         <div className="grid grid-cols-2 gap-3">
           <input className={input} placeholder="Estimated cost (R)" />

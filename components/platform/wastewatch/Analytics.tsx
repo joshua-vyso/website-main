@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { zar } from '@/lib/platform/orderflow';
+import { useToast } from '@/components/platform/orderflow/ui';
 import { SectionCard, InteractiveDonut, ProgressRing } from '@/components/platform/module-ui';
 import { AreaChart, Sparkline } from '@/components/platform/procurepulse/ui';
 import {
@@ -16,14 +17,21 @@ import {
   type TimePeriod,
 } from '@/lib/platform/wastewatch';
 import { TrendArrow } from './shared';
+import { useCategories, CreateCategoryModal } from './categories';
 
 export function WasteAnalytics() {
+  const { node, show } = useToast();
+  const { categories, removeCategory } = useCategories();
   const [hovered, setHovered] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [period, setPeriod] = useState<TimePeriod>('month');
+  const [createOpen, setCreateOpen] = useState(false);
   const activeKey = hovered ?? selected;
   const active = CATEGORY_STATS.find((c) => c.key === activeKey) ?? null;
   const total = CATEGORY_STATS.reduce((s, c) => s + c.cost, 0);
+
+  // Built-in categories carry waste stats; user-created ones have none yet.
+  const statByName = useMemo(() => new Map(CATEGORY_STATS.map((s) => [s.key as string, s])), []);
 
   const maxEmp = Math.max(...EMPLOYEE_STATS.map((e) => e.cost));
   const prevTotal = PREVENTABLE.preventable + PREVENTABLE.unavoidable;
@@ -31,6 +39,7 @@ export function WasteAnalytics() {
 
   return (
     <div className="space-y-5">
+      {node}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h1 className="text-[24px] font-bold leading-tight text-[#1A1C1E]">Analytics</h1>
@@ -42,7 +51,12 @@ export function WasteAnalytics() {
       </div>
 
       {/* Waste by category */}
-      <SectionCard title="Waste by category">
+      <SectionCard
+        title="Waste by category"
+        right={
+          <button type="button" onClick={() => setCreateOpen(true)} className="inline-flex h-8 items-center rounded-lg border border-[#D7DAD8] bg-white px-3 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/40">+ New category</button>
+        }
+      >
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-[auto_1fr]">
           <div className="flex justify-center">
             <InteractiveDonut
@@ -68,17 +82,31 @@ export function WasteAnalytics() {
             />
           </div>
           <div className="flex flex-col justify-center gap-1.5">
-            {CATEGORY_STATS.map((c) => {
-              const isActive = activeKey === c.key;
+            {categories.map((cat) => {
+              const stat = statByName.get(cat.name);
+              if (stat) {
+                const isActive = activeKey === stat.key;
+                return (
+                  <button key={cat.name} type="button" onMouseEnter={() => setHovered(stat.key)} onMouseLeave={() => setHovered(null)} onClick={() => setSelected((s) => (s === stat.key ? null : stat.key))} className={`flex items-center justify-between rounded-lg px-2 py-1.5 text-left transition-colors ${isActive ? 'bg-[#FAFAF8]' : ''}`}>
+                    <span className="flex items-center gap-2 text-[13px] text-[#1A1C1E]"><span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: cat.color }} />{cat.name}</span>
+                    <span className="flex items-center gap-3">
+                      <Sparkline data={stat.trend} color={cat.color} width={56} height={20} />
+                      <span className="w-16 text-right text-[13px] font-medium tabular-nums text-[#1A1C1E]">{zar(stat.cost)}</span>
+                      <span className="w-9 text-right text-[12px] tabular-nums text-[#9A9DA1]">{stat.pct}%</span>
+                    </span>
+                  </button>
+                );
+              }
               return (
-                <button key={c.key} type="button" onMouseEnter={() => setHovered(c.key)} onMouseLeave={() => setHovered(null)} onClick={() => setSelected((s) => (s === c.key ? null : c.key))} className={`flex items-center justify-between rounded-lg px-2 py-1.5 text-left transition-colors ${isActive ? 'bg-[#FAFAF8]' : ''}`}>
-                  <span className="flex items-center gap-2 text-[13px] text-[#1A1C1E]"><span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: c.color }} />{c.key}</span>
-                  <span className="flex items-center gap-3">
-                    <Sparkline data={c.trend} color={c.color} width={56} height={20} />
-                    <span className="w-16 text-right text-[13px] font-medium tabular-nums text-[#1A1C1E]">{zar(c.cost)}</span>
-                    <span className="w-9 text-right text-[12px] tabular-nums text-[#9A9DA1]">{c.pct}%</span>
+                <div key={cat.name} className="group flex items-center justify-between rounded-lg px-2 py-1.5">
+                  <span className="flex items-center gap-2 text-[13px] text-[#1A1C1E]"><span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: cat.color }} />{cat.name}</span>
+                  <span className="flex items-center gap-2">
+                    <span className="text-[12px] text-[#9A9DA1]">No waste logged yet</span>
+                    {cat.custom ? (
+                      <button type="button" onClick={() => { removeCategory(cat.name); show(`Removed “${cat.name}”`); }} aria-label={`Remove ${cat.name}`} className="flex h-5 w-5 items-center justify-center rounded text-[12px] text-[#9A9DA1] opacity-0 transition-opacity hover:text-[#A32D2D] group-hover:opacity-100">✕</button>
+                    ) : null}
                   </span>
-                </button>
+                </div>
               );
             })}
           </div>
@@ -184,6 +212,8 @@ export function WasteAnalytics() {
           </div>
         </SectionCard>
       </div>
+
+      <CreateCategoryModal open={createOpen} onClose={() => setCreateOpen(false)} onCreated={(n) => show(`Category “${n}” created`)} />
     </div>
   );
 }

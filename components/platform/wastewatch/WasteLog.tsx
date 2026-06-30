@@ -4,26 +4,31 @@ import { useEffect, useMemo, useState } from 'react';
 import { zar } from '@/lib/platform/orderflow';
 import { useToast, Drawer } from '@/components/platform/orderflow/ui';
 import { Badge } from '@/components/platform/module-ui';
-import { WASTE_EVENTS, WASTE_CATEGORIES, WASTE_REASONS, type WasteEvent } from '@/lib/platform/wastewatch';
+import { WASTE_EVENTS, WASTE_REASONS, type WasteEvent } from '@/lib/platform/wastewatch';
 import { CategoryBadge, LogWasteDrawer } from './shared';
+import { useCategories } from './categories';
 
 const distinct = (arr: string[]) => Array.from(new Set(arr)).sort();
 
 export function WasteLog({ initialCategory }: { initialCategory?: string }) {
   const { node, show } = useToast();
+  const { categories } = useCategories();
   const [logOpen, setLogOpen] = useState(false);
   const [openId, setOpenId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
-  const [category, setCategory] = useState(initialCategory && (WASTE_CATEGORIES as string[]).includes(initialCategory) ? initialCategory : 'all');
+  const [category, setCategory] = useState(initialCategory || 'all');
   const [employee, setEmployee] = useState('all');
   const [device, setDevice] = useState('all');
   const [recipe, setRecipe] = useState('all');
   const [reason, setReason] = useState('all');
 
   // Keep the category filter in sync with the URL ?category on same-route navigations
-  // (Next.js re-renders this segment with a new prop without remounting).
+  // (Next.js re-renders this segment with a new prop without remounting). Any non-empty
+  // value is accepted — built-in or user-created — so custom-category deep links work too;
+  // an unknown value simply matches no events. This stays consistent with the dropdown,
+  // which is populated from the same category store.
   useEffect(() => {
-    setCategory(initialCategory && (WASTE_CATEGORIES as string[]).includes(initialCategory) ? initialCategory : 'all');
+    setCategory(initialCategory || 'all');
   }, [initialCategory]);
 
   const employees = useMemo(() => distinct(WASTE_EVENTS.map((e) => e.employee)), []);
@@ -59,7 +64,7 @@ export function WasteLog({ initialCategory }: { initialCategory?: string }) {
 
       <div className="flex flex-wrap items-center gap-2">
         <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search item, recipe, employee…" className="h-9 min-w-[220px] flex-1 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] outline-none placeholder:text-[#9A9DA1] focus:border-[#1E5E54]" />
-        <select value={category} onChange={(e) => setCategory(e.target.value)} className={sel}><option value="all">All categories</option>{WASTE_CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}</select>
+        <select value={category} onChange={(e) => setCategory(e.target.value)} className={sel}><option value="all">All categories</option>{categories.map((c) => <option key={c.name} value={c.name}>{c.name}</option>)}</select>
         <select value={employee} onChange={(e) => setEmployee(e.target.value)} className={sel}><option value="all">All employees</option>{employees.map((c) => <option key={c} value={c}>{c}</option>)}</select>
         <select value={device} onChange={(e) => setDevice(e.target.value)} className={sel}><option value="all">All devices</option>{devices.map((c) => <option key={c} value={c}>{c}</option>)}</select>
         <select value={recipe} onChange={(e) => setRecipe(e.target.value)} className={sel}><option value="all">All recipes</option>{recipes.map((c) => <option key={c} value={c}>{c}</option>)}</select>

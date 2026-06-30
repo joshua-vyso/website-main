@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { getPlatformSession } from '@/lib/platform/supabase-server';
 import { SubNav } from '@/components/platform/SubNav';
+import { CategoriesProvider } from '@/components/platform/wastewatch/categories';
 
 const TABS = [
   { label: 'Overview', href: '/app/wastelog' },
@@ -17,7 +18,9 @@ export default async function WasteWatchLayout({ children }: { children: React.R
   return (
     <div className="px-8 py-7">
       <SubNav tabs={TABS} rootHref="/app/wastelog" />
-      <div className="mt-6">{children}</div>
+      <CategoriesProvider>
+        <div className="mt-6">{children}</div>
+      </CategoriesProvider>
     </div>
   );
 }
