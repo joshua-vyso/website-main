@@ -5,7 +5,7 @@ import { zar } from '@/lib/platform/orderflow';
 import { useToast, Drawer } from '@/components/platform/orderflow/ui';
 import { Badge } from '@/components/platform/module-ui';
 import { WASTE_EVENTS, WASTE_REASONS, type WasteEvent } from '@/lib/platform/wastewatch';
-import { CategoryBadge, LogWasteDrawer } from './shared';
+import { CategoryBadge, LogWasteModal } from './shared';
 import { useCategories } from './categories';
 
 const distinct = (arr: string[]) => Array.from(new Set(arr)).sort();
@@ -64,7 +64,7 @@ export function WasteLog({ initialCategory }: { initialCategory?: string }) {
 
       <div className="flex flex-wrap items-center gap-2">
         <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search item, recipe, employee…" className="h-9 min-w-[220px] flex-1 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] outline-none placeholder:text-[#9A9DA1] focus:border-[#1E5E54]" />
-        <select value={category} onChange={(e) => setCategory(e.target.value)} className={sel}><option value="all">All categories</option>{categories.map((c) => <option key={c.name} value={c.name}>{c.name}</option>)}</select>
+        <select value={category} onChange={(e) => setCategory(e.target.value)} className={sel}><option value="all">All categories</option>{categories.map((c) => <option key={c.id} value={c.statKey ?? c.name}>{c.name}</option>)}</select>
         <select value={employee} onChange={(e) => setEmployee(e.target.value)} className={sel}><option value="all">All employees</option>{employees.map((c) => <option key={c} value={c}>{c}</option>)}</select>
         <select value={device} onChange={(e) => setDevice(e.target.value)} className={sel}><option value="all">All devices</option>{devices.map((c) => <option key={c} value={c}>{c}</option>)}</select>
         <select value={recipe} onChange={(e) => setRecipe(e.target.value)} className={sel}><option value="all">All recipes</option>{recipes.map((c) => <option key={c} value={c}>{c}</option>)}</select>
@@ -110,7 +110,7 @@ export function WasteLog({ initialCategory }: { initialCategory?: string }) {
         {open ? <WasteDetail e={open} /> : null}
       </Drawer>
 
-      <LogWasteDrawer open={logOpen} onClose={() => setLogOpen(false)} onSaved={() => show('Waste logged (demo)')} />
+      <LogWasteModal open={logOpen} onClose={() => setLogOpen(false)} onSaved={() => show('Waste logged (demo)')} />
     </div>
   );
 }

@@ -19,10 +19,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         // rounded-sm/md/lg/xl scale and leaves buttons/inputs square. Give the
         // platform subtree a real radius so all corners round consistently.
         style={{ fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties}
-        className="flex min-h-screen bg-[#F6F6F4] text-[#1A1C1E] antialiased"
+        className="flex h-screen overflow-hidden bg-[#F6F6F4] text-[#1A1C1E] antialiased"
       >
         <Sidebar />
-        <main className="min-w-0 flex-1">{children}</main>
+        <main className="min-w-0 flex-1 overflow-y-auto">{children}</main>
       </div>
     </PlatformProvider>
   );

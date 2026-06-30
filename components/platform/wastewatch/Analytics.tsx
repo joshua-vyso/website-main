@@ -17,21 +17,27 @@ import {
   type TimePeriod,
 } from '@/lib/platform/wastewatch';
 import { TrendArrow } from './shared';
-import { useCategories, CreateCategoryModal } from './categories';
+import { useCategories, CategoryModal, type WasteCategoryDef } from './categories';
 
 export function WasteAnalytics() {
   const { node, show } = useToast();
-  const { categories, removeCategory } = useCategories();
+  const { categories, removeCategory, resetCategories } = useCategories();
   const [hovered, setHovered] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [period, setPeriod] = useState<TimePeriod>('month');
-  const [createOpen, setCreateOpen] = useState(false);
+  const [modal, setModal] = useState<{ open: boolean; mode: 'create' | 'edit'; category: WasteCategoryDef | null }>({ open: false, mode: 'create', category: null });
   const activeKey = hovered ?? selected;
-  const active = CATEGORY_STATS.find((c) => c.key === activeKey) ?? null;
-  const total = CATEGORY_STATS.reduce((s, c) => s + c.cost, 0);
 
-  // Built-in categories carry waste stats; user-created ones have none yet.
-  const statByName = useMemo(() => new Map(CATEGORY_STATS.map((s) => [s.key as string, s])), []);
+  // Built-in categories carry demo waste stats (linked by statKey); user-created
+  // ones have none yet. The doughnut + legend are driven entirely by the store so
+  // editing/removing categories stays consistent across the panel.
+  const statByKey = useMemo(() => new Map(CATEGORY_STATS.map((s) => [s.key as string, s])), []);
+  const rows = useMemo(() => categories.map((cat) => ({ cat, stat: cat.statKey ? statByKey.get(cat.statKey) : undefined })), [categories, statByKey]);
+  const visible = useMemo(() => rows.flatMap((r) => (r.stat ? [{ cat: r.cat, stat: r.stat }] : [])), [rows]);
+  const total = visible.reduce((s, r) => s + r.stat.cost, 0);
+  const pctOf = (cost: number) => (total ? Math.round((cost / total) * 100) : 0);
+  const activeRow = visible.find((r) => r.cat.id === activeKey) ?? null;
+  const selectedRow = visible.find((r) => r.cat.id === selected) ?? null;
 
   const maxEmp = Math.max(...EMPLOYEE_STATS.map((e) => e.cost));
   const prevTotal = PREVENTABLE.preventable + PREVENTABLE.unavoidable;
@@ -45,8 +51,8 @@ export function WasteAnalytics() {
           <h1 className="text-[24px] font-bold leading-tight text-[#1A1C1E]">Analytics</h1>
           <p className="mt-0.5 text-[14px] text-[#5F6368]">Patterns by category, employee, recipe and time</p>
         </div>
-        {selected ? (
-          <button type="button" onClick={() => setSelected(null)} className="text-[12px] font-medium text-[#1E5E54] hover:underline">Focus: {selected} · clear</button>
+        {selectedRow ? (
+          <button type="button" onClick={() => setSelected(null)} className="text-[12px] font-medium text-[#1E5E54] hover:underline">Focus: {selectedRow.cat.name} · clear</button>
         ) : null}
       </div>
 
@@ -54,23 +60,26 @@ export function WasteAnalytics() {
       <SectionCard
         title="Waste by category"
         right={
-          <button type="button" onClick={() => setCreateOpen(true)} className="inline-flex h-8 items-center rounded-lg border border-[#D7DAD8] bg-white px-3 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/40">+ New category</button>
+          <div className="flex items-center gap-2">
+            <button type="button" onClick={() => { if (window.confirm('Reset categories to the defaults? This removes your changes.')) { resetCategories(); show('Categories reset to defaults'); } }} className="text-[12px] font-medium text-[#9A9DA1] hover:text-[#5F6368] hover:underline">Reset</button>
+            <button type="button" onClick={() => setModal({ open: true, mode: 'create', category: null })} className="inline-flex h-8 items-center rounded-lg border border-[#D7DAD8] bg-white px-3 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/40">+ New category</button>
+          </div>
         }
       >
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-[auto_1fr]">
           <div className="flex justify-center">
             <InteractiveDonut
-              segments={CATEGORY_STATS.map((c) => ({ key: c.key, value: c.cost, color: c.color }))}
+              segments={visible.map((r) => ({ key: r.cat.id, value: r.stat.cost, color: r.cat.color }))}
               activeKey={activeKey}
               onHover={setHovered}
               onSelect={(k) => setSelected((s) => (s === k ? null : k))}
               size={200}
               center={
-                active ? (
+                activeRow ? (
                   <>
-                    <span className="text-[12px] text-[#9A9DA1]">{active.key}</span>
-                    <span className="text-[22px] font-bold leading-none text-[#1A1C1E]">{zar(active.cost)}</span>
-                    <span className="mt-1 text-[11px] text-[#9A9DA1]">{active.pct}%</span>
+                    <span className="text-[12px] text-[#9A9DA1]">{activeRow.cat.name}</span>
+                    <span className="text-[22px] font-bold leading-none text-[#1A1C1E]">{zar(activeRow.stat.cost)}</span>
+                    <span className="mt-1 text-[11px] text-[#9A9DA1]">{pctOf(activeRow.stat.cost)}%</span>
                   </>
                 ) : (
                   <>
@@ -81,31 +90,32 @@ export function WasteAnalytics() {
               }
             />
           </div>
-          <div className="flex flex-col justify-center gap-1.5">
-            {categories.map((cat) => {
-              const stat = statByName.get(cat.name);
-              if (stat) {
-                const isActive = activeKey === stat.key;
-                return (
-                  <button key={cat.name} type="button" onMouseEnter={() => setHovered(stat.key)} onMouseLeave={() => setHovered(null)} onClick={() => setSelected((s) => (s === stat.key ? null : stat.key))} className={`flex items-center justify-between rounded-lg px-2 py-1.5 text-left transition-colors ${isActive ? 'bg-[#FAFAF8]' : ''}`}>
-                    <span className="flex items-center gap-2 text-[13px] text-[#1A1C1E]"><span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: cat.color }} />{cat.name}</span>
-                    <span className="flex items-center gap-3">
-                      <Sparkline data={stat.trend} color={cat.color} width={56} height={20} />
-                      <span className="w-16 text-right text-[13px] font-medium tabular-nums text-[#1A1C1E]">{zar(stat.cost)}</span>
-                      <span className="w-9 text-right text-[12px] tabular-nums text-[#9A9DA1]">{stat.pct}%</span>
-                    </span>
-                  </button>
-                );
-              }
+          <div className="flex flex-col justify-center gap-0.5">
+            {rows.map(({ cat, stat }) => {
+              const isActive = activeKey === cat.id;
               return (
-                <div key={cat.name} className="group flex items-center justify-between rounded-lg px-2 py-1.5">
-                  <span className="flex items-center gap-2 text-[13px] text-[#1A1C1E]"><span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: cat.color }} />{cat.name}</span>
-                  <span className="flex items-center gap-2">
-                    <span className="text-[12px] text-[#9A9DA1]">No waste logged yet</span>
-                    {cat.custom ? (
-                      <button type="button" onClick={() => { removeCategory(cat.name); show(`Removed “${cat.name}”`); }} aria-label={`Remove ${cat.name}`} className="flex h-5 w-5 items-center justify-center rounded text-[12px] text-[#9A9DA1] opacity-0 transition-opacity hover:text-[#A32D2D] group-hover:opacity-100">✕</button>
-                    ) : null}
-                  </span>
+                <div key={cat.id} className={`group flex items-center gap-1 rounded-lg px-2 py-1.5 transition-colors ${isActive ? 'bg-[#FAFAF8]' : ''}`}>
+                  {stat ? (
+                    <button type="button" onMouseEnter={() => setHovered(cat.id)} onMouseLeave={() => setHovered(null)} onClick={() => setSelected((s) => (s === cat.id ? null : cat.id))} className="flex min-w-0 flex-1 items-center justify-between gap-3 text-left">
+                      <span className="flex items-center gap-2 text-[13px] text-[#1A1C1E]"><span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: cat.color }} />{cat.name}</span>
+                      <span className="flex items-center gap-3">
+                        <Sparkline data={stat.trend} color={cat.color} width={56} height={20} />
+                        <span className="w-16 text-right text-[13px] font-medium tabular-nums text-[#1A1C1E]">{zar(stat.cost)}</span>
+                        <span className="w-9 text-right text-[12px] tabular-nums text-[#9A9DA1]">{pctOf(stat.cost)}%</span>
+                      </span>
+                    </button>
+                  ) : (
+                    <div className="flex min-w-0 flex-1 items-center justify-between gap-3">
+                      <span className="flex items-center gap-2 text-[13px] text-[#1A1C1E]"><span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: cat.color }} />{cat.name}</span>
+                      <span className="text-[12px] text-[#9A9DA1]">No waste logged yet</span>
+                    </div>
+                  )}
+                  <div className="flex shrink-0 items-center opacity-0 transition-opacity group-hover:opacity-100">
+                    <button type="button" onClick={() => setModal({ open: true, mode: 'edit', category: cat })} aria-label={`Edit ${cat.name}`} className="flex h-6 w-6 items-center justify-center rounded text-[#9A9DA1] hover:text-[#1A1C1E]" title="Edit">
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 20h9" /><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" /></svg>
+                    </button>
+                    <button type="button" onClick={() => { removeCategory(cat.id); show(`Removed “${cat.name}”`); }} aria-label={`Remove ${cat.name}`} className="flex h-6 w-6 items-center justify-center rounded text-[12px] text-[#9A9DA1] hover:text-[#A32D2D]" title="Remove">✕</button>
+                  </div>
                 </div>
               );
             })}
@@ -213,7 +223,13 @@ export function WasteAnalytics() {
         </SectionCard>
       </div>
 
-      <CreateCategoryModal open={createOpen} onClose={() => setCreateOpen(false)} onCreated={(n) => show(`Category “${n}” created`)} />
+      <CategoryModal
+        open={modal.open}
+        mode={modal.mode}
+        category={modal.category}
+        onClose={() => setModal((m) => ({ ...m, open: false }))}
+        onSaved={(n) => show(modal.mode === 'edit' ? `Category “${n}” updated` : `Category “${n}” created`)}
+      />
     </div>
   );
 }

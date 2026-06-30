@@ -123,7 +123,7 @@ export function FolderCardMenu({
             className="fixed inset-0 z-[9998] cursor-default"
           />
           <div
-            style={{ position: 'fixed', top: pos.top, left: pos.left }}
+            style={{ position: 'fixed', top: pos.top, left: pos.left, ['--radius' as string]: '0.625rem' } as React.CSSProperties}
             className="z-[9999] w-[208px] rounded-2xl border border-[#E4E4DF] bg-white p-2 shadow-[0_18px_50px_-8px_rgba(26,28,30,0.28)] ring-1 ring-black/[0.04]"
           >
             {mode === 'menu' ? (

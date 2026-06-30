@@ -27,13 +27,13 @@ export function Sidebar() {
   }
 
   return (
-    <aside className="flex w-[248px] shrink-0 flex-col border-r border-[#E7E7E2] bg-[#F6F6F4]">
+    <aside className="flex h-full w-[248px] shrink-0 flex-col border-r border-[#E7E7E2] bg-[#F6F6F4]">
       <div className="px-5 pb-4 pt-6">
         <VysoMark width={104} color="#D9730D" />
         <div className="mt-1 text-[12px] text-[#9A9DA1]">Operations platform</div>
       </div>
 
-      <nav className="flex-1 space-y-1 px-3">
+      <nav className="min-h-0 flex-1 space-y-1 overflow-y-auto px-3">
         {MODULES.map((m) => {
           // Reachable only when active AND entitled. Entitlement is currently
           // forced on for every org in getPlatformSession (testing) — re-gate
