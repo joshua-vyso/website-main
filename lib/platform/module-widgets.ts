@@ -48,9 +48,12 @@ export const MODULE_WIDGETS: Record<VysoModuleKey, ModuleWidget[]> = {
     { id: 'waste-prevent', moduleKey: 'wastewatch', title: 'Preventable waste', value: 'R 1 950', subtitle: 'Avoidable this week', severity: 'warning', actionLabel: 'Log waste' },
   ],
   shiftboard: [
-    { id: 'shift-on', moduleKey: 'shiftboard', title: 'Staff on shift today', value: '9', subtitle: 'of 12 scheduled', severity: 'neutral' },
+    { id: 'shift-working', moduleKey: 'shiftboard', title: 'Staff working now', value: '13', subtitle: 'of 15 rostered', severity: 'neutral' },
     { id: 'shift-open', moduleKey: 'shiftboard', title: 'Open shifts', value: '3', subtitle: 'This week', severity: 'warning', actionLabel: 'Fill shifts' },
-    { id: 'shift-leave', moduleKey: 'shiftboard', title: 'Leave requests', value: '2', subtitle: 'Awaiting approval', severity: 'warning', actionLabel: 'Review' },
+    { id: 'shift-ot', moduleKey: 'shiftboard', title: 'Overtime risk', value: '2', subtitle: 'Over contracted hours', severity: 'warning', actionLabel: 'Review' },
+    { id: 'shift-attendance', moduleKey: 'shiftboard', title: 'Attendance issues', value: '2', subtitle: 'Late or absent today', severity: 'critical', actionLabel: 'View' },
+    { id: 'shift-dispatch', moduleKey: 'shiftboard', title: 'Dispatch short today', value: '−1', subtitle: '2 of 3 this afternoon', severity: 'warning' },
+    { id: 'shift-leave', moduleKey: 'shiftboard', title: 'Leave requests', value: '3', subtitle: 'Awaiting approval', severity: 'warning', actionLabel: 'Review' },
   ],
   supplysync: [
     { id: 'supply-risk', moduleKey: 'supplysync', title: 'Supplier risks', value: '3', subtitle: 'Need attention', severity: 'critical', actionLabel: 'Review' },
