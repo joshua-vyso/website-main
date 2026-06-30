@@ -78,5 +78,9 @@ export const getPlatformSession = cache(async (): Promise<PlatformSession | null
     }
   }
 
+  // TEMPORARY (testing): activate every module for all users, regardless of the
+  // org's org_features rows. Remove this loop to restore per-org gating.
+  for (const k of FEATURE_KEYS) features[k] = true;
+
   return { userId: user.id, email: user.email ?? '', profile: profile ?? null, org, features };
 });

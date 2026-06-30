@@ -55,7 +55,7 @@ export const MODULES: readonly ModuleDefinition[] = [
     label: 'PlanWise',
     description: 'Budgeting & forecasting',
     icon: 'dash',
-    status: 'soon',
+    status: 'active',
     screens: { mobile: '/marginview', desktop: '/app/marginview' },
   },
   {
@@ -63,7 +63,7 @@ export const MODULES: readonly ModuleDefinition[] = [
     label: 'WasteWatch',
     description: 'Wastage & shrinkage',
     icon: 'waste',
-    status: 'soon',
+    status: 'active',
     screens: { mobile: '/wastelog', desktop: '/app/wastelog' },
   },
   {
@@ -71,7 +71,7 @@ export const MODULES: readonly ModuleDefinition[] = [
     label: 'ShiftBoard',
     description: 'Labour & scheduling',
     icon: 'shift',
-    status: 'soon',
+    status: 'active',
     screens: { mobile: '/shiftboard', desktop: '/app/shiftboard' },
   },
   {
@@ -79,7 +79,7 @@ export const MODULES: readonly ModuleDefinition[] = [
     label: 'SupplySync',
     description: 'Supplier management',
     icon: 'supplier',
-    status: 'soon',
+    status: 'active',
     screens: { mobile: '/suppliers', desktop: '/app/suppliers' },
   },
   {
@@ -87,7 +87,7 @@ export const MODULES: readonly ModuleDefinition[] = [
     label: 'InsightGen',
     description: 'Reporting & analytics',
     icon: 'dash',
-    status: 'soon',
+    status: 'active',
     screens: { mobile: '/reportgen', desktop: '/app/reportgen' },
   },
   {
