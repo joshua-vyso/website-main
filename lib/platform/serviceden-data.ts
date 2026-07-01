@@ -13,9 +13,10 @@ import type {
   SdInvoice,
   SdInvoiceItem,
   SdInvoiceStatus,
+  SdSettings,
 } from './serviceden';
 
-export const EMPTY_SERVICEDEN: ServiceDenData = { customers: [], services: [], invoices: [] };
+export const EMPTY_SERVICEDEN: ServiceDenData = { customers: [], services: [], invoices: [], settings: null };
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function num(v: any, d = 0): number {
@@ -25,11 +26,12 @@ function num(v: any, d = 0): number {
 
 export async function getServiceDenData(orgId: string): Promise<ServiceDenData> {
   const sb = await createServerSupabase();
-  const [cus, svc, inv, itm] = await Promise.all([
+  const [cus, svc, inv, itm, set] = await Promise.all([
     sb.from('sd_customers').select('*').eq('org_id', orgId).order('name'),
     sb.from('sd_services').select('*').eq('org_id', orgId).order('sort_order'),
     sb.from('sd_invoices').select('*').eq('org_id', orgId).order('created_at', { ascending: false }),
     sb.from('sd_invoice_items').select('*').eq('org_id', orgId).order('sort_order'),
+    sb.from('sd_settings').select('*').eq('org_id', orgId).maybeSingle(),
   ]);
 
   const customers: SdCustomer[] = ((cus.data as any[]) ?? []).map((r) => ({
@@ -78,5 +80,23 @@ export async function getServiceDenData(orgId: string): Promise<ServiceDenData> 
     items: itemsByInvoice.get(r.id) ?? [],
   }));
 
-  return { customers, services, invoices };
+  const sr = set.data as any;
+  const settings: SdSettings | null = sr
+    ? {
+        businessName: sr.business_name ?? null,
+        businessEmail: sr.business_email ?? null,
+        businessPhone: sr.business_phone ?? null,
+        businessAddress: sr.business_address ?? null,
+        vatNumber: sr.vat_number ?? null,
+        bankName: sr.bank_name ?? null,
+        accountName: sr.account_name ?? null,
+        accountNumber: sr.account_number ?? null,
+        branchCode: sr.branch_code ?? null,
+        swift: sr.swift ?? null,
+        paymentReference: sr.payment_reference ?? null,
+        logoData: sr.logo_data ?? null,
+      }
+    : null;
+
+  return { customers, services, invoices, settings };
 }

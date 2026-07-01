@@ -9,6 +9,7 @@ const TABS = [
   { label: 'Customers', href: '/app/serviceden' },
   { label: 'Services', href: '/app/serviceden/services' },
   { label: 'Invoices', href: '/app/serviceden/invoices' },
+  { label: 'Settings', href: '/app/serviceden/settings' },
 ];
 
 /**

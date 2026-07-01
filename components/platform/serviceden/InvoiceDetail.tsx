@@ -2,20 +2,21 @@
 
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { usePlatform } from '@/lib/platform/session';
 import { createClient } from '@/lib/platform/supabase-browser';
 import { useToast } from '@/components/platform/orderflow/ui';
 import { Badge } from '@/components/platform/module-ui';
 import {
   INVOICE_STATUS_META,
-  SERVICEDEN_ACCOUNT_EMAIL,
+  hasBankDetails,
   invoiceSubtotal,
   invoiceTax,
   invoiceTotal,
   lineAmount,
+  type SdCustomer,
   type SdInvoice,
+  type SdInvoiceStatus,
+  type SdSettings,
 } from '@/lib/platform/serviceden';
-import { useServiceDen } from './context';
 import { zar } from './ui';
 
 // Print CSS: when printing, hide the whole app and show only the invoice sheet,
@@ -25,18 +26,28 @@ const PRINT_CSS = `
 @media print {
   body * { visibility: hidden !important; }
   #sd-invoice-print, #sd-invoice-print * { visibility: visible !important; }
-  #sd-invoice-print { position: absolute; inset: 0; margin: 0; width: 100%; border: none !important; box-shadow: none !important; }
+  /* top/left only (no inset/bottom) so the sheet keeps its natural height and
+     paginates across pages — inset:0 pins the height and truncates long invoices. */
+  #sd-invoice-print { position: absolute; top: 0; left: 0; width: 100%; margin: 0; border: none !important; box-shadow: none !important; }
   @page { margin: 16mm; }
 }
 `;
 
-export function InvoiceDetail({ invoiceId }: { invoiceId: string }) {
-  const { invoices, customerById } = useServiceDen();
-  const { org } = usePlatform();
+export function InvoiceDetail({
+  invoice,
+  customer,
+  settings,
+  orgName,
+  orgLocation,
+}: {
+  invoice: SdInvoice | null;
+  customer: SdCustomer | null;
+  settings: SdSettings | null;
+  orgName: string | null;
+  orgLocation: string | null;
+}) {
   const router = useRouter();
   const { node, show } = useToast();
-
-  const invoice = invoices.find((i) => i.id === invoiceId);
 
   if (!invoice) {
     return (
@@ -48,17 +59,23 @@ export function InvoiceDetail({ invoiceId }: { invoiceId: string }) {
     );
   }
 
-  const customer = customerById(invoice.customerId);
   const meta = INVOICE_STATUS_META[invoice.status];
   const sub = invoiceSubtotal(invoice.items);
   const vat = invoiceTax(sub, invoice.taxRate);
   const total = invoiceTotal(invoice.items, invoice.taxRate);
 
-  async function setStatus(status: SdInvoice['status']) {
+  const sellerName = settings?.businessName || orgName || 'Your business';
+  // Only show a contact email if the business set one — never fall back to the
+  // internal gate account (that would print joshua@vyso.co.za on client PDFs).
+  const sellerEmail = settings?.businessEmail || null;
+  const showBank = hasBankDetails(settings);
+
+  async function setStatus(status: SdInvoiceStatus) {
+    if (!invoice) return;
     const supabase = createClient();
     if (!supabase) return;
     show(status === 'sent' ? 'Marked as sent' : status === 'paid' ? 'Marked as paid' : 'Moved to draft');
-    const { error } = await supabase.from('sd_invoices').update({ status }).eq('id', invoice!.id);
+    const { error } = await supabase.from('sd_invoices').update({ status }).eq('id', invoice.id);
     if (error) { show(`Couldn't update: ${error.message}`); return; }
     router.refresh();
   }
@@ -90,13 +107,19 @@ export function InvoiceDetail({ invoiceId }: { invoiceId: string }) {
       <div id="sd-invoice-print" className="mx-auto max-w-[820px] rounded-2xl border border-[#E7E7E2] bg-white p-8 sm:p-10">
         <div className="flex flex-wrap items-start justify-between gap-6">
           <div>
+            {settings?.logoData ? (
+              /* eslint-disable-next-line @next/next/no-img-element */
+              <img src={settings.logoData} alt={`${sellerName} logo`} className="mb-4 max-h-[64px] max-w-[220px] object-contain" />
+            ) : null}
             <div className="text-[26px] font-bold tracking-tight text-[#1A1C1E]">Invoice</div>
             <div className="mt-1 text-[14px] font-medium text-[#5B53C0]">{invoice.invoiceNumber}</div>
           </div>
-          <div className="text-right">
-            <div className="text-[16px] font-semibold text-[#1A1C1E]">{org?.name ?? 'Your business'}</div>
-            <div className="mt-0.5 text-[13px] text-[#5F6368]">{SERVICEDEN_ACCOUNT_EMAIL}</div>
-            {org?.location ? <div className="text-[13px] text-[#5F6368]">{org.location}</div> : null}
+          <div className="text-right text-[13px] text-[#5F6368]">
+            <div className="text-[16px] font-semibold text-[#1A1C1E]">{sellerName}</div>
+            {sellerEmail ? <div className="mt-0.5">{sellerEmail}</div> : null}
+            {settings?.businessPhone ? <div>{settings.businessPhone}</div> : null}
+            {settings?.businessAddress ? <div className="whitespace-pre-line">{settings.businessAddress}</div> : orgLocation ? <div>{orgLocation}</div> : null}
+            {settings?.vatNumber ? <div className="mt-0.5">VAT: {settings.vatNumber}</div> : null}
           </div>
         </div>
 
@@ -148,10 +171,28 @@ export function InvoiceDetail({ invoiceId }: { invoiceId: string }) {
           </div>
         </div>
 
-        {invoice.notes ? (
-          <div className="mt-8 border-t border-[#F0F0EC] pt-4">
-            <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">Notes</div>
-            <p className="mt-1 whitespace-pre-line text-[13px] text-[#5F6368]">{invoice.notes}</p>
+        {/* Payment details + notes */}
+        {showBank || invoice.notes ? (
+          <div className="mt-8 grid grid-cols-1 gap-6 border-t border-[#F0F0EC] pt-5 sm:grid-cols-2">
+            {showBank ? (
+              <div>
+                <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">Payment details</div>
+                <div className="mt-1.5 space-y-0.5 text-[13px] text-[#1A1C1E]">
+                  {settings?.bankName ? <div><span className="text-[#9A9DA1]">Bank:</span> {settings.bankName}</div> : null}
+                  {settings?.accountName ? <div><span className="text-[#9A9DA1]">Account name:</span> {settings.accountName}</div> : null}
+                  {settings?.accountNumber ? <div><span className="text-[#9A9DA1]">Account no:</span> <span className="tabular-nums">{settings.accountNumber}</span></div> : null}
+                  {settings?.branchCode ? <div><span className="text-[#9A9DA1]">Branch code:</span> <span className="tabular-nums">{settings.branchCode}</span></div> : null}
+                  {settings?.swift ? <div><span className="text-[#9A9DA1]">SWIFT:</span> {settings.swift}</div> : null}
+                  {settings?.paymentReference ? <div className="mt-1 text-[#5F6368]">{settings.paymentReference}</div> : null}
+                </div>
+              </div>
+            ) : null}
+            {invoice.notes ? (
+              <div>
+                <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">Notes</div>
+                <p className="mt-1.5 whitespace-pre-line text-[13px] text-[#5F6368]">{invoice.notes}</p>
+              </div>
+            ) : null}
           </div>
         ) : null}
 

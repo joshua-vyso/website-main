@@ -69,10 +69,47 @@ export interface SdInvoice {
   items: SdInvoiceItem[];
 }
 
+export interface SdSettings {
+  businessName: string | null;
+  businessEmail: string | null;
+  businessPhone: string | null;
+  businessAddress: string | null;
+  vatNumber: string | null;
+  bankName: string | null;
+  accountName: string | null;
+  accountNumber: string | null;
+  branchCode: string | null;
+  swift: string | null;
+  paymentReference: string | null;
+  /** Logo as a base64 data URL (data:image/...;base64,...). */
+  logoData: string | null;
+}
+
+export const EMPTY_SD_SETTINGS: SdSettings = {
+  businessName: null,
+  businessEmail: null,
+  businessPhone: null,
+  businessAddress: null,
+  vatNumber: null,
+  bankName: null,
+  accountName: null,
+  accountNumber: null,
+  branchCode: null,
+  swift: null,
+  paymentReference: null,
+  logoData: null,
+};
+
+/** True when any banking field is filled in (controls the invoice "pay to" block). */
+export function hasBankDetails(s: SdSettings | null | undefined): boolean {
+  return !!(s && (s.bankName || s.accountName || s.accountNumber || s.branchCode || s.swift || s.paymentReference));
+}
+
 export interface ServiceDenData {
   customers: SdCustomer[];
   services: SdService[];
   invoices: SdInvoice[];
+  settings: SdSettings | null;
 }
 
 // ---------------------------------------------------------------------------

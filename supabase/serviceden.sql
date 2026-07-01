@@ -93,3 +93,33 @@ create policy sd_invoices_all on sd_invoices for all
 create policy sd_invoice_items_all on sd_invoice_items for all
   using (org_id = (select p.org_id from profiles p where p.id = auth.uid()))
   with check (org_id = (select p.org_id from profiles p where p.id = auth.uid()));
+
+-- ---------------------------------------------------------------------------
+-- Business settings (one row per org): the "from" details + banking info shown
+-- on invoices, and a logo (stored as a base64 data URL so it renders straight
+-- into the invoice / PDF with no storage bucket or signed-URL plumbing).
+-- Re-run this file to add the table if you created the others earlier.
+-- ---------------------------------------------------------------------------
+create table if not exists sd_settings (
+  id uuid primary key default gen_random_uuid(),
+  org_id uuid not null unique references organisations(id) on delete cascade,
+  business_name text,
+  business_email text,
+  business_phone text,
+  business_address text,
+  vat_number text,
+  bank_name text,
+  account_name text,
+  account_number text,
+  branch_code text,
+  swift text,
+  payment_reference text,
+  logo_data text,
+  updated_at timestamptz not null default now()
+);
+
+alter table sd_settings enable row level security;
+drop policy if exists sd_settings_all on sd_settings;
+create policy sd_settings_all on sd_settings for all
+  using (org_id = (select p.org_id from profiles p where p.id = auth.uid()))
+  with check (org_id = (select p.org_id from profiles p where p.id = auth.uid()));

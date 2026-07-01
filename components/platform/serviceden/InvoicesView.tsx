@@ -107,7 +107,7 @@ export function InvoicesView() {
       )}
 
       {building ? (
-        <InvoiceBuilder show={show} onClose={() => setBuilding(false)} onCreated={(id) => { setBuilding(false); router.push(`/app/serviceden/invoices/${id}`); }} />
+        <InvoiceBuilder show={show} onClose={() => setBuilding(false)} onCreated={(id) => { setBuilding(false); router.refresh(); router.push(`/app/serviceden/invoices/${id}`); }} />
       ) : null}
     </div>
   );
