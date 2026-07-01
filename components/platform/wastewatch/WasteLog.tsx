@@ -4,15 +4,17 @@ import { useEffect, useMemo, useState } from 'react';
 import { zar } from '@/lib/platform/orderflow';
 import { useToast, Drawer } from '@/components/platform/orderflow/ui';
 import { Badge } from '@/components/platform/module-ui';
-import { WASTE_EVENTS, WASTE_REASONS, type WasteEvent } from '@/lib/platform/wastewatch';
+import { WASTE_REASONS, type WasteEvent } from '@/lib/platform/wastewatch';
 import { CategoryBadge, LogWasteModal } from './shared';
-import { useCategories } from './categories';
+import { useWasteWatch } from './categories';
 
 const distinct = (arr: string[]) => Array.from(new Set(arr)).sort();
 
 export function WasteLog({ initialCategory }: { initialCategory?: string }) {
   const { node, show } = useToast();
-  const { categories } = useCategories();
+  const ww = useWasteWatch();
+  const categories = ww.categories;
+  const events = ww.events;
   const [logOpen, setLogOpen] = useState(false);
   const [openId, setOpenId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -31,13 +33,13 @@ export function WasteLog({ initialCategory }: { initialCategory?: string }) {
     setCategory(initialCategory || 'all');
   }, [initialCategory]);
 
-  const employees = useMemo(() => distinct(WASTE_EVENTS.map((e) => e.employee)), []);
-  const devices = useMemo(() => distinct(WASTE_EVENTS.map((e) => e.device)), []);
-  const recipes = useMemo(() => distinct(WASTE_EVENTS.map((e) => e.recipe).filter((r): r is string => !!r)), []);
+  const employees = useMemo(() => distinct(events.map((e) => e.employee)), [events]);
+  const devices = useMemo(() => distinct(events.map((e) => e.device)), [events]);
+  const recipes = useMemo(() => distinct(events.map((e) => e.recipe).filter((r): r is string => !!r)), [events]);
 
   const filtered = useMemo(() => {
     const q = search.trim().toLowerCase();
-    return WASTE_EVENTS.filter((e) => {
+    return events.filter((e) => {
       if (category !== 'all' && e.category !== category) return false;
       if (employee !== 'all' && e.employee !== employee) return false;
       if (device !== 'all' && e.device !== device) return false;
@@ -46,9 +48,9 @@ export function WasteLog({ initialCategory }: { initialCategory?: string }) {
       if (q && !`${e.item} ${e.category} ${e.reason} ${e.employee} ${e.device} ${e.recipe ?? ''}`.toLowerCase().includes(q)) return false;
       return true;
     });
-  }, [search, category, employee, device, recipe, reason]);
+  }, [events, search, category, employee, device, recipe, reason]);
 
-  const open = openId ? WASTE_EVENTS.find((e) => e.id === openId) ?? null : null;
+  const open = openId ? events.find((e) => e.id === openId) ?? null : null;
   const sel = 'h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#1E5E54]';
 
   return (
@@ -64,7 +66,7 @@ export function WasteLog({ initialCategory }: { initialCategory?: string }) {
 
       <div className="flex flex-wrap items-center gap-2">
         <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search item, recipe, employee…" className="h-9 min-w-[220px] flex-1 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] outline-none placeholder:text-[#9A9DA1] focus:border-[#1E5E54]" />
-        <select value={category} onChange={(e) => setCategory(e.target.value)} className={sel}><option value="all">All categories</option>{categories.map((c) => <option key={c.id} value={c.statKey ?? c.name}>{c.name}</option>)}</select>
+        <select value={category} onChange={(e) => setCategory(e.target.value)} className={sel}><option value="all">All categories</option>{categories.map((c) => <option key={c.id} value={c.name}>{c.name}</option>)}</select>
         <select value={employee} onChange={(e) => setEmployee(e.target.value)} className={sel}><option value="all">All employees</option>{employees.map((c) => <option key={c} value={c}>{c}</option>)}</select>
         <select value={device} onChange={(e) => setDevice(e.target.value)} className={sel}><option value="all">All devices</option>{devices.map((c) => <option key={c} value={c}>{c}</option>)}</select>
         <select value={recipe} onChange={(e) => setRecipe(e.target.value)} className={sel}><option value="all">All recipes</option>{recipes.map((c) => <option key={c} value={c}>{c}</option>)}</select>

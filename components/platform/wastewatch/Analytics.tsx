@@ -5,43 +5,33 @@ import { zar } from '@/lib/platform/orderflow';
 import { useToast } from '@/components/platform/orderflow/ui';
 import { SectionCard, InteractiveDonut, ProgressRing } from '@/components/platform/module-ui';
 import { AreaChart, Sparkline } from '@/components/platform/procurepulse/ui';
-import {
-  CATEGORY_STATS,
-  EMPLOYEE_STATS,
-  RECIPE_STATS,
-  HEATMAP,
-  HEATMAP_DAYS,
-  COST_TIMELINE,
-  TIME_PERIODS,
-  PREVENTABLE,
-  type TimePeriod,
-} from '@/lib/platform/wastewatch';
+import { HEATMAP, HEATMAP_DAYS, COST_TIMELINE, TIME_PERIODS, type TimePeriod, type WasteCategoryRow } from '@/lib/platform/wastewatch';
 import { TrendArrow } from './shared';
-import { useCategories, CategoryModal, type WasteCategoryDef } from './categories';
+import { useWasteWatch, CategoryModal } from './categories';
 
 export function WasteAnalytics() {
   const { node, show } = useToast();
-  const { categories, removeCategory, resetCategories } = useCategories();
+  const ww = useWasteWatch();
+  const { categories, removeCategory } = ww;
   const [hovered, setHovered] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [period, setPeriod] = useState<TimePeriod>('month');
-  const [modal, setModal] = useState<{ open: boolean; mode: 'create' | 'edit'; category: WasteCategoryDef | null }>({ open: false, mode: 'create', category: null });
+  const [modal, setModal] = useState<{ open: boolean; mode: 'create' | 'edit'; category: WasteCategoryRow | null }>({ open: false, mode: 'create', category: null });
   const activeKey = hovered ?? selected;
 
-  // Built-in categories carry demo waste stats (linked by statKey); user-created
-  // ones have none yet. The doughnut + legend are driven entirely by the store so
-  // editing/removing categories stays consistent across the panel.
-  const statByKey = useMemo(() => new Map(CATEGORY_STATS.map((s) => [s.key as string, s])), []);
-  const rows = useMemo(() => categories.map((cat) => ({ cat, stat: cat.statKey ? statByKey.get(cat.statKey) : undefined })), [categories, statByKey]);
-  const visible = useMemo(() => rows.flatMap((r) => (r.stat ? [{ cat: r.cat, stat: r.stat }] : [])), [rows]);
-  const total = visible.reduce((s, r) => s + r.stat.cost, 0);
+  // Categories carry their own stats (ww_waste_categories). The doughnut shows
+  // those with recorded waste; the legend lists all (0-cost → "no waste yet").
+  const visible = useMemo(() => categories.filter((c) => c.cost > 0), [categories]);
+  const total = visible.reduce((s, c) => s + c.cost, 0);
   const pctOf = (cost: number) => (total ? Math.round((cost / total) * 100) : 0);
-  const activeRow = visible.find((r) => r.cat.id === activeKey) ?? null;
-  const selectedRow = visible.find((r) => r.cat.id === selected) ?? null;
+  const activeCat = categories.find((c) => c.id === activeKey && c.cost > 0) ?? null;
+  const selectedCat = categories.find((c) => c.id === selected && c.cost > 0) ?? null;
 
-  const maxEmp = Math.max(...EMPLOYEE_STATS.map((e) => e.cost));
-  const prevTotal = PREVENTABLE.preventable + PREVENTABLE.unavoidable;
-  const prevPct = Math.round((PREVENTABLE.preventable / prevTotal) * 100);
+  const emp = ww.employeeStats;
+  const recipes = ww.recipeStats;
+  const maxEmp = Math.max(1, ...emp.map((e) => e.cost));
+  const prevTotal = ww.preventable.preventable + ww.preventable.unavoidable;
+  const prevPct = prevTotal ? Math.round((ww.preventable.preventable / prevTotal) * 100) : 0;
 
   return (
     <div className="space-y-5">
@@ -51,8 +41,8 @@ export function WasteAnalytics() {
           <h1 className="text-[24px] font-bold leading-tight text-[#1A1C1E]">Analytics</h1>
           <p className="mt-0.5 text-[14px] text-[#5F6368]">Patterns by category, employee, recipe and time</p>
         </div>
-        {selectedRow ? (
-          <button type="button" onClick={() => setSelected(null)} className="text-[12px] font-medium text-[#1E5E54] hover:underline">Focus: {selectedRow.cat.name} · clear</button>
+        {selectedCat ? (
+          <button type="button" onClick={() => setSelected(null)} className="text-[12px] font-medium text-[#1E5E54] hover:underline">Focus: {selectedCat.name} · clear</button>
         ) : null}
       </div>
 
@@ -60,26 +50,23 @@ export function WasteAnalytics() {
       <SectionCard
         title="Waste by category"
         right={
-          <div className="flex items-center gap-2">
-            <button type="button" onClick={() => { if (window.confirm('Reset categories to the defaults? This removes your changes.')) { resetCategories(); show('Categories reset to defaults'); } }} className="text-[12px] font-medium text-[#9A9DA1] hover:text-[#5F6368] hover:underline">Reset</button>
-            <button type="button" onClick={() => setModal({ open: true, mode: 'create', category: null })} className="inline-flex h-8 items-center rounded-lg border border-[#D7DAD8] bg-white px-3 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/40">+ New category</button>
-          </div>
+          <button type="button" onClick={() => setModal({ open: true, mode: 'create', category: null })} className="inline-flex h-8 items-center rounded-lg border border-[#D7DAD8] bg-white px-3 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/40">+ New category</button>
         }
       >
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-[auto_1fr]">
           <div className="flex justify-center">
             <InteractiveDonut
-              segments={visible.map((r) => ({ key: r.cat.id, value: r.stat.cost, color: r.cat.color }))}
+              segments={visible.map((c) => ({ key: c.id, value: c.cost, color: c.color }))}
               activeKey={activeKey}
               onHover={setHovered}
               onSelect={(k) => setSelected((s) => (s === k ? null : k))}
               size={200}
               center={
-                activeRow ? (
+                activeCat ? (
                   <>
-                    <span className="text-[12px] text-[#9A9DA1]">{activeRow.cat.name}</span>
-                    <span className="text-[22px] font-bold leading-none text-[#1A1C1E]">{zar(activeRow.stat.cost)}</span>
-                    <span className="mt-1 text-[11px] text-[#9A9DA1]">{pctOf(activeRow.stat.cost)}%</span>
+                    <span className="text-[12px] text-[#9A9DA1]">{activeCat.name}</span>
+                    <span className="text-[22px] font-bold leading-none text-[#1A1C1E]">{zar(activeCat.cost)}</span>
+                    <span className="mt-1 text-[11px] text-[#9A9DA1]">{pctOf(activeCat.cost)}%</span>
                   </>
                 ) : (
                   <>
@@ -91,17 +78,18 @@ export function WasteAnalytics() {
             />
           </div>
           <div className="flex flex-col justify-center gap-0.5">
-            {rows.map(({ cat, stat }) => {
+            {categories.map((cat) => {
               const isActive = activeKey === cat.id;
+              const has = cat.cost > 0;
               return (
                 <div key={cat.id} className={`group flex items-center gap-1 rounded-lg px-2 py-1.5 transition-colors ${isActive ? 'bg-[#FAFAF8]' : ''}`}>
-                  {stat ? (
+                  {has ? (
                     <button type="button" onMouseEnter={() => setHovered(cat.id)} onMouseLeave={() => setHovered(null)} onClick={() => setSelected((s) => (s === cat.id ? null : cat.id))} className="flex min-w-0 flex-1 items-center justify-between gap-3 text-left">
                       <span className="flex items-center gap-2 text-[13px] text-[#1A1C1E]"><span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: cat.color }} />{cat.name}</span>
                       <span className="flex items-center gap-3">
-                        <Sparkline data={stat.trend} color={cat.color} width={56} height={20} />
-                        <span className="w-16 text-right text-[13px] font-medium tabular-nums text-[#1A1C1E]">{zar(stat.cost)}</span>
-                        <span className="w-9 text-right text-[12px] tabular-nums text-[#9A9DA1]">{pctOf(stat.cost)}%</span>
+                        <Sparkline data={cat.trend} color={cat.color} width={56} height={20} />
+                        <span className="w-16 text-right text-[13px] font-medium tabular-nums text-[#1A1C1E]">{zar(cat.cost)}</span>
+                        <span className="w-9 text-right text-[12px] tabular-nums text-[#9A9DA1]">{pctOf(cat.cost)}%</span>
                       </span>
                     </button>
                   ) : (
@@ -127,7 +115,7 @@ export function WasteAnalytics() {
         {/* Leaderboard */}
         <SectionCard title="Waste by employee" right={<span className="text-[12px] text-[#9A9DA1]">highest → lowest</span>}>
           <div className="flex flex-col gap-3">
-            {EMPLOYEE_STATS.map((e, i) => (
+            {emp.map((e, i) => (
               <div key={e.name} className="flex items-center gap-3">
                 <span className="w-5 text-[12px] font-semibold text-[#9A9DA1]">{i + 1}</span>
                 <div className="min-w-0 flex-1">
@@ -157,7 +145,7 @@ export function WasteAnalytics() {
               </tr>
             </thead>
             <tbody>
-              {RECIPE_STATS.map((r) => (
+              {recipes.map((r) => (
                 <tr key={r.recipe} className="border-b border-[#F6F6F2] last:border-0">
                   <td className="py-2.5 pr-2 font-medium text-[#1A1C1E]">{r.recipe}</td>
                   <td className="px-2 py-2.5 text-right tabular-nums font-medium" style={{ color: r.wastePct >= 18 ? '#A32D2D' : r.wastePct >= 12 ? '#854F0B' : '#0F6E56' }}>{r.wastePct}%</td>
@@ -215,8 +203,8 @@ export function WasteAnalytics() {
               <span className="text-[10px] text-[#9A9DA1]">preventable</span>
             </ProgressRing>
             <div className="flex-1 space-y-3">
-              <Bar label="Preventable" value={PREVENTABLE.preventable} total={prevTotal} color="#854F0B" />
-              <Bar label="Unavoidable" value={PREVENTABLE.unavoidable} total={prevTotal} color="#9A9DA1" />
+              <Bar label="Preventable" value={ww.preventable.preventable} total={prevTotal} color="#854F0B" />
+              <Bar label="Unavoidable" value={ww.preventable.unavoidable} total={prevTotal} color="#9A9DA1" />
               <p className="text-[12px] text-[#9A9DA1]">Nearly half of this week&rsquo;s waste cost is avoidable with tighter prep and ordering.</p>
             </div>
           </div>

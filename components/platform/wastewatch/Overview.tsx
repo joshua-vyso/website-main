@@ -8,26 +8,23 @@ import { useToast } from '@/components/platform/orderflow/ui';
 import { ModuleHeader, PrimaryAction, KpiStrip, Kpi, SectionCard, CountUp } from '@/components/platform/module-ui';
 import { AreaChart } from '@/components/platform/procurepulse/ui';
 import { MODULE_META } from '@/lib/platform/module-meta';
-import { CATEGORY_STATS, COST_TIMELINE, TIME_PERIODS, INSIGHTS, WASTE_EVENTS, type TimePeriod } from '@/lib/platform/wastewatch';
+import { COST_TIMELINE, TIME_PERIODS, INSIGHTS, type TimePeriod } from '@/lib/platform/wastewatch';
 import { LogWasteModal, MobileWidgets } from './shared';
-import { useCategories } from './categories';
+import { useWasteWatch } from './categories';
 
 const M = MODULE_META.wastewatch;
 
 export function WasteOverview() {
   const router = useRouter();
   const { node, show } = useToast();
-  const { categories } = useCategories();
+  const ww = useWasteWatch();
   const [logOpen, setLogOpen] = useState(false);
   const [period, setPeriod] = useState<TimePeriod>('week');
 
-  // Mirror the editable category set: only categories still in the store (with
-  // demo stats) contribute to the dashboard, so removing one in Analytics is
-  // reflected here too. Drill-downs link by the stat's original key so they
-  // match the historical waste events even if the category was renamed.
-  const statByKey = useMemo(() => new Map(CATEGORY_STATS.map((s) => [s.key as string, s])), []);
-  const visible = useMemo(() => categories.flatMap((cat) => { const stat = cat.statKey ? statByKey.get(cat.statKey) : undefined; return stat ? [{ cat, stat }] : []; }), [categories, statByKey]);
-  const totalCost = visible.reduce((s, r) => s + r.stat.cost, 0);
+  const categories = ww.categories;
+  // Categories with recorded waste, biggest first — the "top waste sources".
+  const visible = useMemo(() => [...categories].filter((c) => c.cost > 0).sort((a, b) => b.cost - a.cost), [categories]);
+  const totalCost = categories.reduce((s, c) => s + c.cost, 0);
   const top = visible[0] ?? null;
   const pctOf = (cost: number) => (totalCost ? Math.round((cost / totalCost) * 100) : 0);
 
@@ -38,10 +35,10 @@ export function WasteOverview() {
 
       <KpiStrip>
         <Kpi label="Waste cost" value={zar(totalCost)} accent="#A32D2D" sub="this week" />
-        <Kpi label="Preventable" value={zar(4760)} accent="#854F0B" sub="avoidable" />
+        <Kpi label="Preventable" value={zar(ww.preventable.preventable)} accent="#854F0B" sub="avoidable" />
         <Kpi label="Waste %" value="3.4%" sub="of food cost" />
-        <Kpi label="Top category" value={top ? top.cat.name : '—'} sub={top ? `${pctOf(top.stat.cost)}% of waste` : 'no categories'} />
-        <Kpi label="Waste events" value={String(WASTE_EVENTS.length)} sub="logged" />
+        <Kpi label="Top category" value={top ? top.name : '—'} sub={top ? `${pctOf(top.cost)}% of waste` : 'no categories'} />
+        <Kpi label="Waste events" value={String(ww.events.length)} sub="logged" />
       </KpiStrip>
 
       {/* Cost timeline */}
@@ -63,19 +60,19 @@ export function WasteOverview() {
       <div>
         <h2 className="mb-2 text-[15px] font-semibold text-[#1A1C1E]">Top waste sources</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          {visible.map(({ cat, stat }) => (
+          {visible.map((cat) => (
             <button
               key={cat.id}
               type="button"
-              onClick={() => router.push(`/app/wastelog/log?category=${encodeURIComponent(stat.key)}`)}
+              onClick={() => router.push(`/app/wastelog/log?category=${encodeURIComponent(cat.name)}`)}
               className="rounded-2xl border border-[#E7E7E2] bg-white p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-sm"
             >
               <div className="flex items-center gap-1.5">
                 <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: cat.color }} />
                 <span className="text-[12px] font-medium text-[#1A1C1E]">{cat.name}</span>
               </div>
-              <CountUp value={stat.cost} format={(n) => zar(n)} className="mt-2 block text-[18px] font-bold leading-none text-[#1A1C1E]" />
-              <div className="mt-1 text-[12px] text-[#9A9DA1]">{pctOf(stat.cost)}% of waste</div>
+              <CountUp value={cat.cost} format={(n) => zar(n)} className="mt-2 block text-[18px] font-bold leading-none text-[#1A1C1E]" />
+              <div className="mt-1 text-[12px] text-[#9A9DA1]">{pctOf(cat.cost)}% of waste</div>
             </button>
           ))}
         </div>

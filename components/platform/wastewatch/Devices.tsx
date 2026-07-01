@@ -5,21 +5,23 @@ import Link from 'next/link';
 import { useToast, Drawer } from '@/components/platform/orderflow/ui';
 import { Kpi } from '@/components/platform/module-ui';
 import { MODULE_META } from '@/lib/platform/module-meta';
-import { DEVICES, DEVICE_TYPES, type Device, type DeviceHistoryEvent } from '@/lib/platform/wastewatch';
+import { DEVICE_TYPES, type Device, type DeviceHistoryEvent } from '@/lib/platform/wastewatch';
 import { DeviceStatusBadge, BatteryPill } from './shared';
+import { useWasteWatch } from './categories';
 
 export function WasteDevices() {
   const { node, show } = useToast();
+  const { devices } = useWasteWatch();
   const [openId, setOpenId] = useState<string | null>(null);
   const [addOpen, setAddOpen] = useState(false);
 
-  const online = DEVICES.filter((d) => d.status === 'online').length;
-  const offline = DEVICES.filter((d) => d.status === 'offline').length;
-  const needsCal = DEVICES.filter((d) => d.status === 'calibrating' || d.calibration.startsWith('Due')).length;
-  const eventsToday = DEVICES.reduce((s, d) => s + d.eventsToday, 0);
-  const batteryAlerts = DEVICES.filter((d) => d.battery != null && d.battery <= 20).length;
+  const online = devices.filter((d) => d.status === 'online').length;
+  const offline = devices.filter((d) => d.status === 'offline').length;
+  const needsCal = devices.filter((d) => d.status === 'calibrating' || d.calibration.startsWith('Due')).length;
+  const eventsToday = devices.reduce((s, d) => s + d.eventsToday, 0);
+  const batteryAlerts = devices.filter((d) => d.battery != null && d.battery <= 20).length;
 
-  const open = openId ? DEVICES.find((d) => d.id === openId) ?? null : null;
+  const open = openId ? devices.find((d) => d.id === openId) ?? null : null;
 
   return (
     <div className="space-y-5">
@@ -33,7 +35,7 @@ export function WasteDevices() {
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        <Kpi label="Connected devices" value={String(DEVICES.length)} />
+        <Kpi label="Connected devices" value={String(devices.length)} />
         <Kpi label="Online" value={String(online)} accent="#0F6E56" />
         <Kpi label="Offline" value={String(offline)} accent={offline > 0 ? '#5F6368' : undefined} />
         <Kpi label="Needs calibration" value={String(needsCal)} accent={needsCal > 0 ? '#854F0B' : undefined} />
@@ -52,7 +54,7 @@ export function WasteDevices() {
               </tr>
             </thead>
             <tbody>
-              {DEVICES.map((d) => (
+              {devices.map((d) => (
                 <tr key={d.id} onClick={() => setOpenId(d.id)} className="cursor-pointer border-b border-[#F6F6F2] last:border-0 hover:bg-[#FAFAF8]">
                   <td className="px-3 py-3 font-medium text-[#1A1C1E]">{d.name}</td>
                   <td className="px-3 py-3 text-[#5F6368]">{d.type}</td>

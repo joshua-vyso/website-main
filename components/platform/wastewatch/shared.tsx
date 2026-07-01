@@ -4,8 +4,8 @@ import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ModuleWidgetCard } from '@/components/platform/module-ui';
 import { widgetsFor } from '@/lib/platform/module-widgets';
-import { DEVICE_STATUS_STYLE, CATEGORY_COLOR, WASTE_REASONS, type DeviceStatus, type WasteCategory } from '@/lib/platform/wastewatch';
-import { useCategories } from './categories';
+import { DEVICE_STATUS_STYLE, WASTE_REASONS, type DeviceStatus, type WasteCategory } from '@/lib/platform/wastewatch';
+import { useWasteWatch } from './categories';
 
 const MODAL_RADIUS = { fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties;
 
@@ -20,9 +20,10 @@ export function DeviceStatusBadge({ status }: { status: DeviceStatus }) {
 }
 
 export function CategoryBadge({ cat }: { cat: WasteCategory }) {
+  const { colorOf } = useWasteWatch();
   return (
     <span className="inline-flex items-center gap-1.5 text-[13px] text-[#5F6368]">
-      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: CATEGORY_COLOR[cat] }} />
+      <span className="h-2 w-2 rounded-full" style={{ backgroundColor: colorOf(cat) }} />
       {cat}
     </span>
   );
@@ -65,7 +66,7 @@ type LogStep = 'choose' | 'device' | 'device-done' | 'manual';
  * device (prompts for the operator's name; scale wiring comes later) or enter the
  * waste manually. */
 export function LogWasteModal({ open, onClose, onSaved }: { open: boolean; onClose: () => void; onSaved: () => void }) {
-  const { categories } = useCategories();
+  const { categories } = useWasteWatch();
   const [mounted, setMounted] = useState(false);
   const [step, setStep] = useState<LogStep>('choose');
   const [name, setName] = useState('');

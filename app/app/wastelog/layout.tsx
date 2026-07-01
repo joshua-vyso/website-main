@@ -1,7 +1,10 @@
 import { redirect } from 'next/navigation';
 import { getPlatformSession } from '@/lib/platform/supabase-server';
+import { getWasteWatchData } from '@/lib/platform/wastewatch-data';
 import { SubNav } from '@/components/platform/SubNav';
-import { CategoriesProvider } from '@/components/platform/wastewatch/categories';
+import { WasteWatchProvider } from '@/components/platform/wastewatch/categories';
+
+const EMPTY = { categories: [], events: [], devices: [], employeeStats: [], recipeStats: [], preventable: { preventable: 0, unavoidable: 0 } };
 
 const TABS = [
   { label: 'Overview', href: '/app/wastelog' },
@@ -15,12 +18,14 @@ export default async function WasteWatchLayout({ children }: { children: React.R
   const session = await getPlatformSession();
   if (!session) redirect('/login');
 
+  const data = session.org ? await getWasteWatchData(session.org.id) : EMPTY;
+
   return (
     <div className="px-8 py-7">
       <SubNav tabs={TABS} rootHref="/app/wastelog" />
-      <CategoriesProvider>
+      <WasteWatchProvider data={data}>
         <div className="mt-6">{children}</div>
-      </CategoriesProvider>
+      </WasteWatchProvider>
     </div>
   );
 }
