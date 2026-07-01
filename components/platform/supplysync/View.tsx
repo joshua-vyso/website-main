@@ -1,13 +1,18 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/platform/orderflow/ui';
-import { ModuleHeader, PrimaryAction, KpiStrip, Kpi, Badge, SectionCard, DataTable, ModuleWidgetCard, type Tone } from '@/components/platform/module-ui';
+import { ModuleHeader, PrimaryAction, Kpi, Badge, SectionCard, DataTable, ModuleWidgetCard, type Tone } from '@/components/platform/module-ui';
 import { MODULE_META } from '@/lib/platform/module-meta';
 import { widgetsFor } from '@/lib/platform/module-widgets';
+import { usePlatform } from '@/lib/platform/session';
+import { createClient } from '@/lib/platform/supabase-browser';
 import type { SupplySyncData, Supplier } from '@/lib/platform/supplysync-data';
 
 const M = MODULE_META.supplysync;
+const MODAL_STYLE = { fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties;
 const TABS = ['Suppliers', 'Performance', 'Documents', 'Notes'] as const;
 type Tab = (typeof TABS)[number];
 
@@ -29,6 +34,7 @@ export function SupplySyncView({ data }: { data: SupplySyncData }) {
   const { node: toastNode, show: toast } = useToast();
   const [tab, setTab] = useState<Tab>('Suppliers');
   const [search, setSearch] = useState('');
+  const [addOpen, setAddOpen] = useState(false);
 
   const suppliers = data.suppliers;
   const q = search.trim().toLowerCase();
@@ -62,7 +68,9 @@ export function SupplySyncView({ data }: { data: SupplySyncData }) {
   return (
     <div>
       {toastNode}
-      <ModuleHeader icon={M.icon} title={M.name} description={M.description} actions={<PrimaryAction onClick={() => toast('Add supplier (demo)')}>+ Add supplier</PrimaryAction>} />
+      <ModuleHeader icon={M.icon} title={M.name} description={M.description} actions={<PrimaryAction onClick={() => setAddOpen(true)}>+ Add supplier</PrimaryAction>} />
+
+      <AddSupplierModal open={addOpen} onClose={() => setAddOpen(false)} onSaved={(name) => toast(`${name} added`)} />
 
       {empty ? (
         <div className="mt-8 rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
@@ -193,5 +201,102 @@ export function SupplySyncView({ data }: { data: SupplySyncData }) {
         </div>
       ) : null}
     </div>
+  );
+}
+
+function AddSupplierModal({ open, onClose, onSaved }: { open: boolean; onClose: () => void; onSaved: (name: string) => void }) {
+  const { org } = usePlatform();
+  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+  const [name, setName] = useState('');
+  const [category, setCategory] = useState('');
+  const [contactName, setContactName] = useState('');
+  const [contactPhone, setContactPhone] = useState('');
+  const [status, setStatus] = useState<Supplier['status']>('active');
+  const [risk, setRisk] = useState<Supplier['risk']>('low');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    if (open) {
+      setName('');
+      setCategory('');
+      setContactName('');
+      setContactPhone('');
+      setStatus('active');
+      setRisk('low');
+      setError(null);
+    }
+  }, [open]);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && !busy) onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open, onClose, busy]);
+
+  async function save() {
+    const n = name.trim();
+    if (!n) { setError('Give the supplier a name.'); return; }
+    const supabase = createClient();
+    if (!supabase || !org) { setError('Not connected.'); return; }
+    setBusy(true);
+    setError(null);
+    const { error: err } = await supabase.from('ss_suppliers').insert({
+      org_id: org.id,
+      name: n,
+      category: category.trim() || 'General',
+      contact_name: contactName.trim() || null,
+      contact_phone: contactPhone.trim() || null,
+      status,
+      risk,
+    });
+    setBusy(false);
+    if (err) { setError(err.message); return; }
+    onSaved(n);
+    onClose();
+    router.refresh();
+  }
+
+  if (!mounted || !open) return null;
+  const input = 'h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none';
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={MODAL_STYLE}>
+      <div className="absolute inset-0 bg-[#1A1C1E]/25 backdrop-blur-[1px]" onClick={() => !busy && onClose()} />
+      <div role="dialog" aria-modal="true" className="relative w-full max-w-[420px] rounded-2xl border border-[#E7E7E2] bg-white p-5 shadow-[0_24px_70px_-20px_rgba(26,28,30,0.45)]">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h2 className="text-[16px] font-semibold text-[#1A1C1E]">Add supplier</h2>
+            <p className="mt-0.5 text-[13px] text-[#5F6368]">A new entry in your supply base.</p>
+          </div>
+          <button type="button" onClick={onClose} aria-label="Close" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[18px] text-[#9A9DA1] transition-colors hover:bg-[#F0F0EC] hover:text-[#1A1C1E]">✕</button>
+        </div>
+        <div className="mt-4 space-y-3">
+          <div>
+            <label className="mb-1 block text-[13px] font-medium text-[#1A1C1E]">Name</label>
+            <input autoFocus value={name} onChange={(e) => { setName(e.target.value); if (error) setError(null); }} onKeyDown={(e) => { if (e.key === 'Enter') save(); }} placeholder="e.g. Ceres Fruit Growers" className={input} />
+          </div>
+          <div>
+            <label className="mb-1 block text-[13px] font-medium text-[#1A1C1E]">Category</label>
+            <input value={category} onChange={(e) => setCategory(e.target.value)} placeholder="e.g. Stone fruit, Citrus, Root veg" className={input} />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <input value={contactName} onChange={(e) => setContactName(e.target.value)} placeholder="Contact name" className={input} />
+            <input value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} placeholder="Phone" className={input} />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <select value={status} onChange={(e) => setStatus(e.target.value as Supplier['status'])} className={input}><option value="active">Active</option><option value="preferred">Preferred</option><option value="review">On review</option></select>
+            <select value={risk} onChange={(e) => setRisk(e.target.value as Supplier['risk'])} className={input}><option value="low">Low risk</option><option value="medium">Medium risk</option><option value="high">High risk</option></select>
+          </div>
+          {error ? <p className="text-[12px] text-[#A32D2D]">{error}</p> : null}
+        </div>
+        <div className="mt-5 flex justify-end gap-2">
+          <button type="button" onClick={onClose} disabled={busy} className="rounded-lg px-3.5 py-2 text-[13px] text-[#5F6368] hover:bg-black/[0.03] disabled:opacity-50">Cancel</button>
+          <button type="button" onClick={save} disabled={busy} className="rounded-lg bg-[#1E5E54] px-4 py-2 text-[13px] font-medium text-white hover:bg-[#184D45] disabled:opacity-60">{busy ? 'Saving…' : 'Add supplier'}</button>
+        </div>
+      </div>
+    </div>,
+    document.body,
   );
 }

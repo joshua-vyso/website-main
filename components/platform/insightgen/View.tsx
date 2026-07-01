@@ -1,12 +1,17 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
+import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/platform/orderflow/ui';
 import { ModuleHeader, PrimaryAction, SecondaryAction, Kpi, Badge, SectionCard, PlaceholderChart, DataTable, type Tone } from '@/components/platform/module-ui';
 import { MODULE_META, VYSO_MODULE_KEYS, type VysoModuleKey } from '@/lib/platform/module-meta';
+import { usePlatform } from '@/lib/platform/session';
+import { createClient } from '@/lib/platform/supabase-browser';
 import type { InsightGenData, GenInsight, InsightSeverity, ReportStatus } from '@/lib/platform/insightgen-data';
 
 const M = MODULE_META.insightgen;
+const MODAL_STYLE = { fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties;
 const AREAS = ['Executive snapshot', 'AI insights', 'Saved reports', 'Anomalies'] as const;
 type Area = (typeof AREAS)[number];
 
@@ -35,6 +40,7 @@ export function InsightGenView({ data }: { data: InsightGenData }) {
   const { node: toastNode, show: toast } = useToast();
   const [area, setArea] = useState<Area>('Executive snapshot');
   const [moduleFilter, setModuleFilter] = useState<string | 'all'>('all');
+  const [createOpen, setCreateOpen] = useState(false);
 
   const { insights, reports } = data;
   const anomalies = useMemo(() => insights.filter((i) => i.isAnomaly || i.severity === 'critical'), [insights]);
@@ -47,6 +53,7 @@ export function InsightGenView({ data }: { data: InsightGenData }) {
   return (
     <div>
       {toastNode}
+      <CreateReportModal open={createOpen} onClose={() => setCreateOpen(false)} onSaved={(n) => toast(`Report “${n}” created`)} />
       <ModuleHeader
         icon={M.icon}
         title={M.name}
@@ -54,7 +61,7 @@ export function InsightGenView({ data }: { data: InsightGenData }) {
         actions={
           <>
             <SecondaryAction onClick={() => toast('Ask Vyso AI (demo)')}>Ask Vyso AI</SecondaryAction>
-            <PrimaryAction onClick={() => toast('Create report (demo)')}>+ Create report</PrimaryAction>
+            <PrimaryAction onClick={() => setCreateOpen(true)}>+ Create report</PrimaryAction>
           </>
         }
       />
@@ -182,5 +189,99 @@ function Chip({ active, onClick, children }: { active: boolean; onClick: () => v
     <button type="button" onClick={onClick} className={`rounded-full px-3 py-1.5 text-[12px] font-medium transition-colors ${active ? 'bg-[#1A1C1E] text-white' : 'border border-[#E7E7E2] bg-white text-[#5F6368] hover:border-[#1E5E54]/30'}`}>
       {children}
     </button>
+  );
+}
+
+const REPORT_SCOPES = ['Company', 'Finance', 'Operations', 'Procurement', 'Sales'];
+const REPORT_MODULES: VysoModuleKey[] = ['docu', 'procurepulse', 'pricepilot', 'planwise', 'wastewatch', 'shiftboard', 'supplysync', 'orderflow'];
+
+function CreateReportModal({ open, onClose, onSaved }: { open: boolean; onClose: () => void; onSaved: (name: string) => void }) {
+  const { org } = usePlatform();
+  const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+  const [name, setName] = useState('');
+  const [scope, setScope] = useState(REPORT_SCOPES[0]);
+  const [schedule, setSchedule] = useState('weekly');
+  const [modules, setModules] = useState<string[]>([]);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    if (open) { setName(''); setScope(REPORT_SCOPES[0]); setSchedule('weekly'); setModules([]); setError(null); }
+  }, [open]);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && !busy) onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open, onClose, busy]);
+
+  function toggleModule(m: string) {
+    setModules((cur) => (cur.includes(m) ? cur.filter((x) => x !== m) : [...cur, m]));
+  }
+
+  async function save() {
+    const n = name.trim();
+    if (!n) { setError('Give the report a name.'); return; }
+    const supabase = createClient();
+    if (!supabase || !org) { setError('Not connected.'); return; }
+    setBusy(true);
+    setError(null);
+    const { error: err } = await supabase.from('ig_reports').insert({
+      org_id: org.id,
+      name: n,
+      scope,
+      modules: modules.length ? modules : ['all'],
+      schedule,
+      status: 'ready',
+      owner: 'You',
+    });
+    setBusy(false);
+    if (err) { setError(err.message); return; }
+    onSaved(n);
+    onClose();
+    router.refresh();
+  }
+
+  if (!mounted || !open) return null;
+  const input = 'h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none';
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={MODAL_STYLE}>
+      <div className="absolute inset-0 bg-[#1A1C1E]/25 backdrop-blur-[1px]" onClick={() => !busy && onClose()} />
+      <div role="dialog" aria-modal="true" className="relative w-full max-w-[440px] rounded-2xl border border-[#E7E7E2] bg-white p-5 shadow-[0_24px_70px_-20px_rgba(26,28,30,0.45)]">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h2 className="text-[16px] font-semibold text-[#1A1C1E]">Create report</h2>
+            <p className="mt-0.5 text-[13px] text-[#5F6368]">A saved cross-module report definition.</p>
+          </div>
+          <button type="button" onClick={onClose} aria-label="Close" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[18px] text-[#9A9DA1] transition-colors hover:bg-[#F0F0EC] hover:text-[#1A1C1E]">✕</button>
+        </div>
+        <div className="mt-4 space-y-3">
+          <div>
+            <label className="mb-1 block text-[13px] font-medium text-[#1A1C1E]">Report name</label>
+            <input autoFocus value={name} onChange={(e) => { setName(e.target.value); if (error) setError(null); }} onKeyDown={(e) => { if (e.key === 'Enter') save(); }} placeholder="e.g. Weekly business brief" className={input} />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <select value={scope} onChange={(e) => setScope(e.target.value)} className={input}>{REPORT_SCOPES.map((s) => <option key={s}>{s}</option>)}</select>
+            <select value={schedule} onChange={(e) => setSchedule(e.target.value)} className={input}><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="manual">Manual</option></select>
+          </div>
+          <div>
+            <div className="mb-1.5 text-[13px] font-medium text-[#1A1C1E]">Modules <span className="font-normal text-[#9A9DA1]">(none = all)</span></div>
+            <div className="flex flex-wrap gap-1.5">
+              {REPORT_MODULES.map((m) => (
+                <button key={m} type="button" onClick={() => toggleModule(m)} className={`rounded-full px-2.5 py-1 text-[12px] font-medium transition-colors ${modules.includes(m) ? 'bg-[#1A1C1E] text-white' : 'border border-[#E7E7E2] bg-white text-[#5F6368] hover:border-[#1E5E54]/30'}`}>{MODULE_META[m].name}</button>
+              ))}
+            </div>
+          </div>
+          {error ? <p className="text-[12px] text-[#A32D2D]">{error}</p> : null}
+        </div>
+        <div className="mt-5 flex justify-end gap-2">
+          <button type="button" onClick={onClose} disabled={busy} className="rounded-lg px-3.5 py-2 text-[13px] text-[#5F6368] hover:bg-black/[0.03] disabled:opacity-50">Cancel</button>
+          <button type="button" onClick={save} disabled={busy} className="rounded-lg bg-[#1E5E54] px-4 py-2 text-[13px] font-medium text-white hover:bg-[#184D45] disabled:opacity-60">{busy ? 'Saving…' : 'Create report'}</button>
+        </div>
+      </div>
+    </div>,
+    document.body,
   );
 }
