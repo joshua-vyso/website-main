@@ -53,7 +53,7 @@ Supabase dashboard → **Authentication → Users → Add user**
 | ShiftBoard | `sb_departments`, `sb_employees`, `sb_roster_shifts`, `sb_attendance`, `sb_leave_requests` | 40 employees across 7 departments, weekly roster, today's attendance, leave requests |
 | WasteWatch | `ww_waste_categories`, `ww_devices`, `ww_waste_events` | Produce waste (~R23k/wk), 7 scales/stations, operator + recipe links |
 | PlanWise | `pw_budget_lines`, `pw_goals`, `pw_forecast`, `pw_scenarios` | R7M revenue, ~78% COGS, 12-month forecast, what-if scenarios |
-| SupplySync | `ss_suppliers`, `ss_supplier_documents` | 12 fresh-produce suppliers with ratings, risk, compliance docs |
+| SupplySync | `ss_suppliers` (+ intelligence cols), `ss_supplier_contacts`, `ss_supplier_documents`, `ss_supplier_pricing`, `ss_supplier_risks`, `ss_supplier_history` | 12 fresh-produce suppliers: scorecards, contacts, compliance docs, pricing history, a risk register and a relationship timeline |
 | InsightGen | `ig_insights`, `ig_reports` | Cross-module AI insights + saved report definitions |
 | ProcurePulse | `pp_stock_items`, `pp_item_suppliers`, `pp_movements` | 30 produce lines with stock levels, low-stock alerts, per-supplier quotes, recent movements |
 | OrderFlow | `of_customers`, `of_orders`, `of_order_items` | 15 wholesale customers, ~30–40 orders across statuses (~R7M/mo) |
