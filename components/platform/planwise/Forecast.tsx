@@ -5,7 +5,8 @@ import { zar } from '@/lib/platform/orderflow';
 import { AreaChart } from '@/components/platform/procurepulse/ui';
 import { SectionCard, CountUp } from '@/components/platform/module-ui';
 import { MODULE_META } from '@/lib/platform/module-meta';
-import { FORECASTS, FORECAST_DRIVERS, FORECAST_COMMENTARY, type ForecastLine } from '@/lib/platform/planwise';
+import { FORECAST_DRIVERS, FORECAST_COMMENTARY, type ForecastLine } from '@/lib/platform/planwise';
+import { usePlanWise } from './context';
 
 function toneColor(t: ForecastLine['tone']) {
   return t === 'positive' ? '#0F6E56' : t === 'critical' ? '#A32D2D' : t === 'warning' ? '#854F0B' : '#1E5E54';
@@ -13,11 +14,12 @@ function toneColor(t: ForecastLine['tone']) {
 const TREND = { up: '▲', down: '▼', flat: '→' } as const;
 
 export function ForecastCardsRich() {
+  const { forecast } = usePlanWise();
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-      {FORECASTS.map((f) => {
+      {forecast.map((f) => {
         const color = toneColor(f.tone);
-        const pctDiff = Math.round(((f.value - f.target) / f.target) * 100);
+        const pctDiff = f.target !== 0 ? Math.round(((f.value - f.target) / f.target) * 100) : 0;
         const overUnder = f.id === 'exp' ? (pctDiff > 0 ? 'over ceiling' : 'under ceiling') : pctDiff >= 0 ? 'above target' : 'below target';
         return (
           <div key={f.id} className="rounded-2xl border border-[#E7E7E2] bg-white p-5 transition-shadow hover:shadow-sm">

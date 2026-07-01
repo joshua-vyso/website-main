@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import { zar } from '@/lib/platform/orderflow';
 import { Badge } from '@/components/platform/module-ui';
-import { BUDGET, TOTAL_BUDGET, budgetStatus } from '@/lib/platform/planwise';
+import { budgetStatus } from '@/lib/platform/planwise';
+import { usePlanWise } from './context';
 import { BudgetTable } from './ui';
 
 const SIZE = 220;
@@ -23,19 +24,29 @@ function sectorPath(cx: number, cy: number, rO: number, rI: number, a0: number, 
 }
 
 export function BudgetWorkspace() {
+  const { budget, totalBudget } = usePlanWise();
   const [hovered, setHovered] = useState<string | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const active = hovered ?? selected;
-  const activeRow = active ? BUDGET.find((b) => b.cat === active) ?? null : null;
+  const activeRow = active ? budget.find((b) => b.cat === active) ?? null : null;
 
-  const segs = BUDGET.map((b, i) => {
-    const frac = b.budgeted / TOTAL_BUDGET;
-    const offset = BUDGET.slice(0, i).reduce((s, p) => s + p.budgeted, 0) / TOTAL_BUDGET;
+  const segs = budget.map((b, i) => {
+    const frac = totalBudget > 0 ? b.budgeted / totalBudget : 0;
+    const offset = totalBudget > 0 ? budget.slice(0, i).reduce((s, p) => s + p.budgeted, 0) / totalBudget : 0;
     return { ...b, frac, offset };
   });
 
   function toggle(cat: string) {
     setSelected((s) => (s === cat ? null : cat));
+  }
+
+  if (budget.length === 0) {
+    return (
+      <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
+        <p className="text-[15px] font-medium text-[#1A1C1E]">No budget set yet</p>
+        <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">Add budget categories to see where your money goes and how actuals track against plan.</p>
+      </div>
+    );
   }
 
   return (
@@ -71,12 +82,12 @@ export function BudgetWorkspace() {
                 <>
                   <span className="text-[12px] text-[#9A9DA1]">{activeRow.cat}</span>
                   <span className="text-[24px] font-bold leading-none text-[#1A1C1E]">{zar(activeRow.budgeted)}</span>
-                  <span className="mt-1 text-[11px] text-[#9A9DA1]">{Math.round((activeRow.budgeted / TOTAL_BUDGET) * 100)}% of budget</span>
+                  <span className="mt-1 text-[11px] text-[#9A9DA1]">{totalBudget > 0 ? Math.round((activeRow.budgeted / totalBudget) * 100) : 0}% of budget</span>
                 </>
               ) : (
                 <>
                   <span className="text-[12px] text-[#9A9DA1]">Total budget</span>
-                  <span className="text-[26px] font-bold leading-none text-[#1A1C1E]">{zar(TOTAL_BUDGET)}</span>
+                  <span className="text-[26px] font-bold leading-none text-[#1A1C1E]">{zar(totalBudget)}</span>
                 </>
               )}
             </div>
@@ -96,7 +107,7 @@ export function BudgetWorkspace() {
                 <Detail label="Budgeted" value={zar(activeRow.budgeted)} />
                 <Detail label="Actual" value={zar(activeRow.actual)} />
                 <Detail label="Variance" value={`${activeRow.budgeted - activeRow.actual >= 0 ? '+' : '−'}${zar(Math.abs(activeRow.budgeted - activeRow.actual))}`} color={activeRow.actual > activeRow.budgeted ? '#A32D2D' : '#0F6E56'} />
-                <Detail label="% of budget" value={`${Math.round((activeRow.budgeted / TOTAL_BUDGET) * 100)}%`} />
+                <Detail label="% of budget" value={`${totalBudget > 0 ? Math.round((activeRow.budgeted / totalBudget) * 100) : 0}%`} />
               </div>
               <p className="mt-4 rounded-lg bg-[#F6FAF8] px-3 py-2 text-[13px] text-[#5F6368]">{activeRow.suggestedAction}</p>
             </div>
@@ -111,7 +122,7 @@ export function BudgetWorkspace() {
 
       {/* Breakdown cards */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-        {BUDGET.map((b) => {
+        {budget.map((b) => {
           const st = budgetStatus(b);
           const isSel = selected === b.cat;
           return (

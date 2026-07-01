@@ -5,25 +5,22 @@ import { zar } from '@/lib/platform/orderflow';
 import { SectionCard, Badge, DataTable } from '@/components/platform/module-ui';
 import { MODULE_META } from '@/lib/platform/module-meta';
 import {
-  BUDGET,
-  GOAL_SUMMARY,
-  MONTHLY_GOAL,
-  MOBILE_SNAPSHOT,
   budgetStatus,
   goalProgress,
   goalTone,
   goalToneColor,
   type GoalSummary,
 } from '@/lib/platform/planwise';
+import { usePlanWise } from './context';
 
 // ---------------------------------------------------------------------------
 // Monthly business goal — headline target vs forecast + progress bar
 // ---------------------------------------------------------------------------
 
 export function MonthlyGoalCard() {
-  const g = MONTHLY_GOAL;
+  const { monthlyGoal: g } = usePlanWise();
   const gap = g.currentForecast - g.targetRevenue;
-  const pct = Math.round((g.currentForecast / g.targetRevenue) * 100);
+  const pct = g.targetRevenue > 0 ? Math.round((g.currentForecast / g.targetRevenue) * 100) : 0;
   const color = goalToneColor(goalTone(pct));
   return (
     <SectionCard title="Monthly business goal" right={<Badge label={g.label} tone="info" />}>
@@ -58,9 +55,11 @@ export function fmtGoal(g: GoalSummary, n: number) {
 }
 
 export function GoalSummaryCards() {
+  const { goals } = usePlanWise();
+  if (goals.length === 0) return null;
   return (
     <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
-      {GOAL_SUMMARY.map((g) => {
+      {goals.map((g) => {
         const variance = g.higherIsBetter ? g.current - g.target : g.target - g.current;
         const pct = goalProgress(g);
         const color = goalToneColor(goalTone(pct));
@@ -87,7 +86,8 @@ export function GoalSummaryCards() {
 // ---------------------------------------------------------------------------
 
 export function BudgetTable({ filter }: { filter?: string | null }) {
-  const rows = filter ? BUDGET.filter((b) => b.cat === filter) : BUDGET;
+  const { budget } = usePlanWise();
+  const rows = filter ? budget.filter((b) => b.cat === filter) : budget;
   return (
     <DataTable
       columns={[
@@ -124,12 +124,25 @@ export function BudgetTable({ filter }: { filter?: string | null }) {
 // ---------------------------------------------------------------------------
 
 export function MobileSnapshotCards() {
+  const { monthlyGoal, totalBudget, totalActual, scenarioBase } = usePlanWise();
   const color = (s: string) => (s === 'positive' ? '#0F6E56' : s === 'warning' ? '#854F0B' : s === 'critical' ? '#A32D2D' : '#1A1C1E');
+
+  const revProgress = monthlyGoal.targetRevenue > 0 ? Math.round((monthlyGoal.currentForecast / monthlyGoal.targetRevenue) * 100) : 0;
+  const budgetUsed = totalBudget > 0 ? Math.round((totalActual / totalBudget) * 100) : 0;
+  const gap = monthlyGoal.currentForecast - monthlyGoal.targetRevenue;
+
+  const widgets = [
+    { id: 'rev', label: 'Revenue progress', value: `${revProgress}%`, severity: goalTone(revProgress) },
+    { id: 'budget', label: 'Budget used', value: `${budgetUsed}%`, severity: budgetUsed > 95 ? 'critical' : budgetUsed > 85 ? 'warning' : 'neutral' },
+    { id: 'gap', label: 'Forecast gap', value: `${gap >= 0 ? '+' : '−'}${zar(Math.abs(gap))}`, severity: gap >= 0 ? 'positive' : 'warning' },
+    { id: 'runway', label: 'Cash runway', value: `${scenarioBase.runwayMonths.toFixed(1)} months`, severity: 'neutral' },
+  ];
+
   return (
     <div>
       <h2 className="mb-2 text-[13px] font-semibold text-[#9A9DA1]">Mobile snapshot — widgets the companion app will surface</h2>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {MOBILE_SNAPSHOT.map((w) => (
+        {widgets.map((w) => (
           <div key={w.id} className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
             <div className="text-[12px] text-[#9A9DA1]">{w.label}</div>
             <div className="mt-1.5 text-[22px] font-bold leading-none" style={{ color: color(w.severity) }}>{w.value}</div>

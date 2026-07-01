@@ -4,7 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { zar } from '@/lib/platform/orderflow';
 import { MODULE_META } from '@/lib/platform/module-meta';
-import { FINANCIAL_FLOW, type FlowNode } from '@/lib/platform/planwise';
+import { type FlowNode } from '@/lib/platform/planwise';
+import { usePlanWise } from './context';
 
 function nodeColor(tone: FlowNode['tone']) {
   return tone === 'positive' ? '#0F6E56' : tone === 'critical' ? '#A32D2D' : '#1A1C1E';
@@ -14,8 +15,11 @@ function nodeValue(n: FlowNode) {
 }
 
 export function FinancialFlow() {
+  const { financialFlow } = usePlanWise();
   const [open, setOpen] = useState(true);
   const [expanded, setExpanded] = useState<string | null>('expenses');
+
+  if (financialFlow.length === 0) return null;
 
   return (
     <div className="overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
@@ -30,7 +34,7 @@ export function FinancialFlow() {
       {open ? (
         <div className="border-t border-[#F0F0EC] p-5">
           <div className="flex flex-wrap items-stretch gap-2">
-            {FINANCIAL_FLOW.map((n, i) => {
+            {financialFlow.map((n, i) => {
               const hasChildren = !!n.children?.length;
               const isExpanded = expanded === n.key;
               const inner = (
@@ -49,7 +53,7 @@ export function FinancialFlow() {
                   ) : (
                     inner
                   )}
-                  {i < FINANCIAL_FLOW.length - 1 ? <span className="flex items-center text-[18px] text-[#C7C9C5]" aria-hidden>→</span> : null}
+                  {i < financialFlow.length - 1 ? <span className="flex items-center text-[18px] text-[#C7C9C5]" aria-hidden>→</span> : null}
                 </div>
               );
             })}
@@ -58,7 +62,7 @@ export function FinancialFlow() {
           {/* Expanded breakdown */}
           {expanded ? (
             (() => {
-              const node = FINANCIAL_FLOW.find((n) => n.key === expanded);
+              const node = financialFlow.find((n) => n.key === expanded);
               if (!node?.children?.length) return null;
               return (
                 <div className="mt-4 rounded-xl bg-[#FCFCFB] p-4">

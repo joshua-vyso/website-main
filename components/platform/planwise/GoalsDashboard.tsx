@@ -4,15 +4,25 @@ import Link from 'next/link';
 import { Sparkline } from '@/components/platform/procurepulse/ui';
 import { SectionCard, ProgressRing } from '@/components/platform/module-ui';
 import { MODULE_META } from '@/lib/platform/module-meta';
-import { GOAL_SUMMARY, GOAL_TIMELINE, GOAL_CHAIN, goalProgress, goalTone, goalToneColor } from '@/lib/platform/planwise';
+import { GOAL_TIMELINE, GOAL_CHAIN, goalProgress, goalTone, goalToneColor } from '@/lib/platform/planwise';
+import { usePlanWise } from './context';
 import { fmtGoal } from './ui';
 
 export function GoalsDashboard() {
+  const { goals } = usePlanWise();
+  if (goals.length === 0) {
+    return (
+      <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
+        <p className="text-[15px] font-medium text-[#1A1C1E]">No goals set yet</p>
+        <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">Set strategic targets — revenue, margin, waste — to track progress and see how they connect here.</p>
+      </div>
+    );
+  }
   return (
     <div className="space-y-5">
       {/* Goal ring cards */}
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        {GOAL_SUMMARY.map((g) => {
+        {goals.map((g) => {
           const pct = goalProgress(g);
           const color = goalToneColor(goalTone(pct));
           const variance = g.higherIsBetter ? g.current - g.target : g.target - g.current;

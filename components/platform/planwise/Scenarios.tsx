@@ -7,20 +7,21 @@ import { SectionCard, CountUp } from '@/components/platform/module-ui';
 import { MODULE_META } from '@/lib/platform/module-meta';
 import {
   SCENARIO_SLIDERS,
-  SCENARIOS,
   RISK_STYLE,
   AI_SCENARIO,
   projectScenario,
   type SliderValues,
 } from '@/lib/platform/planwise';
+import { usePlanWise } from './context';
 
 const ZERO: SliderValues = { revenueGrowth: 0, expenseReduction: 0, marginImprovement: 0, wasteReduction: 0, invoiceRecovery: 0 };
 
 export function ScenariosWorkspace() {
   const { node, show } = useToast();
+  const { scenarios, scenarioBase } = usePlanWise();
   const [values, setValues] = useState<SliderValues>(ZERO);
   const [aiShown, setAiShown] = useState(false);
-  const result = projectScenario(values);
+  const result = projectScenario(values, scenarioBase);
   const dirty = Object.values(values).some((v) => v !== 0);
 
   function setSlider(id: keyof SliderValues, v: number) {
@@ -90,7 +91,7 @@ export function ScenariosWorkspace() {
               <li key={i} className="flex items-start gap-2.5 text-[14px] text-[#1A1C1E]"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1E5E54]" />{s}</li>
             ))}
           </ul>
-          <p className="mt-3 text-[14px]">Projected additional monthly profit: <span className="text-[18px] font-bold text-[#0F6E56]">+{zar(projectScenario(AI_SCENARIO.sliders).diffVsCurrent)}</span></p>
+          <p className="mt-3 text-[14px]">Projected additional monthly profit: <span className="text-[18px] font-bold text-[#0F6E56]">+{zar(projectScenario(AI_SCENARIO.sliders, scenarioBase).diffVsCurrent)}</span></p>
         </div>
       ) : null}
 
@@ -112,7 +113,7 @@ export function ScenariosWorkspace() {
             </thead>
             <tbody>
               <ComparisonRow name="Current" sliders={ZERO} />
-              {SCENARIOS.map((s) => (
+              {scenarios.map((s) => (
                 <ComparisonRow key={s.id} name={s.title} sliders={s.sliders} risk={s.risk} probability={s.probability} onLoad={() => { setValues(s.sliders); setAiShown(false); show(`Loaded ${s.title}`); }} />
               ))}
             </tbody>
@@ -136,7 +137,8 @@ function Result({ label, value, color, format, signed }: { label: string; value:
 }
 
 function ComparisonRow({ name, sliders, risk, probability, onLoad }: { name: string; sliders: SliderValues; risk?: 'Low' | 'Medium' | 'High'; probability?: number; onLoad?: () => void }) {
-  const r = projectScenario(sliders);
+  const { scenarioBase } = usePlanWise();
+  const r = projectScenario(sliders, scenarioBase);
   const isCurrent = !onLoad;
   return (
     <tr onClick={onLoad} className={`border-b border-[#F6F6F2] last:border-0 ${onLoad ? 'cursor-pointer hover:bg-[#FAFAF8]' : ''}`}>
