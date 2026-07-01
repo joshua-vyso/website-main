@@ -112,7 +112,7 @@ export function WasteLog({ initialCategory }: { initialCategory?: string }) {
         {open ? <WasteDetail e={open} /> : null}
       </Drawer>
 
-      <LogWasteModal open={logOpen} onClose={() => setLogOpen(false)} onSaved={() => show('Waste logged (demo)')} />
+      <LogWasteModal open={logOpen} onClose={() => setLogOpen(false)} onSaved={() => show('Waste logged')} />
     </div>
   );
 }

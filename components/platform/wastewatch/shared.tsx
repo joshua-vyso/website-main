@@ -2,12 +2,19 @@
 
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useRouter } from 'next/navigation';
 import { ModuleWidgetCard } from '@/components/platform/module-ui';
 import { widgetsFor } from '@/lib/platform/module-widgets';
+import { usePlatform } from '@/lib/platform/session';
+import { createClient } from '@/lib/platform/supabase-browser';
 import { DEVICE_STATUS_STYLE, WASTE_REASONS, type DeviceStatus, type WasteCategory } from '@/lib/platform/wastewatch';
 import { useWasteWatch } from './categories';
 
 const MODAL_RADIUS = { fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties;
+
+const UNITS = ['kg', 'units', 'crates', 'L'];
+/** Reasons that stem from a controllable process (vs. natural spoilage). */
+const PREVENTABLE_REASONS = new Set(['Over-portioned', 'Prep error', 'Damaged']);
 
 export function DeviceStatusBadge({ status }: { status: DeviceStatus }) {
   const s = DEVICE_STATUS_STYLE[status];
@@ -67,17 +74,41 @@ type LogStep = 'choose' | 'device' | 'device-done' | 'manual';
  * waste manually. */
 export function LogWasteModal({ open, onClose, onSaved }: { open: boolean; onClose: () => void; onSaved: () => void }) {
   const { categories } = useWasteWatch();
+  const { org } = usePlatform();
+  const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [step, setStep] = useState<LogStep>('choose');
   const [name, setName] = useState('');
+
+  // Manual-entry form
+  const [item, setItem] = useState('');
+  const [qty, setQty] = useState('');
+  const [unit, setUnit] = useState(UNITS[0]);
+  const [category, setCategory] = useState('');
+  const [cost, setCost] = useState('');
+  const [reason, setReason] = useState<string>(WASTE_REASONS[0]);
+  const [recipe, setRecipe] = useState('');
+  const [notes, setNotes] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => setMounted(true), []);
   useEffect(() => {
     if (open) {
       setStep('choose');
       setName('');
+      setItem('');
+      setQty('');
+      setUnit(UNITS[0]);
+      setCategory(categories[0]?.name ?? '');
+      setCost('');
+      setReason(WASTE_REASONS[0]);
+      setRecipe('');
+      setNotes('');
+      setSaving(false);
+      setError(null);
     }
-  }, [open]);
+  }, [open, categories]);
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -92,6 +123,43 @@ export function LogWasteModal({ open, onClose, onSaved }: { open: boolean; onClo
   const input = 'h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none';
   const title = step === 'manual' ? 'Enter waste manually' : step === 'choose' ? 'Log waste' : 'Connect to a device';
   const subtitle = step === 'choose' ? 'How would you like to record this?' : step === 'manual' ? 'Type the details yourself' : 'Start a measuring session';
+
+  const canSave = !!org && item.trim().length > 0 && Number(qty) > 0 && !saving;
+
+  async function submitManual() {
+    if (!org || !canSave) return;
+    const supabase = createClient();
+    if (!supabase) { setError('Not connected.'); return; }
+    setSaving(true);
+    setError(null);
+    const now = new Date();
+    const row = {
+      org_id: org.id,
+      event_date: now.toISOString().slice(0, 10),
+      event_time: now.toLocaleTimeString('en-ZA', { hour: '2-digit', minute: '2-digit', hour12: false }),
+      item: item.trim(),
+      category: category || categories[0]?.name || 'Uncategorised',
+      qty: Number(qty) || 0,
+      unit,
+      cost: Number(cost) || 0,
+      reason,
+      recipe: recipe.trim() || null,
+      employee: 'You',
+      device: 'Manual entry',
+      location: 'Main site',
+      preventable: PREVENTABLE_REASONS.has(reason),
+      notes: notes.trim() || null,
+    };
+    const { error: insErr } = await supabase.from('ww_waste_events').insert(row);
+    if (insErr) {
+      setSaving(false);
+      setError(insErr.message);
+      return;
+    }
+    router.refresh();
+    onClose();
+    onSaved();
+  }
 
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={MODAL_RADIUS}>
@@ -159,21 +227,23 @@ export function LogWasteModal({ open, onClose, onSaved }: { open: boolean; onClo
         {step === 'manual' ? (
           <>
             <div className="mt-4 space-y-3">
-              <input className={input} placeholder="Item (e.g. Strawberries)" />
-              <div className="grid grid-cols-2 gap-3">
-                <input className={input} placeholder="Quantity" />
-                <select className={input}>{categories.map((c) => <option key={c.id}>{c.name}</option>)}</select>
+              <input autoFocus value={item} onChange={(e) => setItem(e.target.value)} className={input} placeholder="Item (e.g. Strawberries)" />
+              <div className="grid grid-cols-[1fr_84px_1fr] gap-3">
+                <input value={qty} onChange={(e) => setQty(e.target.value)} inputMode="decimal" className={input} placeholder="Quantity" />
+                <select value={unit} onChange={(e) => setUnit(e.target.value)} className={input}>{UNITS.map((u) => <option key={u} value={u}>{u}</option>)}</select>
+                <select value={category} onChange={(e) => setCategory(e.target.value)} className={input}>{categories.map((c) => <option key={c.id} value={c.name}>{c.name}</option>)}</select>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <input className={input} placeholder="Estimated cost (R)" />
-                <select className={input}>{WASTE_REASONS.map((r) => <option key={r}>{r}</option>)}</select>
+                <input value={cost} onChange={(e) => setCost(e.target.value)} inputMode="decimal" className={input} placeholder="Estimated cost (R)" />
+                <select value={reason} onChange={(e) => setReason(e.target.value)} className={input}>{WASTE_REASONS.map((r) => <option key={r} value={r}>{r}</option>)}</select>
               </div>
-              <input className={input} placeholder="Recipe (optional)" />
-              <textarea className={`${input} h-20 py-2`} placeholder="Notes (optional)" />
+              <input value={recipe} onChange={(e) => setRecipe(e.target.value)} className={input} placeholder="Recipe (optional)" />
+              <textarea value={notes} onChange={(e) => setNotes(e.target.value)} className={`${input} h-20 py-2`} placeholder="Notes (optional)" />
+              {error ? <p className="text-[12px] text-[#A32D2D]">{error}</p> : null}
             </div>
             <div className="mt-5 flex justify-between gap-2">
               <button type="button" onClick={() => setStep('choose')} className="rounded-lg px-3.5 py-2 text-[13px] text-[#5F6368] hover:bg-black/[0.03]">Back</button>
-              <button type="button" onClick={() => { onClose(); onSaved(); }} className="rounded-lg bg-[#1E5E54] px-4 py-2 text-[13px] font-medium text-white hover:bg-[#184D45]">Log waste</button>
+              <button type="button" disabled={!canSave} onClick={submitManual} className="rounded-lg bg-[#1E5E54] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:cursor-not-allowed disabled:opacity-40">{saving ? 'Logging…' : 'Log waste'}</button>
             </div>
           </>
         ) : null}

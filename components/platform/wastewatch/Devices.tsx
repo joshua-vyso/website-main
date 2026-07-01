@@ -2,9 +2,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useToast, Drawer } from '@/components/platform/orderflow/ui';
 import { Kpi } from '@/components/platform/module-ui';
 import { MODULE_META } from '@/lib/platform/module-meta';
+import { usePlatform } from '@/lib/platform/session';
+import { createClient } from '@/lib/platform/supabase-browser';
 import { DEVICE_TYPES, type Device, type DeviceHistoryEvent } from '@/lib/platform/wastewatch';
 import { DeviceStatusBadge, BatteryPill } from './shared';
 import { useWasteWatch } from './categories';
@@ -77,7 +80,7 @@ export function WasteDevices() {
       </Drawer>
 
       {/* Add device wizard */}
-      <AddDeviceWizard open={addOpen} onClose={() => setAddOpen(false)} onConnect={() => { setAddOpen(false); show('Device connected (demo)'); }} />
+      <AddDeviceWizard open={addOpen} onClose={() => setAddOpen(false)} onSaved={() => show('Device connected')} />
     </div>
   );
 }
@@ -178,9 +181,47 @@ function historyColor(kind: DeviceHistoryEvent['kind']) {
   return kind === 'disconnected' ? '#A32D2D' : kind === 'calibration' ? '#854F0B' : kind === 'connected' ? '#0F6E56' : '#1E5E54';
 }
 
-function AddDeviceWizard({ open, onClose, onConnect }: { open: boolean; onClose: () => void; onConnect: () => void }) {
+function AddDeviceWizard({ open, onClose, onSaved }: { open: boolean; onClose: () => void; onSaved: () => void }) {
+  const { org } = usePlatform();
+  const router = useRouter();
   const [type, setType] = useState<string>(DEVICE_TYPES[0]);
+  const [name, setName] = useState('');
+  const [location, setLocation] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const input = 'h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none';
+
+  const canSave = !!org && name.trim().length > 0 && location.trim().length > 0 && !saving;
+
+  async function connect() {
+    if (!org || !canSave) return;
+    const supabase = createClient();
+    if (!supabase) { setError('Not connected.'); return; }
+    setSaving(true);
+    setError(null);
+    const { error: insErr } = await supabase.from('ww_devices').insert({
+      org_id: org.id,
+      name: name.trim(),
+      type,
+      location: location.trim(),
+      status: 'online',
+      last_sync: 'Just now',
+      calibration: 'Pending first calibration',
+      events_today: 0,
+      history: [{ kind: 'connected', label: 'Device added', time: 'Just now' }],
+    });
+    if (insErr) {
+      setSaving(false);
+      setError(insErr.message);
+      return;
+    }
+    router.refresh();
+    setName('');
+    setLocation('');
+    onClose();
+    onSaved();
+  }
+
   return (
     <Drawer
       open={open}
@@ -189,9 +230,12 @@ function AddDeviceWizard({ open, onClose, onConnect }: { open: boolean; onClose:
       subtitle="Connect a measuring device"
       width={460}
       footer={
-        <div className="flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="rounded-lg px-3.5 py-2 text-[13px] text-[#5F6368] hover:bg-black/[0.03]">Cancel</button>
-          <button type="button" onClick={onConnect} className="rounded-lg bg-[#1E5E54] px-4 py-2 text-[13px] font-medium text-white hover:bg-[#184D45]">Connect device</button>
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-[12px] text-[#A32D2D]">{error ?? ''}</span>
+          <div className="flex gap-2">
+            <button type="button" onClick={onClose} className="rounded-lg px-3.5 py-2 text-[13px] text-[#5F6368] hover:bg-black/[0.03]">Cancel</button>
+            <button type="button" disabled={!canSave} onClick={connect} className="rounded-lg bg-[#1E5E54] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:cursor-not-allowed disabled:opacity-40">{saving ? 'Connecting…' : 'Connect device'}</button>
+          </div>
         </div>
       }
     >
@@ -206,13 +250,13 @@ function AddDeviceWizard({ open, onClose, onConnect }: { open: boolean; onClose:
         </div>
         <div>
           <label className="mb-1 block text-[13px] font-medium text-[#1A1C1E]">Device name</label>
-          <input className={input} placeholder="e.g. Bench Scale 2" />
+          <input value={name} onChange={(e) => setName(e.target.value)} className={input} placeholder="e.g. Bench Scale 2" />
         </div>
         <div>
           <label className="mb-1 block text-[13px] font-medium text-[#1A1C1E]">Location</label>
-          <input className={input} placeholder="e.g. Cold prep" />
+          <input value={location} onChange={(e) => setLocation(e.target.value)} className={input} placeholder="e.g. Cold prep" />
         </div>
-        <p className="rounded-lg bg-[#F6FAF8] px-3 py-2 text-[12px] text-[#5F6368]">More connectors (IoT sensors, barcode & camera stations) plug in here as we add them.</p>
+        <p className="rounded-lg bg-[#F6FAF8] px-3 py-2 text-[12px] text-[#5F6368]">More connectors (IoT sensors, barcode &amp; camera stations) plug in here as we add them.</p>
       </div>
     </Drawer>
   );

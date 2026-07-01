@@ -95,7 +95,7 @@ export function WasteOverview() {
 
       <MobileWidgets onAction={() => setLogOpen(true)} />
 
-      <LogWasteModal open={logOpen} onClose={() => setLogOpen(false)} onSaved={() => show('Waste logged (demo)')} />
+      <LogWasteModal open={logOpen} onClose={() => setLogOpen(false)} onSaved={() => show('Waste logged')} />
     </div>
   );
 }
