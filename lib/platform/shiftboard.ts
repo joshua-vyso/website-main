@@ -151,6 +151,7 @@ export const ATTENDANCE_STYLE: Record<AttendanceStatus, { bg: string; fg: string
 };
 
 export interface AttendanceRecord {
+  id: string;
   employeeId: string;
   name: string;
   department: DepartmentName;

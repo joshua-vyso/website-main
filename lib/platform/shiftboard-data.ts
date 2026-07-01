@@ -89,6 +89,7 @@ export async function getShiftBoardData(orgId: string): Promise<ShiftBoardData> 
   };
 
   const attendance: AttendanceRecord[] = ((att.data as any[]) ?? []).map((r) => ({
+    id: r.id,
     employeeId: r.employee_id ?? '',
     name: r.name,
     department: r.department ?? '',

@@ -1,20 +1,45 @@
 'use client';
 
+import { useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useToast, RowActionsMenu } from '@/components/platform/orderflow/ui';
 import { Kpi } from '@/components/platform/module-ui';
+import { usePlatform } from '@/lib/platform/session';
+import { createClient } from '@/lib/platform/supabase-browser';
+import type { AttendanceStatus } from '@/lib/platform/shiftboard';
 import { AttendanceBadge, DeptBadge } from './shared';
 import { useShiftBoard } from './context';
 
 export function Attendance() {
   const { node, show } = useToast();
   const sb = useShiftBoard();
+  const router = useRouter();
+  const { org } = usePlatform();
+  // Optimistic status overrides so the badge flips immediately; the DB write follows.
+  const [overrides, setOverrides] = useState<Record<string, AttendanceStatus>>({});
 
-  const clockedIn = sb.attendance.filter((a) => a.clockIn != null).length;
-  const late = sb.attendance.filter((a) => a.status === 'Late').length;
-  const absent = sb.attendance.filter((a) => a.status === 'Absent').length;
+  const attendance = useMemo(() => sb.attendance.map((a) => ({ ...a, status: overrides[a.id] ?? a.status })), [sb.attendance, overrides]);
+
+  async function setStatus(id: string, status: AttendanceStatus, label: string) {
+    setOverrides((o) => ({ ...o, [id]: status })); // optimistic
+    show(label);
+    const supabase = createClient();
+    if (!supabase || !org) return;
+    const { error } = await supabase.from('sb_attendance').update({ status }).eq('id', id);
+    if (error) {
+      setOverrides((o) => { const { [id]: _drop, ...rest } = o; return rest; }); // revert
+      show(`Couldn't save: ${error.message}`);
+      return;
+    }
+    router.refresh();
+  }
+
+  const clockedIn = attendance.filter((a) => a.clockIn != null).length;
+  const late = attendance.filter((a) => a.status === 'Late').length;
+  const absent = attendance.filter((a) => a.status === 'Absent').length;
   // Overtime accrued this week (hours over contract) — the daily snapshot is mid-shift.
   const overtime = sb.employees.reduce((s, e) => s + Math.max(0, e.hoursThisWeek - e.contractedHours), 0);
-  const pending = sb.attendance.filter((a) => a.status === 'Manual review').length + (sb.attendance.length ? 3 : 0);
+  const pending = attendance.filter((a) => a.status === 'Manual review').length;
 
   const header = (
     <div>
@@ -60,8 +85,8 @@ export function Attendance() {
               </tr>
             </thead>
             <tbody>
-              {sb.attendance.map((a) => (
-                <tr key={a.employeeId} className="border-b border-[#F6F6F2] last:border-0 hover:bg-[#FAFAF8]">
+              {attendance.map((a) => (
+                <tr key={a.id} className="border-b border-[#F6F6F2] last:border-0 hover:bg-[#FAFAF8]">
                   <td className="px-3 py-3 font-medium text-[#1A1C1E]">{a.name}</td>
                   <td className="px-3 py-3"><DeptBadge department={a.department} /></td>
                   <td className="px-3 py-3 tabular-nums text-[#5F6368]">{a.scheduled}</td>
@@ -73,8 +98,8 @@ export function Attendance() {
                   <td className="px-3 py-3 text-right">
                     <RowActionsMenu actions={[
                       { label: 'Adjust time', onClick: () => show('Adjust time (demo)') },
-                      { label: 'Mark absent', onClick: () => show('Marked absent (demo)') },
-                      { label: 'Approve timesheet', onClick: () => show('Timesheet approved (demo)') },
+                      { label: 'Mark absent', onClick: () => void setStatus(a.id, 'Absent', `Marked ${a.name} absent`) },
+                      { label: 'Approve timesheet', onClick: () => void setStatus(a.id, 'On time', `Timesheet approved for ${a.name}`) },
                       { label: 'View history', onClick: () => show('Attendance history (demo)') },
                     ]} />
                   </td>

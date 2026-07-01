@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { zar } from '@/lib/platform/orderflow';
 import { useToast } from '@/components/platform/orderflow/ui';
 import { ModuleHeader, PrimaryAction, SecondaryAction, KpiStrip, Kpi } from '@/components/platform/module-ui';
@@ -11,6 +12,7 @@ import { FinancialFlow } from './FinancialFlow';
 import { BudgetWorkspace } from './BudgetWorkspace';
 import { ForecastCardsRich, ForecastDrivers, ForecastInsight } from './Forecast';
 import { ScenariosWorkspace } from './Scenarios';
+import { AddBudgetLineModal } from './AddBudgetLineModal';
 
 const M = MODULE_META.planwise;
 
@@ -26,19 +28,22 @@ function PageTitle({ title, subtitle }: { title: string; subtitle?: string }) {
 export function OverviewView() {
   const { node, show } = useToast();
   const pw = usePlanWise();
+  const [budgetOpen, setBudgetOpen] = useState(false);
   const { totalBudget, totalActual, monthlyGoal, scenarioBase, forecast } = pw;
   const used = totalBudget > 0 ? Math.round((totalActual / totalBudget) * 100) : 0;
   const variance = totalActual - totalBudget;
   const profitLine = forecast.find((f) => f.id === 'profit');
   const forecastProfit = profitLine ? profitLine.value : scenarioBase.revenue - scenarioBase.expenses;
 
-  const header = <ModuleHeader icon={M.icon} title={M.name} description="Where are we trying to get to — and what needs to happen to get there?" actions={<PrimaryAction onClick={() => show('Create budget (demo)')}>+ Create budget</PrimaryAction>} />;
+  const header = <ModuleHeader icon={M.icon} title={M.name} description="Where are we trying to get to — and what needs to happen to get there?" actions={<PrimaryAction onClick={() => setBudgetOpen(true)}>+ Add budget line</PrimaryAction>} />;
+  const budgetModal = <AddBudgetLineModal open={budgetOpen} onClose={() => setBudgetOpen(false)} onSaved={(c) => show(`${c} added to budget`)} />;
 
   if (pw.isEmpty) {
     return (
       <div className="space-y-5">
         {node}
         {header}
+        {budgetModal}
         <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
           <p className="text-[15px] font-medium text-[#1A1C1E]">No plan set up yet</p>
           <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">Set a budget, goals and a forecast to see your revenue target, budget health and the decisions that close the gap here.</p>
@@ -51,6 +56,7 @@ export function OverviewView() {
     <div className="space-y-5">
       {node}
       {header}
+      {budgetModal}
 
       <KpiStrip>
         <Kpi label="Monthly revenue target" value={zar(monthlyGoal.targetRevenue)} />
@@ -71,12 +77,14 @@ export function OverviewView() {
 
 export function BudgetView() {
   const { node, show } = useToast();
+  const [budgetOpen, setBudgetOpen] = useState(false);
   return (
     <div className="space-y-5">
       {node}
+      <AddBudgetLineModal open={budgetOpen} onClose={() => setBudgetOpen(false)} onSaved={(c) => show(`${c} added to budget`)} />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <PageTitle title="Budget" subtitle="Explore where your budget goes — hover and click to dig in" />
-        <SecondaryAction onClick={() => show('Adjust budget (demo)')}>Adjust budget</SecondaryAction>
+        <SecondaryAction onClick={() => setBudgetOpen(true)}>+ Add category</SecondaryAction>
       </div>
       <BudgetWorkspace />
     </div>

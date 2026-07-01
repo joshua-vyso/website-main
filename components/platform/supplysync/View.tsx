@@ -35,6 +35,7 @@ export function SupplySyncView({ data }: { data: SupplySyncData }) {
   const [tab, setTab] = useState<Tab>('Suppliers');
   const [search, setSearch] = useState('');
   const [addOpen, setAddOpen] = useState(false);
+  const [noteOpen, setNoteOpen] = useState(false);
 
   const suppliers = data.suppliers;
   const q = search.trim().toLowerCase();
@@ -71,6 +72,7 @@ export function SupplySyncView({ data }: { data: SupplySyncData }) {
       <ModuleHeader icon={M.icon} title={M.name} description={M.description} actions={<PrimaryAction onClick={() => setAddOpen(true)}>+ Add supplier</PrimaryAction>} />
 
       <AddSupplierModal open={addOpen} onClose={() => setAddOpen(false)} onSaved={(name) => toast(`${name} added`)} />
+      <AddNoteModal open={noteOpen} suppliers={suppliers} onClose={() => setNoteOpen(false)} onSaved={(name) => toast(`Note added to ${name}`)} />
 
       {empty ? (
         <div className="mt-8 rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
@@ -169,7 +171,7 @@ export function SupplySyncView({ data }: { data: SupplySyncData }) {
                       <div className="mt-1 text-[13px] text-[#5F6368]">{n.body}</div>
                     </div>
                   ))}
-                  <button type="button" onClick={() => toast('Add note (demo)')} className="text-[13px] font-medium text-[#1E5E54] hover:underline">+ Add note</button>
+                  <button type="button" onClick={() => setNoteOpen(true)} disabled={suppliers.length === 0} className="text-[13px] font-medium text-[#1E5E54] hover:underline disabled:opacity-40">+ Add note</button>
                 </div>
               ) : null}
             </div>
@@ -294,6 +296,87 @@ function AddSupplierModal({ open, onClose, onSaved }: { open: boolean; onClose: 
         <div className="mt-5 flex justify-end gap-2">
           <button type="button" onClick={onClose} disabled={busy} className="rounded-lg px-3.5 py-2 text-[13px] text-[#5F6368] hover:bg-black/[0.03] disabled:opacity-50">Cancel</button>
           <button type="button" onClick={save} disabled={busy} className="rounded-lg bg-[#1E5E54] px-4 py-2 text-[13px] font-medium text-white hover:bg-[#184D45] disabled:opacity-60">{busy ? 'Saving…' : 'Add supplier'}</button>
+        </div>
+      </div>
+    </div>,
+    document.body,
+  );
+}
+
+/** Append a running note to a supplier's `notes` jsonb. */
+function AddNoteModal({ open, suppliers, onClose, onSaved }: { open: boolean; suppliers: Supplier[]; onClose: () => void; onSaved: (name: string) => void }) {
+  const router = useRouter();
+  const { org } = usePlatform();
+  const [mounted, setMounted] = useState(false);
+  const [supplierId, setSupplierId] = useState('');
+  const [body, setBody] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    if (open) {
+      setSupplierId(suppliers[0]?.id ?? '');
+      setBody('');
+      setBusy(false);
+      setError(null);
+    }
+  }, [open, suppliers]);
+  useEffect(() => {
+    if (!open) return;
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape' && !busy) onClose(); };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [open, onClose, busy]);
+
+  async function save() {
+    const text = body.trim();
+    const supplier = suppliers.find((s) => s.id === supplierId);
+    if (!text) { setError('Write a note first.'); return; }
+    if (!supplier) { setError('Pick a supplier.'); return; }
+    const supabase = createClient();
+    if (!supabase || !org) { setError('Not connected.'); return; }
+    setBusy(true);
+    setError(null);
+    const date = new Date().toISOString().slice(0, 10);
+    const notes = [...supplier.notes, { body: text, date, author: 'You' }];
+    const { error: err } = await supabase.from('ss_suppliers').update({ notes }).eq('id', supplier.id);
+    setBusy(false);
+    if (err) { setError(err.message); return; }
+    onSaved(supplier.name);
+    onClose();
+    router.refresh();
+  }
+
+  if (!mounted || !open) return null;
+  const input = 'w-full rounded-lg border border-[#E7E7E2] bg-white px-3 py-2 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none';
+  return createPortal(
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={MODAL_STYLE}>
+      <div className="absolute inset-0 bg-[#1A1C1E]/25 backdrop-blur-[1px]" onClick={() => !busy && onClose()} />
+      <div role="dialog" aria-modal="true" className="relative w-full max-w-[420px] rounded-2xl border border-[#E7E7E2] bg-white p-5 shadow-[0_24px_70px_-20px_rgba(26,28,30,0.45)]">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h2 className="text-[16px] font-semibold text-[#1A1C1E]">Add note</h2>
+            <p className="mt-0.5 text-[13px] text-[#5F6368]">A running note on a supplier.</p>
+          </div>
+          <button type="button" onClick={onClose} aria-label="Close" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[18px] text-[#9A9DA1] transition-colors hover:bg-[#F0F0EC] hover:text-[#1A1C1E]">✕</button>
+        </div>
+        <div className="mt-4 space-y-3">
+          <div>
+            <label className="mb-1 block text-[13px] font-medium text-[#1A1C1E]">Supplier</label>
+            <select value={supplierId} onChange={(e) => setSupplierId(e.target.value)} className={`${input} h-10`}>
+              {suppliers.map((s) => <option key={s.id} value={s.id}>{s.name}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="mb-1 block text-[13px] font-medium text-[#1A1C1E]">Note</label>
+            <textarea autoFocus value={body} onChange={(e) => { setBody(e.target.value); if (error) setError(null); }} placeholder="e.g. Confirmed price hold on citrus through August" className={`${input} h-24`} />
+          </div>
+          {error ? <p className="text-[12px] text-[#A32D2D]">{error}</p> : null}
+        </div>
+        <div className="mt-5 flex justify-end gap-2">
+          <button type="button" onClick={onClose} disabled={busy} className="rounded-lg px-3.5 py-2 text-[13px] text-[#5F6368] hover:bg-black/[0.03] disabled:opacity-50">Cancel</button>
+          <button type="button" onClick={save} disabled={busy} className="rounded-lg bg-[#1E5E54] px-4 py-2 text-[13px] font-medium text-white hover:bg-[#184D45] disabled:opacity-60">{busy ? 'Saving…' : 'Add note'}</button>
         </div>
       </div>
     </div>,
