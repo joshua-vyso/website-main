@@ -188,7 +188,7 @@ export function RecipeEditor({
   }
 
   const field =
-    'h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none';
+    'h-10 rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none';
 
   return (
     <div>
@@ -278,7 +278,7 @@ export function RecipeEditor({
                       <div className="flex items-center gap-2">
                         <div className="relative flex-1">
                           <input
-                            className={field}
+                            className={`${field} w-full`}
                             placeholder="Search stock or type a name"
                             value={row.product_name}
                             onFocus={() => setOpenRow(i)}
