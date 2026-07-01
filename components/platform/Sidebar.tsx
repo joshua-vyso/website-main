@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { MODULES } from '@/lib/platform/modules';
+import { SERVICEDEN_ACCOUNT_EMAIL } from '@/lib/platform/serviceden';
 import { usePlatform } from '@/lib/platform/session';
 import { createClient } from '@/lib/platform/supabase-browser';
 import { AppIcon } from './AppIcon';
@@ -15,9 +16,10 @@ function initials(name: string | null | undefined): string {
 }
 
 export function Sidebar() {
-  const { org, features } = usePlatform();
+  const { org, features, email } = usePlatform();
   const pathname = usePathname();
   const router = useRouter();
+  const serviceDenActive = pathname === '/app/serviceden' || pathname.startsWith('/app/serviceden/');
 
   async function signOut() {
     const supabase = createClient();
@@ -67,6 +69,23 @@ export function Sidebar() {
             </Link>
           );
         })}
+
+        {/* ServiceDen — private to Vyso's own account (email-gated, not in the shared registry). */}
+        {email === SERVICEDEN_ACCOUNT_EMAIL ? (
+          <Link
+            href="/app/serviceden"
+            className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] font-medium transition-colors ${serviceDenActive ? 'bg-[#E6F0FB] text-[#1A1C1E]' : 'text-[#1A1C1E] hover:bg-black/[0.03]'}`}
+          >
+            <span className="flex h-[26px] w-[26px] items-center justify-center" aria-hidden>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="7" width="20" height="14" rx="2" />
+                <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+                <path d="M2 13h20" />
+              </svg>
+            </span>
+            <span className="flex-1">ServiceDen</span>
+          </Link>
+        ) : null}
       </nav>
 
       <div className="space-y-1 px-3 pb-1">
