@@ -2,8 +2,11 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useRouter } from 'next/navigation';
 import { useToast } from '@/components/platform/orderflow/ui';
 import { Kpi, Badge } from '@/components/platform/module-ui';
+import { usePlatform } from '@/lib/platform/session';
+import { createClient } from '@/lib/platform/supabase-browser';
 import { LEAVE_TYPE_TONE, type LeaveRequest, type LeaveStatus } from '@/lib/platform/shiftboard';
 import { DeptBadge } from './shared';
 import { useShiftBoard } from './context';
@@ -13,7 +16,9 @@ const MODAL_RADIUS = { fontFamily: 'var(--font-inter)', ['--radius' as string]: 
 export function LeaveWorkspace() {
   const { node, show } = useToast();
   const sb = useShiftBoard();
-  // Local status overrides so approve/decline visibly change the card (mock).
+  const router = useRouter();
+  const { org } = usePlatform();
+  // Optimistic overrides so the card flips immediately; the DB write + refresh follow.
   const [overrides, setOverrides] = useState<Record<string, LeaveStatus>>({});
   const [confirm, setConfirm] = useState<LeaveRequest | null>(null);
 
@@ -25,17 +30,29 @@ export function LeaveWorkspace() {
   const annualDays = sb.leave.filter((r) => r.type === 'Annual leave').reduce((s, r) => s + r.days, 0);
   const coverageRisk = requests.filter((r) => r.status === 'Pending' && r.coverageRisk === 'high').length;
 
+  async function setStatus(r: LeaveRequest, status: LeaveStatus) {
+    setOverrides((o) => ({ ...o, [r.id]: status })); // optimistic
+    show(status === 'Approved' ? 'Leave approved' : 'Leave declined');
+    const supabase = createClient();
+    if (!supabase || !org) return;
+    const { error } = await supabase.from('sb_leave_requests').update({ status }).eq('id', r.id);
+    if (error) {
+      setOverrides((o) => { const { [r.id]: _drop, ...rest } = o; return rest; }); // revert
+      show(`Couldn't save: ${error.message}`);
+      return;
+    }
+    router.refresh();
+  }
+
   function approve(r: LeaveRequest) {
     if (r.coverageRisk === 'high') {
       setConfirm(r);
       return;
     }
-    setOverrides((o) => ({ ...o, [r.id]: 'Approved' }));
-    show('Leave approved (demo)');
+    void setStatus(r, 'Approved');
   }
   function decline(r: LeaveRequest) {
-    setOverrides((o) => ({ ...o, [r.id]: 'Declined' }));
-    show('Leave declined (demo)');
+    void setStatus(r, 'Declined');
   }
 
   return (
@@ -95,10 +112,7 @@ export function LeaveWorkspace() {
         request={confirm}
         onClose={() => setConfirm(null)}
         onConfirm={() => {
-          if (confirm) {
-            setOverrides((o) => ({ ...o, [confirm.id]: 'Approved' }));
-            show('Leave approved despite coverage risk (demo)');
-          }
+          if (confirm) void setStatus(confirm, 'Approved');
           setConfirm(null);
         }}
       />
