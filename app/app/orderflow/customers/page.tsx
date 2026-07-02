@@ -1,43 +1,38 @@
 import { getPlatformSession, createServerSupabase } from '@/lib/platform/supabase-server';
+import { getCustomersData } from '@/lib/platform/orderflow-data';
 import { CustomersView } from '@/components/platform/orderflow/CustomersView';
-import type { OfCustomer, OfOrder } from '@/lib/platform/orderflow';
-import type { OrderLite } from '@/lib/platform/orderflow-crm';
+import type { OfInvoiceItem } from '@/lib/platform/orderflow';
 
-type ItemAgg = { order_id: string; qty: number; unit_price: number };
-
+/**
+ * Customers list — the operational customer book, built entirely on Core Data
+ * (of_customers) with real invoice/payment aggregates. Server-fetches once and
+ * hands the whole slice to the client view (no mocks).
+ *
+ * getCustomersData returns invoices + payments but not invoice items; we fetch
+ * items here so the outstanding-balance column can be derived exactly via
+ * docTotals + paymentsTotal (contract rule 10).
+ */
 export default async function OrderFlowCustomersPage() {
   const session = await getPlatformSession();
-  const orgId = session?.org?.id ?? '';
-  const db = await createServerSupabase();
+  const orgId = session?.org?.id ?? null;
 
-  const [{ data: customers }, { data: orders }, { data: items }] = await Promise.all([
-    db.from('of_customers').select('*').eq('org_id', orgId).order('name', { ascending: true }),
-    db.from('of_orders').select('id, customer_id, status, invoice_number, created_at').eq('org_id', orgId),
-    db.from('of_order_items').select('order_id, qty, unit_price').eq('org_id', orgId),
+  if (!orgId) {
+    return <CustomersView customers={[]} invoices={[]} invoiceItems={[]} payments={[]} paymentTerms={[]} />;
+  }
+
+  const [data, itemsRes] = await Promise.all([
+    getCustomersData(orgId),
+    createServerSupabase().then((sb) => sb.from('of_invoice_items').select('*').eq('org_id', orgId)),
   ]);
+  const invoiceItems = ((itemsRes.data as OfInvoiceItem[] | null) ?? []) as OfInvoiceItem[];
 
-  const byOrder = new Map<string, { total: number; count: number }>();
-  for (const it of (items ?? []) as ItemAgg[]) {
-    const agg = byOrder.get(it.order_id) ?? { total: 0, count: 0 };
-    agg.total += (Number(it.qty) || 0) * (Number(it.unit_price) || 0);
-    agg.count += 1;
-    byOrder.set(it.order_id, agg);
-  }
-
-  const ordersByCustomer: Record<string, OrderLite[]> = {};
-  for (const o of (orders ?? []) as Pick<OfOrder, 'id' | 'customer_id' | 'status' | 'invoice_number' | 'created_at'>[]) {
-    if (!o.customer_id) continue;
-    const agg = byOrder.get(o.id) ?? { total: 0, count: 0 };
-    (ordersByCustomer[o.customer_id] ??= []).push({
-      id: o.id,
-      customer_id: o.customer_id,
-      status: o.status,
-      invoice_number: o.invoice_number,
-      created_at: o.created_at,
-      total: agg.total,
-      item_count: agg.count,
-    });
-  }
-
-  return <CustomersView customers={(customers ?? []) as OfCustomer[]} ordersByCustomer={ordersByCustomer} />;
+  return (
+    <CustomersView
+      customers={data.customers}
+      invoices={data.invoices}
+      invoiceItems={invoiceItems}
+      payments={data.payments}
+      paymentTerms={data.paymentTerms}
+    />
+  );
 }

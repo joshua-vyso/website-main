@@ -8,6 +8,8 @@
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { ExtractedData } from './types';
 import { invoiceNumber } from './orderflow';
+import type { CdPriceList, CdPriceOverride } from './coredata';
+import { customerPriceList, resolvePrice } from './coredata';
 
 export interface CustomerLite {
   id: string;
@@ -193,8 +195,9 @@ export async function syncOrderFromDocument(
   const lines = ed.line_items ?? [];
 
   // Resolve customer — an explicit pick (from review) wins; else fuzzy-match.
-  const { data: custRows } = await db.from('of_customers').select('id, name').eq('org_id', orgId);
-  const customers = (custRows ?? []) as CustomerLite[];
+  // select('*') so default_price_list_id (core-data.sql) rides along when present.
+  const { data: custRows } = await db.from('of_customers').select('*').eq('org_id', orgId);
+  const customers = (custRows ?? []) as (CustomerLite & { default_price_list_id?: string | null })[];
   let customerId = params.customerId ?? null;
   let matchConfidence = customerId ? 100 : 0;
   if (!customerId) {
@@ -204,24 +207,21 @@ export async function syncOrderFromDocument(
   }
   const customerKnown = !!customerId && matchConfidence >= CUSTOMER_CONFIDENT;
 
-  // Pricing: document price first; otherwise the customer's price list.
-  type PriceListRow = { id: string; default_margin_pct: number };
-  let priceList: PriceListRow | null = null;
-  const overrideByItem = new Map<string, number>();
-  if (customerId) {
-    const { data: pls } = await db
-      .from('pl_price_lists')
-      .select('id, default_margin_pct')
-      .eq('org_id', orgId)
-      .eq('customer_id', customerId)
-      .order('created_at', { ascending: true });
-    priceList = ((pls as PriceListRow[] | null)?.[0]) ?? null;
-    if (priceList) {
-      const { data: ov } = await db.from('pl_overrides').select('stock_item_id, margin_pct').eq('price_list_id', priceList.id);
-      for (const o of (ov ?? []) as { stock_item_id: string; margin_pct: number }[]) {
-        overrideByItem.set(o.stock_item_id, Number(o.margin_pct));
-      }
-    }
+  // Pricing: document price first; otherwise the shared Core Data resolution —
+  // customerPriceList picks the customer's explicit default list when valid, else
+  // their newest valid own list, else the org standard list; resolvePrice then
+  // applies custom-price/margin overrides exactly like the invoice builder.
+  // select('*') keeps this safe pre-migration (never names a missing column).
+  const { data: plRows } = await db.from('pl_price_lists').select('*').eq('org_id', orgId);
+  const matchedCustomer = customerId ? customers.find((c) => c.id === customerId) ?? null : null;
+  const priceList = customerPriceList(
+    matchedCustomer ? { id: matchedCustomer.id, default_price_list_id: matchedCustomer.default_price_list_id ?? null } : null,
+    (plRows ?? []) as CdPriceList[],
+  );
+  let overrides: CdPriceOverride[] = [];
+  if (priceList) {
+    const { data: ov } = await db.from('pl_overrides').select('*').eq('price_list_id', priceList.id);
+    overrides = (ov ?? []) as CdPriceOverride[];
   }
 
   // Catalogue (loaded once) for fuzzy product matching of each ordered line.
@@ -238,19 +238,15 @@ export async function syncOrderFromDocument(
     if (!name) continue;
     const qty = num(li.quantity) ?? 0;
     const s = matchStockItem(name, stockItems);
-    const basePrice = s?.avg_unit_price != null ? Number(s.avg_unit_price) : null;
     let unitPrice = num(li.unit_price);
     let priced = unitPrice != null; // a real price came off the document
     if (unitPrice == null) {
-      if (priceList && basePrice != null && s) {
-        const margin = overrideByItem.has(s.id) ? overrideByItem.get(s.id)! : Number(priceList.default_margin_pct ?? 0);
-        unitPrice = Math.round(basePrice * (1 + margin / 100) * 100) / 100;
-        priced = true;
-      } else if (basePrice != null) {
-        unitPrice = basePrice;
+      const resolved = s ? resolvePrice(s, priceList, overrides) : null;
+      if (resolved && resolved.source !== 'none') {
+        unitPrice = resolved.price;
         priced = true;
       } else {
-        unitPrice = 0; // no price on the doc, no stock match, no price list — unresolved
+        unitPrice = 0; // no price on the doc, no resolvable stock/list price — unresolved
       }
     }
     if (!priced) unpricedLines += 1;
@@ -280,12 +276,22 @@ export async function syncOrderFromDocument(
   let inv = (existingOrder as { invoice_number: string | null } | null)?.invoice_number ?? null;
   const status = finalize ? 'invoiced' : 'draft';
   if (finalize && !inv) {
-    const { count } = await db
-      .from('of_orders')
-      .select('id', { count: 'exact', head: true })
-      .eq('org_id', orgId)
-      .not('invoice_number', 'is', null);
-    inv = invoiceNumber((count ?? 0) + 1);
+    // Shared numbering: allocate from the same of_next_number() counter the
+    // invoice builder uses, so doc-driven invoices can't collide with
+    // builder-created ones. Orders that already carry a number keep it (`!inv`
+    // guard above) so re-syncs stay stable. Pre-migration (rpc missing) we fall
+    // back to the legacy count-based scheme.
+    const { data: alloc, error: allocErr } = await db.rpc('of_next_number', { p_kind: 'invoice' });
+    if (!allocErr && typeof alloc === 'string' && alloc) {
+      inv = alloc;
+    } else {
+      const { count } = await db
+        .from('of_orders')
+        .select('id', { count: 'exact', head: true })
+        .eq('org_id', orgId)
+        .not('invoice_number', 'is', null);
+      inv = invoiceNumber((count ?? 0) + 1);
+    }
   }
 
   if (orderId) {
@@ -313,6 +319,74 @@ export async function syncOrderFromDocument(
         unit_price: i.unit_price,
       })),
     );
+  }
+
+  // Materialise a REAL invoice (of_invoices + item snapshot) for auto-invoiced
+  // orders so the v2 Invoices module sees the sale. Idempotent: one invoice per
+  // order — when a row already exists for this order we only re-link it, and an
+  // order that already carried an invoice number keeps it (no re-allocation) so
+  // re-syncs stay stable. Tolerant of the core-data migration not being applied
+  // yet: a missing table/column just skips this step and the order behaves
+  // exactly as before.
+  if (status === 'invoiced' && orderId && inv) {
+    const { data: existInv, error: invLookErr } = await db
+      .from('of_invoices')
+      .select('id')
+      .eq('org_id', orgId)
+      .eq('order_id', orderId)
+      .maybeSingle();
+    if (!invLookErr) {
+      let invoiceId = (existInv as { id: string } | null)?.id ?? null;
+      if (!invoiceId) {
+        const { data: setRow } = await db
+          .from('of_settings')
+          .select('default_vat_rate, default_payment_terms_days')
+          .eq('org_id', orgId)
+          .maybeSingle();
+        const settings = setRow as { default_vat_rate?: number; default_payment_terms_days?: number } | null;
+        const vatRate = Number(settings?.default_vat_rate ?? 15);
+        const termsDays = Number(settings?.default_payment_terms_days ?? 30);
+        const issued = new Date();
+        const due = new Date(issued.getTime() + termsDays * 86_400_000);
+        const { data: createdInv, error: invInsErr } = await db
+          .from('of_invoices')
+          .insert({
+            org_id: orgId,
+            customer_id: customerId,
+            order_id: orderId,
+            invoice_number: inv,
+            status: 'sent',
+            issue_date: issued.toISOString().slice(0, 10),
+            due_date: due.toISOString().slice(0, 10),
+            vat_rate: vatRate,
+            sent_at: issued.toISOString(),
+          })
+          .select('id')
+          .single();
+        if (!invInsErr && createdInv) {
+          invoiceId = (createdInv as { id: string }).id;
+          if (items.length > 0) {
+            await db.from('of_invoice_items').insert(
+              items.map((i, idx) => ({
+                org_id: orgId,
+                invoice_id: invoiceId,
+                stock_item_id: i.stock_item_id,
+                name: i.name,
+                qty: i.qty,
+                unit: i.unit,
+                unit_price: i.unit_price,
+                sort_order: idx,
+              })),
+            );
+          }
+        }
+      }
+      if (invoiceId) {
+        // invoice_id column may predate the migration — a failed link is fine,
+        // the invoice row itself still exists and lists under Invoices.
+        await db.from('of_orders').update({ invoice_id: invoiceId }).eq('id', orderId);
+      }
+    }
   }
 
   await syncStock(db, orgId, orderId, status === 'invoiced', inv);

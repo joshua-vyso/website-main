@@ -5,20 +5,37 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/platform/supabase-browser';
 import { usePlatform } from '@/lib/platform/session';
+import { logActivity } from '@/lib/platform/orderflow-activity';
 import {
   ORDER_STATUSES,
   ORDER_STATUS_STYLE,
+  docTotals,
+  isoDatePlusDays,
   paymentStatusOf,
-  withVat,
   zar,
+  zar2,
+  type OfCustomer,
+  type OfSettings,
   type OrderStatus,
   type PaymentStatus,
 } from '@/lib/platform/orderflow';
-import { mockDeliveryDate, orderAttention, orderActivity, compareOrders, type OrderLite } from '@/lib/platform/orderflow-crm';
+import { orderAttention, compareOrders, type OrderLite } from '@/lib/platform/orderflow-crm';
+import { customerPriceList, formatAddress, resolvePrice } from '@/lib/platform/coredata';
+import type { BuilderContext } from '@/lib/platform/orderflow-data';
+import {
+  CustomerSelect,
+  LineItemsEditor,
+  createDeliveryNote,
+  createInvoice,
+  createOrder,
+  type BuilderLine,
+} from './builder';
+import { Field as FormField, PrimaryBtn, SecondaryBtn, ConfirmDialog, inputClass } from '@/components/platform/coredata/ui';
 import { Kpi, OrderStatusBadge, PaymentStatusBadge, RowActionsMenu, Drawer, useToast } from './ui';
 import { PublishOrderButton } from './PublishOrderButton';
 
 export interface OrderItemLite {
+  stock_item_id?: string | null;
   name: string;
   qty: number;
   unit: string | null;
@@ -29,15 +46,17 @@ export interface OrderRow {
   customer_id: string | null;
   customer_name: string;
   status: OrderStatus;
+  order_number: string | null;
   invoice_number: string | null;
+  invoice_id: string | null;
+  delivery_date: string | null;
+  delivery_address: string | null;
+  delivery_instructions: string | null;
+  customer_po: string | null;
   notes: string | null;
   total: number;
   item_count: number;
   created_at: string;
-}
-interface CustomerLite {
-  id: string;
-  name: string;
 }
 interface ProductLite {
   id: string;
@@ -54,8 +73,10 @@ interface Line {
   unit_price: string;
 }
 
-function fmtDate(iso: string) {
-  const d = new Date(iso);
+function fmtDate(iso: string | null | undefined) {
+  if (!iso) return '—';
+  // Bare dates (yyyy-mm-dd) are anchored to noon so the local calendar day holds.
+  const d = new Date(iso.length === 10 ? `${iso}T12:00:00` : iso);
   return Number.isNaN(d.getTime()) ? '—' : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 function isSameDay(a: number, b: number) {
@@ -63,27 +84,54 @@ function isSameDay(a: number, b: number) {
   const db = new Date(b);
   return da.getFullYear() === db.getFullYear() && da.getMonth() === db.getMonth() && da.getDate() === db.getDate();
 }
-function orderRef(o: OrderRow) {
-  return o.invoice_number ?? `#${o.id.slice(0, 6).toUpperCase()}`;
+function orderRef(o: Pick<OrderRow, 'id' | 'order_number' | 'invoice_number'>) {
+  return o.order_number ?? o.invoice_number ?? `#${o.id.slice(0, 6).toUpperCase()}`;
 }
+/** Order lines → builder lines for createInvoice / createOrder (source 'base', no override note). */
+function toBuilderLines(items: OrderItemLite[]): BuilderLine[] {
+  return items.map((it, i) => ({
+    key: `ol${i}`,
+    stock_item_id: it.stock_item_id ?? null,
+    name: it.name,
+    qty: Number(it.qty) || 0,
+    unit: it.unit,
+    unit_price: Number(it.unit_price) || 0,
+    source: 'base' as const,
+    override_note: null,
+  }));
+}
+/** Reflect a sale in ProcurePulse stock — the same call this module has always made. */
+async function syncOrderStock(orderId: string, action: 'apply' | 'reverse') {
+  await fetch('/api/orderflow/order-stock', {
+    method: 'POST',
+    headers: { 'content-type': 'application/json' },
+    body: JSON.stringify({ orderId, action }),
+  }).catch(() => {});
+}
+
+const INVOICED_STATUSES: OrderStatus[] = ['invoiced', 'partially_paid', 'paid'];
+const PIPELINE_STATUSES: OrderStatus[] = ['draft', 'confirmed', 'picking', 'packed', 'out_for_delivery', 'delivered'];
 
 export function OrdersView({
   orders,
   items,
   customers,
   products,
+  settings,
   orgUnits = [],
 }: {
   orders: OrderRow[];
   items: Record<string, OrderItemLite[]>;
-  customers: CustomerLite[];
+  customers: OfCustomer[];
   products: ProductLite[];
+  settings: OfSettings;
   orgUnits?: string[];
 }) {
   const router = useRouter();
-  const { org } = usePlatform();
+  const { org, email } = usePlatform();
   const { node: toastNode, show: toast } = useToast();
   const now = Date.now();
+  const vatRate = Number(settings.default_vat_rate) || 15;
 
   // ---- Filters + selection + drawer ----
   const [search, setSearch] = useState('');
@@ -94,8 +142,11 @@ export function OrdersView({
   const [to, setTo] = useState('');
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [drawerId, setDrawerId] = useState<string | null>(null);
+  const [actionBusy, setActionBusy] = useState(false);
+  const [cancelIds, setCancelIds] = useState<string[] | null>(null);
+  const selectedRows = orders.filter((o) => selected.has(o.id));
 
-  // ---- New-order builder (preserved) ----
+  // ---- Quick-order modal builder (preserved) ----
   const unitOptions = (current?: string): string[] => {
     const cur = (current ?? '').trim();
     if (cur && !orgUnits.some((u) => u.toLowerCase() === cur.toLowerCase())) return [...orgUnits, cur];
@@ -106,7 +157,7 @@ export function OrdersView({
   const [customerQuery, setCustomerQuery] = useState('');
   const [customerOpen, setCustomerOpen] = useState(false);
   const [creatingCustomer, setCreatingCustomer] = useState(false);
-  const [customerList, setCustomerList] = useState<CustomerLite[]>(customers);
+  const [customerList, setCustomerList] = useState<OfCustomer[]>(customers);
   const [lines, setLines] = useState<Line[]>([]);
   const [query, setQuery] = useState('');
   const [deliveryDate, setDeliveryDate] = useState('');
@@ -127,7 +178,7 @@ export function OrdersView({
     return orders.some((o) => o.customer_id === customerId && o.status !== 'cancelled' && isSameDay(new Date(o.created_at).getTime(), now));
   }, [customerId, orders, now]);
 
-  function pickCustomer(c: CustomerLite) {
+  function pickCustomer(c: Pick<OfCustomer, 'id' | 'name'>) {
     setCustomerId(c.id);
     setCustomerQuery(c.name);
     setCustomerOpen(false);
@@ -138,14 +189,21 @@ export function OrdersView({
     const supabase = createClient();
     if (!supabase || !org?.id) return;
     setCreatingCustomer(true);
-    const { data, error } = await supabase.from('of_customers').insert({ org_id: org.id, name: n }).select('id, name').single();
+    const { data, error } = await supabase.from('of_customers').insert({ org_id: org.id, name: n }).select('*').single();
     setCreatingCustomer(false);
     if (error || !data) return;
-    const c = data as CustomerLite;
+    const c = data as OfCustomer;
+    logActivity(supabase, {
+      orgId: org.id,
+      actorEmail: email,
+      entityType: 'customer',
+      entityId: c.id,
+      customerId: c.id,
+      event: 'customer_created',
+      description: `${c.name} — added from the order builder`,
+    });
     setCustomerList((prev) => [...prev, c]);
-    setCustomerId(c.id);
-    setCustomerQuery(c.name);
-    setCustomerOpen(false);
+    pickCustomer(c);
   }
 
   const matches = useMemo(() => {
@@ -193,7 +251,7 @@ export function OrdersView({
     setLines(
       its.map((it) => ({
         key: `l-${tempRef.n++}`,
-        stock_item_id: null,
+        stock_item_id: it.stock_item_id ?? null,
         name: it.name,
         qty: String(it.qty),
         unit: it.unit ?? '',
@@ -220,41 +278,275 @@ export function OrdersView({
   async function saveOrder() {
     if (!canSave || busy) return;
     const supabase = createClient();
-    if (!supabase || !org?.id) return;
-    setBusy(true);
-    const noteParts = [orderNotes.trim(), deliveryDate ? `Delivery: ${fmtDate(deliveryDate)}` : ''].filter(Boolean);
-    const { data: order, error } = await supabase
-      .from('of_orders')
-      .insert({ org_id: org.id, customer_id: customerId, status: 'draft', notes: noteParts.join(' · ') || null })
-      .select('id')
-      .single();
-    if (error || !order?.id) {
-      setBusy(false);
-      toast('Could not create the order.');
+    if (!supabase || !org?.id) {
+      toast('Not connected.');
       return;
     }
-    const rows = lines
+    setBusy(true);
+    const builderLines: BuilderLine[] = lines
       .filter((l) => l.name.trim() && Number(l.qty) > 0)
       .map((l) => ({
-        org_id: org.id,
-        order_id: order.id as string,
+        key: l.key,
         stock_item_id: l.stock_item_id,
         name: l.name.trim(),
         qty: Number(l.qty) || 0,
         unit: l.unit.trim() || null,
         unit_price: Number(l.unit_price) || 0,
+        source: l.stock_item_id ? ('base' as const) : ('none' as const),
+        override_note: null,
       }));
-    if (rows.length) {
-      await supabase.from('of_order_items').insert(rows);
-      await fetch('/api/orderflow/order-stock', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ orderId: order.id, action: 'apply' }),
-      }).catch(() => {});
+    let orderId: string | null = null;
+    try {
+      const res = await createOrder(supabase, {
+        orgId: org.id,
+        actorEmail: email,
+        customerId,
+        lines: builderLines,
+        notes: orderNotes.trim() || null,
+        deliveryDate: deliveryDate || null,
+        status: 'draft',
+      });
+      orderId = res.id;
+    } catch {
+      // core-data migration not applied yet (new of_orders columns missing) —
+      // fall back to the original minimal insert so quick orders keep working.
+      const noteParts = [orderNotes.trim(), deliveryDate ? `Delivery: ${fmtDate(deliveryDate)}` : ''].filter(Boolean);
+      const { data: order, error } = await supabase
+        .from('of_orders')
+        .insert({ org_id: org.id, customer_id: customerId, status: 'draft', notes: noteParts.join(' · ') || null })
+        .select('id')
+        .single();
+      if (error || !order?.id) {
+        setBusy(false);
+        toast(error?.message ?? 'Could not create the order.');
+        return;
+      }
+      orderId = order.id as string;
+      if (builderLines.length) {
+        await supabase.from('of_order_items').insert(
+          builderLines.map((l) => ({
+            org_id: org.id,
+            order_id: orderId,
+            stock_item_id: l.stock_item_id,
+            name: l.name,
+            qty: l.qty,
+            unit: l.unit,
+            unit_price: l.unit_price,
+          })),
+        );
+      }
+      logActivity(supabase, {
+        orgId: org.id,
+        actorEmail: email,
+        entityType: 'order',
+        entityId: orderId,
+        customerId,
+        event: 'order_created',
+        description: `${builderLines.length} line${builderLines.length === 1 ? '' : 's'} (quick order)`,
+      });
     }
+    if (orderId && builderLines.length) await syncOrderStock(orderId, 'apply');
     setBusy(false);
     resetBuilder();
+    toast('Order created');
     router.refresh();
+  }
+
+  // ---- Real actions: invoice / delivery note / status / cancel / duplicate ----
+
+  function canInvoice(o: OrderRow): boolean {
+    return !o.invoice_id && !INVOICED_STATUSES.includes(o.status) && o.status !== 'cancelled' && (items[o.id] ?? []).length > 0;
+  }
+
+  async function generateInvoiceFor(o: OrderRow): Promise<{ ok: boolean; msg: string }> {
+    const supabase = createClient();
+    if (!supabase || !org) return { ok: false, msg: 'Not connected.' };
+    if (o.invoice_id || INVOICED_STATUSES.includes(o.status)) return { ok: false, msg: `${orderRef(o)} is already invoiced.` };
+    if (o.status === 'cancelled') return { ok: false, msg: `${orderRef(o)} is cancelled.` };
+    const its = items[o.id] ?? [];
+    if (!its.length) return { ok: false, msg: `${orderRef(o)} has no line items.` };
+    const customer = customers.find((c) => c.id === o.customer_id) ?? null;
+    const today = new Date().toISOString().slice(0, 10);
+    try {
+      const res = await createInvoice(supabase, {
+        orgId: org.id,
+        actorEmail: email,
+        customer,
+        customerId: o.customer_id,
+        lines: toBuilderLines(its),
+        vatRate,
+        issueDate: today,
+        dueDate: isoDatePlusDays(today, customer?.payment_terms_days ?? settings.default_payment_terms_days),
+        customerPo: o.customer_po,
+        deliveryAddress: o.delivery_address,
+        deliveryInstructions: o.delivery_instructions,
+        orderId: o.id,
+      });
+      await syncOrderStock(o.id, 'apply');
+      return { ok: true, msg: `Invoice ${res.number} created` };
+    } catch (err) {
+      return { ok: false, msg: err instanceof Error ? err.message : 'Could not create the invoice.' };
+    }
+  }
+
+  async function invoiceOne(o: OrderRow) {
+    if (actionBusy) return;
+    setActionBusy(true);
+    const res = await generateInvoiceFor(o);
+    setActionBusy(false);
+    toast(res.msg);
+    if (res.ok) router.refresh();
+  }
+
+  async function invoiceSelected() {
+    if (actionBusy) return;
+    setActionBusy(true);
+    let ok = 0;
+    let firstErr: string | null = null;
+    for (const o of selectedRows) {
+      if (!canInvoice(o)) continue;
+      const res = await generateInvoiceFor(o);
+      if (res.ok) ok += 1;
+      else firstErr ??= res.msg;
+    }
+    setActionBusy(false);
+    setSelected(new Set());
+    toast(ok > 0 ? `${ok} invoice${ok === 1 ? '' : 's'} created${firstErr ? ` · ${firstErr}` : ''}` : firstErr ?? 'Nothing to invoice in the selection.');
+    if (ok > 0) router.refresh();
+  }
+
+  async function deliveryNoteFor(o: OrderRow) {
+    if (actionBusy) return;
+    const supabase = createClient();
+    if (!supabase || !org) {
+      toast('Not connected.');
+      return;
+    }
+    const its = items[o.id] ?? [];
+    if (!its.length) {
+      toast(`${orderRef(o)} has no line items.`);
+      return;
+    }
+    setActionBusy(true);
+    try {
+      const res = await createDeliveryNote(supabase, {
+        orgId: org.id,
+        actorEmail: email,
+        customerId: o.customer_id,
+        orderId: o.id,
+        deliveryAddress: o.delivery_address,
+        instructions: o.delivery_instructions,
+        lines: its.map((i) => ({ name: i.name, qty: Number(i.qty) || 0, unit: i.unit })),
+      });
+      toast(`Delivery note ${res.number} created`);
+      router.refresh();
+      router.push(`/app/orderflow/delivery-notes/${res.id}`);
+    } catch (err) {
+      setActionBusy(false);
+      toast(err instanceof Error ? err.message : 'Could not create the delivery note.');
+    }
+  }
+
+  async function duplicateOrder(o: OrderRow) {
+    if (actionBusy) return;
+    const supabase = createClient();
+    if (!supabase || !org) {
+      toast('Not connected.');
+      return;
+    }
+    const its = items[o.id] ?? [];
+    if (!its.length) {
+      toast(`${orderRef(o)} has no line items to duplicate.`);
+      return;
+    }
+    setActionBusy(true);
+    try {
+      const res = await createOrder(supabase, {
+        orgId: org.id,
+        actorEmail: email,
+        customerId: o.customer_id,
+        lines: toBuilderLines(its),
+        notes: `Duplicated from ${orderRef(o)}`,
+        deliveryAddress: o.delivery_address,
+        deliveryInstructions: o.delivery_instructions,
+        customerPo: o.customer_po,
+        status: 'draft',
+      });
+      await syncOrderStock(res.id, 'apply');
+      toast(`Order ${res.number} created`);
+      router.refresh();
+      router.push(`/app/orderflow/orders/${res.id}`);
+    } catch (err) {
+      setActionBusy(false);
+      toast(err instanceof Error ? err.message : 'Could not duplicate the order.');
+    }
+  }
+
+  async function markDeliveredSelected() {
+    if (actionBusy) return;
+    const supabase = createClient();
+    if (!supabase || !org) {
+      toast('Not connected.');
+      return;
+    }
+    const eligible = selectedRows.filter((o) => PIPELINE_STATUSES.includes(o.status) && o.status !== 'delivered');
+    if (!eligible.length) {
+      toast('No selected orders can be marked delivered.');
+      return;
+    }
+    setActionBusy(true);
+    let ok = 0;
+    for (const o of eligible) {
+      const { error } = await supabase.from('of_orders').update({ status: 'delivered' }).eq('id', o.id);
+      if (error) continue;
+      ok += 1;
+      logActivity(supabase, {
+        orgId: org.id,
+        actorEmail: email,
+        entityType: 'order',
+        entityId: o.id,
+        customerId: o.customer_id,
+        event: 'order_status_changed',
+        description: `${orderRef(o)}: ${ORDER_STATUS_STYLE[o.status].label} → Delivered`,
+      });
+    }
+    setActionBusy(false);
+    setSelected(new Set());
+    toast(ok > 0 ? `${ok} order${ok === 1 ? '' : 's'} marked delivered` : 'Could not update the selection.');
+    if (ok > 0) router.refresh();
+  }
+
+  async function cancelOrders(ids: string[]) {
+    const supabase = createClient();
+    if (!supabase || !org) {
+      toast('Not connected.');
+      return;
+    }
+    setActionBusy(true);
+    let ok = 0;
+    for (const id of ids) {
+      const o = orders.find((x) => x.id === id);
+      if (!o || INVOICED_STATUSES.includes(o.status) || o.status === 'cancelled') continue;
+      const { error } = await supabase.from('of_orders').update({ status: 'cancelled' }).eq('id', id);
+      if (error) continue;
+      ok += 1;
+      // Put any sold stock back — cancelled orders must not keep a decrement.
+      await syncOrderStock(id, 'reverse');
+      logActivity(supabase, {
+        orgId: org.id,
+        actorEmail: email,
+        entityType: 'order',
+        entityId: id,
+        customerId: o.customer_id,
+        event: 'order_status_changed',
+        description: `${orderRef(o)}: ${ORDER_STATUS_STYLE[o.status].label} → Cancelled`,
+      });
+    }
+    setActionBusy(false);
+    setSelected(new Set());
+    setCancelIds(null);
+    toast(ok > 0 ? `${ok} order${ok === 1 ? '' : 's'} cancelled` : 'Invoiced orders can’t be cancelled here.');
+    if (ok > 0) router.refresh();
   }
 
   // ---- KPIs ----
@@ -266,8 +558,10 @@ export function OrdersView({
     return {
       today: orders.filter((o) => isSameDay(new Date(o.created_at).getTime(), now)).length,
       pending: orders.filter((o) => o.status === 'draft').length,
-      readyToInvoice: orders.filter((o) => o.status === 'confirmed' || o.status === 'packed' || o.status === 'delivered').length,
-      deliveredToday: orders.filter((o) => o.status === 'delivered' && isSameDay(new Date(mockDeliveryDate(o)).getTime(), now)).length,
+      readyToInvoice: orders.filter((o) => PIPELINE_STATUSES.includes(o.status) && o.status !== 'draft' && !o.invoice_id).length,
+      deliveredToday: orders.filter(
+        (o) => o.status === 'delivered' && o.delivery_date && isSameDay(new Date(`${o.delivery_date}T12:00:00`).getTime(), now),
+      ).length,
       outstanding,
       aov: active.length ? active.reduce((s, o) => s + o.total, 0) / active.length : 0,
     };
@@ -287,7 +581,7 @@ export function OrdersView({
       if (toTs != null && ts >= toTs) return false;
       if (q) {
         const inItems = (items[o.id] ?? []).some((it) => it.name.toLowerCase().includes(q));
-        const hay = `${o.customer_name} ${o.invoice_number ?? ''} ${orderRef(o)}`.toLowerCase();
+        const hay = `${o.customer_name} ${o.invoice_number ?? ''} ${o.order_number ?? ''} ${orderRef(o)}`.toLowerCase();
         if (!hay.includes(q) && !inItems) return false;
       }
       return true;
@@ -306,7 +600,7 @@ export function OrdersView({
   // ---- Selection / bulk ----
   const allFilteredSelected = filtered.length > 0 && filtered.every((o) => selected.has(o.id));
   function toggleAll() {
-    setSelected((prev) => {
+    setSelected(() => {
       if (allFilteredSelected) return new Set();
       return new Set(filtered.map((o) => o.id));
     });
@@ -320,11 +614,20 @@ export function OrdersView({
     });
   }
   function exportCsv(rows: OrderRow[]) {
-    const header = ['Order', 'Customer', 'Status', 'Payment', 'Items', 'Total', 'Created'];
+    const header = ['Order', 'Customer', 'Status', 'Payment', 'Items', 'Total', 'Delivery', 'Created'];
     const lines2 = [header.join(',')];
     for (const o of rows) {
       lines2.push(
-        [orderRef(o), `"${o.customer_name.replace(/"/g, '""')}"`, o.status, paymentStatusOf(o.status), o.item_count, Math.round(o.total), fmtDate(o.created_at)].join(','),
+        [
+          orderRef(o),
+          `"${o.customer_name.replace(/"/g, '""')}"`,
+          o.status,
+          paymentStatusOf(o.status),
+          o.item_count,
+          Math.round(o.total),
+          o.delivery_date ?? '',
+          fmtDate(o.created_at),
+        ].join(','),
       );
     }
     const blob = new Blob([lines2.join('\r\n')], { type: 'text/csv;charset=utf-8' });
@@ -339,7 +642,6 @@ export function OrdersView({
   }
 
   const drawerOrder = drawerId ? orders.find((o) => o.id === drawerId) ?? null : null;
-  const selectedRows = orders.filter((o) => selected.has(o.id));
 
   const cell = 'h-9 rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:border-[#1E5E54]/40 focus:outline-none';
   const filterSel = 'h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#1E5E54]';
@@ -357,10 +659,16 @@ export function OrdersView({
           <button
             type="button"
             onClick={() => setOpen(true)}
+            className="inline-flex h-10 items-center rounded-xl border border-[#D7DAD8] bg-white px-4 text-[14px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/40"
+          >
+            Quick order
+          </button>
+          <Link
+            href="/app/orderflow/orders/new"
             className="inline-flex h-10 items-center rounded-xl bg-[#1E5E54] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#184D45]"
           >
             + New order
-          </button>
+          </Link>
         </div>
       </div>
 
@@ -411,10 +719,10 @@ export function OrdersView({
             <div className="flex flex-wrap items-center gap-2 border-b border-[#F0F0EC] bg-[#F6FAF8] px-4 py-2.5 text-[13px]">
               <span className="font-medium text-[#1A1C1E]">{selected.size} selected</span>
               <span className="flex-1" />
-              <BulkBtn onClick={() => toast(`Generating ${selected.size} invoices… (demo)`)}>Generate invoices</BulkBtn>
-              <BulkBtn onClick={() => exportCsv(selectedRows)}>Export CSV</BulkBtn>
-              <BulkBtn onClick={() => toast(`Marked ${selected.size} delivered (demo)`)}>Mark delivered</BulkBtn>
-              <BulkBtn onClick={() => toast(`Archived ${selected.size} orders (demo)`)} danger>Archive</BulkBtn>
+              <BulkBtn onClick={() => void invoiceSelected()} disabled={actionBusy}>Generate invoices</BulkBtn>
+              <BulkBtn onClick={() => exportCsv(selectedRows)} disabled={actionBusy}>Export CSV</BulkBtn>
+              <BulkBtn onClick={() => void markDeliveredSelected()} disabled={actionBusy}>Mark delivered</BulkBtn>
+              <BulkBtn onClick={() => setCancelIds([...selected])} disabled={actionBusy} danger>Cancel orders</BulkBtn>
               <button type="button" onClick={() => setSelected(new Set())} className="text-[12px] text-[#9A9DA1] hover:text-[#5F6368]">Clear</button>
             </div>
           ) : null}
@@ -459,18 +767,20 @@ export function OrdersView({
                       <td className="px-2 py-3"><OrderStatusBadge status={o.status} /></td>
                       <td className="px-2 py-3"><PaymentStatusBadge status={paymentStatusOf(o.status)} /></td>
                       <td className="px-2 py-3 text-right tabular-nums text-[#5F6368]">{o.item_count}</td>
-                      <td className="px-2 py-3 text-[#5F6368]">{fmtDate(mockDeliveryDate(o))}</td>
+                      <td className="px-2 py-3 text-[#5F6368]">{fmtDate(o.delivery_date)}</td>
                       <td className="px-2 py-3 text-right font-medium tabular-nums text-[#1A1C1E]">{zar(o.total)}</td>
                       <td className="px-2 py-3 text-[#9A9DA1]">{fmtDate(o.created_at)}</td>
                       <td className="px-2 py-3" onClick={(e) => e.stopPropagation()}>
                         <RowActionsMenu
                           actions={[
                             { label: 'View', onClick: () => setDrawerId(o.id) },
-                            { label: 'Edit', onClick: () => router.push(`/app/orderflow/orders/${o.id}`) },
-                            { label: 'Generate invoice', onClick: () => toast('Invoice generated (demo)') },
-                            { label: 'Duplicate', onClick: () => toast('Order duplicated (demo)') },
-                            { label: 'Download PDF', onClick: () => toast('PDF downloaded (demo)') },
-                            { label: 'Archive', onClick: () => toast('Order archived (demo)'), danger: true },
+                            { label: 'Open', onClick: () => router.push(`/app/orderflow/orders/${o.id}`) },
+                            ...(canInvoice(o) ? [{ label: 'Generate invoice', onClick: () => void invoiceOne(o) }] : []),
+                            { label: 'Create delivery note', onClick: () => void deliveryNoteFor(o) },
+                            { label: 'Duplicate', onClick: () => void duplicateOrder(o) },
+                            ...(!INVOICED_STATUSES.includes(o.status) && o.status !== 'cancelled'
+                              ? [{ label: 'Cancel order', onClick: () => setCancelIds([o.id]), danger: true }]
+                              : []),
                           ]}
                         />
                       </td>
@@ -503,6 +813,17 @@ export function OrdersView({
         </div>
       </div>
 
+      {/* Cancel confirmation */}
+      <ConfirmDialog
+        open={cancelIds != null}
+        title={cancelIds && cancelIds.length > 1 ? `Cancel ${cancelIds.length} orders?` : 'Cancel this order?'}
+        body="Cancelled orders keep their history but reverse any stock movements. Invoiced orders are skipped."
+        confirmLabel="Cancel orders"
+        danger
+        onConfirm={() => cancelIds && void cancelOrders(cancelIds)}
+        onClose={() => setCancelIds(null)}
+      />
+
       {/* Order detail drawer */}
       <Drawer
         open={!!drawerOrder}
@@ -513,40 +834,41 @@ export function OrdersView({
         width={520}
         footer={
           drawerOrder ? (
-            <div className="flex items-center justify-between">
-              <button type="button" onClick={() => toast('PDF downloaded (demo)')} className="text-[13px] font-medium text-[#5F6368] hover:text-[#1A1C1E]">
-                Download PDF
-              </button>
-              <div className="flex gap-2">
-                <Link href={`/app/orderflow/orders/${drawerOrder.id}`} className="rounded-lg border border-[#D7DAD8] bg-white px-3.5 py-2 text-[13px] font-medium text-[#1A1C1E] hover:border-[#1E5E54]/40">
-                  Open full page
-                </Link>
-                <button type="button" onClick={() => toast('Invoice generated (demo)')} className="rounded-lg bg-[#1E5E54] px-3.5 py-2 text-[13px] font-medium text-white hover:bg-[#184D45]">
+            <div className="flex items-center justify-end gap-2">
+              <Link href={`/app/orderflow/orders/${drawerOrder.id}`} className="rounded-lg border border-[#D7DAD8] bg-white px-3.5 py-2 text-[13px] font-medium text-[#1A1C1E] hover:border-[#1E5E54]/40">
+                Open full page
+              </Link>
+              {canInvoice(drawerOrder) ? (
+                <button
+                  type="button"
+                  onClick={() => void invoiceOne(drawerOrder)}
+                  disabled={actionBusy}
+                  className="rounded-lg bg-[#1E5E54] px-3.5 py-2 text-[13px] font-medium text-white hover:bg-[#184D45] disabled:opacity-40"
+                >
                   Generate invoice
                 </button>
-              </div>
+              ) : null}
             </div>
           ) : undefined
         }
       >
-        {drawerOrder ? <OrderDrawerBody order={drawerOrder} items={items} allOrders={orders} /> : null}
+        {drawerOrder ? <OrderDrawerBody order={drawerOrder} items={items} allOrders={orders} vatRate={vatRate} /> : null}
       </Drawer>
 
-      {/* New order builder */}
+      {/* Quick-order builder (modal) */}
       {open ? (
-        <div className="fixed inset-0 z-[80] flex items-start justify-center p-4 pt-[7vh]">
+        <div className="fixed inset-0 z-[80] flex items-start justify-center p-4 pt-[7vh]" style={{ fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties}>
           <button type="button" aria-label="Close" onClick={resetBuilder} className="absolute inset-0 bg-black/20" />
           <div className="relative z-10 w-full max-w-[640px] rounded-2xl border border-[#E7E7E2] bg-white p-5 shadow-[0_24px_70px_-20px_rgba(26,28,30,0.5)]">
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-[16px] font-semibold text-[#1A1C1E]">New order</h3>
+              <h3 className="text-[16px] font-semibold text-[#1A1C1E]">Quick order</h3>
               <button type="button" onClick={resetBuilder} aria-label="Close" className="text-[#9A9DA1] hover:text-[#1A1C1E]">✕</button>
             </div>
 
             {/* Quick-start */}
             <div className="mb-4 flex flex-wrap gap-1.5">
               <QuickStart onClick={repeatLastOrder}>↻ Repeat last order</QuickStart>
-              <QuickStart onClick={() => toast('Last week’s order loaded (demo)')}>Repeat last week</QuickStart>
-              <QuickStart onClick={() => toast('Templates coming soon (demo)')}>Use template</QuickStart>
+              <QuickStart onClick={() => { resetBuilder(); router.push('/app/orderflow/orders/new'); }}>Open full builder</QuickStart>
               <QuickStart onClick={() => toast('Use the Upload order button to import a document.')}>Upload order</QuickStart>
             </div>
 
@@ -654,12 +976,13 @@ export function OrdersView({
   );
 }
 
-function BulkBtn({ children, onClick, danger }: { children: React.ReactNode; onClick: () => void; danger?: boolean }) {
+function BulkBtn({ children, onClick, danger, disabled }: { children: React.ReactNode; onClick: () => void; danger?: boolean; disabled?: boolean }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className={`rounded-lg border bg-white px-3 py-1.5 text-[12px] font-medium transition-colors ${
+      disabled={disabled}
+      className={`rounded-lg border bg-white px-3 py-1.5 text-[12px] font-medium transition-colors disabled:opacity-50 ${
         danger ? 'border-[#F0D9D9] text-[#A32D2D] hover:bg-[#FCEBEB]' : 'border-[#D7DAD8] text-[#1A1C1E] hover:border-[#1E5E54]/40'
       }`}
     >
@@ -676,11 +999,9 @@ function QuickStart({ children, onClick }: { children: React.ReactNode; onClick:
   );
 }
 
-function OrderDrawerBody({ order, items, allOrders }: { order: OrderRow; items: Record<string, OrderItemLite[]>; allOrders: OrderRow[] }) {
+function OrderDrawerBody({ order, items, allOrders, vatRate }: { order: OrderRow; items: Record<string, OrderItemLite[]>; allOrders: OrderRow[]; vatRate: number }) {
   const its = items[order.id] ?? [];
-  const subtotal = its.reduce((s, i) => s + (Number(i.qty) || 0) * (Number(i.unit_price) || 0), 0);
-  const v = withVat(subtotal);
-  const activity = orderActivity({ ...order } as OrderLite, order.customer_name);
+  const totals = docTotals(its, vatRate);
 
   const prevOrder = allOrders
     .filter((o) => o.customer_id === order.customer_id && new Date(o.created_at).getTime() < new Date(order.created_at).getTime())
@@ -693,8 +1014,13 @@ function OrderDrawerBody({ order, items, allOrders }: { order: OrderRow; items: 
         <Field label="Payment"><PaymentStatusBadge status={paymentStatusOf(order.status)} /></Field>
         <Field label="Invoice">{order.invoice_number ?? '—'}</Field>
         <Field label="Created">{fmtDate(order.created_at)}</Field>
-        <Field label="Delivery">{fmtDate(mockDeliveryDate(order))}</Field>
+        <Field label="Delivery">{fmtDate(order.delivery_date)}</Field>
       </div>
+      {order.delivery_address ? (
+        <Field label="Deliver to">
+          <span className="text-[13px] text-[#5F6368]">{order.delivery_address}</span>
+        </Field>
+      ) : null}
       {order.notes ? (
         <div className="rounded-xl border border-[#F0F0EC] bg-[#FCFCFB] px-3.5 py-2.5 text-[13px] text-[#5F6368]">{order.notes}</div>
       ) : null}
@@ -725,9 +1051,9 @@ function OrderDrawerBody({ order, items, allOrders }: { order: OrderRow; items: 
           </tbody>
         </table>
         <div className="mt-3 space-y-1 border-t border-[#F0F0EC] pt-3 text-[13px]">
-          <Row label="Subtotal" value={zar(v.subtotal)} />
-          <Row label="VAT (15%)" value={zar(v.vat)} muted />
-          <Row label="Total" value={zar(v.total)} bold />
+          <Row label="Subtotal" value={zar2(totals.subtotal)} />
+          <Row label={`VAT (${vatRate}%)`} value={zar2(totals.vat)} muted />
+          <Row label="Total" value={zar2(totals.total)} bold />
         </div>
       </Section>
 
@@ -748,26 +1074,6 @@ function OrderDrawerBody({ order, items, allOrders }: { order: OrderRow; items: 
           </div>
         </Section>
       ) : null}
-
-      <Section title="Activity">
-        <div className="flex flex-col gap-3">
-          {activity.map((a) => (
-            <div key={a.id} className="flex gap-3 text-[13px]">
-              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1E5E54]" />
-              <div className="min-w-0">
-                <div className="text-[#1A1C1E]">{a.label}{a.detail ? <span className="text-[#9A9DA1]"> · {a.detail}</span> : null}</div>
-                <div className="text-[11px] text-[#9A9DA1]">{fmtDate(a.date)}</div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </Section>
-
-      <Section title="Attachments">
-        <p className="rounded-xl border border-dashed border-[#E7E7E2] px-3.5 py-4 text-center text-[12px] text-[#9A9DA1]">
-          No attachments yet — signed delivery notes and POs will appear here.
-        </p>
-      </Section>
     </div>
   );
 }
@@ -793,6 +1099,240 @@ function Row({ label, value, bold, muted }: { label: string; value: string; bold
     <div className="flex items-center justify-between">
       <span className={muted ? 'text-[#9A9DA1]' : 'text-[#5F6368]'}>{label}</span>
       <span className={`tabular-nums ${bold ? 'font-bold text-[#1A1C1E]' : 'text-[#1A1C1E]'}`}>{value}</span>
+    </div>
+  );
+}
+
+// ===========================================================================
+// Full-page new-order builder (rendered by /app/orderflow/orders/new). Mirrors
+// the quote builder: CustomerSelect + delivery address (customer's saved
+// cd_delivery_addresses or a free-text override) + delivery date/instructions/
+// customer PO + LineItemsEditor with price-list resolution → builder.createOrder.
+// ===========================================================================
+
+export function NewOrderBuilder({ context, defaultCustomerId }: { context: BuilderContext; defaultCustomerId?: string | null }) {
+  const router = useRouter();
+  const { org, email } = usePlatform();
+  const { node: toastNode, show: toast } = useToast();
+
+  const [customerId, setCustomerId] = useState<string | null>(defaultCustomerId ?? null);
+  const [blines, setBlines] = useState<BuilderLine[]>([]);
+  const initialAddress = defaultCustomerId
+    ? context.addresses
+        .filter((a) => a.customer_id === defaultCustomerId)
+        .sort((a, b) => Number(b.is_default) - Number(a.is_default))[0] ?? null
+    : null;
+  /** '' = no address, 'custom' = free text, otherwise a cd_delivery_addresses id. */
+  const [addressChoice, setAddressChoice] = useState<string>(initialAddress?.id ?? '');
+  const [customAddress, setCustomAddress] = useState('');
+  const [instructions, setInstructions] = useState(initialAddress?.instructions ?? '');
+  const [deliveryDate, setDeliveryDate] = useState('');
+  const [customerPo, setCustomerPo] = useState('');
+  const [notes, setNotes] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const vatRate = Number(context.settings.default_vat_rate) || 15;
+  const customer = context.customers.find((c) => c.id === customerId) ?? null;
+  const priceList = useMemo(() => customerPriceList(customer, context.priceLists), [customer, context.priceLists]);
+  const customerAddresses = useMemo(
+    () =>
+      context.addresses
+        .filter((a) => a.customer_id === customerId)
+        .sort((a, b) => Number(b.is_default) - Number(a.is_default)),
+    [context.addresses, customerId],
+  );
+
+  function pickCustomer(id: string | null) {
+    setCustomerId(id);
+    const def = context.addresses
+      .filter((a) => a.customer_id === id)
+      .sort((a, b) => Number(b.is_default) - Number(a.is_default))[0];
+    setAddressChoice(def ? def.id : '');
+    setCustomAddress('');
+    setInstructions(def?.instructions ?? '');
+  }
+
+  const chosenAddress = customerAddresses.find((a) => a.id === addressChoice) ?? null;
+  const deliveryAddress = addressChoice === 'custom' ? customAddress.trim() || null : chosenAddress ? formatAddress(chosenAddress) : null;
+
+  /** A product line priced away from its resolved price needs a reason (override_note). */
+  const missingReason = useMemo(
+    () =>
+      blines.some((l) => {
+        if (!l.stock_item_id) return false;
+        const p = context.products.find((x) => x.id === l.stock_item_id);
+        if (!p) return false;
+        const r = resolvePrice(p, priceList, context.overrides);
+        return Math.abs((Number(l.unit_price) || 0) - r.price) > 0.005 && !(l.override_note ?? '').trim();
+      }),
+    [blines, context.products, priceList, context.overrides],
+  );
+
+  const validLines = blines.filter((l) => l.name.trim() && Number(l.qty) > 0);
+  const totals = docTotals(validLines, vatRate);
+  const canSave = !!customerId && validLines.length > 0 && !missingReason && !busy;
+
+  async function save(status: 'draft' | 'confirmed') {
+    if (busy) return;
+    const supabase = createClient();
+    if (!supabase || !org) {
+      setError('Not connected.');
+      return;
+    }
+    if (!customerId) {
+      setError('Pick a customer first.');
+      return;
+    }
+    if (!validLines.length) {
+      setError('Add at least one line item.');
+      return;
+    }
+    if (missingReason) {
+      setError('Every changed price needs a reason before saving.');
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await createOrder(supabase, {
+        orgId: org.id,
+        actorEmail: email,
+        customerId,
+        lines: validLines,
+        notes: notes.trim() || null,
+        deliveryAddress,
+        deliveryInstructions: instructions.trim() || null,
+        deliveryDate: deliveryDate || null,
+        customerPo: customerPo.trim() || null,
+        status,
+      });
+      // Reflect the sale in ProcurePulse stock — same behaviour as the quick-order modal.
+      await syncOrderStock(res.id, 'apply');
+      toast(`Order ${res.number} created`);
+      router.refresh();
+      router.push(`/app/orderflow/orders/${res.id}`);
+    } catch (err) {
+      setBusy(false);
+      const msg = err instanceof Error ? err.message : 'Could not create the order.';
+      setError(/column|relation|schema/i.test(msg) ? `${msg} — run supabase/core-data.sql to enable the full order builder.` : msg);
+    }
+  }
+
+  return (
+    <div>
+      {toastNode}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <Link
+            href="/app/orderflow/orders"
+            className="inline-flex h-8 items-center gap-1 rounded-full border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#5F6368] transition-colors hover:border-[#1E5E54]/30 hover:text-[#1A1C1E]"
+          >
+            <span aria-hidden>‹</span> Orders
+          </Link>
+          <h1 className="text-[22px] font-bold text-[#1A1C1E]">New order</h1>
+        </div>
+        <div className="flex items-center gap-2">
+          <SecondaryBtn onClick={() => void save('draft')} disabled={!canSave}>
+            {busy ? 'Saving…' : 'Save draft'}
+          </SecondaryBtn>
+          <PrimaryBtn onClick={() => void save('confirmed')} disabled={!canSave}>
+            {busy ? 'Saving…' : 'Create & confirm'}
+          </PrimaryBtn>
+        </div>
+      </div>
+
+      {error ? (
+        <div className="mt-4 rounded-xl border border-[#F0D9D9] bg-[#FCEBEB] px-4 py-2.5 text-[13px] text-[#A32D2D]">{error}</div>
+      ) : null}
+
+      <div className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-[340px_1fr]">
+        {/* Customer + delivery */}
+        <div className="space-y-4">
+          <div className="space-y-4 rounded-2xl border border-[#E7E7E2] bg-white p-5">
+            <h2 className="text-[14px] font-semibold text-[#1A1C1E]">Customer</h2>
+            <FormField label="Customer">
+              <CustomerSelect customers={context.customers} value={customerId} onChange={pickCustomer} allowCreate />
+            </FormField>
+            <FormField label="Customer PO" hint="optional">
+              <input value={customerPo} onChange={(e) => setCustomerPo(e.target.value)} placeholder="PO number on their order" className={inputClass} />
+            </FormField>
+          </div>
+
+          <div className="space-y-4 rounded-2xl border border-[#E7E7E2] bg-white p-5">
+            <h2 className="text-[14px] font-semibold text-[#1A1C1E]">Delivery</h2>
+            <FormField label="Deliver to">
+              <select
+                value={addressChoice}
+                onChange={(e) => {
+                  const v = e.target.value;
+                  setAddressChoice(v);
+                  const a = customerAddresses.find((x) => x.id === v);
+                  if (a && a.instructions && !instructions.trim()) setInstructions(a.instructions);
+                }}
+                className={inputClass}
+              >
+                <option value="">No delivery address</option>
+                {customerAddresses.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.nickname ? `${a.nickname} — ` : ''}{formatAddress(a) || 'Saved address'}
+                  </option>
+                ))}
+                <option value="custom">Custom address…</option>
+              </select>
+            </FormField>
+            {addressChoice === 'custom' ? (
+              <FormField label="Address">
+                <textarea
+                  value={customAddress}
+                  onChange={(e) => setCustomAddress(e.target.value)}
+                  rows={2}
+                  placeholder="Street, suburb, city…"
+                  className="w-full rounded-lg border border-[#D7DAD8] bg-white px-3 py-2 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/50 focus:outline-none"
+                />
+              </FormField>
+            ) : chosenAddress ? (
+              <p className="rounded-xl border border-[#F0F0EC] bg-[#FBFBF9] px-3 py-2 text-[12px] text-[#5F6368]">{formatAddress(chosenAddress) || '—'}</p>
+            ) : null}
+            <FormField label="Delivery date">
+              <input type="date" value={deliveryDate} onChange={(e) => setDeliveryDate(e.target.value)} className={inputClass} />
+            </FormField>
+            <FormField label="Delivery instructions" hint="optional">
+              <input value={instructions} onChange={(e) => setInstructions(e.target.value)} placeholder="Gate code, receiving hours…" className={inputClass} />
+            </FormField>
+          </div>
+
+          <div className="space-y-4 rounded-2xl border border-[#E7E7E2] bg-white p-5">
+            <h2 className="text-[14px] font-semibold text-[#1A1C1E]">Notes</h2>
+            <textarea
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              rows={3}
+              placeholder="Internal order notes…"
+              className="w-full rounded-lg border border-[#D7DAD8] bg-white px-3 py-2 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/50 focus:outline-none"
+            />
+          </div>
+        </div>
+
+        {/* Line items + totals */}
+        <div className="rounded-2xl border border-[#E7E7E2] bg-white p-5">
+          <h2 className="text-[14px] font-semibold text-[#1A1C1E]">Line items</h2>
+          <div className="mt-3">
+            <LineItemsEditor
+              products={context.products}
+              priceList={priceList}
+              overrides={context.overrides}
+              lines={blines}
+              onChange={setBlines}
+            />
+          </div>
+          <div className="mt-4 ml-auto w-full max-w-[280px] space-y-1.5 border-t border-[#F0F0EC] pt-3 text-[13px]">
+            <Row label="Subtotal" value={zar2(totals.subtotal)} />
+            <Row label={`VAT (${vatRate}%) if invoiced`} value={zar2(totals.vat)} muted />
+            <Row label="Total" value={zar2(totals.total)} bold />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,7 +1,48 @@
+import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import { getPlatformSession, createServerSupabase } from '@/lib/platform/supabase-server';
 import { FolderGridView } from '@/components/platform/docu/FolderGridView';
 import type { DocumentFolder, DocumentWithSupplier } from '@/lib/platform/types';
+
+/** Prominent entry point into Core Data (the shared operational tables). */
+function DatabasesTile() {
+  return (
+    <div className="px-8 pt-7">
+      <Link
+        href="/app/docu/databases"
+        className="group flex items-center gap-4 rounded-2xl border border-[#E7E7E2] bg-white p-5 transition-colors hover:border-[#1E5E54]/40 hover:bg-[#FAFAF8]"
+      >
+        <span
+          className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
+          style={{ backgroundColor: '#1E5E541A' }}
+          aria-hidden
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1E5E54" strokeWidth="1.8">
+            <ellipse cx="12" cy="5" rx="8" ry="3" />
+            <path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5" />
+            <path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6" />
+          </svg>
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <span className="text-[15px] font-semibold text-[#1A1C1E] transition-colors group-hover:text-[#1E5E54]">
+              Databases
+            </span>
+            <span className="rounded-full bg-[#F0F0EC] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#5F6368]">
+              Core Data
+            </span>
+          </div>
+          <p className="mt-0.5 text-[13px] text-[#5F6368]">
+            Customers, products, price lists, company profile and more — the shared source of truth behind every document.
+          </p>
+        </div>
+        <span className="shrink-0 text-[18px] text-[#C9CCC8] transition-colors group-hover:text-[#1E5E54]" aria-hidden>
+          &rsaquo;
+        </span>
+      </Link>
+    </div>
+  );
+}
 
 export default async function DocuInboxPage() {
   const session = await getPlatformSession();
@@ -38,5 +79,10 @@ export default async function DocuInboxPage() {
   const docs = (data ?? []) as DocumentWithSupplier[];
   const folders = (folderData ?? []) as DocumentFolder[];
 
-  return <FolderGridView docs={docs} folders={folders} />;
+  return (
+    <>
+      <DatabasesTile />
+      <FolderGridView docs={docs} folders={folders} />
+    </>
+  );
 }
