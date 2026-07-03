@@ -57,11 +57,14 @@ export function CustomerSelect({
   value,
   onChange,
   allowCreate,
+  allLabel,
 }: {
   customers: OfCustomer[];
   value: string | null;
   onChange: (id: string | null) => void;
   allowCreate?: boolean;
+  /** When set, null is a real choice shown as this label (e.g. "All customers"). */
+  allLabel?: string;
 }) {
   const { org, email } = usePlatform();
   const [open, setOpen] = useState(false);
@@ -150,8 +153,8 @@ export function CustomerSelect({
         onClick={() => setOpen((o) => !o)}
         className={`${inputClass} flex items-center justify-between gap-2 text-left`}
       >
-        <span className={`truncate ${selected ? 'text-[#1A1C1E]' : 'text-[#9A9DA1]'}`}>
-          {selected ? selected.name : 'Select customer…'}
+        <span className={`truncate ${selected || allLabel ? 'text-[#1A1C1E]' : 'text-[#9A9DA1]'}`}>
+          {selected ? selected.name : allLabel ?? 'Select customer…'}
         </span>
         <span className="shrink-0 text-[10px] text-[#9A9DA1]">▾</span>
       </button>
@@ -176,7 +179,15 @@ export function CustomerSelect({
             />
           </div>
           <div className="max-h-60 overflow-y-auto py-1">
-            {value ? (
+            {allLabel ? (
+              <button
+                type="button"
+                onClick={() => pick(null)}
+                className={`block w-full px-3 py-2 text-left transition-colors hover:bg-[#FAFAF8] ${value === null ? 'bg-[#F2F7F5]' : ''}`}
+              >
+                <span className="block truncate text-[13px] text-[#1A1C1E]">{allLabel}</span>
+              </button>
+            ) : value ? (
               <button
                 type="button"
                 onClick={() => pick(null)}

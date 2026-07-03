@@ -38,6 +38,7 @@ import {
 import { zar2 } from '@/lib/platform/pricepilot';
 import type { PriceCadence } from '@/lib/platform/pricepilot';
 import type { OfCustomer } from '@/lib/platform/orderflow';
+import { CustomerSelect } from '@/components/platform/orderflow/builder';
 import { downloadCsv, type CsvField } from '@/lib/platform/csv';
 import { Kpi, RowActionsMenu, Drawer, useToast } from './ui';
 import {
@@ -572,18 +573,12 @@ export function PriceListsView({
           </Field>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label="Customer" hint="(blank = all customers)">
-              <select
-                value={listDraft.customer_id}
-                onChange={(e) => setListDraft({ ...listDraft, customer_id: e.target.value })}
-                className={inputClass}
-              >
-                <option value="">All customers</option>
-                {customers.map((c) => (
-                  <option key={c.id} value={c.id}>
-                    {c.name}
-                  </option>
-                ))}
-              </select>
+              <CustomerSelect
+                customers={customers}
+                value={listDraft.customer_id || null}
+                onChange={(id) => setListDraft({ ...listDraft, customer_id: id ?? '' })}
+                allLabel="All customers"
+              />
             </Field>
             <Field label="Default margin %">
               <input
@@ -700,6 +695,9 @@ function PriceListEditor({
 
   // "Only needs review" filter — rows whose base cost is unknown.
   const [onlyReview, setOnlyReview] = useState(false);
+
+  // Typeahead over the products already on this list.
+  const [rowSearch, setRowSearch] = useState('');
 
   // CSV import.
   const [importing, setImporting] = useState(false);
@@ -1052,10 +1050,14 @@ function PriceListEditor({
   }, [rows, productById, list, latestStatementPrices]);
 
   const reviewCount = useMemo(() => displayRows.filter((d) => d.needsReview).length, [displayRows]);
-  const visibleRows = useMemo(
-    () => (onlyReview ? displayRows.filter((d) => d.needsReview) : displayRows),
-    [displayRows, onlyReview],
-  );
+  const visibleRows = useMemo(() => {
+    const q = rowSearch.trim().toLowerCase();
+    return displayRows.filter((d) => {
+      if (onlyReview && !d.needsReview) return false;
+      if (q && !(d.product?.name ?? '').toLowerCase().includes(q)) return false;
+      return true;
+    });
+  }, [displayRows, onlyReview, rowSearch]);
 
   return (
     <Drawer
@@ -1190,6 +1192,13 @@ function PriceListEditor({
         </div>
       ) : null}
 
+      {/* Search the products already on this list */}
+      {rows.length > 0 ? (
+        <div className="mb-3">
+          <SearchInput value={rowSearch} onChange={setRowSearch} placeholder={`Search this list's ${rows.length} products…`} />
+        </div>
+      ) : null}
+
       {/* Override rows */}
       {rows.length === 0 ? (
         <EmptyState
@@ -1306,7 +1315,9 @@ function PriceListEditor({
               {visibleRows.length === 0 ? (
                 <tr>
                   <td colSpan={6} className="px-3 py-8 text-center text-[13px] text-[#9A9DA1]">
-                    No items need review — every product has a cost.
+                    {rowSearch.trim()
+                      ? `No products on this list match “${rowSearch.trim()}”.`
+                      : 'No items need review — every product has a cost.'}
                   </td>
                 </tr>
               ) : null}
