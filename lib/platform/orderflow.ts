@@ -55,6 +55,8 @@ export interface OfCustomer {
   invoice_terms_text?: string | null;
   invoice_note?: string | null;
   ai_invoice_instructions?: string | null;
+  /** Standing rebate % (rebates.sql) — auto-deducted from this customer's invoices. */
+  rebate_pct?: number | null;
   // Flat imported fields (import-fields.sql) — editable on the profile.
   delivery_address?: string | null;
   contact_name?: string | null;
@@ -281,6 +283,8 @@ export interface OfInvoice {
   vat_rate: number;
   /** Absolute discount in rands, applied to the subtotal before VAT. */
   discount: number;
+  /** Customer rebate % snapshotted at creation, deducted after discount, before VAT. */
+  rebate_pct?: number;
   customer_po: string | null;
   billing_address: string | null;
   delivery_address: string | null;
@@ -474,11 +478,16 @@ export function docTotals(
   items: Pick<OfDocItem, 'qty' | 'unit_price'>[],
   vatRate: number,
   discount = 0,
-): { subtotal: number; discount: number; vat: number; total: number } {
+  rebatePct = 0,
+): { subtotal: number; discount: number; rebate: number; vat: number; total: number } {
   const subtotal = round2(items.reduce((s, i) => s + (Number(i.qty) || 0) * (Number(i.unit_price) || 0), 0));
   const disc = Math.min(round2(Number(discount) || 0), subtotal);
-  const vat = round2((subtotal - disc) * ((Number(vatRate) || 0) / 100));
-  return { subtotal, discount: disc, vat, total: round2(subtotal - disc + vat) };
+  const afterDisc = round2(subtotal - disc);
+  // Rebate is a % off what's left after any absolute discount, before VAT.
+  const rebate = round2(afterDisc * (Math.max(0, Number(rebatePct) || 0) / 100));
+  const net = round2(afterDisc - rebate);
+  const vat = round2(net * ((Number(vatRate) || 0) / 100));
+  return { subtotal, discount: disc, rebate, vat, total: round2(net + vat) };
 }
 
 function round2(n: number): number {

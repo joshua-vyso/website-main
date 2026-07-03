@@ -116,7 +116,7 @@ export function InvoicesViewV2({ data }: { data: InvoicesData }) {
 
     const now = new Date();
     return data.invoices.map((inv) => {
-      const total = docTotals(itemsByInvoice.get(inv.id) ?? [], inv.vat_rate, inv.discount).total;
+      const total = docTotals(itemsByInvoice.get(inv.id) ?? [], inv.vat_rate, inv.discount, inv.rebate_pct ?? 0).total;
       const paid = paymentsTotal(paymentsByInvoice.get(inv.id) ?? []);
       const credited = creditedByInvoice.get(inv.id) ?? 0;
       return {

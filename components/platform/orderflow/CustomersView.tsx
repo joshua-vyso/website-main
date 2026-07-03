@@ -147,7 +147,7 @@ export function CustomersView({
         if (!lastInvoice || (inv.issue_date && inv.issue_date > lastInvoice)) lastInvoice = inv.issue_date;
         // Draft/cancelled/credited invoices don't count toward outstanding.
         if (inv.status === 'draft' || inv.status === 'cancelled' || inv.status === 'credited') continue;
-        const total = docTotals(itemsByInvoice.get(inv.id) ?? [], inv.vat_rate, inv.discount).total;
+        const total = docTotals(itemsByInvoice.get(inv.id) ?? [], inv.vat_rate, inv.discount, inv.rebate_pct ?? 0).total;
         const paid = paymentsTotal(payByInvoice.get(inv.id) ?? []);
         const bal = balanceDue(total, paid);
         outstanding += bal;

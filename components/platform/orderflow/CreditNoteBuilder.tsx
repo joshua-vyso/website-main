@@ -112,7 +112,7 @@ export function CreditNoteBuilder({
       .filter((inv) => inv.status !== 'cancelled')
       .map((inv) => {
         const its = itemsByInvoice.get(inv.id) ?? [];
-        const total = docTotals(its, inv.vat_rate, inv.discount).total;
+        const total = docTotals(its, inv.vat_rate, inv.discount, inv.rebate_pct ?? 0).total;
         const paid = paymentsTotal(paymentsByInvoice.get(inv.id) ?? []);
         const credited = creditedByInvoice.get(inv.id) ?? 0;
         const balance = balanceDue(total, paid, credited);
@@ -260,7 +260,7 @@ export function CreditNoteBuilder({
       // it drops to zero while the invoice isn't fully paid, the invoice is now
       // effectively settled by credit → store status 'credited'. Otherwise the
       // stored status is left as-is (its displayed status stays derived).
-      const total = docTotals(invoiceLines, invoice.vat_rate, invoice.discount).total;
+      const total = docTotals(invoiceLines, invoice.vat_rate, invoice.discount, invoice.rebate_pct ?? 0).total;
       const paid = paymentsTotal(paymentsByInvoice.get(invoice.id) ?? []);
       const creditedBefore = creditedByInvoice.get(invoice.id) ?? 0;
       // Both sides of this sum are on the discount-adjusted basis (stored

@@ -47,6 +47,7 @@ import {
   PrimaryBtn,
   SecondaryBtn,
   DangerBtn,
+  ConfirmDialog,
   EmptyState,
   SearchInput,
   Pill,
@@ -239,6 +240,9 @@ export function PriceListsView({
   // Editor drawer — which list is open.
   const [openListId, setOpenListId] = useState<string | null>(null);
 
+  // Delete confirmation.
+  const [deletingList, setDeletingList] = useState<CdPriceList | null>(null);
+
   const customerName = useMemo(() => new Map(customers.map((c) => [c.id, c.name])), [customers]);
   const overrideCount = useMemo(() => {
     const m = new Map<string, number>();
@@ -416,6 +420,25 @@ export function PriceListsView({
     setOpenListId(inserted.id);
   }
 
+  // Delete a list + its overrides.
+  async function deleteList(id: string) {
+    const supabase = createClient();
+    if (!supabase || !org) {
+      toast('Not connected.');
+      return;
+    }
+    setDeletingList(null);
+    await supabase.from('pl_overrides').delete().eq('price_list_id', id).eq('org_id', org.id);
+    const { error: err } = await supabase.from('pl_price_lists').delete().eq('id', id).eq('org_id', org.id);
+    if (err) {
+      toast(migrationMessage(err.message));
+      return;
+    }
+    if (openListId === id) setOpenListId(null);
+    toast('Price list deleted');
+    router.refresh();
+  }
+
   const hasAny = priceLists.length > 0;
 
   return (
@@ -532,6 +555,7 @@ export function PriceListsView({
                             { label: 'Open editor', onClick: () => setOpenListId(l.id) },
                             { label: 'Edit settings', onClick: () => startEdit(l) },
                             { label: 'Duplicate list', onClick: () => void duplicateList(l) },
+                            { label: 'Delete list', onClick: () => setDeletingList(l), danger: true },
                           ]}
                         />
                       </td>
@@ -644,6 +668,17 @@ export function PriceListsView({
           toast={toast}
         />
       ) : null}
+
+      {/* Delete list confirmation */}
+      <ConfirmDialog
+        open={deletingList !== null}
+        title="Delete price list?"
+        body={deletingList ? `"${deletingList.name}" and its item pricing will be permanently removed. Quotes and invoices already created aren't affected.` : ''}
+        confirmLabel="Delete"
+        danger
+        onConfirm={() => deletingList && void deleteList(deletingList.id)}
+        onClose={() => setDeletingList(null)}
+      />
     </div>
   );
 }

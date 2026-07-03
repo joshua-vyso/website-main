@@ -151,7 +151,7 @@ export function PaymentsView({
   const invoiceDerived = useMemo(() => {
     const m = new Map<string, { total: number; paid: number; credited: number; balance: number }>();
     for (const inv of invoices) {
-      const total = docTotals(itemsByInvoice.get(inv.id) ?? [], inv.vat_rate, inv.discount).total;
+      const total = docTotals(itemsByInvoice.get(inv.id) ?? [], inv.vat_rate, inv.discount, inv.rebate_pct ?? 0).total;
       const paid = paymentsTotal(paymentsByInvoice.get(inv.id) ?? []);
       const credited = creditedByInvoice.get(inv.id) ?? 0;
       m.set(inv.id, { total, paid, credited, balance: balanceDue(total, paid, credited) });

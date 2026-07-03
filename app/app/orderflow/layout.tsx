@@ -14,6 +14,7 @@ const TABS = [
   { label: 'Credit notes', href: '/app/orderflow/credit-notes' },
   { label: 'Payments', href: '/app/orderflow/payments' },
   { label: 'Price lists', href: '/app/orderflow/pricelists' },
+  { label: 'Rebates', href: '/app/orderflow/rebates' },
   { label: 'Settings', href: '/app/orderflow/settings' },
 ];
 

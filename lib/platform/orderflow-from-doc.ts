@@ -526,21 +526,31 @@ export async function syncOrderFromDocument(
         const termsDays = Number(applyParams?.invoice_terms_days_override ?? settings?.default_payment_terms_days ?? 30);
         const issued = new Date();
         const due = new Date(issued.getTime() + termsDays * 86_400_000);
-        const { data: createdInv, error: invInsErr } = await db
+        // Snapshot the matched customer's standing rebate (rebates.sql) onto the
+        // materialised invoice. Migration-safe: rebate_pct only exists once
+        // rebates.sql is run — on a missing-column error, retry without that one
+        // key so pre-migration auto-invoicing behaves exactly as before.
+        const invoiceRow: Record<string, unknown> = {
+          org_id: orgId,
+          customer_id: customerId,
+          order_id: orderId,
+          invoice_number: inv,
+          status: 'sent',
+          issue_date: issued.toISOString().slice(0, 10),
+          due_date: due.toISOString().slice(0, 10),
+          vat_rate: vatRate,
+          rebate_pct: Number(matchedCustomer?.rebate_pct) || 0,
+          sent_at: issued.toISOString(),
+        };
+        let { data: createdInv, error: invInsErr } = await db
           .from('of_invoices')
-          .insert({
-            org_id: orgId,
-            customer_id: customerId,
-            order_id: orderId,
-            invoice_number: inv,
-            status: 'sent',
-            issue_date: issued.toISOString().slice(0, 10),
-            due_date: due.toISOString().slice(0, 10),
-            vat_rate: vatRate,
-            sent_at: issued.toISOString(),
-          })
+          .insert(invoiceRow)
           .select('id')
           .single();
+        if (invInsErr && /rebate_pct/i.test(invInsErr.message) && /column|schema cache|find/i.test(invInsErr.message)) {
+          delete invoiceRow.rebate_pct;
+          ({ data: createdInv, error: invInsErr } = await db.from('of_invoices').insert(invoiceRow).select('id').single());
+        }
         if (!invInsErr && createdInv) {
           invoiceId = (createdInv as { id: string }).id;
           if (items.length > 0) {

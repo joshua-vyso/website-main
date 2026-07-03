@@ -71,6 +71,7 @@ export function InvoiceSheetClassic({
   vatTreatment,
   vatRate,
   discount = 0,
+  rebatePct = 0,
 }: {
   companyProfile: CdCompanyProfile | null;
   orgName: string | null;
@@ -81,6 +82,8 @@ export function InvoiceSheetClassic({
   vatRate: number;
   /** Absolute rand discount on the invoice, applied to the subtotal before VAT. */
   discount?: number;
+  /** Customer rebate % snapshotted on the invoice, deducted after discount, before VAT. */
+  rebatePct?: number;
 }) {
   // Seller identity — company_name falls back to the org name; every other
   // contact detail prints ONLY when actually set (never invent details).
@@ -97,7 +100,7 @@ export function InvoiceSheetClassic({
   // Totals via the shared docTotals so discount + VAT + Total agree with the
   // on-screen figures, balanceDue and payment tracking (which all use docTotals).
   const rate = Number(vatRate) || 0;
-  const totals = docTotals(lines, rate, discount);
+  const totals = docTotals(lines, rate, discount, rebatePct);
   // Derive the per-line VAT code from the EFFECTIVE rate so the code and the VAT
   // Total can never contradict (a 0% invoice always reads Z/E; a rated one reads V).
   const vatCode = rate > 0 ? 'V' : vatCodeFor(vatTreatment);
@@ -254,17 +257,23 @@ export function InvoiceSheetClassic({
         <div className="mt-3 flex justify-end">
           <table className="border-collapse text-[12px]" style={{ minWidth: '280px' }}>
             <tbody>
+              {totals.discount > 0 || totals.rebate > 0 ? (
+                <tr>
+                  <td className="border border-[#333] px-3 py-1.5 font-semibold text-[#333]">Subtotal</td>
+                  <td className="border border-[#333] px-3 py-1.5 text-right tabular-nums text-[#111]">{zarAmt(totals.subtotal)}</td>
+                </tr>
+              ) : null}
               {totals.discount > 0 ? (
-                <>
-                  <tr>
-                    <td className="border border-[#333] px-3 py-1.5 font-semibold text-[#333]">Subtotal</td>
-                    <td className="border border-[#333] px-3 py-1.5 text-right tabular-nums text-[#111]">{zarAmt(totals.subtotal)}</td>
-                  </tr>
-                  <tr>
-                    <td className="border border-[#333] px-3 py-1.5 font-semibold text-[#333]">Discount</td>
-                    <td className="border border-[#333] px-3 py-1.5 text-right tabular-nums text-[#111]">−{zarAmt(totals.discount)}</td>
-                  </tr>
-                </>
+                <tr>
+                  <td className="border border-[#333] px-3 py-1.5 font-semibold text-[#333]">Discount</td>
+                  <td className="border border-[#333] px-3 py-1.5 text-right tabular-nums text-[#111]">−{zarAmt(totals.discount)}</td>
+                </tr>
+              ) : null}
+              {totals.rebate > 0 ? (
+                <tr>
+                  <td className="border border-[#333] px-3 py-1.5 font-semibold text-[#333]">Rebate ({rebatePct}%)</td>
+                  <td className="border border-[#333] px-3 py-1.5 text-right tabular-nums text-[#111]">−{zarAmt(totals.rebate)}</td>
+                </tr>
               ) : null}
               <tr>
                 <td className="border border-[#333] px-3 py-1.5 font-semibold text-[#333]">VAT Total</td>

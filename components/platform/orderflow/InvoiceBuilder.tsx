@@ -117,6 +117,12 @@ export function InvoiceBuilder({
   const [dueTouched, setDueTouched] = useState(!!initial.dueDate);
   const [vatRate, setVatRate] = useState<number>(initial.vatRate ?? settings.default_vat_rate ?? 15);
   const [discount, setDiscount] = useState<string>(initial.discount ? String(initial.discount) : '');
+  // Rebate % — in edit mode the invoice keeps its own snapshotted rebate; a fresh
+  // invoice defaults to the prefilled customer's standing rebate (blank = none).
+  const [rebate, setRebate] = useState<string>(() => {
+    const src = isEdit ? initial.editInvoice?.rebate_pct : initialCustomer?.rebate_pct;
+    return src != null && Number(src) > 0 ? String(src) : '';
+  });
   const [customerPo, setCustomerPo] = useState(initial.customerPo ?? '');
   const [billingAddress, setBillingAddress] = useState(initial.billingAddress ?? initialCustomer?.billing_address ?? '');
   // Fresh flows (blank or ?customer=) prefill the default Core Data delivery
@@ -173,7 +179,8 @@ export function InvoiceBuilder({
   const customer = useMemo(() => customers.find((c) => c.id === customerId) ?? null, [customers, customerId]);
   const priceList = useMemo(() => customerPriceList(customer, priceLists), [customer, priceLists]);
   const discountNum = Math.max(0, Number(discount) || 0);
-  const totals = useMemo(() => docTotals(lines, vatRate, discountNum), [lines, vatRate, discountNum]);
+  const rebateNum = Math.min(100, Math.max(0, Number(rebate) || 0));
+  const totals = useMemo(() => docTotals(lines, vatRate, discountNum, rebateNum), [lines, vatRate, discountNum, rebateNum]);
 
   // Auto-fill on customer change — skipped for the customer the page prefilled,
   // so edit/duplicate/conversion values survive the first render.
@@ -186,6 +193,9 @@ export function InvoiceBuilder({
     autofilledFor.current = id;
     const c = customers.find((x) => x.id === id) ?? null;
     setBillingAddress(c?.billing_address ?? '');
+    // Default the rebate to the picked customer's standing rebate (blank = none);
+    // the user can still override it before saving.
+    setRebate(c?.rebate_pct != null && Number(c.rebate_pct) > 0 ? String(c.rebate_pct) : '');
     if (!dueTouched) setDueDate(isoDatePlusDays(issueDate, termsDaysFor(c)));
     const own = addresses.filter((a) => a.customer_id === id);
     const def = own.find((a) => a.is_default) ?? own[0] ?? null;
@@ -230,25 +240,30 @@ export function InvoiceBuilder({
       if (isEdit && initial.editInvoice) {
         const inv = initial.editInvoice;
         const nowIso = new Date().toISOString();
-        const { error: upErr } = await supabase
-          .from('of_invoices')
-          .update({
-            customer_id: customerId,
-            status: mode === 'sent' ? 'sent' : inv.status,
-            issue_date: issueDate,
-            due_date: dueDate || null,
-            vat_rate: vatRate,
-            discount: discountNum,
-            customer_po: customerPo.trim() || null,
-            billing_address: billingAddress.trim() || null,
-            delivery_address: deliveryAddress.trim() || null,
-            delivery_instructions: deliveryInstructions.trim() || null,
-            notes: notes.trim() || null,
-            terms: terms.trim() || null,
-            sent_at: mode === 'sent' ? (inv.sent_at ?? nowIso) : inv.sent_at,
-            updated_at: nowIso,
-          })
-          .eq('id', inv.id);
+        const invoicePatch: Record<string, unknown> = {
+          customer_id: customerId,
+          status: mode === 'sent' ? 'sent' : inv.status,
+          issue_date: issueDate,
+          due_date: dueDate || null,
+          vat_rate: vatRate,
+          discount: discountNum,
+          rebate_pct: rebateNum,
+          customer_po: customerPo.trim() || null,
+          billing_address: billingAddress.trim() || null,
+          delivery_address: deliveryAddress.trim() || null,
+          delivery_instructions: deliveryInstructions.trim() || null,
+          notes: notes.trim() || null,
+          terms: terms.trim() || null,
+          sent_at: mode === 'sent' ? (inv.sent_at ?? nowIso) : inv.sent_at,
+          updated_at: nowIso,
+        };
+        let { error: upErr } = await supabase.from('of_invoices').update(invoicePatch).eq('id', inv.id);
+        // Migration-safe: rebate_pct only exists once supabase/rebates.sql is run —
+        // drop just that key and retry so editing works before the migration.
+        if (upErr && /rebate_pct/i.test(upErr.message) && /column|schema cache|find/i.test(upErr.message)) {
+          delete invoicePatch.rebate_pct;
+          ({ error: upErr } = await supabase.from('of_invoices').update(invoicePatch).eq('id', inv.id));
+        }
         if (upErr) throw new Error(upErr.message);
 
         const { error: delErr } = await supabase.from('of_invoice_items').delete().eq('invoice_id', inv.id);
@@ -303,6 +318,7 @@ export function InvoiceBuilder({
         lines,
         vatRate,
         discount: discountNum,
+        rebatePct: rebateNum,
         issueDate,
         dueDate: dueDate || null,
         customerPo: customerPo.trim() || null,
@@ -469,6 +485,21 @@ export function InvoiceBuilder({
                 />
               </span>
               <span className="tabular-nums text-[#1A1C1E]">{totals.discount > 0 ? `−${zar2(totals.discount)}` : zar2(0)}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="flex items-center text-[#5F6368]">
+                Rebate
+                <input
+                  value={rebate}
+                  onChange={(e) => setRebate(e.target.value)}
+                  inputMode="decimal"
+                  placeholder="0"
+                  aria-label="Rebate percentage"
+                  className="mx-1.5 h-6 w-12 rounded-md border border-[#E7E7E2] px-1 text-right text-[12px] tabular-nums text-[#1A1C1E] focus:border-[#1E5E54]/50 focus:outline-none"
+                />
+                %
+              </span>
+              <span className="tabular-nums text-[#1A1C1E]">{totals.rebate > 0 ? `−${zar2(totals.rebate)}` : zar2(0)}</span>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-[#5F6368]">

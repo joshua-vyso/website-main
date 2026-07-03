@@ -107,7 +107,7 @@ export function Dashboard({
   const invoiceRows = useMemo(() => {
     return invoices.map((inv) => {
       const items = itemsByInvoice.get(inv.id) ?? [];
-      const total = docTotals(items, Number(inv.vat_rate ?? vatRate), Number(inv.discount ?? 0)).total;
+      const total = docTotals(items, Number(inv.vat_rate ?? vatRate), Number(inv.discount ?? 0), Number(inv.rebate_pct ?? 0)).total;
       const paid = paymentsTotal(paymentsByInvoice.get(inv.id) ?? []);
       const credited = creditedByInvoice.get(inv.id) ?? 0;
       const status = effectiveInvoiceStatus(inv, paid, total);

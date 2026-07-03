@@ -148,7 +148,7 @@ export function CustomerProfile({ data, orgName }: { data: CustomerProfileData |
     for (const inv of data.invoices) {
       if (!lastInvoice || (inv.issue_date && inv.issue_date > lastInvoice)) lastInvoice = inv.issue_date;
       if (inv.status === 'cancelled') continue;
-      const total = docTotals(itemsByInvoice.get(inv.id) ?? [], inv.vat_rate, inv.discount).total;
+      const total = docTotals(itemsByInvoice.get(inv.id) ?? [], inv.vat_rate, inv.discount, inv.rebate_pct ?? 0).total;
       if (inv.status !== 'draft') lifetime += total;
       if (inv.status === 'draft' || inv.status === 'credited') continue;
       const paid = paymentsTotal(payByInvoice.get(inv.id) ?? []);
@@ -510,7 +510,7 @@ export function CustomerProfile({ data, orgName }: { data: CustomerProfileData |
             ) : (
               <MiniTable head={['Number', 'Date', 'Status', 'Total', 'Balance', '']}>
                 {data!.invoices.map((inv) => {
-                  const total = docTotals(itemsByInvoice.get(inv.id) ?? [], inv.vat_rate, inv.discount).total;
+                  const total = docTotals(itemsByInvoice.get(inv.id) ?? [], inv.vat_rate, inv.discount, inv.rebate_pct ?? 0).total;
                   const paid = paymentsTotal(payByInvoice.get(inv.id) ?? []);
                   const credited = creditedByInvoice.get(inv.id) ?? 0;
                   const eff = effectiveInvoiceStatus(inv, paid, total, now);

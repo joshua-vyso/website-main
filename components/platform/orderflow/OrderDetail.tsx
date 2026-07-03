@@ -281,7 +281,7 @@ export function OrderDetail({
     ? effectiveInvoiceStatus(
         invoice,
         paymentsTotal(invoicePayments),
-        docTotals(invoiceItems, invoice.vat_rate, invoice.discount).total,
+        docTotals(invoiceItems, invoice.vat_rate, invoice.discount, invoice.rebate_pct ?? 0).total,
       )
     : null;
   const invoiceStyle = invoiceStatus ? INVOICE_STATUS_STYLE[invoiceStatus] : null;

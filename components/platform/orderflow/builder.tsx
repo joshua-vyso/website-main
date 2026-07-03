@@ -588,6 +588,21 @@ export async function nextDocNumber(supabase: SupabaseClient, kind: DocKind): Pr
 // They throw on error; the calling page toasts the message.
 // ---------------------------------------------------------------------------
 
+/**
+ * True when a PostgREST error is a missing-column error for `col` — used to make
+ * a write migration-safe by dropping that one key and retrying (e.g. rebate_pct
+ * before supabase/rebates.sql is run). Matches the PGRST204 phrasing
+ * "Could not find the 'rebate_pct' column of 'of_invoices' in the schema cache".
+ */
+function isMissingColumn(msg: string | null | undefined, col: string): boolean {
+  if (!msg) return false;
+  // The column name appears anywhere in a schema-cache / missing-column error;
+  // requiring both the name AND the missing-column wording avoids swallowing
+  // unrelated errors (e.g. a not-null violation on a different column).
+  const nameRe = new RegExp(col.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i');
+  return nameRe.test(msg) && /column|schema cache|could not find/i.test(msg);
+}
+
 function itemRows(lines: BuilderLine[]) {
   return lines.map((l, i) => ({
     stock_item_id: l.stock_item_id,
@@ -610,6 +625,7 @@ export async function createInvoice(
     lines: BuilderLine[];
     vatRate: number;
     discount?: number;
+    rebatePct?: number;
     issueDate: string;
     dueDate: string | null;
     customerPo?: string | null;
@@ -626,28 +642,33 @@ export async function createInvoice(
   const status = args.status ?? 'draft';
   const number = await nextDocNumber(supabase, 'invoice');
 
-  const { data: inv, error: invErr } = await supabase
-    .from('of_invoices')
-    .insert({
-      org_id: args.orgId,
-      customer_id: args.customerId,
-      order_id: args.orderId ?? null,
-      invoice_number: number,
-      status,
-      issue_date: args.issueDate,
-      due_date: args.dueDate,
-      vat_rate: args.vatRate,
-      discount: args.discount ?? 0,
-      customer_po: args.customerPo ?? null,
-      billing_address: args.billingAddress ?? args.customer?.billing_address ?? null,
-      delivery_address: args.deliveryAddress ?? null,
-      delivery_instructions: args.deliveryInstructions ?? null,
-      notes: args.notes ?? null,
-      terms: args.terms ?? null,
-      sent_at: status === 'sent' ? new Date().toISOString() : null,
-    })
-    .select('id')
-    .single();
+  const invoiceRow: Record<string, unknown> = {
+    org_id: args.orgId,
+    customer_id: args.customerId,
+    order_id: args.orderId ?? null,
+    invoice_number: number,
+    status,
+    issue_date: args.issueDate,
+    due_date: args.dueDate,
+    vat_rate: args.vatRate,
+    discount: args.discount ?? 0,
+    rebate_pct: args.rebatePct ?? 0,
+    customer_po: args.customerPo ?? null,
+    billing_address: args.billingAddress ?? args.customer?.billing_address ?? null,
+    delivery_address: args.deliveryAddress ?? null,
+    delivery_instructions: args.deliveryInstructions ?? null,
+    notes: args.notes ?? null,
+    terms: args.terms ?? null,
+    sent_at: status === 'sent' ? new Date().toISOString() : null,
+  };
+  let { data: inv, error: invErr } = await supabase.from('of_invoices').insert(invoiceRow).select('id').single();
+  // Migration-safe: rebate_pct only exists once supabase/rebates.sql is run. When
+  // PostgREST reports it missing, drop just that key and retry so invoicing works
+  // before the migration (the rebate simply isn't snapshotted yet).
+  if (invErr && isMissingColumn(invErr.message, 'rebate_pct')) {
+    delete invoiceRow.rebate_pct;
+    ({ data: inv, error: invErr } = await supabase.from('of_invoices').insert(invoiceRow).select('id').single());
+  }
   if (invErr || !inv) throw new Error(invErr?.message ?? 'Could not create the invoice.');
 
   if (args.lines.length > 0) {
@@ -677,7 +698,7 @@ export async function createInvoice(
     if (error) console.warn('quote → invoice link failed:', error.message);
   }
 
-  const total = docTotals(args.lines, args.vatRate, args.discount ?? 0).total;
+  const total = docTotals(args.lines, args.vatRate, args.discount ?? 0, args.rebatePct ?? 0).total;
   logActivity(supabase, {
     orgId: args.orgId,
     actorEmail: args.actorEmail,

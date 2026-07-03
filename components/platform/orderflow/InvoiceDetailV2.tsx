@@ -66,8 +66,8 @@ export function InvoiceDetailV2({ data, orgName }: { data: InvoiceDetailData; or
   }, [invoice, searchParams]);
 
   const totals = useMemo(
-    () => docTotals(items, invoice?.vat_rate ?? 0, invoice?.discount ?? 0),
-    [items, invoice?.vat_rate, invoice?.discount],
+    () => docTotals(items, invoice?.vat_rate ?? 0, invoice?.discount ?? 0, invoice?.rebate_pct ?? 0),
+    [items, invoice?.vat_rate, invoice?.discount, invoice?.rebate_pct],
   );
   const paid = useMemo(() => paymentsTotal(payments), [payments]);
   const cnTotals = useMemo(() => {
@@ -281,6 +281,7 @@ export function InvoiceDetailV2({ data, orgName }: { data: InvoiceDetailData; or
           vatTreatment={customer?.vat_treatment ?? 'zero_rated'}
           vatRate={inv.vat_rate}
           discount={inv.discount}
+          rebatePct={inv.rebate_pct ?? 0}
         />
 
         {/* Side panels */}
@@ -301,6 +302,12 @@ export function InvoiceDetailV2({ data, orgName }: { data: InvoiceDetailData; or
             </div>
 
             <div className="mt-3 space-y-1.5 rounded-xl border border-[#E7E7E2] bg-[#FBFBF9] p-3 text-[13px]">
+              {totals.rebate > 0 ? (
+                <div className="flex justify-between">
+                  <span className="text-[#5F6368]">Rebate ({inv.rebate_pct ?? 0}%)</span>
+                  <span className="tabular-nums text-[#1A1C1E]">−{zar2(totals.rebate)}</span>
+                </div>
+              ) : null}
               <div className="flex justify-between">
                 <span className="text-[#5F6368]">Total</span>
                 <span className="tabular-nums text-[#1A1C1E]">{zar2(totals.total)}</span>
