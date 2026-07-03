@@ -1,6 +1,7 @@
 'use client';
 
 import { useMemo, useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/platform/supabase-browser';
 import { usePlatform } from '@/lib/platform/session';
@@ -261,6 +262,12 @@ export function ProductsDb({ data }: { data: CoreData }) {
           <option value="all">All</option>
         </select>
         <div className="ml-auto flex flex-wrap items-center gap-2">
+          <Link
+            href="/app/docu/databases/import?entity=products"
+            className="inline-flex h-9 items-center justify-center rounded-lg border border-[#D7DAD8] bg-white px-4 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:bg-[#F0F0EC]"
+          >
+            Import Excel/CSV
+          </Link>
           <SecondaryBtn onClick={() => setImportOpen(true)}>Import CSV</SecondaryBtn>
           <SecondaryBtn onClick={exportCsv} disabled={filtered.length === 0}>Export CSV</SecondaryBtn>
           <PrimaryBtn onClick={startNew}>Add product</PrimaryBtn>

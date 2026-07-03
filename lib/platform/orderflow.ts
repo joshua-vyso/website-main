@@ -55,6 +55,14 @@ export interface OfCustomer {
   invoice_terms_text?: string | null;
   invoice_note?: string | null;
   ai_invoice_instructions?: string | null;
+  // Flat imported fields (import-fields.sql) — editable on the profile.
+  delivery_address?: string | null;
+  contact_name?: string | null;
+  contact_title?: string | null;
+  alt_phone?: string | null;
+  fax?: string | null;
+  opening_balance?: number | null;
+  currency?: string | null;
 }
 
 // ---------------------------------------------------------------------------

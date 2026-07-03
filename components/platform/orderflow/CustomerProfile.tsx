@@ -85,6 +85,14 @@ interface EditDraft {
   billing_address: string;
   tags: string;
   notes: string;
+  // Flat imported fields (import-fields.sql) — editable after import.
+  contact_name: string;
+  contact_title: string;
+  alt_phone: string;
+  fax: string;
+  delivery_address: string;
+  opening_balance: string;
+  currency: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -215,6 +223,13 @@ export function CustomerProfile({ data, orgName }: { data: CustomerProfileData |
       billing_address: customer.billing_address ?? '',
       tags: (customer.tags ?? []).join(', '),
       notes: customer.notes ?? '',
+      contact_name: customer.contact_name ?? '',
+      contact_title: customer.contact_title ?? '',
+      alt_phone: customer.alt_phone ?? '',
+      fax: customer.fax ?? '',
+      delivery_address: customer.delivery_address ?? '',
+      opening_balance: customer.opening_balance == null ? '' : String(customer.opening_balance),
+      currency: customer.currency ?? '',
     });
     setError(null);
     setEditing(true);
@@ -248,6 +263,13 @@ export function CustomerProfile({ data, orgName }: { data: CustomerProfileData |
         billing_address: editDraft.billing_address.trim() || null,
         tags,
         notes: editDraft.notes.trim() || null,
+        contact_name: editDraft.contact_name.trim() || null,
+        contact_title: editDraft.contact_title.trim() || null,
+        alt_phone: editDraft.alt_phone.trim() || null,
+        fax: editDraft.fax.trim() || null,
+        delivery_address: editDraft.delivery_address.trim() || null,
+        opening_balance: editDraft.opening_balance.trim() === '' ? null : Number(editDraft.opening_balance.replace(/[R\s,]/g, '')),
+        currency: editDraft.currency.trim().toUpperCase() || null,
       })
       .eq('id', customer.id);
     if (upErr) {
@@ -352,6 +374,12 @@ export function CustomerProfile({ data, orgName }: { data: CustomerProfileData |
             {customer.email ? ` · ${customer.email}` : ''}
             {customer.phone ? ` · ${customer.phone}` : ''}
           </p>
+          {customer.contact_name ? (
+            <p className="mt-0.5 text-[13px] text-[#5F6368]">
+              Contact: <span className="font-medium text-[#1A1C1E]">{customer.contact_name}</span>
+              {customer.contact_title ? ` · ${customer.contact_title}` : ''}
+            </p>
+          ) : null}
           {(customer.tags ?? []).length > 0 ? (
             <div className="mt-2 flex flex-wrap gap-1.5">
               {(customer.tags ?? []).map((t) => (
@@ -598,6 +626,13 @@ export function CustomerProfile({ data, orgName }: { data: CustomerProfileData |
 
           {/* Delivery addresses */}
           <SectionCard title="Delivery addresses">
+            {customer.delivery_address?.trim() ? (
+              <div className="mb-3 rounded-xl border border-[#F0F0EC] bg-[#FCFCFB] px-3.5 py-3">
+                <div className="text-[11px] font-medium uppercase tracking-wide text-[#9A9DA1]">Imported address</div>
+                <p className="mt-1 whitespace-pre-line text-[13px] text-[#1A1C1E]">{customer.delivery_address}</p>
+                <p className="mt-1 text-[11px] text-[#9A9DA1]">Edit via “Edit customer”, or add structured addresses below.</p>
+              </div>
+            ) : null}
             <DeliveryAddressesEditor customerId={customer.id} addresses={data!.addresses} />
           </SectionCard>
 
@@ -666,6 +701,29 @@ export function CustomerProfile({ data, orgName }: { data: CustomerProfileData |
             <Field label="Registration number" hint="optional">
               <input className={inputClass} value={editDraft.registration_number} onChange={(e) => setEditDraft({ ...editDraft, registration_number: e.target.value })} />
             </Field>
+            <Field label="Contact person" hint="optional">
+              <input className={inputClass} value={editDraft.contact_name} onChange={(e) => setEditDraft({ ...editDraft, contact_name: e.target.value })} placeholder="e.g. Jane Dlamini" />
+            </Field>
+            <Field label="Contact title" hint="optional">
+              <input className={inputClass} value={editDraft.contact_title} onChange={(e) => setEditDraft({ ...editDraft, contact_title: e.target.value })} placeholder="e.g. Buyer, Owner" />
+            </Field>
+            <Field label="Alternate phone" hint="optional">
+              <input className={inputClass} value={editDraft.alt_phone} onChange={(e) => setEditDraft({ ...editDraft, alt_phone: e.target.value })} />
+            </Field>
+            <Field label="Fax" hint="optional">
+              <input className={inputClass} value={editDraft.fax} onChange={(e) => setEditDraft({ ...editDraft, fax: e.target.value })} />
+            </Field>
+            <Field label="Opening balance" hint="rands, optional">
+              <input className={inputClass} type="number" value={editDraft.opening_balance} onChange={(e) => setEditDraft({ ...editDraft, opening_balance: e.target.value })} />
+            </Field>
+            <Field label="Currency" hint="e.g. ZAR, optional">
+              <input className={inputClass} value={editDraft.currency} onChange={(e) => setEditDraft({ ...editDraft, currency: e.target.value })} placeholder="ZAR" />
+            </Field>
+            <div className="sm:col-span-2">
+              <Field label="Delivery address" hint="single imported address — manage multiple below">
+                <textarea className={`${inputClass} h-auto py-2`} rows={2} value={editDraft.delivery_address} onChange={(e) => setEditDraft({ ...editDraft, delivery_address: e.target.value })} />
+              </Field>
+            </div>
             <div className="sm:col-span-2">
               <Field label="Billing address" hint="optional">
                 <textarea className={`${inputClass} h-auto py-2`} rows={2} value={editDraft.billing_address} onChange={(e) => setEditDraft({ ...editDraft, billing_address: e.target.value })} />

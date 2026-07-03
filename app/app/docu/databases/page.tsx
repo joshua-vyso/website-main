@@ -48,12 +48,20 @@ export default async function DatabasesIndexPage() {
     <div className="px-8 py-7">
       <DocuNav />
 
-      <div className="mt-6">
-        <h1 className="text-[26px] font-bold leading-tight text-[#1A1C1E]">Databases</h1>
-        <p className="mt-1 max-w-2xl text-[14px] text-[#5F6368]">
-          Your Core Data — the single source of truth behind every document. Manage it here and it flows straight
-          through to OrderFlow invoices, quotes, orders and delivery notes.
-        </p>
+      <div className="mt-6 flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <h1 className="text-[26px] font-bold leading-tight text-[#1A1C1E]">Databases</h1>
+          <p className="mt-1 max-w-2xl text-[14px] text-[#5F6368]">
+            Your Core Data — the single source of truth behind every document. Manage it here and it flows straight
+            through to OrderFlow invoices, quotes, orders and delivery notes.
+          </p>
+        </div>
+        <Link
+          href="/app/docu/databases/import"
+          className="inline-flex h-10 shrink-0 items-center rounded-xl bg-[#1E5E54] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#174A42]"
+        >
+          Import Excel / CSV
+        </Link>
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">

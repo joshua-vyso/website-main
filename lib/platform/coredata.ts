@@ -70,6 +70,8 @@ export interface CdProduct extends StockItem {
   /** 'product' | 'service' */
   kind?: string;
   notes?: string | null;
+  /** Purchase cost (import-fields.sql); avg_unit_price stays the selling/base price. */
+  cost?: number | null;
 }
 
 export type ProductKind = 'product' | 'service';
