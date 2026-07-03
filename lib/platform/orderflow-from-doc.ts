@@ -23,6 +23,18 @@
  *     zero_rated/exempt, the org standard for standard); invoice_terms_days_override
  *     sets the due date.
  * ----------------------------------------------------------------------------
+ * CREATE-ON-UPLOAD (populate Core Data). An upload no longer just leaves gaps:
+ *   • Unmatched customer → a new of_customers row is created from the extracted
+ *     name (guarded: ≥2 chars, deduped by normalised name against the loaded
+ *     customers) and the order links to it as a KNOWN customer.
+ *   • Unmatched order line → a new pp_stock_items row is created from the line
+ *     name/unit (on_hand 0, price from the line when positive) and the line links
+ *     to it; it then prices via the normal avg_unit_price path.
+ *   Both are best-effort: a failed insert falls back to the prior behaviour
+ *   (customer_id / stock_item_id null). Dedupe + re-matching keep this idempotent
+ *   per source_document_id — the first sync creates the rows, later syncs match
+ *   them instead of creating duplicates.
+ * ----------------------------------------------------------------------------
  */
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { ExtractedData } from './types';
@@ -214,6 +226,18 @@ export async function syncOrderFromDocument(
   const ed = ((docRow as { extracted_data?: ExtractedData }).extracted_data ?? {}) as ExtractedData;
   const lines = ed.line_items ?? [];
 
+  // We upsert exactly ONE order per source document, which needs the
+  // of-order-source-doc migration (of_orders.source_document_id). Without it we
+  // can't dedup — so creating customers/products/an order here would duplicate on
+  // every re-extract. Probe FIRST and bail before touching Core Data.
+  const { data: existingOrder, error: lookupErr } = await db
+    .from('of_orders')
+    .select('id, invoice_number')
+    .eq('source_document_id', documentId)
+    .eq('org_id', orgId)
+    .maybeSingle();
+  if (lookupErr) return { ok: false, reason: 'migration-needed' };
+
   // Resolve customer — an explicit pick (from review) wins; else fuzzy-match.
   // select('*') so default_price_list_id (core-data.sql) + the AI-invoicing
   // params (customer-ai-invoicing.sql) ride along when present.
@@ -226,6 +250,39 @@ export async function syncOrderFromDocument(
     customerId = m.customerId;
     matchConfidence = m.confidence;
   }
+
+  // CREATE-ON-UPLOAD: no explicit pick and nothing fuzzy-matched, but the document
+  // named a customer → create it so the order links to a real of_customers row.
+  // Guards: name ≥2 chars after trim; a final exact normalised check against the
+  // loaded customers (so we never duplicate one we merely failed to fuzzy-match).
+  // Best-effort — a failed insert falls back to customer_id null (prior behaviour).
+  // A freshly created customer counts as KNOWN (confidence 100) so the per-customer
+  // auto-invoice gating downstream treats it exactly like a confident match.
+  if (!customerId) {
+    const cleanName = (ed.customer_name ?? '').trim();
+    const key = normName(cleanName);
+    // Guard on the NORMALISED name so punctuation-only junk ("()", "--", ". .")
+    // — which normalises to "" — can't create (and re-create every sync) a customer.
+    if (key.length >= 2) {
+      const dupe = customers.find((c) => normName(c.name) === key);
+      if (dupe) {
+        customerId = dupe.id;
+        matchConfidence = 100;
+      } else {
+        const { data: newCust } = await db
+          .from('of_customers')
+          .insert({ org_id: orgId, name: cleanName })
+          .select('*')
+          .single();
+        if (newCust) {
+          customers.push(newCust as CustomerLite & Partial<OfCustomer>);
+          customerId = (newCust as { id: string }).id;
+          matchConfidence = 100;
+        }
+      }
+    }
+  }
+
   const matchedCustomer = customerId ? customers.find((c) => c.id === customerId) ?? null : null;
 
   // Per-customer auto-invoice threshold (customer-ai-invoicing.sql), else the
@@ -282,6 +339,11 @@ export async function syncOrderFromDocument(
 
   const items: { stock_item_id: string | null; name: string; qty: number; unit: string | null; unit_price: number }[] = [];
   let unpricedLines = 0;
+  // CREATE-ON-UPLOAD dedupe: normalised line name → the pp_stock_items row we
+  // created earlier IN THIS SAME RUN, so two identical unmatched lines link to one
+  // new product instead of inserting it twice. Loaded catalogue dedupe is handled
+  // by matchStockItem re-finding a row a prior sync already created.
+  const createdStock = new Map<string, StockLite>();
   for (const li of lines) {
     const rawName = (li.description ?? '').trim();
     if (!rawName) continue;
@@ -294,6 +356,9 @@ export async function syncOrderFromDocument(
     let s: StockLite | null = null;
     let name = rawName;
     let unit = docUnit;
+    // The name a NEW catalogue product is created under — must equal what the next
+    // sync's matchStockItem query uses, so a re-sync re-finds it (never duplicates).
+    let createName = rawName;
     if (alias) {
       s = alias.stock_item_id ? stockItems.find((it) => it.id === alias.stock_item_id) ?? null : null;
       name = (alias.invoice_name ?? '').trim() || s?.name || rawName;
@@ -303,12 +368,54 @@ export async function syncOrderFromDocument(
       // 2. Prefix strip: drop a leading category code ("FF - ", "VEG - ", "PSAL - ")
       //    before fuzzy matching, so "FF - NAARTJIES Box" hits "Naartjies".
       const forMatch = stripPrefixes ? rawName.replace(/^[A-Z]{2,5}\s*-\s*/, '').trim() || rawName : rawName;
+      createName = forMatch; // next sync queries matchStockItem(forMatch) → create under it
       s = matchStockItem(forMatch, stockItems);
       // Known customer → rectify to the clean catalogue name; when nothing matches
-      // keep the FULL raw description (not the stripped fragment, in case the
-      // leading token wasn't really a category). Unknown customer → raw as before.
+      // keep the FULL raw description (in case the leading token wasn't a category).
+      // Unknown customer → raw as before.
       name = applyParams ? s?.name ?? rawName : rawName;
       if (!unit) unit = s?.unit ?? null;
+    }
+
+    // CREATE-ON-UPLOAD: an order line that matched no catalogue item (and had no
+    // alias mapping) → create a pp_stock_items row so Core Data grows with the
+    // upload and the line links to a real product. Dedupe: first within this run
+    // (createdStock, keyed by normalised name) so repeated identical lines share
+    // one new row; the loaded-catalogue case is covered because a prior sync's row
+    // is re-found by matchStockItem above. Best-effort — a failed insert leaves
+    // stock_item_id null (prior behaviour). New product prices via avg_unit_price.
+    if (!alias && !s) {
+      // Key on the NORMALISED create-name: skips punctuation-only junk (normalises
+      // to "" → no create/re-create), and dedups identical lines within this run.
+      const key = normName(createName);
+      const already = key ? createdStock.get(key) : undefined;
+      if (already) {
+        s = already;
+        name = already.name;
+        if (!unit) unit = already.unit;
+      } else if (key) {
+        const linePrice = num(li.unit_price);
+        const { data: newItem } = await db
+          .from('pp_stock_items')
+          .insert({
+            org_id: orgId,
+            name: createName,
+            unit: unit || 'each',
+            on_hand: 0,
+            low_threshold: 0,
+            avg_unit_price: linePrice != null && linePrice > 0 ? linePrice : null,
+            currency: 'ZAR',
+          })
+          .select('id, name, avg_unit_price, unit')
+          .single();
+        if (newItem) {
+          s = newItem as StockLite;
+          stockItems.push(s);
+          createdStock.set(key, s);
+          name = s.name; // line + catalogue agree on the clean created name
+          if (!unit) unit = s.unit;
+        }
+      }
     }
 
     // 3. Price basis: 'price_list' re-prices every line from OUR list (ignoring the
@@ -337,20 +444,8 @@ export async function syncOrderFromDocument(
       ? true
       : customerKnown && (unpricedLines === 0 || applyParams?.ai_allow_unpriced === true);
 
-  // Upsert one order per source document.
-  const { data: existingOrder, error: lookupErr } = await db
-    .from('of_orders')
-    .select('id, invoice_number')
-    .eq('source_document_id', documentId)
-    .eq('org_id', orgId)
-    .maybeSingle();
-  if (lookupErr) {
-    // The source_document_id column isn't there yet (of-order-source-doc migration
-    // not applied). Without it we can't dedup, and a blind insert would create a
-    // duplicate invoiced sale + double stock decrement on the next re-sync — so do
-    // nothing here (extraction already succeeded; the order builds once migrated).
-    return { ok: false, reason: 'migration-needed' };
-  }
+  // Upsert one order per source document. The existence probe + migration guard
+  // ran at the TOP (before any Core Data was created), so `existingOrder` is ready.
   let orderId = (existingOrder as { id: string } | null)?.id ?? null;
   let inv = (existingOrder as { invoice_number: string | null } | null)?.invoice_number ?? null;
   const status = finalize ? 'invoiced' : 'draft';

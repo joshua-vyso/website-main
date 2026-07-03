@@ -24,6 +24,7 @@ import {
   type InvoiceStatus,
 } from '@/lib/platform/orderflow';
 import { Kpi } from '@/components/platform/orderflow/ui';
+import { PublishOrderButton } from '@/components/platform/orderflow/PublishOrderButton';
 import { ActivityFeed } from '@/components/platform/orderflow/ActivityFeed';
 import { GlobalSearch, type SearchIndexItem } from '@/components/platform/orderflow/GlobalSearch';
 import { useIsAdmin, LockedTile } from '@/components/platform/RoleGate';
@@ -270,7 +271,10 @@ export function Dashboard({
       {/* Quick actions */}
       <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
         <div className="mb-3 text-[12px] font-semibold uppercase tracking-wide text-[#9A9DA1]">Quick actions</div>
-        <div className="flex flex-wrap gap-2">
+        <div className="flex flex-wrap items-center gap-2">
+          {/* Upload a customer order (WhatsApp/email/handwritten) → Doc-U extraction
+              → auto-built OrderFlow order, creating any new customer/products. */}
+          <PublishOrderButton />
           <QuickAction href="/app/orderflow/invoices/new" label="New invoice" primary />
           <QuickAction href="/app/orderflow/quotes/new" label="New quote" />
           <QuickAction href="/app/orderflow/orders/new" label="New order" />

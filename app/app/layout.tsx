@@ -2,6 +2,7 @@ import { redirect } from 'next/navigation';
 import { getPlatformSession } from '@/lib/platform/supabase-server';
 import { PlatformProvider } from '@/lib/platform/session';
 import { Sidebar } from '@/components/platform/Sidebar';
+import { ModuleLockGuard } from '@/components/platform/ModuleLockGuard';
 
 export const metadata = {
   title: 'Vyso — Platform',
@@ -22,7 +23,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         className="flex h-screen overflow-hidden bg-[#F6F6F4] text-[#1A1C1E] antialiased"
       >
         <Sidebar />
-        <main className="min-w-0 flex-1 overflow-y-auto">{children}</main>
+        <main className="min-w-0 flex-1 overflow-y-auto">
+          <ModuleLockGuard>{children}</ModuleLockGuard>
+        </main>
       </div>
     </PlatformProvider>
   );

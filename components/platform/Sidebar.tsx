@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { MODULES } from '@/lib/platform/modules';
@@ -7,6 +8,8 @@ import { SERVICEDEN_ACCOUNT_EMAIL } from '@/lib/platform/serviceden';
 import { usePlatform } from '@/lib/platform/session';
 import { createClient } from '@/lib/platform/supabase-browser';
 import { AppIcon } from './AppIcon';
+import { FeedbackModal } from './FeedbackModal';
+import { ModuleLockNotice } from './ModuleLockNotice';
 import { VysoMark } from './VysoMark';
 
 function initials(name: string | null | undefined): string {
@@ -16,10 +19,13 @@ function initials(name: string | null | undefined): string {
 }
 
 export function Sidebar() {
-  const { org, features, email } = usePlatform();
+  const { org, features, email, lockedModules } = usePlatform();
   const pathname = usePathname();
   const router = useRouter();
   const serviceDenActive = pathname === '/app/serviceden' || pathname.startsWith('/app/serviceden/');
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
+  // The label of the locked module whose "unlock" notice is currently open.
+  const [lockNotice, setLockNotice] = useState<string | null>(null);
 
   async function signOut() {
     const supabase = createClient();
@@ -41,8 +47,34 @@ export function Sidebar() {
           // forced on for every org in getPlatformSession (testing) — re-gate
           // there per-org to restore plan-based access.
           const enabled = m.status === 'active' && features[m.key];
+          // A locked module is one the org's plan excludes (org.locked_modules).
+          // Locked takes precedence over the enabled/soon logic: the row becomes
+          // an unlock prompt rather than a link.
+          const locked = lockedModules.includes(m.key);
           const active =
             pathname === m.screens.desktop || pathname.startsWith(`${m.screens.desktop}/`);
+          const base =
+            'flex items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] font-medium transition-colors';
+          if (locked) {
+            return (
+              <button
+                key={m.key}
+                type="button"
+                onClick={() => setLockNotice(m.label)}
+                className={`${base} w-full text-left text-[#9A9DA1] hover:bg-black/[0.03]`}
+              >
+                <AppIcon name={m.icon} size={26} />
+                <span className="flex-1">{m.label}</span>
+                <span className="flex items-center gap-1 text-[11px] text-[#9A9DA1]">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+                    <rect x="3" y="11" width="18" height="11" rx="2" />
+                    <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                  </svg>
+                  Unlock
+                </span>
+              </button>
+            );
+          }
           const content = (
             <>
               <AppIcon name={m.icon} size={26} />
@@ -50,8 +82,6 @@ export function Sidebar() {
               {!enabled ? <span className="text-[11px] text-[#9A9DA1]">soon</span> : null}
             </>
           );
-          const base =
-            'flex items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] font-medium transition-colors';
           if (!enabled) {
             return (
               <div key={m.key} className={`${base} cursor-default text-[#9A9DA1]`} aria-disabled>
@@ -89,6 +119,19 @@ export function Sidebar() {
       </nav>
 
       <div className="space-y-1 px-3 pb-1">
+        <button
+          type="button"
+          onClick={() => setFeedbackOpen(true)}
+          className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-[14px] font-medium text-[#1A1C1E] transition-colors hover:bg-black/[0.03]"
+        >
+          <span className="flex h-[26px] w-[26px] items-center justify-center" aria-hidden>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M3 11a8 8 0 0 1 16 0v0a8 8 0 0 1-8 8H7l-4 3v-3.5" />
+              <path d="M8 11h.01M12 11h.01M16 11h.01" />
+            </svg>
+          </span>
+          <span className="flex-1">Feedback</span>
+        </button>
         <Link
           href="/app/organisation"
           className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-[14px] font-medium transition-colors ${
@@ -164,6 +207,9 @@ export function Sidebar() {
           Sign out
         </button>
       </div>
+
+      <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
+      <ModuleLockNotice open={lockNotice !== null} moduleLabel={lockNotice ?? ''} onClose={() => setLockNotice(null)} />
     </aside>
   );
 }

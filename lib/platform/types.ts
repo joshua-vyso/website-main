@@ -55,6 +55,8 @@ export interface Organisation {
   location: string | null;
   tier: OrgTier;
   created_at: string;
+  /** Module feature-keys this org may NOT open (locked in the sidebar). Empty = all open. */
+  locked_modules?: string[];
 }
 
 export interface OrgFeature {

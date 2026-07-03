@@ -33,6 +33,8 @@ export interface PlatformSession {
   profile: Profile | null;
   org: Organisation | null;
   features: Record<FeatureKey, boolean>;
+  /** Module feature-keys this org may NOT open (locked in the sidebar + guarded). */
+  lockedModules: FeatureKey[];
 }
 
 const emptyFeatures = (): Record<FeatureKey, boolean> =>
@@ -82,5 +84,11 @@ export const getPlatformSession = cache(async (): Promise<PlatformSession | null
   // org's org_features rows. Remove this loop to restore per-org gating.
   for (const k of FEATURE_KEYS) features[k] = true;
 
-  return { userId: user.id, email: user.email ?? '', profile: profile ?? null, org, features };
+  // Locked modules are a per-org override on top of the above: the sidebar shows
+  // them with a lock/Unlock CTA and direct navigation is blocked.
+  const lockedModules = ((org?.locked_modules ?? []) as string[]).filter((k): k is FeatureKey =>
+    (FEATURE_KEYS as readonly string[]).includes(k),
+  );
+
+  return { userId: user.id, email: user.email ?? '', profile: profile ?? null, org, features, lockedModules };
 });

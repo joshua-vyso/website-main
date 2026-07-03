@@ -9,6 +9,8 @@ export interface PlatformContextValue {
   profile: Profile | null;
   org: Organisation | null;
   features: Record<FeatureKey, boolean>;
+  /** Module feature-keys this org may NOT open (locked in the sidebar + guarded). */
+  lockedModules: FeatureKey[];
 }
 
 const PlatformContext = createContext<PlatformContextValue | undefined>(undefined);
