@@ -61,11 +61,86 @@ function fmtDate(iso: string | null | undefined): string {
   return Number.isNaN(d.getTime()) ? '—' : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-/** A migration-not-run error → a quiet inline note; anything else → the raw message. */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+const MISSING_COLUMN_RE = /column|schema cache|could not find|does not exist/i;
+
+/** The column PostgREST reports missing, e.g. PGRST204
+ *  "Could not find the 'notes' column of 'pl_price_lists' in the schema cache". */
+function missingColumnName(msg: string): string | null {
+  const m = /'([^']+)' column/i.exec(msg) ?? /column "?([a-zA-Z0-9_]+)"?/.exec(msg);
+  return m ? m[1] : null;
+}
+
+/** A migration-not-run error → a clear, actionable note; anything else → the raw message. */
 function migrationMessage(msg: string): string {
-  return /column|relation|schema cache|does not exist/i.test(msg)
-    ? 'Run supabase/core-data.sql to enable custom pricing.'
+  return MISSING_COLUMN_RE.test(msg) || /relation/i.test(msg)
+    ? 'This needs the Core Data migration — run supabase/core-data.sql in your Supabase SQL editor.'
     : msg;
+}
+
+// Friendly names for the optional Core Data columns that only exist once
+// core-data.sql has been run (used to tell the user what didn't persist).
+const COL_LABEL: Record<string, string> = {
+  notes: 'notes',
+  valid_from: 'validity dates',
+  valid_until: 'validity dates',
+  custom_price: 'custom prices',
+};
+
+/** A "saved, but X wasn't persisted" note when we had to drop columns, else null. */
+function droppedNote(dropped: string[]): string | null {
+  if (dropped.length === 0) return null;
+  const labels = [...new Set(dropped.map((c) => COL_LABEL[c] ?? c))];
+  return `Saved — ${labels.join(' & ')} need the core-data.sql migration`;
+}
+
+/**
+ * Write a single row, transparently dropping any columns the database doesn't
+ * have yet (a not-yet-run / partial core-data.sql migration). `build` must
+ * construct a fresh query from the working row on every call. Returns the
+ * response plus which columns were dropped, so callers can tell the user what
+ * didn't persist. Base columns always exist, so they're never reported missing —
+ * only the optional Core Data extras (notes, valid_from/until, custom_price)
+ * can ever be dropped, and the row is still created with everything else.
+ */
+async function writeDroppingMissing<T = any>(
+  build: (row: Record<string, any>) => PromiseLike<{ data: T | null; error: { message: string } | null }>,
+  row: Record<string, any>,
+): Promise<{ data: T | null; error: { message: string } | null; dropped: string[] }> {
+  const working: Record<string, any> = { ...row };
+  const dropped: string[] = [];
+  for (let i = 0; i < 8; i++) {
+    const res = await build(working);
+    if (!res.error) return { data: res.data ?? null, error: null, dropped };
+    const col = missingColumnName(res.error.message);
+    if (!col || !(col in working)) return { data: (res.data as T | null) ?? null, error: res.error, dropped };
+    delete working[col];
+    dropped.push(col);
+  }
+  return { data: null, error: { message: 'Too many missing columns — run supabase/core-data.sql.' }, dropped };
+}
+
+/** Array variant of writeDroppingMissing — drops a missing column from every row. */
+async function writeArrayDroppingMissing(
+  build: (rows: Record<string, any>[]) => PromiseLike<{ error: { message: string } | null }>,
+  rows: Record<string, any>[],
+): Promise<{ error: { message: string } | null; dropped: string[] }> {
+  let working = rows.map((r) => ({ ...r }));
+  const dropped: string[] = [];
+  for (let i = 0; i < 8; i++) {
+    const res = await build(working);
+    if (!res.error) return { error: null, dropped };
+    const col = missingColumnName(res.error.message);
+    if (!col || !working.some((r) => col in r)) return { error: res.error, dropped };
+    working = working.map((r) => {
+      const c = { ...r };
+      delete c[col];
+      return c;
+    });
+    dropped.push(col);
+  }
+  return { error: { message: 'Too many missing columns — run supabase/core-data.sql.' }, dropped };
 }
 
 const CADENCES: { value: PriceCadence; label: string }[] = [
@@ -208,11 +283,10 @@ export function PriceListsView({
       notes: listDraft.notes.trim() || null,
     };
     if (editingList === 'new') {
-      const { data: inserted, error: err } = await supabase
-        .from('pl_price_lists')
-        .insert({ org_id: org.id, ...payload })
-        .select('id')
-        .single();
+      const { data: inserted, error: err, dropped } = await writeDroppingMissing<{ id: string }>(
+        (row) => supabase.from('pl_price_lists').insert({ org_id: org.id, ...row }).select('id').single(),
+        payload,
+      );
       setListBusy(false);
       if (err || !inserted) {
         setListError(migrationMessage(err?.message ?? 'Could not create the price list.'));
@@ -228,11 +302,15 @@ export function PriceListsView({
         description: `Created ${payload.name}`,
       });
       setEditingList(null);
-      toast('Price list created');
+      toast(droppedNote(dropped) ?? 'Price list created');
       router.refresh();
       setOpenListId(inserted.id);
     } else if (editingList) {
-      const { error: err } = await supabase.from('pl_price_lists').update(payload).eq('id', editingList).eq('org_id', org.id);
+      const listId = editingList;
+      const { error: err, dropped } = await writeDroppingMissing(
+        (row) => supabase.from('pl_price_lists').update(row).eq('id', listId).eq('org_id', org.id),
+        payload,
+      );
       setListBusy(false);
       if (err) {
         setListError(migrationMessage(err.message));
@@ -242,13 +320,13 @@ export function PriceListsView({
         orgId: org.id,
         actorEmail: email,
         entityType: 'price_list',
-        entityId: editingList,
+        entityId: listId,
         customerId: payload.customer_id,
         event: 'price_list_updated',
         description: `Updated ${payload.name}`,
       });
       setEditingList(null);
-      toast('Price list updated');
+      toast(droppedNote(dropped) ?? 'Price list updated');
       router.refresh();
     }
   }
@@ -260,10 +338,9 @@ export function PriceListsView({
       toast('Not connected.');
       return;
     }
-    const { data: inserted, error: err } = await supabase
-      .from('pl_price_lists')
-      .insert({
-        org_id: org.id,
+    const { data: inserted, error: err } = await writeDroppingMissing<{ id: string }>(
+      (row) => supabase.from('pl_price_lists').insert({ org_id: org.id, ...row }).select('id').single(),
+      {
         name: `${l.name} (copy)`,
         customer_id: l.customer_id ?? null,
         default_margin_pct: l.default_margin_pct ?? 0,
@@ -271,9 +348,8 @@ export function PriceListsView({
         valid_until: l.valid_until ?? null,
         cadence: l.cadence ?? 'standard',
         notes: l.notes ?? null,
-      })
-      .select('id')
-      .single();
+      },
+    );
     if (err || !inserted) {
       toast(migrationMessage(err?.message ?? 'Could not duplicate the price list.'));
       return;
@@ -288,7 +364,7 @@ export function PriceListsView({
         custom_price: o.custom_price ?? null,
       }));
     if (rows.length > 0) {
-      const { error: ovErr } = await supabase.from('pl_overrides').insert(rows);
+      const { error: ovErr } = await writeArrayDroppingMissing((w) => supabase.from('pl_overrides').insert(w), rows);
       if (ovErr) {
         toast(migrationMessage(ovErr.message));
         // The list itself copied — refresh so it appears; overrides just didn't.
@@ -634,7 +710,9 @@ function PriceListEditor({
     if (!supabase || !org) return;
     setBusyId(product.id);
     setError(null);
-    const { error: err } = await supabase.from('pl_overrides').insert({
+    // custom_price only exists post-migration; drop it if missing so a product
+    // can still be added at the list's margin before core-data.sql is run.
+    const { error: err } = await writeDroppingMissing((row) => supabase.from('pl_overrides').insert(row), {
       org_id: org.id,
       price_list_id: list.id,
       stock_item_id: product.id,
@@ -813,13 +891,20 @@ function PriceListEditor({
     if (upserts.length === 0) {
       return { inserted: 0, error: unmatched > 0 ? `No products matched — ${unmatched} row(s) had no matching product name.` : 'No rows to import.' };
     }
-    const { error: err } = await supabase.from('pl_overrides').upsert(upserts, { onConflict: 'price_list_id,stock_item_id' });
+    const { error: err, dropped } = await writeArrayDroppingMissing(
+      (w) => supabase.from('pl_overrides').upsert(w, { onConflict: 'price_list_id,stock_item_id' }),
+      upserts,
+    );
     if (err) return { inserted: 0, error: migrationMessage(err.message) };
     logEdit(list.id, `Imported ${upserts.length} prices into ${list.name}`);
     router.refresh();
     const notes = [
       unmatched > 0 ? `${unmatched} row(s) skipped — no matching product name.` : null,
-      clearedCustom > 0 ? `${clearedCustom} row(s) had a 0 or negative custom price → margin pricing used.` : null,
+      dropped.includes('custom_price')
+        ? 'Custom prices need the core-data.sql migration — margins imported only.'
+        : clearedCustom > 0
+          ? `${clearedCustom} row(s) had a 0 or negative custom price → margin pricing used.`
+          : null,
     ].filter(Boolean);
     return { inserted: upserts.length, error: notes.length > 0 ? notes.join(' ') : undefined };
   }

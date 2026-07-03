@@ -582,14 +582,15 @@ export function computeNotifications(i: NotificationInput): PpNotification[] {
   return out.sort((a, b) => rank[a.severity] - rank[b.severity]);
 }
 
-/** Rand, plain. */
+/** Rand, plain — e.g. "R 88 000". en-US grouping (comma) → spaces. */
 export function zar(n: number | null | undefined): string {
   if (n == null) return '—';
-  return `R ${Math.round(n).toLocaleString('en-ZA')}`;
+  return `R ${Math.round(n).toLocaleString('en-US').replace(/,/g, ' ')}`;
 }
 
-/** Rand with cents (price lists need precision). */
+/** Rand with cents (price lists need precision), e.g. "R 1 234.56". en-US (dot
+ *  decimal, comma grouping) → spaces, so the decimal separator survives. */
 export function zar2(n: number | null | undefined): string {
   if (n == null) return '—';
-  return `R ${Number(n).toLocaleString('en-ZA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  return `R ${Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).replace(/,/g, ' ')}`;
 }
