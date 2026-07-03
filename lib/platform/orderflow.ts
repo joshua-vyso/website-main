@@ -43,6 +43,53 @@ export interface OfCustomer {
   billing_address?: string | null;
   tags?: string[];
   updated_at?: string;
+  // Per-customer AI invoicing parameters (customer-ai-invoicing.sql).
+  account_code?: string | null;
+  vat_treatment?: VatTreatment;
+  invoice_price_basis?: InvoicePriceBasis;
+  invoice_quantity_basis?: InvoiceQuantityBasis;
+  strip_order_prefixes?: boolean;
+  ai_auto_invoice_confidence?: number | null;
+  ai_allow_unpriced?: boolean;
+  invoice_terms_days_override?: number | null;
+  invoice_terms_text?: string | null;
+  invoice_note?: string | null;
+  ai_invoice_instructions?: string | null;
+}
+
+// ---------------------------------------------------------------------------
+// Per-customer AI invoicing parameters
+// ---------------------------------------------------------------------------
+
+export type VatTreatment = 'zero_rated' | 'standard' | 'exempt';
+export type InvoicePriceBasis = 'price_list' | 'order_prices';
+export type InvoiceQuantityBasis = 'auto' | 'bulk' | 'order_unit';
+
+export const VAT_TREATMENTS: { value: VatTreatment; label: string }[] = [
+  { value: 'zero_rated', label: 'Zero-rated (Z)' },
+  { value: 'standard', label: 'Standard rate' },
+  { value: 'exempt', label: 'Exempt' },
+];
+
+export const INVOICE_PRICE_BASES: { value: InvoicePriceBasis; label: string }[] = [
+  { value: 'price_list', label: 'Our price list' },
+  { value: 'order_prices', label: "Customer's order prices" },
+];
+
+export const INVOICE_QUANTITY_BASES: { value: InvoiceQuantityBasis; label: string }[] = [
+  { value: 'auto', label: 'Auto' },
+  { value: 'bulk', label: 'Bulk quantity' },
+  { value: 'order_unit', label: 'Order unit quantity' },
+];
+
+/** The short VAT code printed per line on the classic invoice. */
+export function vatCodeFor(t: VatTreatment | null | undefined): string {
+  return t === 'standard' ? 'V' : t === 'exempt' ? 'E' : 'Z';
+}
+
+/** The VAT rate % an invoice should carry for a customer's treatment. */
+export function vatRateForTreatment(t: VatTreatment | null | undefined, standardRate = 15): number {
+  return t === 'standard' ? standardRate : 0;
 }
 
 export interface OfOrder {

@@ -30,6 +30,7 @@ import { customerPriceList, formatAddress, type CdContact, type CdDeliveryAddres
 import type { CustomerProfileData } from '@/lib/platform/orderflow-data';
 import { ActivityFeed } from './ActivityFeed';
 import { AttachDocuments } from './AttachDocuments';
+import { CustomerAiInvoicing } from './CustomerAiInvoicing';
 import { useToast } from './ui';
 import {
   ConfirmDialog,
@@ -581,6 +582,9 @@ export function CustomerProfile({ data, orgName }: { data: CustomerProfileData |
               ) : null}
             </div>
           </SectionCard>
+
+          {/* AI invoicing params + order mappings */}
+          <CustomerAiInvoicing customer={customer} products={data!.products} aliases={data!.itemAliases} />
 
           {/* Contacts */}
           <SectionCard title="Contacts">

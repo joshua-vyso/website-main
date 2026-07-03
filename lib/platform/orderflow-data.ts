@@ -23,7 +23,7 @@ import type {
   OfSettings,
 } from './orderflow';
 import { DEFAULT_OF_SETTINGS } from './orderflow';
-import type { CdContact, CdDeliveryAddress, CdProduct, CdPriceList, CdPriceOverride, CdPaymentTerm, CdCompanyProfile } from './coredata';
+import type { CdContact, CdDeliveryAddress, CdProduct, CdPriceList, CdPriceOverride, CdPaymentTerm, CdCompanyProfile, CdCustomerItemAlias } from './coredata';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 function rows<T>(res: { data: unknown }): T[] {
@@ -149,12 +149,16 @@ export interface CustomerProfileData {
   priceLists: CdPriceList[];
   overrides: CdPriceOverride[];
   paymentTerms: CdPaymentTerm[];
+  /** The org catalogue — for the order-mapping item picker. */
+  products: CdProduct[];
+  /** This customer's order-name → catalogue mappings (cd_customer_item_aliases). */
+  itemAliases: CdCustomerItemAlias[];
   settings: OfSettings;
 }
 
 export async function getCustomerProfile(orgId: string, customerId: string): Promise<CustomerProfileData> {
   const sb = await createServerSupabase();
-  const [cus, con, adr, qts, ord, inv, itm, pay, cns, cni, act, docs, pls, ovr, terms, set] = await Promise.all([
+  const [cus, con, adr, qts, ord, inv, itm, pay, cns, cni, act, docs, pls, ovr, terms, prod, ali, set] = await Promise.all([
     sb.from('of_customers').select('*').eq('org_id', orgId).eq('id', customerId).maybeSingle(),
     sb.from('cd_contacts').select('*').eq('org_id', orgId).eq('customer_id', customerId).order('is_primary', { ascending: false }),
     sb.from('cd_delivery_addresses').select('*').eq('org_id', orgId).eq('customer_id', customerId).order('is_default', { ascending: false }),
@@ -170,6 +174,8 @@ export async function getCustomerProfile(orgId: string, customerId: string): Pro
     sb.from('pl_price_lists').select('*').eq('org_id', orgId),
     sb.from('pl_overrides').select('*').eq('org_id', orgId),
     sb.from('cd_payment_terms').select('*').eq('org_id', orgId).order('days'),
+    sb.from('pp_stock_items').select('*').eq('org_id', orgId).order('name'),
+    sb.from('cd_customer_item_aliases').select('*').eq('org_id', orgId).eq('customer_id', customerId).order('raw_name'),
     sb.from('of_settings').select('*').eq('org_id', orgId).maybeSingle(),
   ]);
   const invoices = rows<OfInvoice>(inv);
@@ -192,6 +198,8 @@ export async function getCustomerProfile(orgId: string, customerId: string): Pro
     priceLists: rows<CdPriceList>(pls),
     overrides: rows<CdPriceOverride>(ovr),
     paymentTerms: rows<CdPaymentTerm>(terms),
+    products: rows<CdProduct>(prod),
+    itemAliases: rows<CdCustomerItemAlias>(ali),
     settings: (set.data as OfSettings | null) ?? { ...DEFAULT_OF_SETTINGS, org_id: orgId },
   };
 }

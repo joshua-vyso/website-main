@@ -4,11 +4,31 @@
  * else the customer's price list), upsert one order per source document, and —
  * when the customer is known — finalise it to 'invoiced' (so PricePilot sees the
  * sale) and decrement stock. Idempotent: re-running re-prices + re-applies stock.
+ *
+ * ----------------------------------------------------------------------------
+ * Per-customer parameters (customer-ai-invoicing.sql) steer the rectification.
+ * They only apply when a customer is KNOWN (matched at/above their confidence
+ * threshold); an unknown/partial customer behaves exactly as before.
+ *   • cd_customer_item_aliases — an exact raw_name → catalogue mapping wins over
+ *     fuzzy matching: it fixes the stock item, the printed invoice name and the
+ *     billing unit for that customer's coded/misspelled order line.
+ *   • strip_order_prefixes (default true) — strips a leading category code like
+ *     "FF - " / "VEG - " / "PSAL - " from the order name before fuzzy matching.
+ *   • invoice_price_basis — 'price_list' re-prices every line from OUR list
+ *     (ignoring the document's own price); 'order_prices' keeps the doc price.
+ *   • ai_auto_invoice_confidence (default 80) — the match confidence at/above
+ *     which the order auto-invoices; ai_allow_unpriced lets it invoice even with
+ *     unpriced lines. An explicit params.finalize still overrides both gates.
+ *   • vat_treatment — sets the materialised invoice's vat_rate (0 for
+ *     zero_rated/exempt, the org standard for standard); invoice_terms_days_override
+ *     sets the due date.
+ * ----------------------------------------------------------------------------
  */
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { ExtractedData } from './types';
-import { invoiceNumber } from './orderflow';
-import type { CdPriceList, CdPriceOverride } from './coredata';
+import { invoiceNumber, vatRateForTreatment } from './orderflow';
+import type { OfCustomer } from './orderflow';
+import type { CdCustomerItemAlias, CdPriceList, CdPriceOverride } from './coredata';
 import { customerPriceList, resolvePrice } from './coredata';
 
 export interface CustomerLite {
@@ -195,9 +215,10 @@ export async function syncOrderFromDocument(
   const lines = ed.line_items ?? [];
 
   // Resolve customer — an explicit pick (from review) wins; else fuzzy-match.
-  // select('*') so default_price_list_id (core-data.sql) rides along when present.
+  // select('*') so default_price_list_id (core-data.sql) + the AI-invoicing
+  // params (customer-ai-invoicing.sql) ride along when present.
   const { data: custRows } = await db.from('of_customers').select('*').eq('org_id', orgId);
-  const customers = (custRows ?? []) as (CustomerLite & { default_price_list_id?: string | null })[];
+  const customers = (custRows ?? []) as (CustomerLite & Partial<OfCustomer>)[];
   let customerId = params.customerId ?? null;
   let matchConfidence = customerId ? 100 : 0;
   if (!customerId) {
@@ -205,7 +226,36 @@ export async function syncOrderFromDocument(
     customerId = m.customerId;
     matchConfidence = m.confidence;
   }
-  const customerKnown = !!customerId && matchConfidence >= CUSTOMER_CONFIDENT;
+  const matchedCustomer = customerId ? customers.find((c) => c.id === customerId) ?? null : null;
+
+  // Per-customer auto-invoice threshold (customer-ai-invoicing.sql), else the
+  // module default. Only a KNOWN customer gets their params applied below.
+  const confidenceThreshold = matchedCustomer?.ai_auto_invoice_confidence ?? CUSTOMER_CONFIDENT;
+  const customerKnown = !!customerId && matchConfidence >= confidenceThreshold;
+
+  // Load this customer's order-name mappings. Missing table (migration not run)
+  // → [], so behaviour degrades to fuzzy-only matching, never crashes.
+  let aliases: CdCustomerItemAlias[] = [];
+  if (customerId) {
+    const { data: aliasRows } = await db
+      .from('cd_customer_item_aliases')
+      .select('*')
+      .eq('org_id', orgId)
+      .eq('customer_id', customerId);
+    aliases = (aliasRows ?? []) as CdCustomerItemAlias[];
+  }
+  // raw_name (lowercased, trimmed) → alias, for an exact-match lookup per line.
+  const aliasByRaw = new Map<string, CdCustomerItemAlias>();
+  for (const a of aliases) {
+    const key = (a.raw_name ?? '').toLowerCase().trim();
+    if (key) aliasByRaw.set(key, a);
+  }
+  // Aliases + all params only steer a KNOWN customer's order — an unknown/partial
+  // customer behaves exactly as before (no alias, no prefix strip, doc price first).
+  const applyParams = customerKnown ? matchedCustomer : null;
+  if (!applyParams) aliasByRaw.clear();
+  const stripPrefixes = !!applyParams && applyParams.strip_order_prefixes !== false; // default on when known
+  const priceFromList = applyParams?.invoice_price_basis === 'price_list';
 
   // Pricing: document price first; otherwise the shared Core Data resolution —
   // customerPriceList picks the customer's explicit default list when valid, else
@@ -213,7 +263,6 @@ export async function syncOrderFromDocument(
   // applies custom-price/margin overrides exactly like the invoice builder.
   // select('*') keeps this safe pre-migration (never names a missing column).
   const { data: plRows } = await db.from('pl_price_lists').select('*').eq('org_id', orgId);
-  const matchedCustomer = customerId ? customers.find((c) => c.id === customerId) ?? null : null;
   const priceList = customerPriceList(
     matchedCustomer ? { id: matchedCustomer.id, default_price_list_id: matchedCustomer.default_price_list_id ?? null } : null,
     (plRows ?? []) as CdPriceList[],
@@ -234,11 +283,37 @@ export async function syncOrderFromDocument(
   const items: { stock_item_id: string | null; name: string; qty: number; unit: string | null; unit_price: number }[] = [];
   let unpricedLines = 0;
   for (const li of lines) {
-    const name = (li.description ?? '').trim();
-    if (!name) continue;
+    const rawName = (li.description ?? '').trim();
+    if (!rawName) continue;
     const qty = num(li.quantity) ?? 0;
-    const s = matchStockItem(name, stockItems);
-    let unitPrice = num(li.unit_price);
+    const docUnit = (li.unit ?? '').trim() || null;
+
+    // 1. Alias-first product match: an exact customer mapping (raw_name) pins the
+    //    stock item, the printed invoice name and the billing unit — skip fuzzy.
+    const alias = aliasByRaw.get(rawName.toLowerCase());
+    let s: StockLite | null = null;
+    let name = rawName;
+    let unit = docUnit;
+    if (alias) {
+      s = alias.stock_item_id ? stockItems.find((it) => it.id === alias.stock_item_id) ?? null : null;
+      name = (alias.invoice_name ?? '').trim() || s?.name || rawName;
+      if ((alias.unit ?? '').trim()) unit = (alias.unit as string).trim();
+      else if (!unit) unit = s?.unit ?? null;
+    } else {
+      // 2. Prefix strip: drop a leading category code ("FF - ", "VEG - ", "PSAL - ")
+      //    before fuzzy matching, so "FF - NAARTJIES Box" hits "Naartjies".
+      const forMatch = stripPrefixes ? rawName.replace(/^[A-Z]{2,5}\s*-\s*/, '').trim() || rawName : rawName;
+      s = matchStockItem(forMatch, stockItems);
+      // Known customer → rectify to the clean catalogue name; when nothing matches
+      // keep the FULL raw description (not the stripped fragment, in case the
+      // leading token wasn't really a category). Unknown customer → raw as before.
+      name = applyParams ? s?.name ?? rawName : rawName;
+      if (!unit) unit = s?.unit ?? null;
+    }
+
+    // 3. Price basis: 'price_list' re-prices every line from OUR list (ignoring the
+    //    document's own price); otherwise the doc price wins, then the list, then 0.
+    let unitPrice = priceFromList ? null : num(li.unit_price);
     let priced = unitPrice != null; // a real price came off the document
     if (unitPrice == null) {
       const resolved = s ? resolvePrice(s, priceList, overrides) : null;
@@ -250,13 +325,17 @@ export async function syncOrderFromDocument(
       }
     }
     if (!priced) unpricedLines += 1;
-    items.push({ stock_item_id: s?.id ?? null, name, qty, unit: (li.unit ?? '').trim() || s?.unit || null, unit_price: unitPrice });
+    items.push({ stock_item_id: s?.id ?? null, name, qty, unit, unit_price: unitPrice });
   }
 
-  // Auto-invoice only when the customer is known AND every line has a real price.
+  // Auto-invoice only when the customer is known AND every line has a real price —
+  // unless the customer opts into invoicing with unpriced lines (ai_allow_unpriced).
   // An explicit "Confirm & invoice" (params.finalize) always wins — the human has
   // seen and can edit the prices. Anything else holds as a draft for review.
-  const finalize = params.finalize === true ? true : customerKnown && unpricedLines === 0;
+  const finalize =
+    params.finalize === true
+      ? true
+      : customerKnown && (unpricedLines === 0 || applyParams?.ai_allow_unpriced === true);
 
   // Upsert one order per source document.
   const { data: existingOrder, error: lookupErr } = await db
@@ -344,8 +423,12 @@ export async function syncOrderFromDocument(
           .eq('org_id', orgId)
           .maybeSingle();
         const settings = setRow as { default_vat_rate?: number; default_payment_terms_days?: number } | null;
-        const vatRate = Number(settings?.default_vat_rate ?? 15);
-        const termsDays = Number(settings?.default_payment_terms_days ?? 30);
+        const standardRate = Number(settings?.default_vat_rate ?? 15);
+        // VAT rate follows the customer's treatment (zero_rated/exempt → 0,
+        // standard → the org default). Unknown customer → the org default.
+        const vatRate = applyParams ? vatRateForTreatment(applyParams.vat_treatment, standardRate) : standardRate;
+        // Per-customer payment-terms override (null → the org default).
+        const termsDays = Number(applyParams?.invoice_terms_days_override ?? settings?.default_payment_terms_days ?? 30);
         const issued = new Date();
         const due = new Date(issued.getTime() + termsDays * 86_400_000);
         const { data: createdInv, error: invInsErr } = await db

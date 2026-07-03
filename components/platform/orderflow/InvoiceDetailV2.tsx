@@ -15,7 +15,6 @@ import { createClient } from '@/lib/platform/supabase-browser';
 import { usePlatform } from '@/lib/platform/session';
 import { logActivity } from '@/lib/platform/orderflow-activity';
 import {
-  INVOICE_STATUS_STYLE,
   PAYMENT_METHODS,
   balanceDue,
   docTotals,
@@ -25,7 +24,8 @@ import {
   type OfCreditNote,
 } from '@/lib/platform/orderflow';
 import type { InvoiceDetailData } from '@/lib/platform/orderflow-data';
-import { DocSheet, PrintButton, type DocSheetLine } from './DocSheet';
+import { PrintButton, type DocSheetLine } from './DocSheet';
+import { InvoiceSheetClassic } from './InvoiceSheetClassic';
 import { RecordPaymentModal } from './PaymentModal';
 import { ActivityFeed } from './ActivityFeed';
 import { AttachDocuments } from './AttachDocuments';
@@ -94,7 +94,6 @@ export function InvoiceDetailV2({ data, orgName }: { data: InvoiceDetailData; or
   const inv = invoice;
   const eff = effectiveInvoiceStatus(inv, paid, totals.total);
   const balance = balanceDue(totals.total, paid, credited);
-  const statusStyle = INVOICE_STATUS_STYLE[eff];
 
   const settled = eff === 'draft' || eff === 'cancelled' || eff === 'credited';
   const canPay = !settled && balance > 0;
@@ -108,15 +107,6 @@ export function InvoiceDetailV2({ data, orgName }: { data: InvoiceDetailData; or
     unit: it.unit,
     unit_price: Number(it.unit_price) || 0,
   }));
-
-  const meta = [
-    { label: 'Issued', value: fmtDate(inv.issue_date) },
-    { label: 'Due', value: fmtDate(inv.due_date) },
-    ...(inv.customer_po ? [{ label: 'Customer PO', value: inv.customer_po }] : []),
-    ...(order ? [{ label: 'Order no', value: order.order_number ?? `#${order.id.slice(0, 6).toUpperCase()}` }] : []),
-  ];
-
-  const deliverTo = [inv.delivery_address, inv.delivery_instructions].filter(Boolean).join('\n') || null;
 
   async function markSent() {
     const supabase = createClient();
@@ -274,22 +264,23 @@ export function InvoiceDetailV2({ data, orgName }: { data: InvoiceDetailData; or
       ) : null}
 
       <div className="grid grid-cols-1 items-start gap-5 xl:grid-cols-[minmax(0,1fr)_340px]">
-        {/* Printable invoice sheet */}
-        <DocSheet
-          title="Invoice"
-          number={inv.invoice_number}
-          statusPill={{ label: statusStyle.label, bg: statusStyle.bg, fg: statusStyle.fg }}
+        {/* Printable invoice sheet — the classic SA tax-invoice template. */}
+        <InvoiceSheetClassic
           companyProfile={companyProfile}
           orgName={orgName}
           customer={customer}
-          billTo={inv.billing_address}
-          deliverTo={deliverTo}
-          meta={meta}
+          invoice={{
+            number: inv.invoice_number,
+            issueDate: inv.issue_date,
+            dueDate: inv.due_date,
+            customerPo: inv.customer_po,
+            termsText: inv.terms ?? customer?.invoice_terms_text ?? null,
+            note: inv.notes ?? customer?.invoice_note ?? null,
+          }}
           lines={sheetLines}
+          vatTreatment={customer?.vat_treatment ?? 'zero_rated'}
           vatRate={inv.vat_rate}
           discount={inv.discount}
-          notes={inv.notes}
-          terms={inv.terms}
         />
 
         {/* Side panels */}

@@ -76,6 +76,24 @@ export type ProductKind = 'product' | 'service';
 
 export const PRODUCT_UNIT_TYPES = ['kg', 'box', 'punnet', 'bag', 'each', 'bunch', 'litre', 'service', 'other'] as const;
 
+/**
+ * A per-customer order-name → catalogue mapping (cd_customer_item_aliases).
+ * Encodes how a customer's coded/misspelled order names ("FF - NAARTJIES Box")
+ * resolve to a catalogue item and a clean invoice name + billing unit.
+ */
+export interface CdCustomerItemAlias {
+  id: string;
+  org_id: string;
+  customer_id: string;
+  raw_name: string;
+  stock_item_id: string | null;
+  invoice_name: string | null;
+  unit: string | null;
+  /** auto | bulk | order_unit — overrides the customer's default quantity basis. */
+  quantity_basis: string | null;
+  created_at: string;
+}
+
 export interface CdPaymentTerm {
   id: string;
   org_id: string;
