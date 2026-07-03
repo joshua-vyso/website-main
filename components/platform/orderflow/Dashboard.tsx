@@ -26,6 +26,7 @@ import {
 import { Kpi } from '@/components/platform/orderflow/ui';
 import { ActivityFeed } from '@/components/platform/orderflow/ActivityFeed';
 import { GlobalSearch, type SearchIndexItem } from '@/components/platform/orderflow/GlobalSearch';
+import { useIsAdmin, LockedTile } from '@/components/platform/RoleGate';
 
 // ---------------------------------------------------------------------------
 // Props — the OrderFlowSnapshot spread + orgName/email (see page.tsx).
@@ -68,6 +69,8 @@ export function Dashboard({
   email,
 }: DashboardProps) {
   const vatRate = Number(settings?.default_vat_rate ?? 15);
+  // Members don't see money figures — revenue/outstanding tiles are locked.
+  const isAdmin = useIsAdmin();
 
   // Group invoice items + payments by invoice, and credit-note totals per
   // invoice, once for all downstream maths.
@@ -227,19 +230,27 @@ export function Dashboard({
 
       {/* KPI row */}
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-        <Kpi
-          label="Revenue this month"
-          value={zar(kpis.revenueMonth)}
-          accent="#0F6E56"
-          sub={`${zar(kpis.revenueToday)} today`}
-        />
+        {isAdmin ? (
+          <Kpi
+            label="Revenue this month"
+            value={zar(kpis.revenueMonth)}
+            accent="#0F6E56"
+            sub={`${zar(kpis.revenueToday)} today`}
+          />
+        ) : (
+          <LockedTile label="Revenue this month" />
+        )}
         <Kpi label="Invoices today" value={String(kpis.invoicesCreatedToday)} sub="created today" />
-        <Kpi
-          label="Outstanding"
-          value={zar(kpis.outstanding)}
-          accent={kpis.outstanding > 0 ? '#854F0B' : undefined}
-          sub={`${kpis.unpaid} unpaid invoice${kpis.unpaid === 1 ? '' : 's'}`}
-        />
+        {isAdmin ? (
+          <Kpi
+            label="Outstanding"
+            value={zar(kpis.outstanding)}
+            accent={kpis.outstanding > 0 ? '#854F0B' : undefined}
+            sub={`${kpis.unpaid} unpaid invoice${kpis.unpaid === 1 ? '' : 's'}`}
+          />
+        ) : (
+          <LockedTile label="Outstanding" />
+        )}
         <Kpi
           label="Overdue"
           value={String(kpis.overdue)}
