@@ -22,7 +22,7 @@ import {
   type CdPriceOverride,
   type CdProduct,
 } from '@/lib/platform/coredata';
-import { docTotals, isoDatePlusDays, zar2, type OfCustomer, type OfSettings } from '@/lib/platform/orderflow';
+import { docTotals, isoDatePlusDays, setupMessage, zar2, type OfCustomer, type OfSettings } from '@/lib/platform/orderflow';
 import { CustomerSelect, LineItemsEditor, nextDocNumber, type BuilderLine } from './builder';
 import { useToast } from './ui';
 import { Field, inputClass } from '@/components/platform/coredata/ui';
@@ -178,7 +178,7 @@ export function QuoteBuilder({
       router.push(`/app/orderflow/quotes/${quote.id}`);
     } catch (e) {
       setBusy(null);
-      toast(e instanceof Error ? e.message : 'Could not save the quote.');
+      toast(setupMessage(e instanceof Error ? e.message : 'Could not save the quote.'));
     }
   }
 

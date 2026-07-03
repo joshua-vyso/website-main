@@ -29,6 +29,7 @@ import {
   balanceDue,
   docTotals,
   paymentsTotal,
+  setupMessage,
   zar2,
   type OfCreditNote,
   type OfCreditNoteItem,
@@ -289,7 +290,7 @@ export function CreditNoteBuilder({
       router.push(`/app/orderflow/credit-notes/${cn.id}`);
     } catch (e) {
       setBusy(false);
-      toast(e instanceof Error ? e.message : 'Could not issue the credit note.');
+      toast(setupMessage(e instanceof Error ? e.message : 'Could not issue the credit note.'));
     }
   }
 

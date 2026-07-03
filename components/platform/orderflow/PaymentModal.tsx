@@ -15,6 +15,7 @@ import {
   PAYMENT_METHODS,
   balanceDue,
   effectiveInvoiceStatus,
+  setupMessage,
   zar2,
   type OfInvoice,
   type PaymentMethod,
@@ -25,7 +26,7 @@ import { useToast } from '@/components/platform/orderflow/ui';
 function friendlyError(message: string | undefined): string {
   if (!message) return 'Could not record the payment.';
   if (/does not exist|schema cache/i.test(message)) return 'Run supabase/core-data.sql to enable payments.';
-  return message;
+  return setupMessage(message);
 }
 
 export function RecordPaymentModal({

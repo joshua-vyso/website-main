@@ -15,7 +15,7 @@ export default async function OrderFlowPriceListsPage() {
   const orgId = session?.org?.id ?? null;
 
   if (!orgId) {
-    return <PriceListsView priceLists={[]} overrides={[]} products={[]} customers={[]} />;
+    return <PriceListsView priceLists={[]} overrides={[]} products={[]} customers={[]} latestStatementPrices={{}} />;
   }
 
   const data = await getPriceListsData(orgId);
@@ -26,6 +26,7 @@ export default async function OrderFlowPriceListsPage() {
       overrides={data.overrides}
       products={data.products}
       customers={data.customers}
+      latestStatementPrices={data.latestStatementPrices}
     />
   );
 }

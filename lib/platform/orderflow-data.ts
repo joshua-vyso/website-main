@@ -515,25 +515,100 @@ export async function getPaymentsData(orgId: string): Promise<PaymentsData> {
   };
 }
 
+/** The latest positive unit price a market-statement document quoted for a
+ *  product, with its provenance (statement date + source filename). */
+export interface StatementPrice {
+  price: number;
+  date: string | null;
+  source: string | null;
+}
+
 export interface PriceListsData {
   priceLists: CdPriceList[];
   overrides: CdPriceOverride[];
   products: CdProduct[];
   customers: OfCustomer[];
+  /** Latest market-statement price per product, keyed by stock_item_id. Empty
+   *  for any product with no matching statement line. */
+  latestStatementPrices: Record<string, StatementPrice>;
+}
+
+/** Positive unit price from a loose string ("R 78,50", "1 240.00"), else null. */
+function statementUnitPrice(raw: unknown): number | null {
+  if (raw == null) return null;
+  const cleaned = String(raw).replace(/[^0-9.\-]/g, '');
+  if (cleaned === '' || cleaned === '-' || cleaned === '.') return null;
+  const n = Number(cleaned);
+  return Number.isFinite(n) && n > 0 ? n : null;
 }
 
 export async function getPriceListsData(orgId: string): Promise<PriceListsData> {
   const sb = await createServerSupabase();
-  const [pls, ovr, prod, cus] = await Promise.all([
+  const [pls, ovr, prod, cus, aliasRes, docRes] = await Promise.all([
     sb.from('pl_price_lists').select('*').eq('org_id', orgId).order('created_at'),
     sb.from('pl_overrides').select('*').eq('org_id', orgId),
     sb.from('pp_stock_items').select('*').eq('org_id', orgId).order('name'),
     sb.from('of_customers').select('*').eq('org_id', orgId).order('name'),
+    // Confirmed name aliases (raw description → canonical stock item). Table may
+    // not exist pre-migration; PostgREST returns an error, so default to [].
+    sb.from('pp_name_aliases').select('raw_name, stock_item_id').eq('org_id', orgId).eq('status', 'confirmed'),
+    // Market-statement documents, newest first. Tolerate a missing/odd table.
+    sb
+      .from('documents')
+      .select('id, filename, created_at, extracted_data')
+      .eq('org_id', orgId)
+      .eq('document_type', 'statement')
+      .order('created_at', { ascending: false })
+      .limit(60),
   ]);
+
+  const products = rows<CdProduct>(prod);
+
+  // Matcher: lowercased/trimmed product name → stock_item_id, then overlay the
+  // confirmed aliases (aliases win, being a deliberate human link).
+  const matcher = new Map<string, string>();
+  for (const p of products) {
+    const key = (p.name ?? '').trim().toLowerCase();
+    if (key) matcher.set(key, p.id);
+  }
+  const aliasRows = aliasRes.error ? [] : ((aliasRes.data as { raw_name: string; stock_item_id: string | null }[] | null) ?? []);
+  for (const a of aliasRows) {
+    const key = (a.raw_name ?? '').trim().toLowerCase();
+    if (key && a.stock_item_id) matcher.set(key, a.stock_item_id);
+  }
+
+  // Walk statement docs newest→oldest; first positive price per item wins.
+  const latestStatementPrices: Record<string, StatementPrice> = {};
+  const docs = docRes.error
+    ? []
+    : ((docRes.data as { id: string; filename: string | null; created_at: string | null; extracted_data: any }[] | null) ?? []);
+  for (const doc of docs) {
+    const ed = doc.extracted_data ?? null;
+    const lineItems: any[] = Array.isArray(ed?.line_items) ? ed.line_items : [];
+    if (lineItems.length === 0) continue;
+    const statementDate: string | null =
+      (typeof ed?.summary?.statement_date === 'string' && ed.summary.statement_date) ||
+      (doc.created_at ? doc.created_at.slice(0, 10) : null);
+    for (const li of lineItems) {
+      const price = statementUnitPrice(li?.unit_price);
+      if (price == null) continue;
+      const desc = (li?.description ?? '').toString().trim().toLowerCase();
+      if (!desc) continue;
+      const stockItemId = matcher.get(desc);
+      if (!stockItemId || stockItemId in latestStatementPrices) continue;
+      latestStatementPrices[stockItemId] = {
+        price,
+        date: statementDate,
+        source: doc.filename ?? null,
+      };
+    }
+  }
+
   return {
     priceLists: rows<CdPriceList>(pls),
     overrides: rows<CdPriceOverride>(ovr),
-    products: rows<CdProduct>(prod),
+    products,
     customers: rows<OfCustomer>(cus),
+    latestStatementPrices,
   };
 }

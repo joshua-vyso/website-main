@@ -479,3 +479,21 @@ export function isoDatePlusDays(base: string | Date, days: number): string {
   d.setDate(d.getDate() + days);
   return d.toISOString().slice(0, 10);
 }
+
+// ============================================================================
+// Setup detection — the v2 tables/columns live in supabase/core-data.sql. Until
+// it's run, PostgREST returns "could not find the table … in the schema cache"
+// (or a missing-column variant). Turn those into a clear, actionable message.
+// ============================================================================
+
+/** True when a Supabase error really means core-data.sql hasn't been run (missing table/column). */
+export function isSetupError(msg: string | null | undefined): boolean {
+  return !!msg && /could not find the table|schema cache|does not exist|could not find the '.*?' column|relation .*? does not exist/i.test(msg);
+}
+
+/** Map a missing-table/column error to a clear setup note; pass anything else through unchanged. */
+export function setupMessage(msg: string): string {
+  return isSetupError(msg)
+    ? 'OrderFlow needs a one-time setup — run supabase/core-data.sql in your Supabase SQL editor to enable invoices, quotes, credit notes, payments and delivery notes.'
+    : msg;
+}

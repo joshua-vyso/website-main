@@ -30,6 +30,7 @@ import {
 import {
   docTotals,
   isoDatePlusDays,
+  setupMessage,
   zar2,
   type OfCustomer,
   type OfInvoice,
@@ -331,7 +332,7 @@ export function InvoiceBuilder({
       router.push(`/app/orderflow/invoices/${res.id}`);
     } catch (e) {
       setBusy(null);
-      toast(e instanceof Error ? e.message : 'Could not save the invoice.');
+      toast(setupMessage(e instanceof Error ? e.message : 'Could not save the invoice.'));
     }
   }
 

@@ -6,11 +6,14 @@
  * Left: the lists table (name, customer or "All customers", default margin,
  * validity window, status pill, overrides count) with create/edit and duplicate
  * actions. Selecting a list opens the editor Drawer (~760px): one row per
- * override showing the product, base cost (avg_unit_price), margin %, custom
- * price and the computed sell price via resolvePrice (custom price wins; clear
- * it to fall back to margin). Add products via search over the catalogue,
- * remove overrides, bulk-update all margins / bump all custom prices, and
- * import/export CSV.
+ * override showing the product, base cost, margin %, custom price and the
+ * computed sell price. Base cost resolves to the latest MARKET-STATEMENT price
+ * (from Doc-U statement docs) if known, else the product's catalogue price; when
+ * neither exists the cost is editable inline and flagged for review. Sell price
+ * is derived from that base (custom price wins outright; clear it to fall back to
+ * margin). Add products one-by-one via catalogue search, or one-click "Fill from
+ * catalogue" to add every product; remove overrides, bulk-update all margins /
+ * bump all custom prices, and import/export CSV.
  *
  * Every write is org-scoped, writes to Core Data (pl_price_lists / pl_overrides
  * — never a module-private copy), logs a price_list_updated activity event, then
@@ -28,7 +31,6 @@ import { logActivity } from '@/lib/platform/orderflow-activity';
 import {
   priceListStatus,
   PRICE_LIST_STATUS_STYLE,
-  resolvePrice,
   type CdPriceList,
   type CdPriceOverride,
   type CdProduct,
@@ -55,10 +57,35 @@ import { CsvImportModal } from '@/components/platform/coredata/CsvImportModal';
 // Helpers
 // ---------------------------------------------------------------------------
 
+/** The latest market-statement price for a product, from Doc-U statement docs. */
+export interface StatementPrice {
+  price: number;
+  date: string | null;
+  source: string | null;
+}
+
 function fmtDate(iso: string | null | undefined): string {
   if (!iso) return '—';
   const d = new Date(`${iso}T12:00:00`);
   return Number.isNaN(d.getTime()) ? '—' : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function round2(n: number): number {
+  return Math.round(n * 100) / 100;
+}
+
+/** The base cost a price list should use for a product: the latest market
+ *  statement price if known, else the product's catalogue price, else null. */
+function baseCostFor(
+  product: { id: string; avg_unit_price: number | null } | null | undefined,
+  statementPrices: Record<string, StatementPrice>,
+): { cost: number | null; source: 'statement' | 'catalogue' | 'none'; label: string | null } {
+  if (!product) return { cost: null, source: 'none', label: null };
+  const sp = statementPrices[product.id];
+  if (sp && sp.price > 0) return { cost: sp.price, source: 'statement', label: sp.date ? `Statement · ${sp.date}` : 'Statement' };
+  const avg = Number(product.avg_unit_price);
+  if (Number.isFinite(avg) && avg > 0) return { cost: avg, source: 'catalogue', label: 'Catalogue' };
+  return { cost: null, source: 'none', label: null };
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -187,11 +214,13 @@ export function PriceListsView({
   overrides,
   products,
   customers,
+  latestStatementPrices = {},
 }: {
   priceLists: CdPriceList[];
   overrides: CdPriceOverride[];
   products: CdProduct[];
   customers: OfCustomer[];
+  latestStatementPrices?: Record<string, StatementPrice>;
 }) {
   const router = useRouter();
   const { org, email } = usePlatform();
@@ -614,6 +643,7 @@ export function PriceListsView({
           list={openList}
           allOverrides={overrides}
           products={products}
+          latestStatementPrices={latestStatementPrices}
           customerName={openList.customer_id ? customerName.get(openList.customer_id) ?? null : null}
           onClose={() => setOpenListId(null)}
           toast={toast}
@@ -631,6 +661,7 @@ function PriceListEditor({
   list,
   allOverrides,
   products,
+  latestStatementPrices,
   customerName,
   onClose,
   toast,
@@ -638,6 +669,7 @@ function PriceListEditor({
   list: CdPriceList;
   allOverrides: CdPriceOverride[];
   products: CdProduct[];
+  latestStatementPrices: Record<string, StatementPrice>;
   customerName: string | null;
   onClose: () => void;
   toast: (m: string) => void;
@@ -662,6 +694,13 @@ function PriceListEditor({
   const [bulkIncrease, setBulkIncrease] = useState('');
   const [bulkBusy, setBulkBusy] = useState(false);
 
+  // Fill from catalogue.
+  const [fillBusy, setFillBusy] = useState(false);
+  const [confirmFill, setConfirmFill] = useState(false);
+
+  // "Only needs review" filter — rows whose base cost is unknown.
+  const [onlyReview, setOnlyReview] = useState(false);
+
   // CSV import.
   const [importing, setImporting] = useState(false);
 
@@ -670,15 +709,19 @@ function PriceListEditor({
 
   const style = PRICE_LIST_STATUS_STYLE[priceListStatus(list)];
 
+  // Active catalogue products not yet on this list — the fill-from-catalogue set.
+  const missingProducts = useMemo(() => {
+    const onList = new Set(rows.map((r) => r.stock_item_id));
+    return products.filter((p) => (p.active ?? true) !== false && !onList.has(p.id));
+  }, [products, rows]);
+
   // Products not yet on the list, matching the search.
   const addable = useMemo(() => {
-    const onList = new Set(rows.map((r) => r.stock_item_id));
     const q = addQuery.trim().toLowerCase();
-    return products
-      .filter((p) => !onList.has(p.id) && (p.active ?? true) !== false)
+    return missingProducts
       .filter((p) => (q ? `${p.name} ${p.sku ?? ''} ${p.category ?? ''}`.toLowerCase().includes(q) : true))
       .slice(0, 8);
-  }, [products, rows, addQuery]);
+  }, [missingProducts, addQuery]);
 
   function db() {
     const supabase = createClient();
@@ -727,6 +770,64 @@ function PriceListEditor({
     logEdit(list.id, `Added ${product.name} to ${list.name}`);
     setAddQuery('');
     toast('Product added');
+    router.refresh();
+  }
+
+  // Bulk-add every active catalogue product not already on the list, at the
+  // list's default margin. Base cost is resolved (statement → catalogue) at
+  // display time, so no cost is stored on the override itself.
+  async function fillFromCatalogue() {
+    setConfirmFill(false);
+    const supabase = db();
+    if (!supabase || !org) return;
+    if (missingProducts.length === 0) {
+      toast(products.length === 0 ? 'No products in the catalogue yet.' : 'Every product is already on this list.');
+      return;
+    }
+    setFillBusy(true);
+    setError(null);
+    const margin = Number(list.default_margin_pct) || 0;
+    const newRows = missingProducts.map((p) => ({
+      org_id: org.id,
+      price_list_id: list.id,
+      stock_item_id: p.id,
+      margin_pct: margin,
+      custom_price: null,
+    }));
+    const { error: err } = await writeArrayDroppingMissing((w) => supabase.from('pl_overrides').insert(w), newRows);
+    setFillBusy(false);
+    if (err) {
+      setError(migrationMessage(err.message));
+      return;
+    }
+    logEdit(list.id, `Filled ${list.name} with ${newRows.length} products from the catalogue`);
+    toast(`Added ${newRows.length} products`);
+    router.refresh();
+  }
+
+  // Set a product's catalogue cost (avg_unit_price) for a row with no known
+  // base cost — the amber "Review" input. Only positive values persist.
+  async function setBaseCost(product: CdProduct, value: string) {
+    const supabase = db();
+    if (!supabase || !org) return;
+    const trimmed = value.trim();
+    if (trimmed === '') return;
+    const n = Number(trimmed.replace(/[R\s,]/g, ''));
+    if (!Number.isFinite(n) || n <= 0) return;
+    setBusyId(product.id);
+    setError(null);
+    const { error: err } = await supabase
+      .from('pp_stock_items')
+      .update({ avg_unit_price: n })
+      .eq('id', product.id)
+      .eq('org_id', org.id);
+    setBusyId(null);
+    if (err) {
+      setError(migrationMessage(err.message));
+      return;
+    }
+    logEdit(list.id, `Set cost on ${product.name} to ${zar2(n)}`);
+    toast('Cost set');
     router.refresh();
   }
 
@@ -913,14 +1014,17 @@ function PriceListEditor({
     const headers = ['product', 'unit', 'base cost', 'margin', 'custom price', 'sell price'];
     const csvRows = rows.map((r) => {
       const product = productById.get(r.stock_item_id);
-      const resolved = product ? resolvePrice(product, list, allOverrides) : null;
+      const { cost } = baseCostFor(product, latestStatementPrices);
+      const margin = Number(r.margin_pct ?? list.default_margin_pct) || 0;
+      const custom = r.custom_price != null && Number(r.custom_price) > 0 ? Number(r.custom_price) : null;
+      const sell = custom != null ? custom : cost != null ? round2(cost * (1 + margin / 100)) : null;
       return [
         product?.name ?? 'Unknown product',
         product?.unit ?? '',
-        product?.avg_unit_price != null ? Number(product.avg_unit_price).toFixed(2) : '',
+        cost != null ? cost.toFixed(2) : '',
         r.margin_pct != null ? String(r.margin_pct) : '',
         r.custom_price != null ? Number(r.custom_price).toFixed(2) : '',
-        resolved ? resolved.price.toFixed(2) : '',
+        sell != null ? sell.toFixed(2) : '',
       ];
     });
     const slug = list.name.replace(/[^a-z0-9]+/gi, '-').replace(/^-+|-+$/g, '').toLowerCase() || 'price-list';
@@ -928,16 +1032,30 @@ function PriceListEditor({
     toast('CSV exported');
   }
 
-  // Rows enriched for display, joined to their product.
+  // Rows enriched for display, joined to their product. Base cost resolves to
+  // the latest market-statement price (else catalogue, else unknown), and the
+  // sell price is derived from that base so it tracks the market — a custom
+  // price still wins outright. Rows with an unknown cost are flagged for review.
   const displayRows = useMemo(() => {
     return rows
       .map((r) => {
         const product = productById.get(r.stock_item_id) ?? null;
-        const resolved = product ? resolvePrice(product, list, allOverrides) : null;
-        return { row: r, product, resolved };
+        const base = baseCostFor(product, latestStatementPrices);
+        const margin = Number(r.margin_pct ?? list.default_margin_pct) || 0;
+        const custom = r.custom_price != null && Number(r.custom_price) > 0 ? Number(r.custom_price) : null;
+        const sell = custom != null ? custom : base.cost != null ? round2(base.cost * (1 + margin / 100)) : null;
+        const isCustom = custom != null;
+        const needsReview = base.cost == null;
+        return { row: r, product, base, sell, isCustom, needsReview };
       })
       .sort((a, b) => (a.product?.name ?? '').localeCompare(b.product?.name ?? ''));
-  }, [rows, productById, list, allOverrides]);
+  }, [rows, productById, list, latestStatementPrices]);
+
+  const reviewCount = useMemo(() => displayRows.filter((d) => d.needsReview).length, [displayRows]);
+  const visibleRows = useMemo(
+    () => (onlyReview ? displayRows.filter((d) => d.needsReview) : displayRows),
+    [displayRows, onlyReview],
+  );
 
   return (
     <Drawer
@@ -957,6 +1075,14 @@ function PriceListEditor({
       }
       right={
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => (missingProducts.length > 40 ? setConfirmFill(true) : void fillFromCatalogue())}
+            disabled={fillBusy || missingProducts.length === 0}
+            className="inline-flex h-8 items-center rounded-lg bg-[#1E5E54] px-3 text-[12px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:opacity-50"
+          >
+            {fillBusy ? 'Adding…' : `Fill from catalogue · ${missingProducts.length}`}
+          </button>
           <SecondaryBtn onClick={() => setImporting(true)} className="h-8 px-3 text-[12px]">
             Import CSV
           </SecondaryBtn>
@@ -968,6 +1094,26 @@ function PriceListEditor({
     >
       {error ? (
         <div className="mb-4 rounded-xl border border-[#E7C9C9] bg-[#F9F0F0] px-3 py-2 text-[12px] text-[#A32D2D]">{error}</div>
+      ) : null}
+
+      {/* Review summary — items with no known base cost can't be priced yet */}
+      {reviewCount > 0 ? (
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#EBD9B0] bg-[#FBF3E4] px-3 py-2.5 text-[12px] text-[#854F0B]">
+          <span>
+            {reviewCount} item{reviewCount === 1 ? '' : 's'} {reviewCount === 1 ? 'needs' : 'need'} a cost — enter it to price {reviewCount === 1 ? 'it' : 'them'}.
+          </span>
+          <button
+            type="button"
+            onClick={() => setOnlyReview((v) => !v)}
+            className={`shrink-0 rounded-lg border px-2.5 py-1 text-[11px] font-medium transition-colors ${
+              onlyReview
+                ? 'border-[#854F0B] bg-[#854F0B] text-white'
+                : 'border-[#EBD9B0] bg-white text-[#854F0B] hover:bg-[#FDF8EF]'
+            }`}
+          >
+            {onlyReview ? 'Show all' : 'Only needs review'}
+          </button>
+        </div>
       ) : null}
 
       {/* Add products */}
@@ -982,7 +1128,9 @@ function PriceListEditor({
               </div>
             ) : (
               addable.map((p) => {
-                const resolved = resolvePrice(p, list, allOverrides);
+                const { cost } = baseCostFor(p, latestStatementPrices);
+                const margin = Number(list.default_margin_pct) || 0;
+                const sell = cost != null ? round2(cost * (1 + margin / 100)) : null;
                 return (
                   <button
                     key={p.id}
@@ -994,7 +1142,7 @@ function PriceListEditor({
                     <div className="min-w-0">
                       <div className="truncate text-[13px] font-medium text-[#1A1C1E]">{p.name}</div>
                       <div className="truncate text-[11px] text-[#9A9DA1]">
-                        {p.category ? `${p.category} · ` : ''}base {p.avg_unit_price != null ? zar2(Number(p.avg_unit_price)) : '—'} → {zar2(resolved.price)}
+                        {p.category ? `${p.category} · ` : ''}base {cost != null ? zar2(cost) : '—'} → {sell != null ? zar2(sell) : '—'}
                       </div>
                     </div>
                     <span className="shrink-0 text-[12px] font-medium text-[#1E5E54]">Add</span>
@@ -1046,7 +1194,17 @@ function PriceListEditor({
       {rows.length === 0 ? (
         <EmptyState
           title="No item pricing yet"
-          body="Search the catalogue above to add products. Each product uses this list's default margin until you set a specific margin or a custom price. Custom prices need supabase/core-data.sql to be run."
+          body="Fill from the catalogue to add every product at this list's default margin, or search above to add them one by one. Base cost uses the latest market-statement price where known. Custom prices need supabase/core-data.sql to be run."
+          action={
+            missingProducts.length > 0 ? (
+              <PrimaryBtn
+                onClick={() => (missingProducts.length > 40 ? setConfirmFill(true) : void fillFromCatalogue())}
+                disabled={fillBusy}
+              >
+                {fillBusy ? 'Adding…' : `Fill from catalogue · ${missingProducts.length} products`}
+              </PrimaryBtn>
+            ) : undefined
+          }
         />
       ) : (
         <div className="overflow-hidden rounded-xl border border-[#E7E7E2]">
@@ -1062,14 +1220,38 @@ function PriceListEditor({
               </tr>
             </thead>
             <tbody>
-              {displayRows.map(({ row, product, resolved }) => (
+              {visibleRows.map(({ row, product, base, sell, isCustom }) => (
                 <tr key={row.id} className="border-b border-[#F6F6F2] last:border-0">
                   <td className="px-3 py-2.5">
                     <div className="font-medium text-[#1A1C1E]">{product?.name ?? 'Unknown product'}</div>
                     {product?.unit ? <div className="text-[11px] text-[#9A9DA1]">per {product.unit}</div> : null}
                   </td>
-                  <td className="px-2 py-2.5 text-right tabular-nums text-[#5F6368]">
-                    {product?.avg_unit_price != null ? zar2(Number(product.avg_unit_price)) : '—'}
+                  <td className="px-2 py-2.5 text-right">
+                    {base.cost != null ? (
+                      <div className="tabular-nums text-[#5F6368]">
+                        {zar2(base.cost)}
+                        {base.label ? <div className="text-[11px] font-normal text-[#9A9DA1]">{base.label}</div> : null}
+                      </div>
+                    ) : product ? (
+                      <div className="flex items-center justify-end gap-1.5">
+                        <span className="inline-flex items-center rounded-full bg-[#FBF3E4] px-1.5 py-0.5 text-[10px] font-medium text-[#854F0B]">
+                          Review
+                        </span>
+                        <input
+                          defaultValue=""
+                          placeholder="Enter cost"
+                          onBlur={(e) => void setBaseCost(product, e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
+                          }}
+                          disabled={busyId === product.id}
+                          inputMode="decimal"
+                          className="h-8 w-[92px] rounded-lg border border-[#E7C9A0] bg-white px-2 text-right text-[13px] text-[#1A1C1E] tabular-nums placeholder:text-[#C9A876] focus:border-[#854F0B] focus:outline-none disabled:opacity-50"
+                        />
+                      </div>
+                    ) : (
+                      <span className="tabular-nums text-[#9A9DA1]">—</span>
+                    )}
                   </td>
                   <td className="px-2 py-2.5 text-right">
                     <input
@@ -1104,8 +1286,8 @@ function PriceListEditor({
                     />
                   </td>
                   <td className="px-2 py-2.5 text-right tabular-nums font-medium text-[#1A1C1E]">
-                    {resolved ? zar2(resolved.price) : '—'}
-                    {resolved?.source === 'custom' ? (
+                    {sell != null ? zar2(sell) : <span className="font-normal text-[#9A9DA1]">—</span>}
+                    {sell != null && isCustom ? (
                       <span className="ml-1 text-[10px] font-normal text-[#854F0B]">custom</span>
                     ) : null}
                   </td>
@@ -1121,6 +1303,13 @@ function PriceListEditor({
                   </td>
                 </tr>
               ))}
+              {visibleRows.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="px-3 py-8 text-center text-[13px] text-[#9A9DA1]">
+                    No items need review — every product has a cost.
+                  </td>
+                </tr>
+              ) : null}
             </tbody>
           </table>
         </div>
@@ -1139,6 +1328,29 @@ function PriceListEditor({
           onConfirm={() => void removeOverride(removeId)}
         />
       ) : null}
+
+      {/* Fill-from-catalogue confirmation (only when adding a lot at once) */}
+      <Modal
+        open={confirmFill}
+        onClose={() => setConfirmFill(false)}
+        title={`Add all ${missingProducts.length} products to this list?`}
+        subtitle={`Every active catalogue product not already priced will be added at the ${
+          list.default_margin_pct != null ? `${list.default_margin_pct}%` : 'default'
+        } margin. You can adjust each afterwards.`}
+        width={420}
+        footer={
+          <>
+            <SecondaryBtn onClick={() => setConfirmFill(false)} disabled={fillBusy}>
+              Cancel
+            </SecondaryBtn>
+            <PrimaryBtn onClick={() => void fillFromCatalogue()} disabled={fillBusy}>
+              {fillBusy ? 'Adding…' : `Add ${missingProducts.length} products`}
+            </PrimaryBtn>
+          </>
+        }
+      >
+        <span className="sr-only">Confirm fill from catalogue</span>
+      </Modal>
 
       {/* CSV import */}
       <CsvImportModal
