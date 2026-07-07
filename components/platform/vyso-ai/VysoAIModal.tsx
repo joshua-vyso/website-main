@@ -22,6 +22,8 @@ function fileToBase64(file: File): Promise<{ base64: string; mediaType: string }
 }
 
 const MAX_ORDER_BYTES = 13 * 1024 * 1024;
+/** How many order files we'll read from a single drop/selection. */
+const MAX_ORDER_FILES = 8;
 
 // Portals mount on document.body, outside the platform subtree's --radius
 // override — re-declare it (else rounded corners collapse) plus the app font.
@@ -33,6 +35,16 @@ const PORTAL_STYLE = {
 interface ChatMessage {
   role: 'user' | 'assistant';
   content: string;
+}
+
+/** One dropped/selected order file, tracked from parsing → done/error so each
+ *  gets its own card. Dropping several orders at once yields several slots. */
+interface OrderSlot {
+  id: string;
+  filename: string;
+  status: 'parsing' | 'done' | 'error';
+  order?: ParsedOrder;
+  error?: string;
 }
 
 /**
@@ -76,16 +88,16 @@ export function VysoAIModal({
   const [streamStatus, setStreamStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Order-parsing (drag/drop or file select).
-  const [parsing, setParsing] = useState(false);
-  const [parsedOrder, setParsedOrder] = useState<ParsedOrder | null>(null);
-  const [parseError, setParseError] = useState<string | null>(null);
+  // Order-parsing (drag/drop or file select) — one slot per dropped file, so
+  // dropping several orders at once yields several parsed-order cards.
+  const [slots, setSlots] = useState<OrderSlot[]>([]);
   const [dragOver, setDragOver] = useState(false);
 
   const abortRef = useRef<AbortController | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const slotSeq = useRef(0);
 
   useEffect(() => setMounted(true), []);
 
@@ -117,7 +129,7 @@ export function VysoAIModal({
   // Keep the transcript pinned to the bottom as content grows.
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
-  }, [messages, streamText, streaming, parsing, parsedOrder]);
+  }, [messages, streamText, streaming, slots]);
 
   const send = useCallback(async () => {
     const text = input.trim();
@@ -187,78 +199,100 @@ export function VysoAIModal({
     }
   }, [input, streaming, messages, module, orgName]);
 
-  // Parse a dropped/selected order file into structured line items.
-  const handleFile = useCallback(
-    async (file: File) => {
-      if (parsing) return;
-      const okType = file.type === 'application/pdf' || file.type.startsWith('image/');
-      if (!okType) {
-        setParseError('Please add a PDF or an image of the order.');
+  // Parse one already-accepted file, updating its slot in place.
+  const parseInto = useCallback(async (file: File, id: string) => {
+    const fail = (msg: string) =>
+      setSlots((prev) => prev.map((s) => (s.id === id ? { ...s, status: 'error', error: msg } : s)));
+    try {
+      const { base64, mediaType } = await fileToBase64(file);
+      const res = await fetch('/api/ai/agent/parse-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ base64, mediaType, filename: file.name }),
+      });
+      const data = (await res.json().catch(() => ({}))) as {
+        error?: string;
+        customer_name?: string | null;
+        customer_confidence?: number;
+        line_items?: Array<{ description?: string; quantity?: string; unit_price?: string; amount?: string }>;
+      };
+      if (!res.ok) {
+        fail(data.error ?? `Could not read the order (${res.status}).`);
         return;
       }
-      if (file.size > MAX_ORDER_BYTES) {
-        setParseError('That file is too large (max ~13MB).');
+      const items = (data.line_items ?? [])
+        .map((li) => {
+          const name = String(li.description ?? '').trim();
+          const qty = Number(li.quantity) > 0 ? Number(li.quantity) : 1;
+          let unit = Number(li.unit_price) || 0;
+          const amt = Number(li.amount) || 0;
+          if (!unit && amt) unit = amt / qty;
+          return { name, qty, unit_price: Math.round(unit * 100) / 100 };
+        })
+        .filter((it) => it.name);
+      if (items.length === 0 && !data.customer_name) {
+        fail("I couldn't read an order from this file. Try a clearer photo or the PDF.");
         return;
       }
-      setParseError(null);
-      setParsedOrder(null);
-      setParsing(true);
-      try {
-        const { base64, mediaType } = await fileToBase64(file);
-        const res = await fetch('/api/ai/agent/parse-order', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ base64, mediaType, filename: file.name }),
-        });
-        const data = (await res.json().catch(() => ({}))) as {
-          error?: string;
-          customer_name?: string | null;
-          customer_confidence?: number;
-          line_items?: Array<{ description?: string; quantity?: string; unit_price?: string; amount?: string }>;
-        };
-        if (!res.ok) throw new Error(data.error ?? `Could not read the order (${res.status}).`);
-        const items = (data.line_items ?? [])
-          .map((li) => {
-            const name = String(li.description ?? '').trim();
-            const qty = Number(li.quantity) > 0 ? Number(li.quantity) : 1;
-            let unit = Number(li.unit_price) || 0;
-            const amt = Number(li.amount) || 0;
-            if (!unit && amt) unit = amt / qty;
-            return { name, qty, unit_price: Math.round(unit * 100) / 100 };
-          })
-          .filter((it) => it.name);
-        if (items.length === 0 && !data.customer_name) {
-          setParseError("I couldn't read an order from that file. Try a clearer photo or the PDF.");
-          return;
+      const order: ParsedOrder = {
+        customerName: data.customer_name ?? null,
+        customerConfidence: data.customer_confidence,
+        items,
+        filename: file.name,
+      };
+      setSlots((prev) => prev.map((s) => (s.id === id ? { ...s, status: 'done', order } : s)));
+    } catch (err) {
+      fail(err instanceof Error ? err.message : 'Could not read the order.');
+    }
+  }, []);
+
+  // Accept one or more dropped/selected files: make a slot per file, then parse
+  // the valid ones concurrently.
+  const handleFiles = useCallback(
+    (fileList: File[]) => {
+      const files = fileList.slice(0, MAX_ORDER_FILES);
+      const newSlots: OrderSlot[] = [];
+      const toParse: Array<{ file: File; id: string }> = [];
+      for (const file of files) {
+        const id = `slot_${slotSeq.current++}`;
+        const okType = file.type === 'application/pdf' || file.type.startsWith('image/');
+        if (!okType) {
+          newSlots.push({ id, filename: file.name, status: 'error', error: 'Not a PDF or image.' });
+          continue;
         }
-        setParsedOrder({
-          customerName: data.customer_name ?? null,
-          customerConfidence: data.customer_confidence,
-          items,
-          filename: file.name,
-        });
-      } catch (err) {
-        setParseError(err instanceof Error ? err.message : 'Could not read the order.');
-      } finally {
-        setParsing(false);
+        if (file.size > MAX_ORDER_BYTES) {
+          newSlots.push({ id, filename: file.name, status: 'error', error: 'Too large (max ~13MB).' });
+          continue;
+        }
+        newSlots.push({ id, filename: file.name, status: 'parsing' });
+        toParse.push({ file, id });
       }
+      if (fileList.length > MAX_ORDER_FILES) {
+        newSlots.push({
+          id: `slot_${slotSeq.current++}`,
+          filename: `${fileList.length - MAX_ORDER_FILES} more`,
+          status: 'error',
+          error: `Only the first ${MAX_ORDER_FILES} files were read.`,
+        });
+      }
+      if (newSlots.length === 0) return;
+      setSlots((prev) => [...prev, ...newSlots]);
+      void Promise.all(toParse.map(({ file, id }) => parseInto(file, id)));
     },
-    [parsing],
+    [parseInto],
   );
 
-  function openInNewOrder() {
-    if (!parsedOrder) return;
-    stashParsedOrder(parsedOrder);
+  function openInNewOrder(order: ParsedOrder) {
+    stashParsedOrder(order);
     onClose();
     router.push('/app/orderflow/orders/new');
   }
 
-  async function copyOrder() {
-    if (!parsedOrder) return;
-    const lines = parsedOrder.items.map(
+  async function copyOrder(order: ParsedOrder) {
+    const lines = order.items.map(
       (it) => `${it.name} — qty ${it.qty}${it.unit_price ? ` @ R ${it.unit_price.toFixed(2)}` : ''}`,
     );
-    const text = [parsedOrder.customerName ? `Order for ${parsedOrder.customerName}` : 'Order', ...lines].join('\n');
+    const text = [order.customerName ? `Order for ${order.customerName}` : 'Order', ...lines].join('\n');
     try {
       await navigator.clipboard.writeText(text);
     } catch {
@@ -266,9 +300,11 @@ export function VysoAIModal({
     }
   }
 
+  const dismissSlot = (id: string) => setSlots((prev) => prev.filter((s) => s.id !== id));
+
   if (!mounted || !open) return null;
 
-  const empty = messages.length === 0 && !streaming;
+  const empty = messages.length === 0 && !streaming && slots.length === 0;
   const orgLabel = orgName?.trim() || 'you';
 
   return createPortal(
@@ -290,14 +326,14 @@ export function VysoAIModal({
         onDrop={(e) => {
           e.preventDefault();
           setDragOver(false);
-          const file = e.dataTransfer.files?.[0];
-          if (file) void handleFile(file);
+          const files = Array.from(e.dataTransfer.files ?? []);
+          if (files.length) handleFiles(files);
         }}
         className="relative flex h-[560px] max-h-[85vh] w-full max-w-[560px] flex-col overflow-hidden rounded-3xl border border-[#E7E7E2] bg-white shadow-[0_30px_80px_-24px_rgba(15,23,32,0.55)]"
       >
         {dragOver ? (
           <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-3xl border-2 border-dashed border-[#3E8FE0] bg-[#F2F8FE]/85 backdrop-blur-[1px]">
-            <span className="text-[14px] font-semibold text-[#12324F]">Drop the order to read it</span>
+            <span className="text-[14px] font-semibold text-[#12324F]">Drop the order(s) to read them</span>
           </div>
         ) : null}
         {/* Header */}
@@ -322,12 +358,12 @@ export function VysoAIModal({
 
         {/* Transcript */}
         <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-5 py-4">
-          {empty && !parsing && !parsedOrder && !parseError ? (
+          {empty ? (
             <div className="flex h-full flex-col items-center justify-center text-center">
               <BouncingDots size={9} />
               <p className="mt-4 max-w-[310px] text-[14px] leading-5 text-[#5F6368]">
                 Ask me how to do anything in this module, or about your live numbers, orders and customers. You can also
-                drop an order in to read it.
+                drop one or more orders in to read them.
               </p>
             </div>
           ) : (
@@ -360,16 +396,29 @@ export function VysoAIModal({
                 </div>
               ) : null}
 
-              {parsing ? (
-                <div className="flex items-center gap-2 rounded-2xl border border-[#EFEFEA] bg-[#FBFBF9] px-3.5 py-2.5">
-                  <BouncingDots size={7} />
-                  <span className="text-[12px] text-[#5F6368]">Reading your order…</span>
-                </div>
-              ) : null}
-
-              {parsedOrder ? <ParsedOrderCard order={parsedOrder} onOpen={openInNewOrder} onCopy={copyOrder} onDismiss={() => setParsedOrder(null)} /> : null}
-
-              {parseError ? <p className="px-1 text-[12px] text-[#A32D2D]">{parseError}</p> : null}
+              {slots.map((slot) =>
+                slot.status === 'parsing' ? (
+                  <div
+                    key={slot.id}
+                    className="flex items-center gap-2 rounded-2xl border border-[#EFEFEA] bg-[#FBFBF9] px-3.5 py-2.5"
+                  >
+                    <BouncingDots size={7} />
+                    <span className="truncate text-[12px] text-[#5F6368]">Reading {slot.filename}…</span>
+                  </div>
+                ) : slot.status === 'error' ? (
+                  <p key={slot.id} className="px-1 text-[12px] text-[#A32D2D]">
+                    {slot.filename}: {slot.error}
+                  </p>
+                ) : slot.order ? (
+                  <ParsedOrderCard
+                    key={slot.id}
+                    order={slot.order}
+                    onOpen={() => openInNewOrder(slot.order!)}
+                    onCopy={() => copyOrder(slot.order!)}
+                    onDismiss={() => dismissSlot(slot.id)}
+                  />
+                ) : null,
+              )}
             </>
           )}
           {error ? <p className="px-1 text-[12px] text-[#A32D2D]">{error}</p> : null}
@@ -382,19 +431,19 @@ export function VysoAIModal({
               ref={fileInputRef}
               type="file"
               accept="application/pdf,image/*"
+              multiple
               className="hidden"
               onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) void handleFile(file);
+                const files = Array.from(e.target.files ?? []);
+                if (files.length) handleFiles(files);
                 e.target.value = '';
               }}
             />
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              disabled={parsing}
-              aria-label="Add an order document"
-              title="Add an order to read"
+              aria-label="Add order documents"
+              title="Add one or more orders to read"
               className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#5F6368] transition-colors hover:bg-[#F0F0EC] disabled:opacity-40"
             >
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -462,12 +511,15 @@ function ParsedOrderCard({
   return (
     <div className="rounded-2xl border border-[#BBD9F5] bg-[#F2F8FE] p-3.5">
       <div className="flex items-center gap-2 text-[13px] font-semibold text-[#12324F]">
-        <span className="vyso-ai-gradient flex h-5 w-5 items-center justify-center rounded-full">
+        <span className="vyso-ai-gradient flex h-5 w-5 shrink-0 items-center justify-center rounded-full">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M12 3l1.6 4.6L18 9.2l-4.4 1.6L12 15l-1.6-4.2L6 9.2l4.4-1.6L12 3z" fill="#fff" />
           </svg>
         </span>
-        Parsed order
+        <span>Parsed order</span>
+        {order.filename ? (
+          <span className="min-w-0 truncate text-[11px] font-normal text-[#5F80A0]">· {order.filename}</span>
+        ) : null}
       </div>
 
       {order.customerName ? (
