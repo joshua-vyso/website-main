@@ -1147,6 +1147,21 @@ export function NewOrderBuilder({ context, defaultCustomerId }: { context: Build
 
   function pickCustomer(id: string | null) {
     setCustomerId(id);
+    // Re-price product-linked lines (that haven't been manually overridden) to
+    // the new customer's price list. This is what lets a Vyso AI-loaded order
+    // fill in prices when the customer is picked after loading — and also keeps
+    // an already-built order correct when the customer is switched.
+    const nextCustomer = context.customers.find((c) => c.id === id) ?? null;
+    const nextList = customerPriceList(nextCustomer, context.priceLists);
+    setBlines((prev) =>
+      prev.map((l) => {
+        if (!l.stock_item_id || (l.override_note ?? '').trim()) return l;
+        const p = context.products.find((x) => x.id === l.stock_item_id);
+        if (!p) return l;
+        const r = resolvePrice(p, nextList, context.overrides);
+        return { ...l, unit_price: r.price, source: r.source };
+      }),
+    );
     const def = context.addresses
       .filter((a) => a.customer_id === id)
       .sort((a, b) => Number(b.is_default) - Number(a.is_default))[0];
@@ -1222,7 +1237,7 @@ export function NewOrderBuilder({ context, defaultCustomerId }: { context: Build
   }
 
   /** Load an order Vyso AI parsed in chat: match the customer, match each line
-   *  to a catalogue product so it's priced from that customer's price list (just
+   *  to a catalogue product so it prices from the customer's price list (just
    *  like adding it by hand), and drop the lines in for review. Lines with no
    *  confident product match stay free-text at whatever price the doc carried. */
   function handleVysoLoad(order: ParsedOrder) {
@@ -1241,15 +1256,13 @@ export function NewOrderBuilder({ context, defaultCustomerId }: { context: Build
         });
         if (candidates.length === 1) matched = candidates[0];
       }
-      if (matched) pickCustomer(matched.id);
     }
 
-    // Price against the matched customer's list directly — the `priceList` memo
-    // won't have recomputed yet inside this synchronous handler. Only price when
-    // we actually know the customer: pricing product lines against a guessed
-    // default list would trigger the "changed price needs a reason" block once
-    // the real customer is picked.
-    const pl = matched ? customerPriceList(matched, context.priceLists) : null;
+    // Resolve prices against whichever list applies now — the matched customer's,
+    // or (if the customer didn't auto-match) the default list. Product lines get
+    // linked regardless of the customer, and pickCustomer re-prices them, so the
+    // user picking the customer manually still fills in the right prices.
+    const pl = customerPriceList(matched, context.priceLists);
     const stamp = Date.now().toString(36);
 
     let pricedCount = 0;
@@ -1261,9 +1274,10 @@ export function NewOrderBuilder({ context, defaultCustomerId }: { context: Build
         const wanted = it.name.trim().toLowerCase();
 
         // Match to a catalogue product (exact, else exactly one unambiguous
-        // ≥4-char substring) so the line prices from the customer's list.
-        let product = matched ? context.products.find((p) => p.name.trim().toLowerCase() === wanted) ?? null : null;
-        if (matched && !product && wanted.length >= 4) {
+        // ≥4-char substring). Product matching is NOT gated on the customer —
+        // an unmatched customer must not leave every line unpriced.
+        let product = context.products.find((p) => p.name.trim().toLowerCase() === wanted) ?? null;
+        if (!product && wanted.length >= 4) {
           const cands = context.products.filter((p) => {
             const n = p.name.trim().toLowerCase();
             return n.length >= 4 && (n.includes(wanted) || wanted.includes(n));
@@ -1298,7 +1312,11 @@ export function NewOrderBuilder({ context, defaultCustomerId }: { context: Build
           override_note: null,
         };
       });
+
+    // Set the lines first, then the customer: pickCustomer re-prices linked
+    // lines off `blines`, so the lines must already be in state when it runs.
     setBlines(lines);
+    if (matched) pickCustomer(matched.id);
     const suffix = pricedCount ? ` · ${pricedCount} priced from ${pl?.name ?? 'price list'}` : '';
     toast(`Loaded ${lines.length} item${lines.length === 1 ? '' : 's'} from Vyso AI${suffix}`);
   }
