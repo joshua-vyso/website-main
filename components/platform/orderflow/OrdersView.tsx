@@ -33,6 +33,8 @@ import {
 import { Field as FormField, PrimaryBtn, SecondaryBtn, ConfirmDialog, inputClass } from '@/components/platform/coredata/ui';
 import { Kpi, OrderStatusBadge, PaymentStatusBadge, RowActionsMenu, Drawer, useToast } from './ui';
 import { PublishOrderButton } from './PublishOrderButton';
+import { VysoAIOrderPrefill } from '@/components/platform/vyso-ai/VysoAIOrderPrefill';
+import type { ParsedOrder } from '@/lib/ai/vyso-agent/order-handoff';
 
 export interface OrderItemLite {
   stock_item_id?: string | null;
@@ -1219,6 +1221,41 @@ export function NewOrderBuilder({ context, defaultCustomerId }: { context: Build
     }
   }
 
+  /** Load an order Vyso AI parsed in chat: match the customer, and drop the
+   *  parsed lines in as manual lines for the user to review/adjust. */
+  function handleVysoLoad(order: ParsedOrder) {
+    if (order.customerName) {
+      const target = order.customerName.trim().toLowerCase();
+      // Prefer an exact match. Only fall back to a substring match when both
+      // names are long enough (≥4 chars) AND exactly one customer matches — an
+      // ambiguous or short match would risk silently invoicing the wrong account,
+      // so we leave the customer unset for the user to pick instead.
+      let match = context.customers.find((c) => c.name.trim().toLowerCase() === target) ?? null;
+      if (!match && target.length >= 4) {
+        const candidates = context.customers.filter((c) => {
+          const n = c.name.trim().toLowerCase();
+          return n.length >= 4 && (n.includes(target) || target.includes(n));
+        });
+        if (candidates.length === 1) match = candidates[0];
+      }
+      if (match) pickCustomer(match.id);
+    }
+    const lines: BuilderLine[] = order.items
+      .filter((it) => (it.name ?? '').trim())
+      .map((it, i) => ({
+        key: `vai_${i}_${Date.now().toString(36)}`,
+        stock_item_id: null,
+        name: it.name.trim(),
+        qty: Number(it.qty) > 0 ? Number(it.qty) : 1,
+        unit: null,
+        unit_price: Number(it.unit_price) || 0,
+        source: 'none',
+        override_note: null,
+      }));
+    setBlines(lines);
+    toast(`Loaded ${lines.length} item${lines.length === 1 ? '' : 's'} from Vyso AI`);
+  }
+
   return (
     <div>
       {toastNode}
@@ -1246,7 +1283,11 @@ export function NewOrderBuilder({ context, defaultCustomerId }: { context: Build
         <div className="mt-4 rounded-xl border border-[#F0D9D9] bg-[#FCEBEB] px-4 py-2.5 text-[13px] text-[#A32D2D]">{error}</div>
       ) : null}
 
-      <div className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-[340px_1fr]">
+      <div className="mt-5">
+        <VysoAIOrderPrefill onLoad={handleVysoLoad} />
+      </div>
+
+      <div className="mt-1 grid grid-cols-1 gap-5 lg:grid-cols-[340px_1fr]">
         {/* Customer + delivery */}
         <div className="space-y-4">
           <div className="space-y-4 rounded-2xl border border-[#E7E7E2] bg-white p-5">
