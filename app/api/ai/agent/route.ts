@@ -73,7 +73,9 @@ export async function POST(req: Request) {
     .eq('id', auth.userId)
     .maybeSingle<{ org_id: string | null; role: string | null }>();
   const orgId = profile?.org_id ?? null;
-  const canSeeMoney = profile?.role !== 'member';
+  // Allow-list, mirroring RoleGate.useIsAdmin: only owner/admin see money. Any
+  // unset/unknown role is treated as non-admin so finance data is never leaked.
+  const canSeeMoney = profile?.role === 'owner' || profile?.role === 'admin';
 
   const toolCtx: ToolContext = { supabase: auth.supabase, orgId: orgId ?? '', canSeeMoney };
   // Only offer tools when we have an org to read from.
@@ -97,13 +99,16 @@ export async function POST(req: Request) {
 
       try {
         for (let turn = 0; turn < MAX_TURNS; turn++) {
+          // On the final allowed turn, withhold tools so the model MUST produce a
+          // text answer rather than requesting a tool whose result nothing reads.
+          const offerTools = tools.length > 0 && turn < MAX_TURNS - 1;
           const modelStream = client.messages.stream(
             {
               model: AGENT_MODEL,
               max_tokens: AGENT_MAX_TOKENS,
               system,
               messages: convo,
-              ...(tools.length ? { tools } : {}),
+              ...(offerTools ? { tools } : {}),
             },
             { signal: req.signal },
           );

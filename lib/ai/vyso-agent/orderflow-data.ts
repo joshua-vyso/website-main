@@ -126,8 +126,9 @@ async function loadInvoiceRows(
 }
 
 function todayIso(): string {
-  // Match the Dashboard's local-day boundary.
-  return new Date().toLocaleDateString('en-CA'); // yyyy-mm-dd
+  // Match the Dashboard exactly (it uses the UTC day boundary) so "today" and the
+  // month prefix line up regardless of the server's timezone.
+  return new Date().toISOString().slice(0, 10); // yyyy-mm-dd (UTC)
 }
 
 // ---------------------------------------------------------------------------
@@ -189,11 +190,13 @@ export async function businessSnapshot(
   return base;
 }
 
-/** The most recent invoices, newest first. */
+/** The most recent invoices, newest first. Money columns are withheld for
+ *  members (mirrors the Dashboard finance blur). */
 export async function recentInvoices(
   supabase: SupabaseClient,
   orgId: string,
   limit: number,
+  includeMoney: boolean,
 ): Promise<Array<Record<string, string>>> {
   const rows = await loadInvoiceRows(supabase, orgId);
   const customers = byId(
@@ -210,9 +213,8 @@ export async function recentInvoices(
       invoice: r.inv.invoice_number,
       customer: (r.inv.customer_id && customers.get(r.inv.customer_id)?.name) || 'Unknown',
       date: (r.inv.issue_date ?? '').slice(0, 10),
-      total: zar2(r.total),
-      balance: zar2(r.balance),
       status: r.status,
+      ...(includeMoney ? { total: zar2(r.total), balance: zar2(r.balance) } : {}),
     }));
 }
 

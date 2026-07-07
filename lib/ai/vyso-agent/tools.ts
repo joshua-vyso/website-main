@@ -59,7 +59,9 @@ const ORDERFLOW_TOOLS: AgentTool[] = [
       additionalProperties: false,
     },
     run: (ctx, input) =>
-      recentInvoices(ctx.supabase, ctx.orgId, clampLimit(input.limit, 8, 25)).then((r) => JSON.stringify(r)),
+      recentInvoices(ctx.supabase, ctx.orgId, clampLimit(input.limit, 8, 25), ctx.canSeeMoney).then((r) =>
+        JSON.stringify(r),
+      ),
   },
   {
     name: 'orderflow_list_recent_orders',
