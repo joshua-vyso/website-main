@@ -29,7 +29,7 @@ function renderContent(text: string) {
 }
 
 /** Parse an SSE `data:` payload line into our event shape. */
-function parseSse(line: string): { text?: string; done?: boolean; error?: string } | null {
+function parseSse(line: string): { text?: string; tool?: string; done?: boolean; error?: string } | null {
   if (!line.startsWith('data:')) return null;
   try {
     return JSON.parse(line.slice(5).trim());
@@ -54,6 +54,7 @@ export function VysoAIModal({
   const [input, setInput] = useState('');
   const [streaming, setStreaming] = useState(false);
   const [streamText, setStreamText] = useState('');
+  const [streamStatus, setStreamStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const abortRef = useRef<AbortController | null>(null);
@@ -102,6 +103,7 @@ export function VysoAIModal({
     setError(null);
     setStreaming(true);
     setStreamText('');
+    setStreamStatus(null);
 
     const ctrl = new AbortController();
     abortRef.current = ctrl;
@@ -134,6 +136,7 @@ export function VysoAIModal({
           const evt = parseSse(part.trim());
           if (!evt) continue;
           if (evt.error) streamError = evt.error;
+          else if (evt.tool) setStreamStatus(evt.tool);
           else if (evt.text) {
             acc += evt.text;
             setStreamText(acc);
@@ -153,6 +156,7 @@ export function VysoAIModal({
       if (!ctrl.signal.aborted) {
         setStreaming(false);
         setStreamText('');
+        setStreamStatus(null);
       }
     }
   }, [input, streaming, messages, module, orgName]);
@@ -220,7 +224,14 @@ export function VysoAIModal({
               {streaming ? (
                 <div className="flex justify-start">
                   <div className="max-w-[85%] rounded-2xl border border-[#EFEFEA] bg-[#FBFBF9] px-3.5 py-2.5 text-[13.5px] leading-5 text-[#1A1C1E]">
-                    {streamText ? <span className="whitespace-pre-wrap">{renderContent(streamText)}</span> : <BouncingDots size={7} />}
+                    {streamText ? (
+                      <span className="whitespace-pre-wrap">{renderContent(streamText)}</span>
+                    ) : (
+                      <span className="flex items-center gap-2">
+                        <BouncingDots size={7} />
+                        {streamStatus ? <span className="text-[12px] text-[#5F6368]">{streamStatus}</span> : null}
+                      </span>
+                    )}
                   </div>
                 </div>
               ) : null}

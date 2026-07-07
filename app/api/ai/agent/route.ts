@@ -1,11 +1,24 @@
 import { NextResponse } from 'next/server';
+import type Anthropic from '@anthropic-ai/sdk';
 import { resolveUser, AI_CORS_HEADERS } from '@/lib/ai/auth';
 import { agentClient, agentConfigured, sanitizeMessages } from '@/lib/ai/vyso-agent/runtime';
 import { AGENT_MODEL, AGENT_MAX_TOKENS, isAgentModule, isVysoAiAllowed } from '@/lib/ai/vyso-agent/config';
 import { buildSystemPrompt } from '@/lib/ai/vyso-agent/knowledge';
+import { toolDefsFor, runTool, type ToolContext } from '@/lib/ai/vyso-agent/tools';
 
-// A chat turn is short, but give it headroom over the default.
-export const maxDuration = 30;
+// Tool-use turns can chain a couple of round-trips; give headroom.
+export const maxDuration = 45;
+
+// Safety cap on the agentic loop (each iteration = one model turn ± tool calls).
+const MAX_TURNS = 5;
+
+/** A short, user-facing status shown while a tool runs. */
+const TOOL_ACTIVITY: Record<string, string> = {
+  orderflow_get_business_snapshot: 'Checking the numbers…',
+  orderflow_list_recent_invoices: 'Reading recent invoices…',
+  orderflow_list_recent_orders: 'Reading recent orders…',
+  orderflow_find_customer: 'Looking up the customer…',
+};
 
 const SSE_HEADERS: Record<string, string> = {
   ...AI_CORS_HEADERS,
@@ -19,9 +32,10 @@ export async function OPTIONS() {
 }
 
 /**
- * Vyso AI chat — streams a Haiku reply as Server-Sent Events. Preview-gated to
- * VYSO_AI_EMAILS on the server (the client also hides the button, but never
- * trust the client). Body: { messages: {role,content}[], module, orgName? }.
+ * Vyso AI chat — streams a Haiku reply as Server-Sent Events, with tool use so
+ * the agent can read the caller's live OrderFlow data (via their RLS-scoped
+ * Supabase client — a tool can only ever touch the caller's own org). Preview-
+ * gated to VYSO_AI_EMAILS on the server. Body: { messages, module, orgName? }.
  */
 export async function POST(req: Request) {
   if (!agentConfigured) {
@@ -51,18 +65,26 @@ export async function POST(req: Request) {
   const orgName = typeof body.orgName === 'string' ? body.orgName.slice(0, 120) : null;
   const system = buildSystemPrompt({ module, orgName });
 
+  // Resolve the caller's org + role (for tools + the finance gate). RLS lets a
+  // user read their own profile only.
+  const { data: profile } = await auth.supabase
+    .from('profiles')
+    .select('org_id, role')
+    .eq('id', auth.userId)
+    .maybeSingle<{ org_id: string | null; role: string | null }>();
+  const orgId = profile?.org_id ?? null;
+  const canSeeMoney = profile?.role !== 'member';
+
+  const toolCtx: ToolContext = { supabase: auth.supabase, orgId: orgId ?? '', canSeeMoney };
+  // Only offer tools when we have an org to read from.
+  const tools = orgId ? toolDefsFor(module) : [];
+
+  const client = agentClient();
   const encoder = new TextEncoder();
   const send = (obj: unknown) => encoder.encode(`data: ${JSON.stringify(obj)}\n\n`);
 
   const stream = new ReadableStream<Uint8Array>({
     async start(controller) {
-      const modelStream = agentClient().messages.stream(
-        { model: AGENT_MODEL, max_tokens: AGENT_MAX_TOKENS, system, messages },
-        { signal: req.signal },
-      );
-      // Terminal controller ops throw if the client already cancelled the stream
-      // (modal closed / navigated away). Guard them so an abort race can't turn
-      // into an unhandled rejection.
       const safeEnqueue = (chunk: Uint8Array) => {
         try {
           controller.enqueue(chunk);
@@ -70,15 +92,51 @@ export async function POST(req: Request) {
           /* stream already cancelled */
         }
       };
+
+      const convo: Anthropic.MessageParam[] = messages.map((m) => ({ role: m.role, content: m.content }));
+
       try {
-        for await (const event of modelStream) {
-          if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
-            safeEnqueue(send({ text: event.delta.text }));
+        for (let turn = 0; turn < MAX_TURNS; turn++) {
+          const modelStream = client.messages.stream(
+            {
+              model: AGENT_MODEL,
+              max_tokens: AGENT_MAX_TOKENS,
+              system,
+              messages: convo,
+              ...(tools.length ? { tools } : {}),
+            },
+            { signal: req.signal },
+          );
+          for await (const event of modelStream) {
+            if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
+              safeEnqueue(send({ text: event.delta.text }));
+            }
           }
+          const finalMsg = await modelStream.finalMessage();
+          convo.push({ role: 'assistant', content: finalMsg.content });
+
+          if (finalMsg.stop_reason !== 'tool_use') break;
+
+          // Run each requested tool through the RLS-scoped client, then feed the
+          // results back for the model's next turn.
+          const toolUses = finalMsg.content.filter(
+            (b): b is Anthropic.ToolUseBlock => b.type === 'tool_use',
+          );
+          const results: Anthropic.ToolResultBlockParam[] = [];
+          for (const tu of toolUses) {
+            safeEnqueue(send({ tool: TOOL_ACTIVITY[tu.name] ?? 'Looking things up…' }));
+            const { content, isError } = await runTool(
+              module,
+              tu.name,
+              toolCtx,
+              (tu.input ?? {}) as Record<string, unknown>,
+            );
+            results.push({ type: 'tool_result', tool_use_id: tu.id, content, is_error: isError });
+          }
+          convo.push({ role: 'user', content: results });
         }
         safeEnqueue(send({ done: true }));
       } catch (err) {
-        // Client aborts are expected — don't surface them as errors.
         if (!req.signal.aborted) {
           safeEnqueue(send({ error: err instanceof Error ? err.message : 'Vyso AI request failed' }));
         }
@@ -89,9 +147,6 @@ export async function POST(req: Request) {
           /* already closed/cancelled */
         }
       }
-    },
-    cancel() {
-      // The browser closed the stream (modal closed / navigated away).
     },
   });
 
