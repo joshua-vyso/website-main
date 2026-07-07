@@ -1221,39 +1221,86 @@ export function NewOrderBuilder({ context, defaultCustomerId }: { context: Build
     }
   }
 
-  /** Load an order Vyso AI parsed in chat: match the customer, and drop the
-   *  parsed lines in as manual lines for the user to review/adjust. */
+  /** Load an order Vyso AI parsed in chat: match the customer, match each line
+   *  to a catalogue product so it's priced from that customer's price list (just
+   *  like adding it by hand), and drop the lines in for review. Lines with no
+   *  confident product match stay free-text at whatever price the doc carried. */
   function handleVysoLoad(order: ParsedOrder) {
+    let matched: (typeof context.customers)[number] | null = null;
     if (order.customerName) {
       const target = order.customerName.trim().toLowerCase();
       // Prefer an exact match. Only fall back to a substring match when both
       // names are long enough (≥4 chars) AND exactly one customer matches — an
       // ambiguous or short match would risk silently invoicing the wrong account,
       // so we leave the customer unset for the user to pick instead.
-      let match = context.customers.find((c) => c.name.trim().toLowerCase() === target) ?? null;
-      if (!match && target.length >= 4) {
+      matched = context.customers.find((c) => c.name.trim().toLowerCase() === target) ?? null;
+      if (!matched && target.length >= 4) {
         const candidates = context.customers.filter((c) => {
           const n = c.name.trim().toLowerCase();
           return n.length >= 4 && (n.includes(target) || target.includes(n));
         });
-        if (candidates.length === 1) match = candidates[0];
+        if (candidates.length === 1) matched = candidates[0];
       }
-      if (match) pickCustomer(match.id);
+      if (matched) pickCustomer(matched.id);
     }
+
+    // Price against the matched customer's list directly — the `priceList` memo
+    // won't have recomputed yet inside this synchronous handler. Only price when
+    // we actually know the customer: pricing product lines against a guessed
+    // default list would trigger the "changed price needs a reason" block once
+    // the real customer is picked.
+    const pl = matched ? customerPriceList(matched, context.priceLists) : null;
+    const stamp = Date.now().toString(36);
+
+    let pricedCount = 0;
     const lines: BuilderLine[] = order.items
       .filter((it) => (it.name ?? '').trim())
-      .map((it, i) => ({
-        key: `vai_${i}_${Date.now().toString(36)}`,
-        stock_item_id: null,
-        name: it.name.trim(),
-        qty: Number(it.qty) > 0 ? Number(it.qty) : 1,
-        unit: null,
-        unit_price: Number(it.unit_price) || 0,
-        source: 'none',
-        override_note: null,
-      }));
+      .map((it, i) => {
+        const key = `vai_${i}_${stamp}`;
+        const qty = Number(it.qty) > 0 ? Number(it.qty) : 1;
+        const wanted = it.name.trim().toLowerCase();
+
+        // Match to a catalogue product (exact, else exactly one unambiguous
+        // ≥4-char substring) so the line prices from the customer's list.
+        let product = matched ? context.products.find((p) => p.name.trim().toLowerCase() === wanted) ?? null : null;
+        if (matched && !product && wanted.length >= 4) {
+          const cands = context.products.filter((p) => {
+            const n = p.name.trim().toLowerCase();
+            return n.length >= 4 && (n.includes(wanted) || wanted.includes(n));
+          });
+          if (cands.length === 1) product = cands[0];
+        }
+
+        if (product) {
+          const r = resolvePrice(product, pl, context.overrides);
+          pricedCount += 1;
+          return {
+            key,
+            stock_item_id: product.id,
+            name: product.name,
+            qty,
+            unit: product.unit ?? null,
+            unit_price: r.price,
+            source: r.source,
+            override_note: null,
+          };
+        }
+
+        // No confident match → free-text line at whatever price the doc carried.
+        return {
+          key,
+          stock_item_id: null,
+          name: it.name.trim(),
+          qty,
+          unit: null,
+          unit_price: Number(it.unit_price) || 0,
+          source: 'none' as const,
+          override_note: null,
+        };
+      });
     setBlines(lines);
-    toast(`Loaded ${lines.length} item${lines.length === 1 ? '' : 's'} from Vyso AI`);
+    const suffix = pricedCount ? ` · ${pricedCount} priced from ${pl?.name ?? 'price list'}` : '';
+    toast(`Loaded ${lines.length} item${lines.length === 1 ? '' : 's'} from Vyso AI${suffix}`);
   }
 
   return (
