@@ -2,18 +2,22 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import type { ReactNode } from 'react';
 
 /**
  * Generic horizontal sub-navigation for a module's screens — the calm underline
  * style shared with Doc-U: a thin baseline with the active tab underlined in teal.
  * The `rootHref` tab (module index) is matched exactly; the rest match by prefix.
+ * An optional `right` slot renders a right-aligned action (e.g. the Vyso AI pill).
  */
 export function SubNav({
   tabs,
   rootHref,
+  right,
 }: {
   tabs: { label: string; href: string }[];
   rootHref: string;
+  right?: ReactNode;
 }) {
   const pathname = usePathname() ?? '';
   return (
@@ -35,6 +39,7 @@ export function SubNav({
           </Link>
         );
       })}
+      {right ? <div className="ml-auto self-center pb-1.5">{right}</div> : null}
     </nav>
   );
 }

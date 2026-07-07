@@ -451,3 +451,26 @@ html, body {
     gap: 0.4rem 1rem !important;
   }
 }
+
+/* ── Vyso AI: dynamic light-blue gradient pill + idle bouncing dots ────────── */
+@keyframes vyso-ai-gradient {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+.vyso-ai-gradient {
+  background-image: linear-gradient(115deg, #6FB7F0, #3E8FE0, #8ED0F7, #59A6EE, #6FB7F0);
+  background-size: 300% 300%;
+  animation: vyso-ai-gradient 6s ease infinite;
+}
+@keyframes vyso-ai-dot {
+  0%, 80%, 100% { transform: translateY(0); opacity: 0.45; }
+  40% { transform: translateY(-4px); opacity: 1; }
+}
+.vyso-ai-dot {
+  animation: vyso-ai-dot 1.2s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .vyso-ai-gradient { animation: none; }
+  .vyso-ai-dot { animation: none; }
+}

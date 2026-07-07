@@ -8,6 +8,8 @@ export interface ResolvedUser {
   /** Supabase client scoped to the caller (RLS applies as that user). */
   supabase: SupabaseClient;
   userId: string;
+  /** The caller's email (lower-cased), for feature gating. */
+  email: string | null;
 }
 
 /**
@@ -28,7 +30,7 @@ export async function resolveUser(req: Request): Promise<ResolvedUser | null> {
     });
     const { data, error } = await supabase.auth.getUser(token);
     if (error || !data.user) return null;
-    return { supabase, userId: data.user.id };
+    return { supabase, userId: data.user.id, email: data.user.email?.toLowerCase() ?? null };
   }
 
   const cookieStore = await cookies();
@@ -42,7 +44,7 @@ export async function resolveUser(req: Request): Promise<ResolvedUser | null> {
   });
   const { data, error } = await supabase.auth.getUser();
   if (error || !data.user) return null;
-  return { supabase, userId: data.user.id };
+  return { supabase, userId: data.user.id, email: data.user.email?.toLowerCase() ?? null };
 }
 
 export const AI_CORS_HEADERS: Record<string, string> = {
