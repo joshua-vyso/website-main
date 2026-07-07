@@ -309,3 +309,106 @@ export async function findCustomers(
     return row;
   });
 }
+
+/** Resolve one customer's display name (or 'Unknown'). */
+async function customerNameOf(supabase: SupabaseClient, orgId: string, customerId: string | null): Promise<string> {
+  if (!customerId) return 'Unknown';
+  const { data } = await supabase
+    .from('of_customers')
+    .select('name')
+    .eq('org_id', orgId)
+    .eq('id', customerId)
+    .maybeSingle<{ name: string }>();
+  return data?.name ?? 'Unknown';
+}
+
+/**
+ * The exact line items on a specific invoice or order, looked up by its number
+ * (e.g. "INV-0008"). Tries invoices first (they carry the authoritative priced
+ * lines + totals), then orders. Money columns are withheld for members.
+ */
+export async function orderDocumentLines(
+  supabase: SupabaseClient,
+  orgId: string,
+  reference: string,
+  includeMoney: boolean,
+): Promise<Record<string, unknown>> {
+  const ref = reference.trim();
+  if (!ref) return { found: false, message: 'Give me an invoice or order number, e.g. INV-0008.' };
+  // Escape PostgREST wildcards/meta so an exact number matches literally.
+  const safe = ref.replace(/[,()%*\\_]/g, ' ').trim();
+  if (!safe) return { found: false, message: `No document matches "${ref}".` };
+
+  // 1. Invoice by number.
+  const invoices = must<OfInvoice[]>(
+    await supabase.from('of_invoices').select('*').eq('org_id', orgId).ilike('invoice_number', safe).limit(1),
+    'invoices',
+  );
+  if (invoices.length) {
+    const inv = invoices[0];
+    const items = must<OfInvoiceItem[]>(
+      await supabase.from('of_invoice_items').select('*').eq('invoice_id', inv.id).order('sort_order', { ascending: true }),
+      'invoice items',
+    );
+    const t = docTotals(items, Number(inv.vat_rate ?? 15), Number(inv.discount ?? 0), Number(inv.rebate_pct ?? 0));
+    return {
+      found: true,
+      type: 'invoice',
+      reference: inv.invoice_number,
+      customer: await customerNameOf(supabase, orgId, inv.customer_id),
+      status: inv.status,
+      date: (inv.issue_date ?? '').slice(0, 10),
+      items: items.map((it) => ({
+        item: it.name,
+        qty: Number(it.qty),
+        ...(it.unit ? { unit: it.unit } : {}),
+        ...(includeMoney ? { unit_price: zar2(it.unit_price), line_total: zar2(Number(it.qty) * Number(it.unit_price)) } : {}),
+      })),
+      ...(includeMoney
+        ? {
+            subtotal: zar2(t.subtotal),
+            ...(t.discount ? { discount: zar2(t.discount) } : {}),
+            ...(t.rebate ? { rebate: zar2(t.rebate) } : {}),
+            vat: zar2(t.vat),
+            total: zar2(t.total),
+          }
+        : {}),
+    };
+  }
+
+  // 2. Order by order number (or its invoice number).
+  const orders = must<OfOrder[]>(
+    await supabase
+      .from('of_orders')
+      .select('*')
+      .eq('org_id', orgId)
+      .or(`order_number.ilike.${safe},invoice_number.ilike.${safe}`)
+      .limit(1),
+    'orders',
+  );
+  if (orders.length) {
+    const ord = orders[0];
+    const items = must<OfOrderItem[]>(
+      await supabase.from('of_order_items').select('*').eq('order_id', ord.id),
+      'order items',
+    );
+    const subtotal = items.reduce((s, it) => s + (Number(it.qty) || 0) * (Number(it.unit_price) || 0), 0);
+    return {
+      found: true,
+      type: 'order',
+      reference: ord.order_number || ord.invoice_number || ord.id.slice(0, 8),
+      customer: await customerNameOf(supabase, orgId, ord.customer_id),
+      status: ord.status,
+      date: (ord.created_at ?? '').slice(0, 10),
+      items: items.map((it) => ({
+        item: it.name,
+        qty: Number(it.qty),
+        ...(it.unit ? { unit: it.unit } : {}),
+        ...(includeMoney ? { unit_price: zar2(it.unit_price), line_total: zar2(Number(it.qty) * Number(it.unit_price)) } : {}),
+      })),
+      ...(includeMoney ? { subtotal_ex_vat: zar2(subtotal) } : {}),
+    };
+  }
+
+  return { found: false, message: `No invoice or order found matching "${ref}".` };
+}

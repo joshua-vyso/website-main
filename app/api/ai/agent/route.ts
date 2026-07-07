@@ -17,6 +17,7 @@ const TOOL_ACTIVITY: Record<string, string> = {
   orderflow_get_business_snapshot: 'Checking the numbers…',
   orderflow_list_recent_invoices: 'Reading recent invoices…',
   orderflow_list_recent_orders: 'Reading recent orders…',
+  orderflow_get_order_lines: 'Reading the order lines…',
   orderflow_find_customer: 'Looking up the customer…',
 };
 

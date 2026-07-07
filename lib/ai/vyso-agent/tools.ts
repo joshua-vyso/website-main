@@ -10,7 +10,7 @@
 import 'server-only';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import type { AgentModule } from './config';
-import { businessSnapshot, recentInvoices, recentOrders, findCustomers } from './orderflow-data';
+import { businessSnapshot, recentInvoices, recentOrders, findCustomers, orderDocumentLines } from './orderflow-data';
 
 /** Runtime context handed to every tool. `canSeeMoney` mirrors the OrderFlow
  *  finance gate (members don't see revenue/outstanding). */
@@ -76,6 +76,23 @@ const ORDERFLOW_TOOLS: AgentTool[] = [
     },
     run: (ctx, input) =>
       recentOrders(ctx.supabase, ctx.orgId, clampLimit(input.limit, 8, 25)).then((r) => JSON.stringify(r)),
+  },
+  {
+    name: 'orderflow_get_order_lines',
+    description:
+      'Get the exact line items (products, quantities and — for admins — prices) on ONE specific invoice or order, identified by its number (e.g. "INV-0008"). Call this when the user asks what was on a specific invoice/order, or what a customer actually ordered on it. You usually get the number from a recent-orders or recent-invoices result first.',
+    input_schema: {
+      type: 'object',
+      properties: {
+        reference: { type: 'string', description: 'The invoice or order number, e.g. "INV-0008".' },
+      },
+      required: ['reference'],
+      additionalProperties: false,
+    },
+    run: (ctx, input) =>
+      orderDocumentLines(ctx.supabase, ctx.orgId, String(input.reference ?? ''), ctx.canSeeMoney).then((r) =>
+        JSON.stringify(r),
+      ),
   },
   {
     name: 'orderflow_find_customer',
