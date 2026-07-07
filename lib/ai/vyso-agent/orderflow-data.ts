@@ -7,6 +7,7 @@
  */
 import 'server-only';
 import type { SupabaseClient } from '@supabase/supabase-js';
+import { matchByName } from './name-match';
 import {
   docTotals,
   paymentsTotal,
@@ -411,4 +412,97 @@ export async function orderDocumentLines(
   }
 
   return { found: false, message: `No invoice or order found matching "${ref}".` };
+}
+
+// ---------------------------------------------------------------------------
+// Workflow (Sonnet) — prepare an order draft for the New Order builder
+// ---------------------------------------------------------------------------
+
+export interface DraftItemInput {
+  name: string;
+  qty: number;
+  unit?: string | null;
+}
+
+/**
+ * Resolve a requested customer + item list against THIS org's real customers and
+ * catalogue, so Vyso AI can hand a draft to the New Order builder. This is
+ * strictly READ-ONLY name resolution — it writes nothing. Matching mirrors the
+ * builder's own rules (exact, else exactly one unambiguous ≥4-char substring) so
+ * what the user is told matches what the builder will do. The builder still does
+ * the authoritative pricing off the customer's price list.
+ */
+export async function prepareOrderDraft(
+  supabase: SupabaseClient,
+  orgId: string,
+  customerQuery: string,
+  items: DraftItemInput[],
+): Promise<Record<string, unknown>> {
+  const cq = (customerQuery ?? '').trim();
+
+  // Resolve the customer (exact name/trading name → else exactly one match).
+  let customerName: string | null = null;
+  let customerMatched = false;
+  let candidates: string[] = [];
+  if (cq) {
+    const safe = cq.replace(/[,()%*\\]/g, ' ').trim();
+    const found = safe
+      ? must<Array<Pick<OfCustomer, 'id' | 'name' | 'trading_name'>>>(
+          await supabase
+            .from('of_customers')
+            .select('id, name, trading_name')
+            .eq('org_id', orgId)
+            .or(`name.ilike.%${safe}%,trading_name.ilike.%${safe}%`)
+            .limit(10),
+          'customers',
+        )
+      : [];
+    const lc = cq.toLowerCase();
+    const exact = found.find(
+      (c) => c.name.trim().toLowerCase() === lc || (c.trading_name ?? '').trim().toLowerCase() === lc,
+    );
+    if (exact) {
+      customerName = exact.name;
+      customerMatched = true;
+    } else if (found.length === 1) {
+      customerName = found[0].name;
+      customerMatched = true;
+    } else if (found.length > 1) {
+      candidates = found.map((c) => c.name);
+    }
+  }
+
+  // Match each requested item to the catalogue.
+  const products = must<Array<{ id: string; name: string; unit: string | null }>>(
+    await supabase.from('pp_stock_items').select('id, name, unit').eq('org_id', orgId).order('name'),
+    'products',
+  );
+  const resolvedItems = (items ?? [])
+    .filter((it) => (it?.name ?? '').trim())
+    .map((it) => {
+      const requested = it.name.trim();
+      const qty = Number(it.qty) > 0 ? Number(it.qty) : 1;
+      const product = matchByName(products, requested, (p) => p.name);
+      return {
+        requested,
+        qty,
+        matched: !!product,
+        name: product ? product.name : requested,
+        unit: product?.unit ?? it.unit ?? null,
+      };
+    });
+
+  const unmatched = resolvedItems.filter((i) => !i.matched).map((i) => i.requested);
+  return {
+    customer: {
+      query: cq,
+      matched: customerMatched,
+      name: customerName,
+      ...(candidates.length ? { ambiguous: true, candidates } : {}),
+    },
+    items: resolvedItems,
+    matched_items: resolvedItems.length - unmatched.length,
+    unmatched,
+    note: 'Draft only — nothing was saved. The user reviews and confirms it on the order page.',
+  };
 }

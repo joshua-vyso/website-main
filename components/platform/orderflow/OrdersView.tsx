@@ -34,6 +34,7 @@ import { Field as FormField, PrimaryBtn, SecondaryBtn, ConfirmDialog, inputClass
 import { Kpi, OrderStatusBadge, PaymentStatusBadge, RowActionsMenu, Drawer, useToast } from './ui';
 import { PublishOrderButton } from './PublishOrderButton';
 import { VysoAIOrderPrefill } from '@/components/platform/vyso-ai/VysoAIOrderPrefill';
+import { matchByName } from '@/lib/ai/vyso-agent/name-match';
 import type { ParsedOrder } from '@/lib/ai/vyso-agent/order-handoff';
 
 export interface OrderItemLite {
@@ -1241,22 +1242,11 @@ export function NewOrderBuilder({ context, defaultCustomerId }: { context: Build
    *  like adding it by hand), and drop the lines in for review. Lines with no
    *  confident product match stay free-text at whatever price the doc carried. */
   function handleVysoLoad(order: ParsedOrder) {
-    let matched: (typeof context.customers)[number] | null = null;
-    if (order.customerName) {
-      const target = order.customerName.trim().toLowerCase();
-      // Prefer an exact match. Only fall back to a substring match when both
-      // names are long enough (≥4 chars) AND exactly one customer matches — an
-      // ambiguous or short match would risk silently invoicing the wrong account,
-      // so we leave the customer unset for the user to pick instead.
-      matched = context.customers.find((c) => c.name.trim().toLowerCase() === target) ?? null;
-      if (!matched && target.length >= 4) {
-        const candidates = context.customers.filter((c) => {
-          const n = c.name.trim().toLowerCase();
-          return n.length >= 4 && (n.includes(target) || target.includes(n));
-        });
-        if (candidates.length === 1) matched = candidates[0];
-      }
-    }
+    // Prefer an exact match; else exactly one unambiguous ≥4-char substring — an
+    // ambiguous or short match would risk silently invoicing the wrong account,
+    // so we leave the customer unset for the user to pick instead. Shared with
+    // the server order-draft resolver so narration can't drift from the builder.
+    const matched = order.customerName ? matchByName(context.customers, order.customerName, (c) => c.name) : null;
 
     // Resolve prices against whichever list applies now — the matched customer's,
     // or (if the customer didn't auto-match) the default list. Product lines get
@@ -1271,19 +1261,10 @@ export function NewOrderBuilder({ context, defaultCustomerId }: { context: Build
       .map((it, i) => {
         const key = `vai_${i}_${stamp}`;
         const qty = Number(it.qty) > 0 ? Number(it.qty) : 1;
-        const wanted = it.name.trim().toLowerCase();
 
-        // Match to a catalogue product (exact, else exactly one unambiguous
-        // ≥4-char substring). Product matching is NOT gated on the customer —
-        // an unmatched customer must not leave every line unpriced.
-        let product = context.products.find((p) => p.name.trim().toLowerCase() === wanted) ?? null;
-        if (!product && wanted.length >= 4) {
-          const cands = context.products.filter((p) => {
-            const n = p.name.trim().toLowerCase();
-            return n.length >= 4 && (n.includes(wanted) || wanted.includes(n));
-          });
-          if (cands.length === 1) product = cands[0];
-        }
+        // Match to a catalogue product (same rule). Product matching is NOT gated
+        // on the customer — an unmatched customer must not leave lines unpriced.
+        const product = matchByName(context.products, it.name, (p) => p.name);
 
         if (product) {
           const r = resolvePrice(product, pl, context.overrides);

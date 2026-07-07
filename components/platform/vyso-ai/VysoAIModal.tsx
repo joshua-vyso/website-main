@@ -25,6 +25,11 @@ const MAX_ORDER_BYTES = 13 * 1024 * 1024;
 /** How many order files we'll read from a single drop/selection. */
 const MAX_ORDER_FILES = 8;
 
+/** Mirrors the server's order-intent detector so a natural-language "create an
+ *  order for …" also enters order-building mode on the client. */
+const CREATE_ORDER_RE =
+  /\b(create|creating|make|making|start|place|build|draft|new|set up|put together|prepare)\b[\s\S]{0,24}\border\b|\border\s+for\b/i;
+
 // Portals mount on document.body, outside the platform subtree's --radius
 // override — re-declare it (else rounded corners collapse) plus the app font.
 const PORTAL_STYLE = {
@@ -45,6 +50,8 @@ interface OrderSlot {
   status: 'parsing' | 'done' | 'error';
   order?: ParsedOrder;
   error?: string;
+  /** Card heading — "Parsed order" for files, "Order draft" for workflow drafts. */
+  label?: string;
 }
 
 /**
@@ -58,8 +65,15 @@ function renderContent(text: string) {
   );
 }
 
+interface OrderDraftEvent {
+  customerName?: string | null;
+  items?: Array<{ name: string; qty: number; unit_price: number }>;
+}
+
 /** Parse an SSE `data:` payload line into our event shape. */
-function parseSse(line: string): { text?: string; tool?: string; done?: boolean; error?: string } | null {
+function parseSse(
+  line: string,
+): { text?: string; tool?: string; done?: boolean; error?: string; orderDraft?: OrderDraftEvent } | null {
   if (!line.startsWith('data:')) return null;
   try {
     return JSON.parse(line.slice(5).trim());
@@ -93,11 +107,21 @@ export function VysoAIModal({
   const [slots, setSlots] = useState<OrderSlot[]>([]);
   const [dragOver, setDragOver] = useState(false);
 
+  // "/" order-workflow customer picker.
+  const [customers, setCustomers] = useState<Array<{ id: string; name: string }> | null>(null);
+  const [customerMenu, setCustomerMenu] = useState(false);
+  // We're actively building an order — armed by the "/" picker or an order-looking
+  // message, and kept ON across the whole exchange (including any clarifying
+  // question the model asks) so follow-up replies stay on the workflow tier. It's
+  // reset when a draft arrives or the modal closes.
+  const [orderMode, setOrderMode] = useState(false);
+
   const abortRef = useRef<AbortController | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const slotSeq = useRef(0);
+  const customersLoading = useRef(false);
 
   useEffect(() => setMounted(true), []);
 
@@ -118,9 +142,15 @@ export function VysoAIModal({
     };
   }, [open, onClose]);
 
-  // Abort any in-flight stream when the modal closes.
+  // Abort any in-flight stream when the modal closes, and drop order-building
+  // state so a fresh open never carries a stale workflow arm onto an unrelated
+  // question.
   useEffect(() => {
-    if (!open) abortRef.current?.abort();
+    if (!open) {
+      abortRef.current?.abort();
+      setOrderMode(false);
+      setCustomerMenu(false);
+    }
   }, [open]);
 
   // Also abort if the component unmounts mid-stream (e.g. route change).
@@ -138,10 +168,19 @@ export function VysoAIModal({
     const nextMessages: ChatMessage[] = [...messages, { role: 'user', content: text }];
     setMessages(nextMessages);
     setInput('');
+    setCustomerMenu(false);
     setError(null);
     setStreaming(true);
     setStreamText('');
     setStreamStatus(null);
+
+    // Stay in the order workflow for the whole exchange: once armed (via "/" or
+    // an order-looking message) every turn routes to the workflow tier until a
+    // draft arrives or the modal closes — so the model's clarifying follow-ups
+    // aren't dropped back to the Q&A tier.
+    const isOrderText = CREATE_ORDER_RE.test(text);
+    const workflow = orderMode || isOrderText;
+    if (isOrderText && !orderMode) setOrderMode(true);
 
     const ctrl = new AbortController();
     abortRef.current = ctrl;
@@ -151,7 +190,7 @@ export function VysoAIModal({
       const res = await fetch('/api/ai/agent', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: nextMessages, module, orgName }),
+        body: JSON.stringify({ messages: nextMessages, module, orgName, workflow }),
         signal: ctrl.signal,
       });
       if (!res.ok || !res.body) {
@@ -174,7 +213,22 @@ export function VysoAIModal({
           const evt = parseSse(part.trim());
           if (!evt) continue;
           if (evt.error) streamError = evt.error;
-          else if (evt.tool) setStreamStatus(evt.tool);
+          else if (evt.orderDraft) {
+            const draft = evt.orderDraft;
+            const items = Array.isArray(draft.items) ? draft.items : [];
+            setSlots((prev) => [
+              ...prev,
+              {
+                id: `draft_${slotSeq.current++}`,
+                filename: '',
+                label: 'Order draft',
+                status: 'done',
+                order: { customerName: draft.customerName ?? null, items },
+              },
+            ]);
+            // Order built — leave workflow mode so later questions run on Q&A tier.
+            setOrderMode(false);
+          } else if (evt.tool) setStreamStatus(evt.tool);
           else if (evt.text) {
             acc += evt.text;
             setStreamText(acc);
@@ -197,7 +251,7 @@ export function VysoAIModal({
         setStreamStatus(null);
       }
     }
-  }, [input, streaming, messages, module, orgName]);
+  }, [input, streaming, messages, module, orgName, orderMode]);
 
   // Parse one already-accepted file, updating its slot in place.
   const parseInto = useCallback(async (file: File, id: string) => {
@@ -302,6 +356,37 @@ export function VysoAIModal({
 
   const dismissSlot = (id: string) => setSlots((prev) => prev.filter((s) => s.id !== id));
 
+  // Lazily load the customer list for the "/" order picker (id + name only).
+  // Guarded so rapid keystrokes before the first response don't fire duplicates.
+  const ensureCustomers = useCallback(async () => {
+    if (customers || customersLoading.current) return;
+    customersLoading.current = true;
+    try {
+      const res = await fetch('/api/ai/agent/customers');
+      const data = (await res.json().catch(() => ({}))) as { customers?: Array<{ id: string; name: string }> };
+      setCustomers(Array.isArray(data.customers) ? data.customers : []);
+    } catch {
+      setCustomers([]);
+    } finally {
+      customersLoading.current = false;
+    }
+  }, [customers]);
+
+  // The user picked a customer from the "/" menu: prefill an order prompt and
+  // enter order mode so the reply builds a draft order.
+  function pickWorkflowCustomer(name: string) {
+    setInput(`Create an order for ${name}: `);
+    setOrderMode(true);
+    setCustomerMenu(false);
+    inputRef.current?.focus();
+  }
+
+  // Customers matching the text typed after "/".
+  const customerQuery = input.startsWith('/') ? input.slice(1).trim().toLowerCase() : '';
+  const customerMatches = customerMenu
+    ? (customers ?? []).filter((c) => !customerQuery || c.name.toLowerCase().includes(customerQuery)).slice(0, 6)
+    : [];
+
   if (!mounted || !open) return null;
 
   const empty = messages.length === 0 && !streaming && slots.length === 0;
@@ -361,9 +446,10 @@ export function VysoAIModal({
           {empty ? (
             <div className="flex h-full flex-col items-center justify-center text-center">
               <BouncingDots size={9} />
-              <p className="mt-4 max-w-[310px] text-[14px] leading-5 text-[#5F6368]">
+              <p className="mt-4 max-w-[320px] text-[14px] leading-5 text-[#5F6368]">
                 Ask me how to do anything in this module, or about your live numbers, orders and customers. You can also
-                drop one or more orders in to read them.
+                drop one or more orders in to read them
+                {module === 'orderflow' ? ', or type / to build an order for a customer' : ''}.
               </p>
             </div>
           ) : (
@@ -413,6 +499,7 @@ export function VysoAIModal({
                   <ParsedOrderCard
                     key={slot.id}
                     order={slot.order}
+                    label={slot.label}
                     onOpen={() => openInNewOrder(slot.order!)}
                     onCopy={() => copyOrder(slot.order!)}
                     onDismiss={() => dismissSlot(slot.id)}
@@ -426,6 +513,32 @@ export function VysoAIModal({
 
         {/* Composer */}
         <div className="border-t border-[#F0F0EC] p-3">
+          {customerMenu ? (
+            <div className="mb-2 max-h-44 overflow-y-auto rounded-xl border border-[#D7DAD8] bg-white py-1 shadow-[0_12px_30px_-12px_rgba(15,23,32,0.3)]">
+              <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-[#9A9DA1]">
+                Create an order for…
+              </div>
+              {customers === null ? (
+                <div className="px-3 py-1.5 text-[12px] text-[#5F6368]">Loading customers…</div>
+              ) : customerMatches.length ? (
+                customerMatches.map((c) => (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => pickWorkflowCustomer(c.name)}
+                    className="block w-full truncate px-3 py-1.5 text-left text-[13px] text-[#1A1C1E] transition-colors hover:bg-[#F2F8FE]"
+                  >
+                    {c.name}
+                  </button>
+                ))
+              ) : (
+                <div className="px-3 py-1.5 text-[12px] text-[#5F6368]">
+                  {customerQuery ? `No customer matches “${customerQuery}”.` : 'No customers yet.'}
+                </div>
+              )}
+            </div>
+          ) : null}
           <div className="flex items-end gap-2 rounded-2xl border border-[#D7DAD8] bg-white px-3 py-2 focus-within:border-[#3E8FE0]/60">
             <input
               ref={fileInputRef}
@@ -459,11 +572,30 @@ export function VysoAIModal({
             <textarea
               ref={inputRef}
               value={input}
-              onChange={(e) => setInput(e.target.value)}
+              onChange={(e) => {
+                const v = e.target.value;
+                setInput(v);
+                if (v.startsWith('/')) {
+                  setCustomerMenu(true);
+                  void ensureCustomers();
+                } else if (customerMenu) {
+                  setCustomerMenu(false);
+                }
+              }}
               onKeyDown={(e) => {
+                if (e.key === 'Escape' && customerMenu) {
+                  e.preventDefault();
+                  // Stop the window-level Escape handler from also closing the
+                  // whole modal — the first Escape should only close the picker.
+                  e.stopPropagation();
+                  setCustomerMenu(false);
+                  return;
+                }
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
-                  void send();
+                  // If the "/" picker is open with matches, pick the first.
+                  if (customerMenu && customerMatches.length) pickWorkflowCustomer(customerMatches[0].name);
+                  else void send();
                 }
               }}
               rows={1}
@@ -495,11 +627,13 @@ export function VysoAIModal({
 /** A parsed order shown in the chat, with actions to open it in a new order or copy it. */
 function ParsedOrderCard({
   order,
+  label,
   onOpen,
   onCopy,
   onDismiss,
 }: {
   order: ParsedOrder;
+  label?: string;
   onOpen: () => void;
   onCopy: () => void;
   onDismiss: () => void;
@@ -516,7 +650,7 @@ function ParsedOrderCard({
             <path d="M12 3l1.6 4.6L18 9.2l-4.4 1.6L12 15l-1.6-4.2L6 9.2l4.4-1.6L12 3z" fill="#fff" />
           </svg>
         </span>
-        <span>Parsed order</span>
+        <span>{label ?? 'Parsed order'}</span>
         {order.filename ? (
           <span className="min-w-0 truncate text-[11px] font-normal text-[#5F80A0]">· {order.filename}</span>
         ) : null}
