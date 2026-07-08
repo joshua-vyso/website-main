@@ -88,11 +88,24 @@ interface ChatMessage {
 
 /** One dropped/selected order file, tracked from parsing → done/error so each
  *  gets its own card. Dropping several orders at once yields several slots. */
+interface IngestResult {
+  documentId: string;
+  documentType: string;
+  customerName?: string | null;
+  supplier?: string | null;
+  itemCount?: number;
+  invoiceNumber?: string | null;
+  orderId?: string | null;
+  needsReview?: boolean;
+}
+
 interface OrderSlot {
   id: string;
   filename: string;
   status: 'parsing' | 'done' | 'error';
   order?: ParsedOrder;
+  /** An uploaded doc that was filed into Doc-U (+ invoiced, for orders). */
+  ingest?: IngestResult;
   error?: string;
   /** Card heading — "Parsed order" for files, "Order draft" for workflow drafts. */
   label?: string;
@@ -221,51 +234,46 @@ export function VysoAIModal({
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, streamText, streaming, slots]);
 
-  // Read one already-computed attachment payload into its slot, with an optional
-  // note (the text the user typed alongside it).
-  const parsePayload = useCallback(
+  // File one attachment into Doc-U: classify it, save it, and (for orders) build
+  // the OrderFlow order — auto-invoicing when confident, else holding a draft to
+  // review. The typed text rides along as a note that guides the order reader.
+  const ingestPayload = useCallback(
     async (att: { base64: string; mediaType: string; name: string }, id: string, note?: string) => {
       const fail = (msg: string) =>
         setSlots((prev) => prev.map((s) => (s.id === id ? { ...s, status: 'error', error: msg } : s)));
       try {
-        const res = await fetch('/api/ai/agent/parse-order', {
+        const res = await fetch('/api/ai/agent/ingest-document', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ base64: att.base64, mediaType: att.mediaType, filename: att.name, note }),
         });
         const data = (await res.json().catch(() => ({}))) as {
           error?: string;
-          customer_name?: string | null;
-          customer_confidence?: number;
-          line_items?: Array<{ description?: string; quantity?: string; unit_price?: string; amount?: string }>;
+          documentId?: string;
+          documentType?: string;
+          customerName?: string | null;
+          supplier?: string | null;
+          itemCount?: number;
+          orderSync?: { orderId?: string; invoice_number?: string | null; needsCustomerReview?: boolean } | null;
         };
-        if (!res.ok) {
-          fail(data.error ?? `Could not read the order (${res.status}).`);
+        if (!res.ok || !data.documentId) {
+          fail(data.error ?? `Could not file the document (${res.status}).`);
           return;
         }
-        const items = (data.line_items ?? [])
-          .map((li) => {
-            const name = String(li.description ?? '').trim();
-            const qty = Number(li.quantity) > 0 ? Number(li.quantity) : 1;
-            let unit = Number(li.unit_price) || 0;
-            const amt = Number(li.amount) || 0;
-            if (!unit && amt) unit = amt / qty;
-            return { name, qty, unit_price: Math.round(unit * 100) / 100 };
-          })
-          .filter((it) => it.name);
-        if (items.length === 0 && !data.customer_name) {
-          fail("I couldn't read an order from this file. Try a clearer photo or the PDF.");
-          return;
-        }
-        const order: ParsedOrder = {
-          customerName: data.customer_name ?? null,
-          customerConfidence: data.customer_confidence,
-          items,
-          filename: att.name,
+        const sync = data.orderSync ?? undefined;
+        const ingest: IngestResult = {
+          documentId: data.documentId,
+          documentType: data.documentType ?? 'document',
+          customerName: data.customerName ?? null,
+          supplier: data.supplier ?? null,
+          itemCount: data.itemCount,
+          invoiceNumber: sync?.invoice_number ?? null,
+          orderId: sync?.orderId ?? null,
+          needsReview: data.documentType === 'order' ? !(sync?.orderId && !sync.needsCustomerReview) : false,
         };
-        setSlots((prev) => prev.map((s) => (s.id === id ? { ...s, status: 'done', order } : s)));
+        setSlots((prev) => prev.map((s) => (s.id === id ? { ...s, status: 'done', ingest, filename: att.name } : s)));
       } catch (err) {
-        fail(err instanceof Error ? err.message : 'Could not read the order.');
+        fail(err instanceof Error ? err.message : 'Could not file the document.');
       }
     },
     [],
@@ -287,7 +295,7 @@ export function VysoAIModal({
       const newSlots: OrderSlot[] = atts.map((a) => ({ id: `slot_${slotSeq.current++}`, filename: a.name, status: 'parsing' }));
       setSlots((prev) => [...prev, ...newSlots]);
       await Promise.all(
-        atts.map((a, i) => parsePayload({ base64: a.base64, mediaType: a.mediaType, name: a.name }, newSlots[i].id, note)),
+        atts.map((a, i) => ingestPayload({ base64: a.base64, mediaType: a.mediaType, name: a.name }, newSlots[i].id, note)),
       );
       return;
     }
@@ -379,7 +387,7 @@ export function VysoAIModal({
         setStreamStatus(null);
       }
     }
-  }, [input, streaming, messages, module, orgName, orderMode, pending, parsePayload]);
+  }, [input, streaming, messages, module, orgName, orderMode, pending, ingestPayload]);
 
   // Attach one or more dropped/selected files: validate + downscale images, and
   // hold them as chips in the composer. They are NOT read until the user sends —
@@ -515,7 +523,7 @@ export function VysoAIModal({
       >
         {dragOver ? (
           <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-3xl border-2 border-dashed border-[#3E8FE0] bg-[#F2F8FE]/85 backdrop-blur-[1px]">
-            <span className="text-[14px] font-semibold text-[#12324F]">Drop the order(s) to attach them</span>
+            <span className="text-[14px] font-semibold text-[#12324F]">Drop a document to attach it</span>
           </div>
         ) : null}
         {/* Header */}
@@ -545,7 +553,8 @@ export function VysoAIModal({
               <BouncingDots size={9} />
               <p className="mt-4 max-w-[320px] text-[14px] leading-5 text-[#5F6368]">
                 Ask me how to do anything in this module, or about your live numbers, orders and customers. You can also
-                attach one or more orders (📎), add a note, and send
+                attach a document (📎) — an order, invoice or statement — add a note, and send: I'll file it in Doc-U and
+                invoice orders automatically
                 {module === 'orderflow' ? ', or type / to build an order for a customer' : ''}.
               </p>
             </div>
@@ -586,12 +595,27 @@ export function VysoAIModal({
                     className="flex items-center gap-2 rounded-2xl border border-[#EFEFEA] bg-[#FBFBF9] px-3.5 py-2.5"
                   >
                     <BouncingDots size={7} />
-                    <span className="truncate text-[12px] text-[#5F6368]">Reading {slot.filename}…</span>
+                    <span className="truncate text-[12px] text-[#5F6368]">Reading &amp; filing {slot.filename}…</span>
                   </div>
                 ) : slot.status === 'error' ? (
                   <p key={slot.id} className="px-1 text-[12px] text-[#A32D2D]">
                     {slot.filename}: {slot.error}
                   </p>
+                ) : slot.ingest ? (
+                  <IngestResultCard
+                    key={slot.id}
+                    result={slot.ingest}
+                    filename={slot.filename}
+                    onOpenOrder={(orderId) => {
+                      router.push(`/app/orderflow/orders/${orderId}`);
+                      onClose();
+                    }}
+                    onOpenDoc={(docId) => {
+                      router.push(`/app/docu/${docId}`);
+                      onClose();
+                    }}
+                    onDismiss={() => dismissSlot(slot.id)}
+                  />
                 ) : slot.order ? (
                   <ParsedOrderCard
                     key={slot.id}
@@ -829,6 +853,109 @@ function ParsedOrderCard({
         >
           {copied ? 'Copied' : 'Copy'}
         </button>
+        <button
+          type="button"
+          onClick={onDismiss}
+          className="rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-[#5F6368] transition-colors hover:bg-[#E4EFFA]"
+        >
+          Dismiss
+        </button>
+      </div>
+    </div>
+  );
+}
+
+const DOC_TYPE_LABEL: Record<string, string> = {
+  order: 'customer order',
+  invoice: 'supplier invoice',
+  statement: 'market statement',
+  delivery_note: 'delivery note',
+  price_list: 'price list',
+};
+
+/** Result of filing an uploaded doc into Doc-U (and, for orders, invoicing it). */
+function IngestResultCard({
+  result,
+  filename,
+  onOpenOrder,
+  onOpenDoc,
+  onDismiss,
+}: {
+  result: IngestResult;
+  filename: string;
+  onOpenOrder: (orderId: string) => void;
+  onOpenDoc: (docId: string) => void;
+  onDismiss: () => void;
+}) {
+  const typeLabel = DOC_TYPE_LABEL[result.documentType] ?? 'document';
+  const isOrder = result.documentType === 'order';
+  const invoiced = isOrder && !!result.invoiceNumber && !result.needsReview;
+
+  return (
+    <div className="rounded-2xl border border-[#BBD9F5] bg-[#F2F8FE] p-3.5">
+      <div className="flex items-center gap-2 text-[13px] font-semibold text-[#12324F]">
+        <span className="vyso-ai-gradient flex h-5 w-5 shrink-0 items-center justify-center rounded-full">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M5 12.5l4 4 10-11" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+        </span>
+        <span>Filed in Doc-U</span>
+        <span className="min-w-0 truncate text-[11px] font-normal text-[#5F80A0]">· {filename}</span>
+      </div>
+
+      <div className="mt-1.5 text-[12px] text-[#12324F]">
+        Read as a <span className="font-medium">{typeLabel}</span>
+        {result.customerName ? (
+          <>
+            {' '}for <span className="font-medium">{result.customerName}</span>
+          </>
+        ) : null}
+        {result.supplier ? (
+          <>
+            {' '}from <span className="font-medium">{result.supplier}</span>
+          </>
+        ) : null}
+        {typeof result.itemCount === 'number' && result.itemCount > 0
+          ? ` · ${result.itemCount} line${result.itemCount === 1 ? '' : 's'}`
+          : ''}
+        .
+      </div>
+
+      {invoiced ? (
+        <div className="mt-1.5 text-[12px] font-medium text-[#1E5E54]">
+          Invoice {result.invoiceNumber} created.
+        </div>
+      ) : isOrder ? (
+        <div className="mt-1.5 text-[12px] text-[#9A6A00]">Saved as a draft — confirm the customer to invoice it.</div>
+      ) : null}
+
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        {invoiced && result.orderId ? (
+          <button
+            type="button"
+            onClick={() => onOpenOrder(result.orderId!)}
+            className="vyso-ai-gradient rounded-lg px-3.5 py-1.5 text-[12px] font-semibold text-white"
+          >
+            View order &amp; invoice
+          </button>
+        ) : (
+          <button
+            type="button"
+            onClick={() => onOpenDoc(result.documentId)}
+            className="vyso-ai-gradient rounded-lg px-3.5 py-1.5 text-[12px] font-semibold text-white"
+          >
+            {isOrder ? 'Review order' : 'Open in Doc-U'}
+          </button>
+        )}
+        {invoiced ? (
+          <button
+            type="button"
+            onClick={() => onOpenDoc(result.documentId)}
+            className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:bg-[#F7FAFD]"
+          >
+            Open in Doc-U
+          </button>
+        ) : null}
         <button
           type="button"
           onClick={onDismiss}
