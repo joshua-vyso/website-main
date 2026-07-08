@@ -269,7 +269,9 @@ export function VysoAIModal({
           itemCount: data.itemCount,
           invoiceNumber: sync?.invoice_number ?? null,
           orderId: sync?.orderId ?? null,
-          needsReview: data.documentType === 'order' ? !(sync?.orderId && !sync.needsCustomerReview) : false,
+          // Raw flag from the sync — the card derives invoiced / draft / failed
+          // from orderId + invoiceNumber + this.
+          needsReview: !!sync?.needsCustomerReview,
         };
         setSlots((prev) => prev.map((s) => (s.id === id ? { ...s, status: 'done', ingest, filename: att.name } : s)));
       } catch (err) {
@@ -287,16 +289,24 @@ export function VysoAIModal({
     // attach time) using any typed text as the note that guides the reading.
     if (pending.length) {
       const atts = pending;
-      const note = text || undefined;
+      // A typed note guides the reading of ONE doc. With several files it's
+      // ambiguous (which customer is it for?), so we don't broadcast it across
+      // the batch — that would mis-attribute every order to one customer.
+      const note = atts.length === 1 ? text || undefined : undefined;
       setInput('');
       setPending([]);
       setAttachError(null);
       setCustomerMenu(false);
       const newSlots: OrderSlot[] = atts.map((a) => ({ id: `slot_${slotSeq.current++}`, filename: a.name, status: 'parsing' }));
       setSlots((prev) => [...prev, ...newSlots]);
-      await Promise.all(
-        atts.map((a, i) => ingestPayload({ base64: a.base64, mediaType: a.mediaType, name: a.name }, newSlots[i].id, note)),
-      );
+      // Sequential, not concurrent: each file's create-on-upload (a new customer
+      // or product) must commit before the next runs, so a batch that's several
+      // pages of ONE new customer's order doesn't race into duplicate customer /
+      // order / invoice rows.
+      for (let i = 0; i < atts.length; i++) {
+        const a = atts[i];
+        await ingestPayload({ base64: a.base64, mediaType: a.mediaType, name: a.name }, newSlots[i].id, note);
+      }
       return;
     }
     if (!text) return;
@@ -889,7 +899,10 @@ function IngestResultCard({
 }) {
   const typeLabel = DOC_TYPE_LABEL[result.documentType] ?? 'document';
   const isOrder = result.documentType === 'order';
-  const invoiced = isOrder && !!result.invoiceNumber && !result.needsReview;
+  const orderBuilt = isOrder && !!result.orderId; // an of_orders row exists
+  const invoiced = orderBuilt && !!result.invoiceNumber && !result.needsReview;
+  const draftHeld = orderBuilt && !invoiced; // order exists but not invoiced yet
+  const orderNotBuilt = isOrder && !orderBuilt; // sync failed / not yet an order
 
   return (
     <div className="rounded-2xl border border-[#BBD9F5] bg-[#F2F8FE] p-3.5">
@@ -922,40 +935,40 @@ function IngestResultCard({
       </div>
 
       {invoiced ? (
-        <div className="mt-1.5 text-[12px] font-medium text-[#1E5E54]">
-          Invoice {result.invoiceNumber} created.
-        </div>
-      ) : isOrder ? (
-        <div className="mt-1.5 text-[12px] text-[#9A6A00]">Saved as a draft — confirm the customer to invoice it.</div>
+        <div className="mt-1.5 text-[12px] font-medium text-[#1E5E54]">Invoice {result.invoiceNumber} created.</div>
+      ) : draftHeld ? (
+        <div className="mt-1.5 text-[12px] text-[#9A6A00]">Saved as a draft order — confirm the customer to invoice it.</div>
+      ) : orderNotBuilt ? (
+        <div className="mt-1.5 text-[12px] text-[#9A6A00]">Filed in Doc-U — open it to finish building the order.</div>
       ) : null}
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
         {invoiced && result.orderId ? (
-          <button
-            type="button"
-            onClick={() => onOpenOrder(result.orderId!)}
-            className="vyso-ai-gradient rounded-lg px-3.5 py-1.5 text-[12px] font-semibold text-white"
-          >
-            View order &amp; invoice
-          </button>
+          <>
+            <button
+              type="button"
+              onClick={() => onOpenOrder(result.orderId!)}
+              className="vyso-ai-gradient rounded-lg px-3.5 py-1.5 text-[12px] font-semibold text-white"
+            >
+              View order &amp; invoice
+            </button>
+            <button
+              type="button"
+              onClick={() => onOpenDoc(result.documentId)}
+              className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:bg-[#F7FAFD]"
+            >
+              Open in Doc-U
+            </button>
+          </>
         ) : (
           <button
             type="button"
             onClick={() => onOpenDoc(result.documentId)}
             className="vyso-ai-gradient rounded-lg px-3.5 py-1.5 text-[12px] font-semibold text-white"
           >
-            {isOrder ? 'Review order' : 'Open in Doc-U'}
+            {draftHeld ? 'Review order' : 'Open in Doc-U'}
           </button>
         )}
-        {invoiced ? (
-          <button
-            type="button"
-            onClick={() => onOpenDoc(result.documentId)}
-            className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:bg-[#F7FAFD]"
-          >
-            Open in Doc-U
-          </button>
-        ) : null}
         <button
           type="button"
           onClick={onDismiss}

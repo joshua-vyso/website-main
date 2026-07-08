@@ -42,13 +42,17 @@ async function resolveSupplierId(supabase: SupabaseClient, orgId: string, name: 
   return (created as { id: string }).id;
 }
 
-/** The org's "Orders" Doc-U folder id (created on first use). */
+/** The org's "Orders" Doc-U folder id (created on first use). Uses limit(1)
+ *  rather than maybeSingle() so a pre-existing duplicate folder can't turn the
+ *  lookup into a multi-row error that keeps re-creating the folder. */
 async function ordersFolderId(supabase: SupabaseClient, orgId: string, userId: string): Promise<string | null> {
   const { data: existing } = await supabase
     .from('document_folders')
     .select('id')
     .eq('org_id', orgId)
     .eq('name', 'Orders')
+    .order('created_at', { ascending: true })
+    .limit(1)
     .maybeSingle();
   if (existing) return (existing as { id: string }).id;
   const { data: created } = await supabase
