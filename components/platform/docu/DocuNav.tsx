@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { VysoAILauncher } from '@/components/platform/vyso-ai/VysoAILauncher';
 
 const TABS = [
   { href: '/app/docu', label: 'Documents', match: 'documents' },
@@ -39,6 +40,9 @@ export function DocuNav() {
           </Link>
         );
       })}
+      <div className="ml-auto self-center pb-1.5">
+        <VysoAILauncher module="docu" />
+      </div>
     </div>
   );
 }
