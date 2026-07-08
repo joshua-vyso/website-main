@@ -7,18 +7,58 @@ import type { AgentModule } from '@/lib/ai/vyso-agent/config';
 import { stashParsedOrder, type ParsedOrder } from '@/lib/ai/vyso-agent/order-handoff';
 import { BouncingDots } from './BouncingDots';
 
-/** Read a File as base64 (no data: prefix) + its media type. */
-function fileToBase64(file: File): Promise<{ base64: string; mediaType: string }> {
+/** Read a File as a data URL string. */
+function readDataUrl(file: File): Promise<string> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    reader.onload = () => {
-      const result = String(reader.result);
-      const comma = result.indexOf(',');
-      resolve({ base64: comma >= 0 ? result.slice(comma + 1) : result, mediaType: file.type || 'application/octet-stream' });
-    };
+    reader.onload = () => resolve(String(reader.result));
     reader.onerror = () => reject(new Error('Could not read the file.'));
     reader.readAsDataURL(file);
   });
+}
+
+/** Read a File as base64 (no data: prefix) + its media type. */
+async function fileToBase64(file: File): Promise<{ base64: string; mediaType: string }> {
+  const result = await readDataUrl(file);
+  const comma = result.indexOf(',');
+  return { base64: comma >= 0 ? result.slice(comma + 1) : result, mediaType: file.type || 'application/octet-stream' };
+}
+
+/**
+ * Downscale an image to at most `maxDim` on the long edge and re-encode as JPEG,
+ * so a 12MP phone photo (which would blow the request-size limit and 413) becomes
+ * a few hundred KB while staying legible for the order reader. Falls back to the
+ * raw bytes if the browser can't decode it.
+ */
+async function imageToScaledBase64(file: File, maxDim = 2000, quality = 0.82): Promise<{ base64: string; mediaType: string }> {
+  try {
+    const dataUrl = await readDataUrl(file);
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const i = new Image();
+      i.onload = () => resolve(i);
+      i.onerror = () => reject(new Error('decode failed'));
+      i.src = dataUrl;
+    });
+    const scale = Math.min(1, maxDim / Math.max(img.width, img.height, 1));
+    const w = Math.max(1, Math.round(img.width * scale));
+    const h = Math.max(1, Math.round(img.height * scale));
+    const canvas = document.createElement('canvas');
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return fileToBase64(file);
+    ctx.drawImage(img, 0, 0, w, h);
+    const out = canvas.toDataURL('image/jpeg', quality);
+    const comma = out.indexOf(',');
+    return { base64: comma >= 0 ? out.slice(comma + 1) : out, mediaType: 'image/jpeg' };
+  } catch {
+    return fileToBase64(file);
+  }
+}
+
+/** Turn a file into an upload payload — images are downscaled, PDFs pass through. */
+async function fileToPayload(file: File): Promise<{ base64: string; mediaType: string }> {
+  return file.type.startsWith('image/') ? imageToScaledBase64(file) : fileToBase64(file);
 }
 
 const MAX_ORDER_BYTES = 13 * 1024 * 1024;
@@ -52,6 +92,18 @@ interface OrderSlot {
   error?: string;
   /** Card heading — "Parsed order" for files, "Order draft" for workflow drafts. */
   label?: string;
+}
+
+/** A file the user attached but hasn't sent yet — shown as a chip in the composer
+ *  and only read when they hit send (with any typed text as the note). */
+interface PendingAtt {
+  id: string;
+  name: string;
+  base64: string;
+  mediaType: string;
+  isImage: boolean;
+  /** Data URL for the chip thumbnail (images only). */
+  previewUrl?: string;
 }
 
 /**
@@ -102,9 +154,11 @@ export function VysoAIModal({
   const [streamStatus, setStreamStatus] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Order-parsing (drag/drop or file select) — one slot per dropped file, so
-  // dropping several orders at once yields several parsed-order cards.
+  // Order-parsing — attachments wait as chips in the composer and are read on
+  // send (with the typed text as the note); each yields a parsed-order card.
   const [slots, setSlots] = useState<OrderSlot[]>([]);
+  const [pending, setPending] = useState<PendingAtt[]>([]);
+  const [attachError, setAttachError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
 
   // "/" order-workflow customer picker.
@@ -150,6 +204,8 @@ export function VysoAIModal({
       abortRef.current?.abort();
       setOrderMode(false);
       setCustomerMenu(false);
+      setPending([]);
+      setAttachError(null);
     }
   }, [open]);
 
@@ -161,9 +217,77 @@ export function VysoAIModal({
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
   }, [messages, streamText, streaming, slots]);
 
+  // Read one already-computed attachment payload into its slot, with an optional
+  // note (the text the user typed alongside it).
+  const parsePayload = useCallback(
+    async (att: { base64: string; mediaType: string; name: string }, id: string, note?: string) => {
+      const fail = (msg: string) =>
+        setSlots((prev) => prev.map((s) => (s.id === id ? { ...s, status: 'error', error: msg } : s)));
+      try {
+        const res = await fetch('/api/ai/agent/parse-order', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ base64: att.base64, mediaType: att.mediaType, filename: att.name, note }),
+        });
+        const data = (await res.json().catch(() => ({}))) as {
+          error?: string;
+          customer_name?: string | null;
+          customer_confidence?: number;
+          line_items?: Array<{ description?: string; quantity?: string; unit_price?: string; amount?: string }>;
+        };
+        if (!res.ok) {
+          fail(data.error ?? `Could not read the order (${res.status}).`);
+          return;
+        }
+        const items = (data.line_items ?? [])
+          .map((li) => {
+            const name = String(li.description ?? '').trim();
+            const qty = Number(li.quantity) > 0 ? Number(li.quantity) : 1;
+            let unit = Number(li.unit_price) || 0;
+            const amt = Number(li.amount) || 0;
+            if (!unit && amt) unit = amt / qty;
+            return { name, qty, unit_price: Math.round(unit * 100) / 100 };
+          })
+          .filter((it) => it.name);
+        if (items.length === 0 && !data.customer_name) {
+          fail("I couldn't read an order from this file. Try a clearer photo or the PDF.");
+          return;
+        }
+        const order: ParsedOrder = {
+          customerName: data.customer_name ?? null,
+          customerConfidence: data.customer_confidence,
+          items,
+          filename: att.name,
+        };
+        setSlots((prev) => prev.map((s) => (s.id === id ? { ...s, status: 'done', order } : s)));
+      } catch (err) {
+        fail(err instanceof Error ? err.message : 'Could not read the order.');
+      }
+    },
+    [],
+  );
+
   const send = useCallback(async () => {
     const text = input.trim();
-    if (!text || streaming) return;
+    if (streaming) return;
+
+    // Attach, type, send: if files are waiting, read them now (deferred from
+    // attach time) using any typed text as the note that guides the reading.
+    if (pending.length) {
+      const atts = pending;
+      const note = text || undefined;
+      setInput('');
+      setPending([]);
+      setAttachError(null);
+      setCustomerMenu(false);
+      const newSlots: OrderSlot[] = atts.map((a) => ({ id: `slot_${slotSeq.current++}`, filename: a.name, status: 'parsing' }));
+      setSlots((prev) => [...prev, ...newSlots]);
+      await Promise.all(
+        atts.map((a, i) => parsePayload({ base64: a.base64, mediaType: a.mediaType, name: a.name }, newSlots[i].id, note)),
+      );
+      return;
+    }
+    if (!text) return;
 
     const nextMessages: ChatMessage[] = [...messages, { role: 'user', content: text }];
     setMessages(nextMessages);
@@ -251,90 +375,48 @@ export function VysoAIModal({
         setStreamStatus(null);
       }
     }
-  }, [input, streaming, messages, module, orgName, orderMode]);
+  }, [input, streaming, messages, module, orgName, orderMode, pending, parsePayload]);
 
-  // Parse one already-accepted file, updating its slot in place.
-  const parseInto = useCallback(async (file: File, id: string) => {
-    const fail = (msg: string) =>
-      setSlots((prev) => prev.map((s) => (s.id === id ? { ...s, status: 'error', error: msg } : s)));
-    try {
-      const { base64, mediaType } = await fileToBase64(file);
-      const res = await fetch('/api/ai/agent/parse-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ base64, mediaType, filename: file.name }),
-      });
-      const data = (await res.json().catch(() => ({}))) as {
-        error?: string;
-        customer_name?: string | null;
-        customer_confidence?: number;
-        line_items?: Array<{ description?: string; quantity?: string; unit_price?: string; amount?: string }>;
-      };
-      if (!res.ok) {
-        fail(data.error ?? `Could not read the order (${res.status}).`);
-        return;
+  // Attach one or more dropped/selected files: validate + downscale images, and
+  // hold them as chips in the composer. They are NOT read until the user sends —
+  // so they can type instructions first (attach, type, send).
+  const attachFiles = useCallback(async (fileList: File[]) => {
+    const files = fileList.slice(0, MAX_ORDER_FILES);
+    const errs: string[] = [];
+    const accepted: File[] = [];
+    for (const file of files) {
+      const okType = file.type === 'application/pdf' || file.type.startsWith('image/');
+      if (!okType) {
+        errs.push(`${file.name}: not a PDF or image.`);
+        continue;
       }
-      const items = (data.line_items ?? [])
-        .map((li) => {
-          const name = String(li.description ?? '').trim();
-          const qty = Number(li.quantity) > 0 ? Number(li.quantity) : 1;
-          let unit = Number(li.unit_price) || 0;
-          const amt = Number(li.amount) || 0;
-          if (!unit && amt) unit = amt / qty;
-          return { name, qty, unit_price: Math.round(unit * 100) / 100 };
-        })
-        .filter((it) => it.name);
-      if (items.length === 0 && !data.customer_name) {
-        fail("I couldn't read an order from this file. Try a clearer photo or the PDF.");
-        return;
+      if (file.size > MAX_ORDER_BYTES) {
+        errs.push(`${file.name}: too large (max ~13MB).`);
+        continue;
       }
-      const order: ParsedOrder = {
-        customerName: data.customer_name ?? null,
-        customerConfidence: data.customer_confidence,
-        items,
-        filename: file.name,
-      };
-      setSlots((prev) => prev.map((s) => (s.id === id ? { ...s, status: 'done', order } : s)));
-    } catch (err) {
-      fail(err instanceof Error ? err.message : 'Could not read the order.');
+      accepted.push(file);
     }
+    if (fileList.length > MAX_ORDER_FILES) errs.push(`Only the first ${MAX_ORDER_FILES} files were added.`);
+    setAttachError(errs.length ? errs.join(' ') : null);
+    if (!accepted.length) return;
+    const added = await Promise.all(
+      accepted.map(async (file): Promise<PendingAtt> => {
+        const { base64, mediaType } = await fileToPayload(file);
+        const isImage = file.type.startsWith('image/');
+        return {
+          id: `att_${slotSeq.current++}`,
+          name: file.name,
+          base64,
+          mediaType,
+          isImage,
+          previewUrl: isImage ? `data:${mediaType};base64,${base64}` : undefined,
+        };
+      }),
+    );
+    setPending((prev) => [...prev, ...added].slice(0, MAX_ORDER_FILES));
   }, []);
 
-  // Accept one or more dropped/selected files: make a slot per file, then parse
-  // the valid ones concurrently.
-  const handleFiles = useCallback(
-    (fileList: File[]) => {
-      const files = fileList.slice(0, MAX_ORDER_FILES);
-      const newSlots: OrderSlot[] = [];
-      const toParse: Array<{ file: File; id: string }> = [];
-      for (const file of files) {
-        const id = `slot_${slotSeq.current++}`;
-        const okType = file.type === 'application/pdf' || file.type.startsWith('image/');
-        if (!okType) {
-          newSlots.push({ id, filename: file.name, status: 'error', error: 'Not a PDF or image.' });
-          continue;
-        }
-        if (file.size > MAX_ORDER_BYTES) {
-          newSlots.push({ id, filename: file.name, status: 'error', error: 'Too large (max ~13MB).' });
-          continue;
-        }
-        newSlots.push({ id, filename: file.name, status: 'parsing' });
-        toParse.push({ file, id });
-      }
-      if (fileList.length > MAX_ORDER_FILES) {
-        newSlots.push({
-          id: `slot_${slotSeq.current++}`,
-          filename: `${fileList.length - MAX_ORDER_FILES} more`,
-          status: 'error',
-          error: `Only the first ${MAX_ORDER_FILES} files were read.`,
-        });
-      }
-      if (newSlots.length === 0) return;
-      setSlots((prev) => [...prev, ...newSlots]);
-      void Promise.all(toParse.map(({ file, id }) => parseInto(file, id)));
-    },
-    [parseInto],
-  );
+  const removePending = (id: string) => setPending((prev) => prev.filter((p) => p.id !== id));
 
   function openInNewOrder(order: ParsedOrder) {
     stashParsedOrder(order);
@@ -412,13 +494,13 @@ export function VysoAIModal({
           e.preventDefault();
           setDragOver(false);
           const files = Array.from(e.dataTransfer.files ?? []);
-          if (files.length) handleFiles(files);
+          if (files.length) void attachFiles(files);
         }}
         className="relative flex h-[560px] max-h-[85vh] w-full max-w-[560px] flex-col overflow-hidden rounded-3xl border border-[#E7E7E2] bg-white shadow-[0_30px_80px_-24px_rgba(15,23,32,0.55)]"
       >
         {dragOver ? (
           <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-3xl border-2 border-dashed border-[#3E8FE0] bg-[#F2F8FE]/85 backdrop-blur-[1px]">
-            <span className="text-[14px] font-semibold text-[#12324F]">Drop the order(s) to read them</span>
+            <span className="text-[14px] font-semibold text-[#12324F]">Drop the order(s) to attach them</span>
           </div>
         ) : null}
         {/* Header */}
@@ -448,7 +530,7 @@ export function VysoAIModal({
               <BouncingDots size={9} />
               <p className="mt-4 max-w-[320px] text-[14px] leading-5 text-[#5F6368]">
                 Ask me how to do anything in this module, or about your live numbers, orders and customers. You can also
-                drop one or more orders in to read them
+                attach one or more orders (📎), add a note, and send
                 {module === 'orderflow' ? ', or type / to build an order for a customer' : ''}.
               </p>
             </div>
@@ -539,7 +621,36 @@ export function VysoAIModal({
               )}
             </div>
           ) : null}
-          <div className="flex items-end gap-2 rounded-2xl border border-[#D7DAD8] bg-white px-3 py-2 focus-within:border-[#3E8FE0]/60">
+          {attachError ? <p className="mb-1.5 px-1 text-[12px] text-[#A32D2D]">{attachError}</p> : null}
+          {pending.length ? (
+            <div className="mb-2 flex flex-wrap gap-2">
+              {pending.map((p) => (
+                <div
+                  key={p.id}
+                  className="flex items-center gap-1.5 rounded-lg border border-[#D7DAD8] bg-[#F7FAFD] py-1 pl-1 pr-1.5"
+                >
+                  {p.previewUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={p.previewUrl} alt="" className="h-7 w-7 rounded object-cover" />
+                  ) : (
+                    <span className="flex h-7 w-7 items-center justify-center rounded bg-[#E7EEF6] text-[10px] font-semibold text-[#5F80A0]">
+                      PDF
+                    </span>
+                  )}
+                  <span className="max-w-[120px] truncate text-[11.5px] text-[#1A1C1E]">{p.name}</span>
+                  <button
+                    type="button"
+                    onClick={() => removePending(p.id)}
+                    aria-label={`Remove ${p.name}`}
+                    className="flex h-5 w-5 items-center justify-center rounded-full text-[12px] text-[#9A9DA1] transition-colors hover:bg-[#E4EFFA] hover:text-[#1A1C1E]"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+            </div>
+          ) : null}
+          <div className="flex items-center gap-2 rounded-2xl border border-[#D7DAD8] bg-white px-3 py-2 focus-within:border-[#3E8FE0]/60">
             <input
               ref={fileInputRef}
               type="file"
@@ -548,15 +659,15 @@ export function VysoAIModal({
               className="hidden"
               onChange={(e) => {
                 const files = Array.from(e.target.files ?? []);
-                if (files.length) handleFiles(files);
+                if (files.length) void attachFiles(files);
                 e.target.value = '';
               }}
             />
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              aria-label="Add order documents"
-              title="Add one or more orders to read"
+              aria-label="Attach order documents"
+              title="Attach one or more orders"
               className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#5F6368] transition-colors hover:bg-[#F0F0EC] disabled:opacity-40"
             >
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -605,7 +716,7 @@ export function VysoAIModal({
             <button
               type="button"
               onClick={() => void send()}
-              disabled={!input.trim() || streaming}
+              disabled={(!input.trim() && pending.length === 0) || streaming}
               aria-label="Send"
               className="vyso-ai-gradient flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white transition-opacity disabled:opacity-40"
             >

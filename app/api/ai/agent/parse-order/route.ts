@@ -36,6 +36,7 @@ export async function POST(req: Request) {
     base64?: unknown;
     mediaType?: unknown;
     filename?: unknown;
+    note?: unknown;
   };
   const base64 = typeof body.base64 === 'string' ? body.base64 : '';
   if (!base64) {
@@ -46,6 +47,7 @@ export async function POST(req: Request) {
   }
   const mediaType = typeof body.mediaType === 'string' ? body.mediaType : 'application/octet-stream';
   const filename = typeof body.filename === 'string' ? body.filename.slice(0, 200) : 'order';
+  const note = typeof body.note === 'string' ? body.note.slice(0, 500) : undefined;
 
   // Give the order reader the org's product catalogue so it resolves
   // abbreviations/varieties to exact product names (best-effort).
@@ -62,7 +64,7 @@ export async function POST(req: Request) {
   }
 
   try {
-    const result = await extractOrderDocument({ base64, mediaType, filename, products });
+    const result = await extractOrderDocument({ base64, mediaType, filename, products, note });
     return NextResponse.json({ ok: true, ...result }, { headers: AI_CORS_HEADERS });
   } catch (err) {
     return NextResponse.json(
