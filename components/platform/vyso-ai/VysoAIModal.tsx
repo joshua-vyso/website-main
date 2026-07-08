@@ -70,6 +70,10 @@ const MAX_ORDER_FILES = 8;
 const CREATE_ORDER_RE =
   /\b(create|creating|make|making|start|place|build|draft|new|set up|put together|prepare)\b[\s\S]{0,24}\border\b|\border\s+for\b/i;
 
+/** A "/customer" token being typed at the END of the composer — works mid-message
+ *  (e.g. "create an order for /bak"), not just when the input starts with "/". */
+const SLASH_TOKEN_RE = /(^|\s)\/([^\s/]*)$/;
+
 // Portals mount on document.body, outside the platform subtree's --radius
 // override — re-declare it (else rounded corners collapse) plus the app font.
 const PORTAL_STYLE = {
@@ -454,17 +458,28 @@ export function VysoAIModal({
     }
   }, [customers]);
 
-  // The user picked a customer from the "/" menu: prefill an order prompt and
-  // enter order mode so the reply builds a draft order.
+  // The user picked a customer from the "/" menu. If they were only typing "/"
+  // (nothing before it) prefill the friendly full prompt; if they typed it
+  // mid-message ("… for /bak") just swap the token for the name. Either way enter
+  // order mode so the reply builds a draft order.
   function pickWorkflowCustomer(name: string) {
-    setInput(`Create an order for ${name}: `);
+    setInput((prev) => {
+      const m = SLASH_TOKEN_RE.exec(prev);
+      if (m) {
+        const start = m.index + m[1].length; // index of the "/"
+        const before = prev.slice(0, start);
+        return before.trim() === '' ? `Create an order for ${name}: ` : `${before}${name} `;
+      }
+      return `Create an order for ${name}: `;
+    });
     setOrderMode(true);
     setCustomerMenu(false);
     inputRef.current?.focus();
   }
 
-  // Customers matching the text typed after "/".
-  const customerQuery = input.startsWith('/') ? input.slice(1).trim().toLowerCase() : '';
+  // Customers matching the "/token" being typed (anywhere in the message).
+  const slashMatch = SLASH_TOKEN_RE.exec(input);
+  const customerQuery = slashMatch ? slashMatch[2].trim().toLowerCase() : '';
   const customerMatches = customerMenu
     ? (customers ?? []).filter((c) => !customerQuery || c.name.toLowerCase().includes(customerQuery)).slice(0, 6)
     : [];
@@ -686,7 +701,7 @@ export function VysoAIModal({
               onChange={(e) => {
                 const v = e.target.value;
                 setInput(v);
-                if (v.startsWith('/')) {
+                if (SLASH_TOKEN_RE.test(v)) {
                   setCustomerMenu(true);
                   void ensureCustomers();
                 } else if (customerMenu) {
