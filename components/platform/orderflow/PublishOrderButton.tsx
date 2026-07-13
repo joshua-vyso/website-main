@@ -20,6 +20,9 @@ export function PublishOrderButton() {
   const [status, setStatus] = useState<'idle' | 'uploading' | 'reading'>('idle');
   const [msg, setMsg] = useState<string | null>(null);
 
+  // Uses order('created_at').limit(1) rather than maybeSingle() so a pre-existing
+  // duplicate "Orders" folder can't turn the lookup into a multi-row error that
+  // keeps re-creating the folder (mirrors the ingest endpoint).
   async function ordersFolderId(supabase: ReturnType<typeof createClient>): Promise<string | null> {
     if (!supabase || !org?.id) return null;
     const { data: existing } = await supabase
@@ -27,6 +30,8 @@ export function PublishOrderButton() {
       .select('id')
       .eq('org_id', org.id)
       .eq('name', 'Orders')
+      .order('created_at', { ascending: true })
+      .limit(1)
       .maybeSingle();
     if (existing) return (existing as { id: string }).id;
     const { data: created } = await supabase
