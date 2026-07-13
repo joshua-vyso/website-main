@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/platform/supabase-browser';
 import { usePlatform } from '@/lib/platform/session';
 import { logActivity } from '@/lib/platform/orderflow-activity';
+import { isUniqueViolation } from '@/lib/platform/db-errors';
 import {
   ACCOUNT_STATUS_STYLE,
   CUSTOMER_TYPES,
@@ -230,7 +231,11 @@ export function CustomersView({
     const { data, error: insErr } = await supabase.from('of_customers').insert(payload).select('id').single();
     if (insErr || !data) {
       setBusy(false);
-      setError(insErr?.message ?? 'Could not add the customer.');
+      setError(
+        isUniqueViolation(insErr)
+          ? 'A customer with that name already exists.'
+          : insErr?.message ?? 'Could not add the customer.',
+      );
       return;
     }
     logActivity(supabase, {

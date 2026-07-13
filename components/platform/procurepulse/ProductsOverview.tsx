@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/platform/supabase-browser';
 import { usePlatform } from '@/lib/platform/session';
+import { isUniqueViolation } from '@/lib/platform/db-errors';
 import type { StockItem, StockThreshold } from '@/lib/platform/types';
 
 interface Row {
@@ -120,7 +121,11 @@ export function ProductsOverview({
 
     setBusy(false);
     if (errors.length) {
-      setMsg('Some changes could not be saved — please try again.');
+      setMsg(
+        errors.some((e) => isUniqueViolation(e as { code?: string; message?: string }))
+          ? 'A product with that name already exists — rename the duplicate and save again.'
+          : 'Some changes could not be saved — please try again.',
+      );
       return;
     }
     router.refresh();

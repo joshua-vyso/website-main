@@ -8,6 +8,7 @@ import { createClient } from '@/lib/platform/supabase-browser';
 import { useToast } from '@/components/platform/orderflow/ui';
 import { downloadCsv, type CsvField } from '@/lib/platform/csv';
 import { logActivity } from '@/lib/platform/orderflow-activity';
+import { isUniqueViolation } from '@/lib/platform/db-errors';
 import type { CoreData } from '@/lib/platform/coredata-data';
 import {
   ACCOUNT_STATUS_STYLE,
@@ -291,11 +292,32 @@ export function CustomersDb({ data }: { data: CoreData }) {
     }));
     const valid = rows.filter((r) => r.name);
     if (valid.length === 0) return { inserted: 0, error: 'No rows had a company name.' };
-    const { error: err } = await supabase.from('of_customers').insert(valid);
-    if (err) return { inserted: 0, error: err.message };
-    show(`Imported ${valid.length} customers`);
+
+    // Skip names already on file or repeated within the file — the
+    // (org_id, lower(name)) unique index would otherwise reject the whole batch.
+    const { data: existingRows } = await supabase.from('of_customers').select('name').eq('org_id', org.id);
+    const seen = new Set((existingRows ?? []).map((r) => String((r as { name: string }).name ?? '').trim().toLowerCase()));
+    const deduped: typeof valid = [];
+    for (const r of valid) {
+      const key = r.name.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      deduped.push(r);
+    }
+    const skipped = valid.length - deduped.length;
+    if (deduped.length === 0) {
+      return { inserted: 0, error: `All ${skipped} row${skipped === 1 ? '' : 's'} already exist.` };
+    }
+    const { error: err } = await supabase.from('of_customers').insert(deduped);
+    if (err) {
+      return {
+        inserted: 0,
+        error: isUniqueViolation(err) ? 'Some customer names already exist — remove duplicates and try again.' : err.message,
+      };
+    }
+    show(`Imported ${deduped.length} customers${skipped ? ` (skipped ${skipped} already on file)` : ''}`);
     router.refresh();
-    return { inserted: valid.length };
+    return { inserted: deduped.length };
   }
 
   return (

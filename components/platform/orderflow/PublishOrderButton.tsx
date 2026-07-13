@@ -4,6 +4,7 @@ import { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/platform/supabase-browser';
 import { usePlatform } from '@/lib/platform/session';
+import { isUniqueViolation } from '@/lib/platform/db-errors';
 
 const MAX_MB = 20;
 
@@ -25,21 +26,29 @@ export function PublishOrderButton() {
   // keeps re-creating the folder (mirrors the ingest endpoint).
   async function ordersFolderId(supabase: ReturnType<typeof createClient>): Promise<string | null> {
     if (!supabase || !org?.id) return null;
-    const { data: existing } = await supabase
+    const orgId = org.id;
+    const findExisting = async () => {
+      const { data } = await supabase
+        .from('document_folders')
+        .select('id')
+        .eq('org_id', orgId)
+        .eq('name', 'Orders')
+        .order('created_at', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      return (data as { id: string } | null)?.id ?? null;
+    };
+    const existing = await findExisting();
+    if (existing) return existing;
+    const { data: created, error } = await supabase
       .from('document_folders')
+      .insert({ org_id: orgId, name: 'Orders', created_by: userId })
       .select('id')
-      .eq('org_id', org.id)
-      .eq('name', 'Orders')
-      .order('created_at', { ascending: true })
-      .limit(1)
       .maybeSingle();
-    if (existing) return (existing as { id: string }).id;
-    const { data: created } = await supabase
-      .from('document_folders')
-      .insert({ org_id: org.id, name: 'Orders', created_by: userId })
-      .select('id')
-      .single();
-    return (created as { id: string } | null)?.id ?? null;
+    if (created) return (created as { id: string }).id;
+    // Lost a create race against the unique index — re-read the winning folder.
+    if (isUniqueViolation(error)) return await findExisting();
+    return null;
   }
 
   async function handle(file: File) {

@@ -7,6 +7,7 @@ import { createClient } from '@/lib/platform/supabase-browser';
 import { usePlatform } from '@/lib/platform/session';
 import { useToast, RowActionsMenu } from '@/components/platform/orderflow/ui';
 import { logActivity } from '@/lib/platform/orderflow-activity';
+import { isUniqueViolation } from '@/lib/platform/db-errors';
 import { zar2 } from '@/lib/platform/orderflow';
 import { PRODUCT_UNIT_TYPES, type CdProduct, type ProductKind } from '@/lib/platform/coredata';
 import type { CoreData } from '@/lib/platform/coredata-data';
@@ -214,11 +215,32 @@ export function ProductsDb({ data }: { data: CoreData }) {
         };
       });
     if (rows.length === 0) return { inserted: 0, error: 'No valid rows (name is required).' };
-    const { error: err } = await supabase.from('pp_stock_items').insert(rows);
-    if (err) return { inserted: 0, error: err.message };
-    logActivity(supabase, { orgId: org.id, actorEmail: email, entityType: 'product', event: 'product_created', description: `Imported ${rows.length} products` });
+
+    // Skip names already on file or repeated within the file — the
+    // (org_id, lower(name)) unique index would otherwise reject the whole batch.
+    const { data: existingRows } = await supabase.from('pp_stock_items').select('name').eq('org_id', org.id);
+    const seen = new Set((existingRows ?? []).map((r) => String((r as { name: string }).name ?? '').trim().toLowerCase()));
+    const deduped: typeof rows = [];
+    for (const r of rows) {
+      const key = r.name.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      deduped.push(r);
+    }
+    const skipped = rows.length - deduped.length;
+    if (deduped.length === 0) {
+      return { inserted: 0, error: `All ${skipped} row${skipped === 1 ? '' : 's'} already exist.` };
+    }
+    const { error: err } = await supabase.from('pp_stock_items').insert(deduped);
+    if (err) {
+      return {
+        inserted: 0,
+        error: isUniqueViolation(err) ? 'Some product names already exist — remove duplicates and try again.' : err.message,
+      };
+    }
+    logActivity(supabase, { orgId: org.id, actorEmail: email, entityType: 'product', event: 'product_created', description: `Imported ${deduped.length} products` });
     router.refresh();
-    return { inserted: rows.length };
+    return { inserted: deduped.length };
   }
 
   function exportCsv() {

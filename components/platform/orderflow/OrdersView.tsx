@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/platform/supabase-browser';
 import { usePlatform } from '@/lib/platform/session';
 import { logActivity } from '@/lib/platform/orderflow-activity';
+import { isUniqueViolation } from '@/lib/platform/db-errors';
 import {
   ORDER_STATUSES,
   ORDER_STATUS_STYLE,
@@ -191,22 +192,42 @@ export function OrdersView({
     if (!n || creatingCustomer) return;
     const supabase = createClient();
     if (!supabase || !org?.id) return;
+    const orgId = org.id;
     setCreatingCustomer(true);
-    const { data, error } = await supabase.from('of_customers').insert({ org_id: org.id, name: n }).select('*').single();
+    const { data, error } = await supabase.from('of_customers').insert({ org_id: orgId, name: n }).select('*').single();
+    if (data) {
+      const c = data as OfCustomer;
+      logActivity(supabase, {
+        orgId,
+        actorEmail: email,
+        entityType: 'customer',
+        entityId: c.id,
+        customerId: c.id,
+        event: 'customer_created',
+        description: `${c.name} — added from the order builder`,
+      });
+      setCustomerList((prev) => (prev.some((p) => p.id === c.id) ? prev : [...prev, c]));
+      pickCustomer(c);
+      setCreatingCustomer(false);
+      return;
+    }
+    // Name already exists (unique index) — reuse the existing customer instead of failing.
+    if (isUniqueViolation(error)) {
+      const { data: found } = await supabase
+        .from('of_customers')
+        .select('*')
+        .eq('org_id', orgId)
+        .ilike('name', n)
+        .order('created_at', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      if (found) {
+        const c = found as OfCustomer;
+        setCustomerList((prev) => (prev.some((p) => p.id === c.id) ? prev : [...prev, c]));
+        pickCustomer(c);
+      }
+    }
     setCreatingCustomer(false);
-    if (error || !data) return;
-    const c = data as OfCustomer;
-    logActivity(supabase, {
-      orgId: org.id,
-      actorEmail: email,
-      entityType: 'customer',
-      entityId: c.id,
-      customerId: c.id,
-      event: 'customer_created',
-      description: `${c.name} — added from the order builder`,
-    });
-    setCustomerList((prev) => [...prev, c]);
-    pickCustomer(c);
   }
 
   const matches = useMemo(() => {

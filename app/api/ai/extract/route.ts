@@ -4,6 +4,7 @@ import { resolveUser, AI_CORS_HEADERS } from '@/lib/ai/auth';
 import { extractDocument, extractOrderDocument, aiConfigured } from '@/lib/ai/anthropic';
 import { feedDocumentToProcurePulse, orgHasProcurePulse } from '@/lib/platform/procurepulse-feed';
 import { syncOrderFromDocument } from '@/lib/platform/orderflow-from-doc';
+import { isUniqueViolation } from '@/lib/platform/db-errors';
 import type { Document } from '@/lib/platform/types';
 
 // Multi-page statements with many line items can take a while to parse.
@@ -30,21 +31,32 @@ async function resolveSupplierId(
   name: string,
 ): Promise<string> {
   const trimmed = name.trim();
-  const { data: existing } = await supabase
-    .from('suppliers')
-    .select('id')
-    .eq('org_id', orgId)
-    .ilike('name', trimmed)
-    .maybeSingle();
-  if (existing) return (existing as { id: string }).id;
+  const findExisting = async () => {
+    const { data } = await supabase
+      .from('suppliers')
+      .select('id')
+      .eq('org_id', orgId)
+      .ilike('name', trimmed)
+      .order('created_at', { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    return (data as { id: string } | null)?.id ?? null;
+  };
+  const existing = await findExisting();
+  if (existing) return existing;
 
   const { data: created, error } = await supabase
     .from('suppliers')
     .insert({ org_id: orgId, name: trimmed, initials: supplierInitials(trimmed) })
     .select('id')
     .single();
-  if (error || !created) throw error ?? new Error('Could not create supplier');
-  return (created as { id: string }).id;
+  if (created) return (created as { id: string }).id;
+  // Lost a create race against the (org_id, lower(name)) unique index — re-read the winner.
+  if (isUniqueViolation(error)) {
+    const winner = await findExisting();
+    if (winner) return winner;
+  }
+  throw error ?? new Error('Could not create supplier');
 }
 
 /**

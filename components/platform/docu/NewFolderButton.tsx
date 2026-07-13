@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/platform/supabase-browser';
 import { usePlatform } from '@/lib/platform/session';
 import { FOLDER_COLORS } from '@/lib/platform/docu/folders';
+import { isUniqueViolation } from '@/lib/platform/db-errors';
 
 /**
  * "New folder" — creates a custom document_folders row (name + colour) for the
@@ -40,7 +41,7 @@ export function NewFolderButton() {
       .insert({ org_id: org.id, name: trimmed, color, created_by: userId });
     setBusy(false);
     if (insErr) {
-      setError(insErr.message);
+      setError(isUniqueViolation(insErr) ? 'A folder with that name already exists.' : insErr.message);
       return;
     }
     reset();

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/platform/supabase-browser';
 import { usePlatform } from '@/lib/platform/session';
 import { DEFAULT_FOLDERS, isDefaultFolderName } from '@/lib/platform/documents';
+import { isUniqueViolation } from '@/lib/platform/db-errors';
 import type { DocumentFolder } from '@/lib/platform/types';
 
 /**
@@ -55,6 +56,35 @@ export function FolderPicker({
     setBusy(false);
   }
 
+  // Find-or-create a folder by name, tolerating the (org_id, lower(name)) unique
+  // index: if the insert loses to an existing/racing row, re-select the winner so
+  // "add a folder that already exists" just files into it instead of erroring.
+  async function ensureFolderId(
+    supabase: NonNullable<ReturnType<typeof createClient>>,
+    orgId: string,
+    name: string,
+  ): Promise<string | null> {
+    const findId = async () => {
+      const { data } = await supabase
+        .from('document_folders')
+        .select('id')
+        .eq('org_id', orgId)
+        .ilike('name', name)
+        .order('created_at', { ascending: true })
+        .limit(1)
+        .maybeSingle();
+      return (data as { id: string } | null)?.id ?? null;
+    };
+    const { data, error } = await supabase
+      .from('document_folders')
+      .insert({ org_id: orgId, name, created_by: userId })
+      .select('id')
+      .maybeSingle();
+    if (data) return (data as { id: string }).id;
+    if (isUniqueViolation(error)) return await findId();
+    return null;
+  }
+
   /** Pick a default folder — find-or-create its row, then assign. */
   async function pickDefault(name: string) {
     if (busy) return;
@@ -64,13 +94,9 @@ export function FolderPicker({
     setOpen(false);
     const supabase = createClient();
     if (supabase && org?.id) {
-      const { data } = await supabase
-        .from('document_folders')
-        .insert({ org_id: org.id, name, created_by: userId })
-        .select('id')
-        .single();
-      if (data?.id) {
-        await supabase.from('documents').update({ folder_id: data.id as string }).eq('id', documentId);
+      const folderId = await ensureFolderId(supabase, org.id, name);
+      if (folderId) {
+        await supabase.from('documents').update({ folder_id: folderId }).eq('id', documentId);
       }
     }
     router.refresh();
@@ -83,17 +109,13 @@ export function FolderPicker({
     const supabase = createClient();
     if (!supabase || !org?.id) return;
     setCreating(true);
-    const { data } = await supabase
-      .from('document_folders')
-      .insert({ org_id: org.id, name, created_by: userId })
-      .select('id')
-      .single();
+    const folderId = await ensureFolderId(supabase, org.id, name);
     setCreating(false);
     setNewName('');
-    if (data?.id) {
+    if (folderId) {
       setOpen(false);
       setBusy(true);
-      await supabase.from('documents').update({ folder_id: data.id as string }).eq('id', documentId);
+      await supabase.from('documents').update({ folder_id: folderId }).eq('id', documentId);
       router.refresh();
       setBusy(false);
     }

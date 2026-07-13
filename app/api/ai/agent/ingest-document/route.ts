@@ -6,6 +6,7 @@ import { isVysoAiAllowed } from '@/lib/ai/vyso-agent/config';
 import { extractDocument, extractOrderDocument, aiConfigured } from '@/lib/ai/anthropic';
 import { syncOrderFromDocument } from '@/lib/platform/orderflow-from-doc';
 import { feedDocumentToProcurePulse, orgHasProcurePulse } from '@/lib/platform/procurepulse-feed';
+import { isUniqueViolation } from '@/lib/platform/db-errors';
 
 // Classification + extraction + (for orders) invoicing can chain a few calls.
 export const maxDuration = 60;
@@ -26,41 +27,59 @@ function supplierInitials(name: string): string {
 /** Resolve (or create) a suppliers row for the org by name. Mirrors /api/ai/extract. */
 async function resolveSupplierId(supabase: SupabaseClient, orgId: string, name: string): Promise<string> {
   const trimmed = name.trim();
-  const { data: existing } = await supabase
-    .from('suppliers')
-    .select('id')
-    .eq('org_id', orgId)
-    .ilike('name', trimmed)
-    .maybeSingle();
-  if (existing) return (existing as { id: string }).id;
+  const findExisting = async () => {
+    const { data } = await supabase
+      .from('suppliers')
+      .select('id')
+      .eq('org_id', orgId)
+      .ilike('name', trimmed)
+      .order('created_at', { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    return (data as { id: string } | null)?.id ?? null;
+  };
+  const existing = await findExisting();
+  if (existing) return existing;
   const { data: created, error } = await supabase
     .from('suppliers')
     .insert({ org_id: orgId, name: trimmed, initials: supplierInitials(trimmed) })
     .select('id')
     .single();
-  if (error || !created) throw error ?? new Error('Could not create supplier');
-  return (created as { id: string }).id;
+  if (created) return (created as { id: string }).id;
+  // Lost a create race against the (org_id, lower(name)) unique index — re-read the winner.
+  if (isUniqueViolation(error)) {
+    const winner = await findExisting();
+    if (winner) return winner;
+  }
+  throw error ?? new Error('Could not create supplier');
 }
 
 /** The org's "Orders" Doc-U folder id (created on first use). Uses limit(1)
  *  rather than maybeSingle() so a pre-existing duplicate folder can't turn the
  *  lookup into a multi-row error that keeps re-creating the folder. */
 async function ordersFolderId(supabase: SupabaseClient, orgId: string, userId: string): Promise<string | null> {
-  const { data: existing } = await supabase
-    .from('document_folders')
-    .select('id')
-    .eq('org_id', orgId)
-    .eq('name', 'Orders')
-    .order('created_at', { ascending: true })
-    .limit(1)
-    .maybeSingle();
-  if (existing) return (existing as { id: string }).id;
-  const { data: created } = await supabase
+  const findExisting = async () => {
+    const { data } = await supabase
+      .from('document_folders')
+      .select('id')
+      .eq('org_id', orgId)
+      .eq('name', 'Orders')
+      .order('created_at', { ascending: true })
+      .limit(1)
+      .maybeSingle();
+    return (data as { id: string } | null)?.id ?? null;
+  };
+  const existing = await findExisting();
+  if (existing) return existing;
+  const { data: created, error } = await supabase
     .from('document_folders')
     .insert({ org_id: orgId, name: 'Orders', created_by: userId })
     .select('id')
     .maybeSingle();
-  return (created as { id: string } | null)?.id ?? null;
+  if (created) return (created as { id: string }).id;
+  // Lost a create race against the unique index — re-read the winning folder.
+  if (isUniqueViolation(error)) return await findExisting();
+  return null;
 }
 
 /**
