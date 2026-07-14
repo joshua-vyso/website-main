@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
-import type { SupabaseClient } from '@supabase/supabase-js';
 import { resolveUser, AI_CORS_HEADERS } from '@/lib/ai/auth';
 import { extractDocument, extractOrderDocument, aiConfigured } from '@/lib/ai/anthropic';
 import { feedDocumentToProcurePulse, orgHasProcurePulse } from '@/lib/platform/procurepulse-feed';
 import { syncOrderFromDocument } from '@/lib/platform/orderflow-from-doc';
-import { isUniqueViolation } from '@/lib/platform/db-errors';
+// Shared with the chat + inbound-email ingest so supplier dedup behaves identically
+// everywhere (re-selects the winner if it loses a race against the unique index).
+import { resolveSupplierId } from '@/lib/platform/document-ingest';
 import type { Document } from '@/lib/platform/types';
 
 // Multi-page statements with many line items can take a while to parse.
@@ -12,51 +13,6 @@ export const maxDuration = 60;
 
 export async function OPTIONS() {
   return new NextResponse(null, { headers: AI_CORS_HEADERS });
-}
-
-/** Build initials for a supplier name ("Bacca Valley (Pty) Ltd" → "BV"). */
-function supplierInitials(name: string): string {
-  const words = name.replace(/\(.*?\)/g, ' ').split(/\s+/).filter(Boolean);
-  return words.slice(0, 2).map((w) => w[0]?.toUpperCase() ?? '').join('') || name.slice(0, 2).toUpperCase();
-}
-
-/**
- * Resolve an extracted supplier name to a suppliers row id for the org, creating
- * the row when it's new. Matches case-insensitively on the trading name so the
- * same counterparty across documents reuses one supplier. Returns the id.
- */
-async function resolveSupplierId(
-  supabase: SupabaseClient,
-  orgId: string,
-  name: string,
-): Promise<string> {
-  const trimmed = name.trim();
-  const findExisting = async () => {
-    const { data } = await supabase
-      .from('suppliers')
-      .select('id')
-      .eq('org_id', orgId)
-      .ilike('name', trimmed)
-      .order('created_at', { ascending: true })
-      .limit(1)
-      .maybeSingle();
-    return (data as { id: string } | null)?.id ?? null;
-  };
-  const existing = await findExisting();
-  if (existing) return existing;
-
-  const { data: created, error } = await supabase
-    .from('suppliers')
-    .insert({ org_id: orgId, name: trimmed, initials: supplierInitials(trimmed) })
-    .select('id')
-    .single();
-  if (created) return (created as { id: string }).id;
-  // Lost a create race against the (org_id, lower(name)) unique index — re-read the winner.
-  if (isUniqueViolation(error)) {
-    const winner = await findExisting();
-    if (winner) return winner;
-  }
-  throw error ?? new Error('Could not create supplier');
 }
 
 /**
