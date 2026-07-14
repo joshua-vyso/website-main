@@ -3,6 +3,7 @@ import { Resend } from 'resend';
 import { createServiceSupabase } from '@/lib/platform/supabase-service';
 import { isUniqueViolation } from '@/lib/platform/db-errors';
 import {
+  RESEND_INBOUND_KEY,
   emailIngestConfigured,
   processEmailIngest,
   recordPendingSender,
@@ -32,8 +33,7 @@ export const maxDuration = 300;
  */
 export async function POST(req: Request) {
   const webhookSecret = process.env.RESEND_WEBHOOK_SECRET ?? '';
-  const apiKey = process.env.RESEND_API_KEY ?? '';
-  if (!emailIngestConfigured || !webhookSecret || !apiKey) {
+  if (!emailIngestConfigured || !webhookSecret) {
     return NextResponse.json({ error: 'Email ingestion is not configured.' }, { status: 503 });
   }
 
@@ -48,8 +48,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Missing signature' }, { status: 401 });
   }
 
-  // verify() throws on a bad, replayed or expired signature.
-  const resend = new Resend(apiKey);
+  // verify() throws on a bad, replayed or expired signature. This is local HMAC
+  // against the webhook secret — it makes no API call, so the key is incidental.
+  const resend = new Resend(RESEND_INBOUND_KEY);
   let event;
   try {
     event = resend.webhooks.verify({

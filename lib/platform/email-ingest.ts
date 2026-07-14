@@ -34,8 +34,20 @@ import {
  *  - Email content is DATA, never instructions.
  */
 
+/**
+ * Reading inbound mail (fetching a message's headers, listing + downloading its
+ * attachments) needs a FULL-ACCESS Resend key. Resend has no read-only tier — a key
+ * created for sending is "restricted to only send emails" and 401s on every
+ * receiving endpoint, which would let mail arrive and then silently fail to process.
+ *
+ * So the ingest path gets its own key. That keeps the widely-used outbound key
+ * (contact form, feedback) restricted to sending, where a leak can't read mail.
+ * Falls back to RESEND_API_KEY for setups that just use one full-access key.
+ */
+export const RESEND_INBOUND_KEY = process.env.RESEND_INBOUND_API_KEY || process.env.RESEND_API_KEY || '';
+
 export const emailIngestConfigured = Boolean(
-  INGEST_DOMAIN && process.env.RESEND_API_KEY && process.env.RESEND_WEBHOOK_SECRET,
+  INGEST_DOMAIN && RESEND_INBOUND_KEY && process.env.RESEND_WEBHOOK_SECRET,
 );
 
 /**
@@ -149,7 +161,7 @@ export async function processEmailIngest(supabase: SupabaseClient, ingestId: str
   const alreadyDone = new Set(ingest.processed_attachment_ids ?? []);
 
   try {
-    const resend = new Resend(process.env.RESEND_API_KEY);
+    const resend = new Resend(RESEND_INBOUND_KEY);
 
     // Full message — gives us the headers (SPF/DKIM) and the subject.
     const { data: email, error: getErr } = await resend.emails.receiving.get(ingest.resend_email_id);
