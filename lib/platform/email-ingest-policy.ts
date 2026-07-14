@@ -7,8 +7,26 @@
  * that acts on these decisions lives in ./email-ingest.
  */
 
+/**
+ * Normalise EMAIL_INGEST_DOMAIN to a bare domain.
+ *
+ * Resend displays its receiving address as a PLACEHOLDER — `anything@abc.resend.app`
+ * (sometimes `<anything>@...`) — meaning "any local part works here". It's very easy
+ * to paste that whole string into the env var, and we then build addresses as
+ * `${localPart}@${INGEST_DOMAIN}` and emit `org-token@<anything>@abc.resend.app`,
+ * which every mail client rejects as malformed. Keep only the part after the last
+ * '@' and strip the angle brackets, so a pasted placeholder still yields a working
+ * domain instead of a silently broken address.
+ */
+function normaliseIngestDomain(raw: string): string {
+  let domain = (raw ?? '').trim().toLowerCase().replace(/[<>\s]/g, '');
+  const at = domain.lastIndexOf('@');
+  if (at !== -1) domain = domain.slice(at + 1);
+  return domain.replace(/^\.+/, '').replace(/[./]+$/, '');
+}
+
 /** The subdomain whose MX points at Resend, e.g. "inbox.vyso.co.za". */
-export const INGEST_DOMAIN = (process.env.EMAIL_INGEST_DOMAIN ?? '').trim().toLowerCase();
+export const INGEST_DOMAIN = normaliseIngestDomain(process.env.EMAIL_INGEST_DOMAIN ?? '');
 
 /** Only these become documents. Anything else in the email is ignored. */
 const ALLOWED_TYPES = /^(application\/pdf|image\/(png|jpe?g|webp|gif|heic|bmp))$/i;
