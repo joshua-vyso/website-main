@@ -5,6 +5,8 @@ import { ingestDocument } from '@/lib/platform/document-ingest';
 import {
   INGEST_DOMAIN,
   MAX_ATTACHMENT_BYTES,
+  authResultsFromHeaders,
+  authResultsFromRawMime,
   localPartForIngestDomain,
   parseEmailAddress,
   passesSenderAuth,
@@ -172,9 +174,33 @@ export async function processEmailIngest(supabase: SupabaseClient, ingestId: str
 
     // From: is spoofable — the allowlist only means something if the mail is
     // authentic AND the domain that passed matches who it claims to be from.
+    //
+    // Resend's header map is a curated subset and omits Authentication-Results, so
+    // fall back to the RAW message, which is where the receiving MTA stamps it.
     const fromEmail = parseEmailAddress(email.from) ?? '';
-    if (!passesSenderAuth(email.headers, fromEmail)) {
-      await fail('Rejected: the email did not pass SPF/DKIM for the sender it claims to be from.', 'quarantined');
+    let authResults = authResultsFromHeaders(email.headers);
+    let authSource = authResults ? 'headers' : 'none';
+    if (!authResults && email.raw?.download_url) {
+      try {
+        const rawRes = await fetch(email.raw.download_url);
+        if (rawRes.ok) {
+          const rawText = await rawRes.text();
+          authResults = authResultsFromRawMime(rawText);
+          if (authResults) authSource = 'raw';
+        }
+      } catch {
+        /* fall through to the failure below, which reports what we found */
+      }
+    }
+
+    if (!passesSenderAuth(authResults, fromEmail)) {
+      // Say precisely WHY, so a rejection is diagnosable instead of a dead end:
+      // either we never found the results, or we found them and they didn't align.
+      const seen = Object.keys(email.headers ?? {}).join(',') || 'none';
+      const detail = authResults
+        ? `SPF/DKIM did not pass for ${fromEmail || 'the sender'} (source: ${authSource}): ${authResults.slice(0, 200)}`
+        : `no Authentication-Results found (headers seen: ${seen}; raw available: ${Boolean(email.raw?.download_url)})`;
+      await fail(`Rejected: ${detail}`, 'quarantined');
       return;
     }
 

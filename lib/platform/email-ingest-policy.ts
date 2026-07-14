@@ -76,7 +76,45 @@ function domainsAlign(authDomain: string, fromDomain: string): boolean {
 }
 
 /**
- * Did the mail actually come from who it claims to?
+ * Pull Authentication-Results out of the header map Resend returns.
+ *
+ * Resend's GET /emails/receiving/:id returns a CURATED SUBSET of headers (from,
+ * return-path, mime-version, ...) and in practice does not include
+ * Authentication-Results — which is why the auth check must also be able to read the
+ * raw MIME. Returns null when it isn't there.
+ */
+export function authResultsFromHeaders(headers: Record<string, string> | null): string | null {
+  if (!headers) return null;
+  const keys = Object.keys(headers).filter((k) => k.toLowerCase() === 'authentication-results');
+  if (keys.length === 0) return null;
+  return keys.map((k) => headers[k] ?? '').join('; ');
+}
+
+/**
+ * Pull Authentication-Results out of a raw RFC-5322 message.
+ *
+ * The receiving MTA stamps this header when it accepts the mail, so the raw message
+ * is the authoritative place to find it even when the API's header map omits it.
+ * There can be several (one per hop); we keep them all — the alignment check below
+ * only ever *accepts* on a pass that matches the From domain, so extra hops can add
+ * evidence but never weaken the decision.
+ */
+export function authResultsFromRawMime(raw: string): string | null {
+  if (!raw) return null;
+  // Headers end at the first blank line. Split on either line ending.
+  const end = raw.search(/\r?\n\r?\n/);
+  const headerBlock = end === -1 ? raw : raw.slice(0, end);
+  // Unfold: a header value continued on the next line starts with whitespace.
+  const unfolded = headerBlock.replace(/\r?\n[ \t]+/g, ' ');
+  const found = unfolded
+    .split(/\r?\n/)
+    .filter((line) => /^authentication-results\s*:/i.test(line))
+    .map((line) => line.replace(/^[^:]*:\s*/, ''));
+  return found.length ? found.join('; ') : null;
+}
+
+/**
+ * Do these Authentication-Results actually prove the mail came from who it claims to?
  *
  * From: is trivially spoofable, so the sender allowlist only means something if we
  * check it against an AUTHENTICATED identity. We require SPF or DKIM to pass AND the
@@ -90,13 +128,11 @@ function domainsAlign(authDomain: string, fromDomain: string): boolean {
  * Either signal suffices because forwarding routinely breaks SPF while leaving DKIM
  * intact — and forwarding is precisely what this feature is built on.
  *
- * Fails CLOSED: no Authentication-Results header, no trust.
+ * Fails CLOSED: no results, no trust.
  */
-export function passesSenderAuth(headers: Record<string, string> | null, fromEmail: string): boolean {
-  if (!headers) return false;
-  const key = Object.keys(headers).find((k) => k.toLowerCase() === 'authentication-results');
-  if (!key) return false;
-  const results = (headers[key] ?? '').toLowerCase();
+export function passesSenderAuth(authResults: string | null, fromEmail: string): boolean {
+  if (!authResults) return false;
+  const results = authResults.toLowerCase();
 
   const fromDomain = fromEmail.split('@')[1]?.trim().toLowerCase() ?? '';
   if (!fromDomain) return false;

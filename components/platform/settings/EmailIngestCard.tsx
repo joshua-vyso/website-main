@@ -273,24 +273,38 @@ export function EmailIngestCard({
             {events.map((e) => {
               const style = STATUS_STYLE[e.status] ?? STATUS_STYLE.ignored;
               return (
-                <div key={e.id} className="flex items-center gap-2 rounded-lg px-2 py-1.5 hover:bg-[#FAFAF8]">
-                  <span
-                    className="shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium"
-                    style={{ backgroundColor: style.bg, color: style.fg }}
-                  >
-                    {style.label}
-                  </span>
-                  <span className="min-w-0 flex-1 truncate text-[13px] text-[#1A1C1E]">
-                    {e.subject || '(no subject)'}
-                    <span className="text-[#9A9DA1]"> — {e.from_email}</span>
-                  </span>
-                  <span className="shrink-0 text-[12px] text-[#9A9DA1]">
-                    {e.documents_created > 0
-                      ? `${e.documents_created} doc${e.documents_created === 1 ? '' : 's'}`
-                      : e.error
-                        ? 'see error'
+                <div key={e.id} className="rounded-lg px-2 py-1.5 hover:bg-[#FAFAF8]">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium"
+                      style={{ backgroundColor: style.bg, color: style.fg }}
+                    >
+                      {style.label}
+                    </span>
+                    <span className="min-w-0 flex-1 truncate text-[13px] text-[#1A1C1E]">
+                      {e.subject || '(no subject)'}
+                      <span className="text-[#9A9DA1]"> — {e.from_email}</span>
+                    </span>
+                    <span className="shrink-0 text-[12px] text-[#9A9DA1]">
+                      {e.documents_created > 0
+                        ? `${e.documents_created} doc${e.documents_created === 1 ? '' : 's'}`
                         : '—'}
-                  </span>
+                    </span>
+                    {canManage && e.status !== 'done' && e.status !== 'processing' ? (
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() => void post('/api/email/retry', { id: e.id })}
+                        className="shrink-0 rounded-lg px-2 py-0.5 text-[12px] text-[#5F6368] transition-colors hover:bg-black/[0.05] disabled:opacity-40"
+                      >
+                        Retry
+                      </button>
+                    ) : null}
+                  </div>
+                  {/* Show the reason. "see error" told you nothing. */}
+                  {e.error ? (
+                    <p className="mt-0.5 pl-1 text-[12px] leading-snug text-[#A32D2D]">{e.error}</p>
+                  ) : null}
                 </div>
               );
             })}
