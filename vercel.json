@@ -2,7 +2,6 @@
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "crons": [
     {
-      "comment": "Safety net only — /api/email/inbound already ingests each email inline via after(). This just re-drives rows whose invocation died mid-way, or that were released when a sender was approved. Daily because Vercel's Hobby plan REJECTS the deployment for any schedule more frequent than once a day; nothing about ingest latency depends on this.",
       "path": "/api/email/process",
       "schedule": "0 3 * * *"
     }
