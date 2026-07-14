@@ -25,6 +25,7 @@ export default async function OrderFlowDashboardPage() {
         creditNoteItems: [],
         activity: [],
         settings: { ...DEFAULT_OF_SETTINGS },
+        quoteRequestsNew: 0,
       };
 
   return <Dashboard {...snapshot} orgName={org?.name ?? null} email={session?.email ?? null} />;

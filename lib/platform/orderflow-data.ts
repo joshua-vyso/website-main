@@ -12,6 +12,7 @@ import type {
   OfOrderItem,
   OfQuote,
   OfQuoteItem,
+  OfQuoteRequest,
   OfInvoice,
   OfInvoiceItem,
   OfCreditNote,
@@ -70,11 +71,14 @@ export interface OrderFlowSnapshot {
   creditNoteItems: OfCreditNoteItem[];
   activity: OfActivityEvent[];
   settings: OfSettings;
+  /** How many website enquiries still need a quote. A COUNT, not a truncated array —
+   *  the tile must not report "50" when 120 are waiting. */
+  quoteRequestsNew: number;
 }
 
 export async function getOrderFlowSnapshot(orgId: string): Promise<OrderFlowSnapshot> {
   const sb = await createServerSupabase();
-  const [cus, ord, qts, inv, itm, pay, cns, cni, act, set] = await Promise.all([
+  const [cus, ord, qts, inv, itm, pay, cns, cni, act, set, qrq] = await Promise.all([
     sb.from('of_customers').select('*').eq('org_id', orgId).order('name'),
     sb.from('of_orders').select('*').eq('org_id', orgId).order('created_at', { ascending: false }),
     sb.from('of_quotes').select('*').eq('org_id', orgId).order('created_at', { ascending: false }),
@@ -85,6 +89,11 @@ export async function getOrderFlowSnapshot(orgId: string): Promise<OrderFlowSnap
     sb.from('of_credit_note_items').select('*').eq('org_id', orgId),
     sb.from('of_activity').select('*').eq('org_id', orgId).order('created_at', { ascending: false }).limit(40),
     sb.from('of_settings').select('*').eq('org_id', orgId).maybeSingle(),
+    sb
+      .from('of_quote_requests')
+      .select('id', { count: 'exact', head: true })
+      .eq('org_id', orgId)
+      .eq('status', 'new'),
   ]);
   return {
     customers: rows<OfCustomer>(cus),
@@ -97,6 +106,7 @@ export async function getOrderFlowSnapshot(orgId: string): Promise<OrderFlowSnap
     creditNoteItems: rows<OfCreditNoteItem>(cni),
     activity: rows<OfActivityEvent>(act),
     settings: (set.data as OfSettings | null) ?? { ...DEFAULT_OF_SETTINGS, org_id: orgId },
+    quoteRequestsNew: qrq.count ?? 0,
   };
 }
 
@@ -248,16 +258,55 @@ export interface QuotesData {
   quotes: OfQuote[];
   items: OfQuoteItem[];
   customers: OfCustomer[];
+  requests: OfQuoteRequest[];
+  /** Un-actioned enquiries in total — may exceed requests.length, which is capped. */
+  requestsTotal: number;
 }
+
+const REQUEST_PAGE = 100;
 
 export async function getQuotesData(orgId: string): Promise<QuotesData> {
   const sb = await createServerSupabase();
-  const [qts, itm, cus] = await Promise.all([
+
+  // Filter to 'new' in the QUERY, not in the component. Fetching every non-dismissed
+  // row and filtering client-side meant quoted leads ate into the row budget, and — far
+  // worse — a burst of junk enquiries (which are the newest, so they sort first) could
+  // push genuine un-actioned leads out of the window entirely. They weren't dismissed
+  // and weren't quoted; they were simply invisible, with no other surface to find them.
+  const [qts, itm, cus, req] = await Promise.all([
     sb.from('of_quotes').select('*').eq('org_id', orgId).order('created_at', { ascending: false }),
     sb.from('of_quote_items').select('*').eq('org_id', orgId).order('sort_order'),
     sb.from('of_customers').select('*').eq('org_id', orgId).order('name'),
+    sb
+      .from('of_quote_requests')
+      .select('*', { count: 'exact' })
+      .eq('org_id', orgId)
+      .eq('status', 'new')
+      .order('received_at', { ascending: false })
+      .limit(REQUEST_PAGE),
   ]);
-  return { quotes: rows<OfQuote>(qts), items: rows<OfQuoteItem>(itm), customers: rows<OfCustomer>(cus) };
+
+  const requests = rows<OfQuoteRequest>(req);
+  return {
+    quotes: rows<OfQuote>(qts),
+    items: rows<OfQuoteItem>(itm),
+    customers: rows<OfCustomer>(cus),
+    requests,
+    // The true count, so a truncated list says so instead of quietly under-reporting.
+    requestsTotal: req.count ?? requests.length,
+  };
+}
+
+/** One quote request, for prefilling the builder. Org-scoped by the caller's RLS. */
+export async function getQuoteRequest(orgId: string, id: string): Promise<OfQuoteRequest | null> {
+  const sb = await createServerSupabase();
+  const { data } = await sb
+    .from('of_quote_requests')
+    .select('*')
+    .eq('org_id', orgId)
+    .eq('id', id)
+    .maybeSingle();
+  return (data as OfQuoteRequest | null) ?? null;
 }
 
 export interface QuoteDetailData {

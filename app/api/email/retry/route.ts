@@ -43,16 +43,27 @@ export async function POST(req: Request) {
 
   // Scoped to the caller's own org — the id comes from the request, so it is not
   // trusted on its own.
+  //
+  // Re-queue anything that isn't already filed or actively in flight. 'queued' is
+  // included because a webhook after() can be killed (deploy/crash) before it claims the
+  // row, leaving it stuck 'queued' with a live Retry button — this is how a human
+  // un-sticks it. 'done' and 'processing' are excluded: re-running a 'done' email pays
+  // for the Resend fetch and AI extraction again and can rewrite a good row's status,
+  // and a live 'processing' worker owns the row.
   const { data: updated } = await supabase
     .from('email_ingests')
     .update({ status: 'queued', error: null, attempts: 0 })
     .eq('id', id)
     .eq('org_id', orgId)
+    .in('status', ['queued', 'failed', 'quarantined', 'ignored'])
     .select('id')
     .maybeSingle();
 
   if (!updated) {
-    return NextResponse.json({ error: 'That email is not in your organisation.' }, { status: 404 });
+    return NextResponse.json(
+      { error: 'That email is not in your organisation, or is already filed or in progress.' },
+      { status: 404 },
+    );
   }
 
   after(async () => {

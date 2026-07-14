@@ -44,6 +44,8 @@ interface DashboardProps {
   creditNoteItems: OfCreditNoteItem[];
   activity: OfActivityEvent[];
   settings: OfSettings;
+  /** How many website enquiries still need a quote. */
+  quoteRequestsNew: number;
   orgName: string | null;
   email: string | null;
 }
@@ -66,6 +68,7 @@ export function Dashboard({
   creditNoteItems,
   activity,
   settings,
+  quoteRequestsNew,
   orgName,
   email,
 }: DashboardProps) {
@@ -164,6 +167,8 @@ export function Dashboard({
     };
   }, [invoiceRows, quotes, orders]);
 
+  const newRequests = quoteRequestsNew;
+
   // Search index across the four core entity types.
   const searchIndex = useMemo<SearchIndexItem[]>(() => {
     const customerName = new Map(customers.map((c) => [c.id, c.name]));
@@ -260,8 +265,26 @@ export function Dashboard({
         />
       </div>
 
-      {/* Secondary KPIs: pipeline */}
-      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+      {/* Secondary KPIs: pipeline.
+          "Quote requests" and "Quotes awaiting approval" are deliberately separate
+          tiles that point in opposite directions: a request is one YOU owe them, a
+          quote awaiting approval is one THEY owe you. One number for both would mean
+          two different things at once. */}
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+        <Kpi
+          label="Quote requests"
+          value={String(newRequests)}
+          accent={newRequests > 0 ? '#854F0B' : undefined}
+          sub={
+            newRequests > 0 ? (
+              <Link href="/app/orderflow/quotes" className="font-medium text-[#1E5E54] hover:underline">
+                needs a quote →
+              </Link>
+            ) : (
+              'from the website'
+            )
+          }
+        />
         <Kpi label="Quotes awaiting approval" value={String(kpis.quotesAwaiting)} sub="sent, not yet decided" />
         <Kpi label="Orders to invoice" value={String(kpis.ordersAwaiting)} sub="confirmed → delivered" />
         <Kpi label="Customers" value={String(customers.length)} sub="on file" />

@@ -22,7 +22,16 @@ import {
   type CdPriceOverride,
   type CdProduct,
 } from '@/lib/platform/coredata';
-import { docTotals, isoDatePlusDays, setupMessage, zar2, type OfCustomer, type OfSettings } from '@/lib/platform/orderflow';
+import {
+  docTotals,
+  isoDatePlusDays,
+  quoteRequestWho,
+  setupMessage,
+  zar2,
+  type OfCustomer,
+  type OfQuoteRequest,
+  type OfSettings,
+} from '@/lib/platform/orderflow';
 import { CustomerSelect, LineItemsEditor, nextDocNumber, type BuilderLine } from './builder';
 import { useToast } from './ui';
 import { Field, inputClass } from '@/components/platform/coredata/ui';
@@ -35,6 +44,8 @@ export function QuoteBuilder({
   overrides,
   settings,
   initialCustomerId,
+  initialLines = null,
+  quoteRequest = null,
 }: {
   customers: OfCustomer[];
   addresses: CdDeliveryAddress[];
@@ -43,6 +54,14 @@ export function QuoteBuilder({
   overrides: CdPriceOverride[];
   settings: OfSettings;
   initialCustomerId: string | null;
+  /** Unpriced lines seeded from a website enquiry. */
+  initialLines?: BuilderLine[] | null;
+  /**
+   * The website enquiry this quote answers, if any. Shown READ-ONLY — its text is never
+   * copied into the quote itself (notes are printed beside your banking details), and
+   * saving closes the enquiry out.
+   */
+  quoteRequest?: OfQuoteRequest | null;
 }) {
   const router = useRouter();
   const { org, email } = usePlatform();
@@ -59,7 +78,7 @@ export function QuoteBuilder({
   const [customerPo, setCustomerPo] = useState('');
   const [deliveryAddress, setDeliveryAddress] = useState('');
   const [notes, setNotes] = useState('');
-  const [lines, setLines] = useState<BuilderLine[]>([]);
+  const [lines, setLines] = useState<BuilderLine[]>(initialLines ?? []);
   const [busy, setBusy] = useState<null | 'draft' | 'sent'>(null);
 
   const customer = useMemo(() => customers.find((c) => c.id === customerId) ?? null, [customers, customerId]);
@@ -152,6 +171,28 @@ export function QuoteBuilder({
         }
       }
 
+      // Close the website enquiry this quote answers. Best-effort: the quote itself is
+      // already saved, and a stale 'new' request is a far better failure than losing it.
+      if (quoteRequest) {
+        await supabase
+          .from('of_quote_requests')
+          .update({
+            status: 'quoted',
+            quote_id: quote.id,
+            // The human just chose this customer for the enquiry — this is the ONLY
+            // place a request is ever linked to a real account. The extractor never
+            // does it, because a name typed into a public form proves nothing.
+            customer_id: customerId,
+            updated_at: nowIso,
+          })
+          .eq('id', quoteRequest.id)
+          .eq('org_id', org.id)
+          // Only close a still-open enquiry. Without this, using the browser Back button
+          // to the ?request= page and saving again would re-point the request at the
+          // newer quote (orphaning the first), or resurrect a dismissed one.
+          .eq('status', 'new');
+      }
+
       logActivity(supabase, {
         orgId: org.id,
         actorEmail: email,
@@ -196,6 +237,31 @@ export function QuoteBuilder({
           <h1 className="mt-1 text-[26px] font-bold text-[#1A1C1E]">New quote</h1>
         </div>
       </div>
+
+      {/* The enquiry, READ-ONLY. Its text is never copied into the quote: notes are
+          printed on the issued document beside your banking details, so a stranger's
+          free text must never arrive there pre-filled. Copy across what you mean to. */}
+      {quoteRequest ? (
+        <div className="mt-4 rounded-2xl border border-[#FBEEDA] bg-[#FFFDF7] p-4">
+          <div className="text-[12px] font-medium uppercase tracking-wide text-[#854F0B]">Website enquiry</div>
+          <div className="mt-1 text-[14px] font-medium text-[#1A1C1E]">
+            {quoteRequestWho(quoteRequest)}
+            {quoteRequest.business_name ? (
+              <span className="font-normal text-[#5F6368]"> · {quoteRequest.business_name}</span>
+            ) : null}
+          </div>
+          <div className="mt-0.5 flex flex-wrap gap-x-3 text-[12px] text-[#5F6368]">
+            {quoteRequest.contact_email ? <span>{quoteRequest.contact_email}</span> : null}
+            {quoteRequest.contact_phone ? <span>{quoteRequest.contact_phone}</span> : null}
+          </div>
+          {quoteRequest.message ? (
+            <p className="mt-2 whitespace-pre-wrap text-[13px] leading-snug text-[#1A1C1E]">{quoteRequest.message}</p>
+          ) : null}
+          <p className="mt-2 text-[11px] text-[#9A9DA1]">
+            Typed into a public form — unverified, and not copied onto the quote. Saving marks this enquiry as quoted.
+          </p>
+        </div>
+      ) : null}
 
       <div className="mt-6 space-y-5 rounded-2xl border border-[#E7E7E2] bg-white p-6">
         {/* Customer + dates */}

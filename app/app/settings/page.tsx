@@ -24,18 +24,29 @@ export default async function WorkspaceSettings() {
   const settings = await fetchSettings(db, orgId);
 
   // Email ingestion. RLS scopes all three reads to the caller's org.
-  const [addressRow, senderRows, eventRows] = await Promise.all([
-    db.from('email_ingest_addresses').select('local_part').eq('org_id', orgId).eq('active', true).maybeSingle(),
+  //
+  // Two addresses, two independent secrets: 'documents' goes to your suppliers,
+  // 'quotes' goes into your website's contact form. Rows written before the purpose
+  // column existed default to 'documents', which is the stricter lane.
+  const [addressRows, senderRows, eventRows] = await Promise.all([
+    db
+      .from('email_ingest_addresses')
+      .select('local_part, purpose')
+      .eq('org_id', orgId)
+      .eq('active', true),
     db.from('email_ingest_senders').select('id, email, status').eq('org_id', orgId).order('created_at', { ascending: false }),
     db
       .from('email_ingests')
-      .select('id, from_email, subject, status, documents_created, error, created_at')
+      .select('id, from_email, subject, status, documents_created, error, created_at, tag')
       .eq('org_id', orgId)
       .order('created_at', { ascending: false })
       .limit(8),
   ]);
 
-  const localPart = (addressRow.data as { local_part: string } | null)?.local_part ?? null;
+  const addresses = (addressRows.data ?? []) as { local_part: string; purpose: string | null }[];
+  const localPart = addresses.find((a) => (a.purpose ?? 'documents') === 'documents')?.local_part ?? null;
+  const quotesLocalPart = addresses.find((a) => a.purpose === 'quotes')?.local_part ?? null;
+
   const role = session.profile?.role;
   const canManage = role === 'owner' || role === 'admin';
 
@@ -55,6 +66,7 @@ export default async function WorkspaceSettings() {
           configured={Boolean(INGEST_DOMAIN)}
           canManage={canManage}
           address={localPart ? addressFor(localPart) : null}
+          quotesAddress={quotesLocalPart ? addressFor(quotesLocalPart) : null}
           senders={(senderRows.data ?? []) as IngestSender[]}
           events={(eventRows.data ?? []) as IngestEvent[]}
         />

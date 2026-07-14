@@ -17,6 +17,8 @@ export interface IngestEvent {
   documents_created: number;
   error: string | null;
   created_at: string;
+  /** Which lane it arrived on: null/'documents' or 'quotes'. */
+  tag: string | null;
 }
 
 const STATUS_STYLE: Record<string, { bg: string; fg: string; label: string }> = {
@@ -37,12 +39,15 @@ const STATUS_STYLE: Record<string, { bg: string; fg: string; label: string }> = 
  */
 export function EmailIngestCard({
   address,
+  quotesAddress,
   senders,
   events,
   configured,
   canManage,
 }: {
   address: string | null;
+  /** The org's SEPARATE enquiry address (its own secret, not derived from `address`). */
+  quotesAddress?: string | null;
   senders: IngestSender[];
   events: IngestEvent[];
   configured: boolean;
@@ -50,7 +55,7 @@ export function EmailIngestCard({
 }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [copied, setCopied] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [newSender, setNewSender] = useState('');
 
@@ -82,12 +87,11 @@ export function EmailIngestCard({
     }
   }
 
-  async function copy() {
-    if (!address) return;
+  async function copy(value: string) {
     try {
-      await navigator.clipboard.writeText(address);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1800);
+      await navigator.clipboard.writeText(value);
+      setCopied(value);
+      setTimeout(() => setCopied(null), 1800);
     } catch {
       /* clipboard unavailable — the address is selectable anyway */
     }
@@ -112,40 +116,118 @@ export function EmailIngestCard({
         Forward supplier invoices and customer orders to this address and Vyso files them automatically.
       </p>
 
-      {/* The address */}
+      {/* Two SEPARATE addresses, each its own secret, with deliberately different trust
+          models (documents need an approved sender; enquiries come from strangers by
+          definition). They are kept apart so publishing the enquiry address — which
+          rides in every website form submission — never exposes the document one. */}
       <div className="mt-3">
         {address ? (
-          <div className="flex flex-wrap items-center gap-2">
-            <code className="min-w-0 flex-1 truncate rounded-lg border border-[#E7E7E2] bg-[#FAFAF8] px-3 py-2 text-[13px] text-[#1A1C1E]">
-              {address}
-            </code>
-            <button
-              type="button"
-              onClick={() => void copy()}
-              className="h-9 shrink-0 rounded-lg border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/30"
-            >
-              {copied ? 'Copied' : 'Copy'}
-            </button>
-            {canManage ? (
-              <button
-                type="button"
-                disabled={busy}
-                onClick={() => {
-                  if (confirm('Rotate the address? The old one stops working immediately.')) {
-                    void post('/api/email/address', { rotate: true });
-                  }
-                }}
-                className="h-9 shrink-0 rounded-lg px-3 text-[13px] text-[#5F6368] transition-colors hover:bg-[#FAFAF8] disabled:opacity-40"
-              >
-                Rotate
-              </button>
-            ) : null}
+          <div className="space-y-2">
+            <div>
+              <div className="mb-1 text-[12px] font-medium uppercase tracking-wide text-[#9A9DA1]">
+                Documents — invoices, delivery notes
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <code className="min-w-0 flex-1 truncate rounded-lg border border-[#E7E7E2] bg-[#FAFAF8] px-3 py-2 text-[13px] text-[#1A1C1E]">
+                  {address}
+                </code>
+                <button
+                  type="button"
+                  onClick={() => void copy(address)}
+                  className="h-9 shrink-0 rounded-lg border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/30"
+                >
+                  {copied === address ? 'Copied' : 'Copy'}
+                </button>
+                {canManage ? (
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => {
+                      if (
+                        confirm(
+                          'Rotate the document address? Every supplier forwarding invoices to the old one will stop reaching you until you give them the new one.',
+                        )
+                      ) {
+                        void post('/api/email/address', { purpose: 'documents', rotate: true });
+                      }
+                    }}
+                    className="h-9 shrink-0 rounded-lg px-3 text-[13px] text-[#5F6368] transition-colors hover:bg-[#FAFAF8] disabled:opacity-40"
+                  >
+                    Rotate
+                  </button>
+                ) : null}
+              </div>
+              <p className="mt-1 text-[12px] text-[#9A9DA1]">
+                Attachments only, and only from an approved sender.
+              </p>
+            </div>
+
+            {/* A SEPARATE secret. This one gets pasted into a website form vendor's
+                config and rides in the To: header of every enquiry, so it leaks by
+                design — which is exactly why it must not be derived from the address
+                above. Rotating it doesn't touch your suppliers. */}
+            <div>
+              <div className="mb-1 text-[12px] font-medium uppercase tracking-wide text-[#9A9DA1]">
+                Website enquiries — quote requests
+              </div>
+              {quotesAddress ? (
+                <>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <code className="min-w-0 flex-1 truncate rounded-lg border border-[#E7E7E2] bg-[#FAFAF8] px-3 py-2 text-[13px] text-[#1A1C1E]">
+                      {quotesAddress}
+                    </code>
+                    <button
+                      type="button"
+                      onClick={() => void copy(quotesAddress)}
+                      className="h-9 shrink-0 rounded-lg border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/30"
+                    >
+                      {copied === quotesAddress ? 'Copied' : 'Copy'}
+                    </button>
+                    {canManage ? (
+                      <button
+                        type="button"
+                        disabled={busy}
+                        onClick={() => {
+                          if (confirm('Rotate the enquiry address? Update your website form afterwards. Your suppliers are unaffected.')) {
+                            void post('/api/email/address', { purpose: 'quotes', rotate: true });
+                          }
+                        }}
+                        className="h-9 shrink-0 rounded-lg px-3 text-[13px] text-[#5F6368] transition-colors hover:bg-[#FAFAF8] disabled:opacity-40"
+                      >
+                        Rotate
+                      </button>
+                    ) : null}
+                  </div>
+                  <p className="mt-1 text-[12px] text-[#9A9DA1]">
+                    Send your website&apos;s contact form here. No sender approval — enquiries come from the public — so
+                    they land on the Quotes page to triage, capped at 100/day, and nothing is priced automatically.
+                  </p>
+                </>
+              ) : canManage ? (
+                <>
+                  <button
+                    type="button"
+                    disabled={busy}
+                    onClick={() => void post('/api/email/address', { purpose: 'quotes' })}
+                    className="h-9 rounded-lg border border-[#E7E7E2] bg-white px-3.5 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/30 disabled:opacity-40"
+                  >
+                    {busy ? 'Creating…' : 'Create enquiry address'}
+                  </button>
+                  <p className="mt-1 text-[12px] text-[#9A9DA1]">
+                    A separate address for your website&apos;s contact form. Kept apart from the document address so
+                    publishing one never exposes the other.
+                  </p>
+                </>
+              ) : (
+                <p className="text-[13px] text-[#9A9DA1]">None yet — an owner or admin can create one.</p>
+              )}
+            </div>
           </div>
         ) : canManage ? (
           <button
             type="button"
             disabled={busy}
-            onClick={() => void post('/api/email/address', {})}
+            onClick={() => void post('/api/email/address', { purpose: 'documents' })}
             className="h-9 rounded-lg bg-[#1E5E54] px-3.5 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:opacity-40"
           >
             {busy ? 'Creating…' : 'Create ingestion address'}
@@ -286,9 +368,11 @@ export function EmailIngestCard({
                       <span className="text-[#9A9DA1]"> — {e.from_email}</span>
                     </span>
                     <span className="shrink-0 text-[12px] text-[#9A9DA1]">
-                      {e.documents_created > 0
-                        ? `${e.documents_created} doc${e.documents_created === 1 ? '' : 's'}`
-                        : '—'}
+                      {e.documents_created === 0
+                        ? '—'
+                        : e.tag === 'quotes'
+                          ? 'enquiry'
+                          : `${e.documents_created} doc${e.documents_created === 1 ? '' : 's'}`}
                     </span>
                     {canManage && e.status !== 'done' && e.status !== 'processing' ? (
                       <button

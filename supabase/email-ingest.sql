@@ -36,9 +36,16 @@ create table if not exists email_ingest_addresses (
 -- The address is the routing key, so it must be globally unique (case-insensitive).
 create unique index if not exists email_ingest_addresses_local_part_uidx
   on email_ingest_addresses (lower(local_part));
--- One active address per org (rotate by deactivating the old one).
-create unique index if not exists email_ingest_addresses_org_active_uidx
-  on email_ingest_addresses (org_id) where active;
+-- One active address per org PER PURPOSE. Superseded quote-requests.sql, which adds the
+-- `purpose` column and this partial index; kept here (matching that form) so re-running
+-- this base file can never reinstate the old one-active-address-per-org constraint,
+-- which would make the two-lane (documents + quotes) model impossible.
+-- Do NOT re-add `... (org_id) where active` here.
+alter table email_ingest_addresses
+  add column if not exists purpose text not null default 'documents';
+drop index if exists email_ingest_addresses_org_active_uidx;
+create unique index if not exists email_ingest_addresses_org_purpose_active_uidx
+  on email_ingest_addresses (org_id, purpose) where active;
 
 
 -- ── Who may send to it ──────────────────────────────────────────────────────

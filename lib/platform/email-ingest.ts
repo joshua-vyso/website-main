@@ -2,16 +2,21 @@ import 'server-only';
 import { Resend } from 'resend';
 import type { SupabaseClient } from '@supabase/supabase-js';
 import { ingestDocument } from '@/lib/platform/document-ingest';
+import { extractQuoteRequest } from '@/lib/ai/anthropic';
+import { isUniqueViolation } from '@/lib/platform/db-errors';
 import {
   INGEST_DOMAIN,
   MAX_ATTACHMENT_BYTES,
   authResultsFromHeaders,
   authResultsFromRawMime,
+  htmlToText,
+  isIngestTag,
   localPartForIngestDomain,
   parseEmailAddress,
   passesSenderAuth,
   selectIngestableAttachments,
   type AttachmentLite,
+  type IngestTag,
   type SenderStatus,
 } from '@/lib/platform/email-ingest-policy';
 
@@ -53,28 +58,94 @@ export const emailIngestConfigured = Boolean(
 );
 
 /**
- * Resolve the org from the recipients — the ONLY trusted routing signal. Returns
- * the first recipient that matches an active ingest address.
+ * Resolve the org AND its intake lane from the recipients — the ONLY trusted routing
+ * signal. Returns the first recipient that matches an active ingest address.
+ *
+ * The lane is the matched ADDRESS ROW's purpose. Each lane has its own secret local
+ * part, so a sender cannot move their mail into a different trust model: reaching the
+ * quote lane requires the quote token, and reaching the document lane requires the
+ * document token (and then still an approved, DKIM-aligned sender).
  */
 export async function resolveOrgFromRecipients(
   supabase: SupabaseClient,
   recipients: string[],
-): Promise<{ orgId: string; toAddress: string } | null> {
+): Promise<{ orgId: string; toAddress: string; tag: IngestTag } | 'error' | null> {
   for (const raw of recipients) {
     const address = parseEmailAddress(raw);
     if (!address) continue;
     const localPart = localPartForIngestDomain(address);
     if (!localPart) continue;
-    const { data } = await supabase
+    const { data, error } = await supabase
       .from('email_ingest_addresses')
-      .select('org_id')
+      .select('org_id, purpose')
       .eq('local_part', localPart)
       .eq('active', true)
       .maybeSingle();
-    const orgId = (data as { org_id: string } | null)?.org_id;
-    if (orgId) return { orgId, toAddress: address };
+    // A query FAILURE is not the same as "no such address". If we swallow it and return
+    // null, the webhook answers 200 unknown-address, Resend never retries, and a real
+    // invoice is lost with no trace on a transient DB blip (or a not-yet-applied
+    // migration). Surface it so the caller can 5xx and let Resend redeliver.
+    if (error) return 'error';
+    const row = data as { org_id: string; purpose: string | null } | null;
+    if (!row?.org_id) continue;
+    // An unrecognised purpose falls back to the document lane, which is the STRICTER
+    // one. Failing toward "needs an approved sender" is the safe direction.
+    return {
+      orgId: row.org_id,
+      toAddress: address,
+      tag: isIngestTag(row.purpose) ? row.purpose : 'documents',
+    };
   }
   return null;
+}
+
+/**
+ * The quote lane deliberately has no sender allowlist — a public contact form is
+ * strangers by definition, and authenticating the mail would prove nothing the form
+ * itself doesn't already permit. That makes abuse a VOLUME problem, so volume is what
+ * we cap.
+ */
+export const QUOTE_REQUESTS_PER_DAY = 100;
+
+/**
+ * Has this org taken more quote-lane mail than the cap allows in the last 24h?
+ *
+ * Counted AFTER the row for the current email is inserted, so the count includes it.
+ * Checking before inserting was a time-of-check/time-of-use hole: Resend delivers in
+ * parallel and the webhook scales out, so a burst of emails could all read the same
+ * pre-insert count, all pass, and all be queued — the cap would be enforced against a
+ * number that was already stale.
+ *
+ * Fails CLOSED. If the count query itself errors — which is exactly what happens when
+ * the database is under the load the cap exists to shed — the previous version
+ * returned 0 and silently disabled the limit. A rate limiter that turns itself off
+ * under pressure is not a rate limiter.
+ */
+export async function quoteCapExceeded(supabase: SupabaseClient, orgId: string): Promise<boolean> {
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+  // Excludes 'ignored'. Over-cap mail is recorded as 'ignored' and consumes no AI call,
+  // so counting it would let a slow junk drip (≈101/day) pin the count over the cap
+  // forever and wedge the lane — every genuine enquiry thereafter dropped, with the
+  // table never draining. Counting only mail that actually got queued/processed bounds
+  // AI spend to ~cap per window AND lets the lane self-heal 24h after a burst.
+  //
+  // A bounded existence check, not an exact COUNT: stop at cap+1 rows so the query cost
+  // can't grow with the size of a flood (an exact count over an unbounded window is
+  // O(N) per email → O(N²) under attack, on the same DB the document lane shares).
+  const { data, error } = await supabase
+    .from('email_ingests')
+    .select('id')
+    .eq('org_id', orgId)
+    .eq('tag', 'quotes')
+    .neq('status', 'ignored')
+    .gte('created_at', since)
+    .limit(QUOTE_REQUESTS_PER_DAY + 1);
+
+  // Fails CLOSED: a query error — exactly what happens when the DB is under the load the
+  // cap exists to shed — must not silently disable the limit.
+  if (error || !data) return true;
+  return data.length > QUOTE_REQUESTS_PER_DAY;
 }
 
 /**
@@ -109,60 +180,148 @@ export async function recordPendingSender(supabase: SupabaseClient, orgId: strin
 }
 
 /**
- * Process one queued email: fetch it from Resend, verify the sender is authentic,
- * turn each ingestable attachment into a document, and close the row out.
+ * A 'processing' row is considered abandoned after this long, and only then may another
+ * worker re-claim it.
  *
- * Safe to run twice. It claims the row with a compare-and-swap (so the webhook's
- * after() and the cron can't both work it), and records each attachment as it lands
- * (so a timeout partway through doesn't re-file what already succeeded).
+ * This MUST stay larger than every route's maxDuration (all 300s / 5min). A worker that
+ * is still alive holds a claimed_at younger than this, so it can never be re-claimed out
+ * from under itself; a row older than this is one whose worker was actually killed, so
+ * re-claiming it is safe and there is no live writer left to clobber the winner. Keep
+ * this invariant if either number ever changes.
+ */
+export const STALE_PROCESSING_MS = 10 * 60 * 1000;
+
+interface IngestRow {
+  id: string;
+  org_id: string;
+  resend_email_id: string;
+  status: string;
+  attempts: number;
+  documents_created: number;
+  processed_attachment_ids: string[] | null;
+  tag: string | null;
+  created_at: string;
+}
+
+type FailFn = (error: string, status?: 'failed' | 'quarantined' | 'ignored') => Promise<void>;
+
+/** What Resend's GET /emails/receiving/:id gives us back. */
+type ReceivedEmail = Awaited<ReturnType<Resend['emails']['receiving']['get']>>['data'];
+
+/**
+ * Find the Authentication-Results the receiving MTA stamped on this email.
+ *
+ * Resend's header map is a curated subset and in practice omits Authentication-Results,
+ * so this falls back to the RAW message, which is where it actually lives.
+ */
+async function resolveSenderAuth(
+  email: NonNullable<ReceivedEmail>,
+): Promise<{ authResults: string | null; source: string }> {
+  const fromHeaders = authResultsFromHeaders(email.headers);
+  if (fromHeaders) return { authResults: fromHeaders, source: 'headers' };
+
+  if (email.raw?.download_url) {
+    try {
+      const res = await fetch(email.raw.download_url);
+      if (res.ok) {
+        const authResults = authResultsFromRawMime(await res.text());
+        if (authResults) return { authResults, source: 'raw' };
+      }
+    } catch {
+      /* fall through — the caller reports what we found (or didn't) */
+    }
+  }
+  return { authResults: null, source: 'none' };
+}
+
+/**
+ * Process one queued email. Two lanes, chosen by the PURPOSE of the address it arrived
+ * at (recorded on the row as `tag`), never by its content:
+ *
+ *   'documents' — invoices and delivery notes. The sender must be on the allowlist AND
+ *                 pass SPF/DKIM aligned to their From domain, because these become
+ *                 financial records with no human in the loop.
+ *   'quotes'    — a website enquiry. No allowlist, no auth gate (see the note on
+ *                 QUOTE_REQUESTS_PER_DAY), and it produces a triage row that a human
+ *                 must action before anything is priced or linked.
+ *
+ * Safe to run twice either way. It claims the row with a compare-and-swap (so the
+ * webhook's after() and the cron can't both work it) and records progress as it goes.
  */
 export async function processEmailIngest(supabase: SupabaseClient, ingestId: string): Promise<void> {
   const { data: row } = await supabase
     .from('email_ingests')
-    .select('id, org_id, resend_email_id, status, attempts, documents_created, processed_attachment_ids')
+    .select('id, org_id, resend_email_id, status, attempts, documents_created, processed_attachment_ids, tag, created_at')
     .eq('id', ingestId)
     .maybeSingle();
-  const ingest = row as
-    | {
-        id: string;
-        org_id: string;
-        resend_email_id: string;
-        status: string;
-        attempts: number;
-        documents_created: number;
-        processed_attachment_ids: string[] | null;
-      }
-    | null;
+  const ingest = row as IngestRow | null;
   if (!ingest) return;
   if (ingest.status !== 'queued' && ingest.status !== 'processing') return;
 
-  const orgId = ingest.org_id;
-
-  // CLAIM it: only the caller that flips the row off the exact values we just read
-  // gets to run. Otherwise the webhook's after() and the cron can both grab the same
-  // email and ingest it twice.
-  const { data: claimed } = await supabase
+  // CLAIM it atomically. The claim's WHERE clause — not the value we happened to read —
+  // is the concurrency guard: the UPDATE only lands on a row that is still 'queued', or
+  // one that is 'processing' but whose claim has gone STALE. Postgres re-checks that
+  // predicate under the row lock, so of two racing workers exactly one matches.
+  //
+  // The old CAS matched on (status, attempts) read a moment earlier, which let a second
+  // caller that read the row AFTER the first worker claimed it (both see processing,
+  // attempts=N) match and claim it too — two workers on one email: a doubled AI call, or
+  // in the document lane, the same attachments filed twice. Because maxDuration (5min) <
+  // STALE_PROCESSING_MS (10min), a still-running worker's row is never stale, so this
+  // predicate can't steal a live claim — and a row that IS stale has a dead worker, so
+  // there's no one left to clobber.
+  const staleBefore = new Date(Date.now() - STALE_PROCESSING_MS).toISOString();
+  const { data: claimed, error: claimErr } = await supabase
     .from('email_ingests')
-    .update({ status: 'processing', attempts: (ingest.attempts ?? 0) + 1 })
+    .update({
+      status: 'processing',
+      attempts: (ingest.attempts ?? 0) + 1,
+      claimed_at: new Date().toISOString(),
+    })
     .eq('id', ingest.id)
-    .eq('status', ingest.status)
-    .eq('attempts', ingest.attempts ?? 0)
+    .or(`status.eq.queued,and(status.eq.processing,claimed_at.lt.${staleBefore})`)
     .select('id')
     .maybeSingle();
-  if (!claimed) return; // someone else is already on it
 
-  const fail = async (error: string, status: 'failed' | 'quarantined' | 'ignored' = 'failed') => {
+  // A broken UPDATE (e.g. a missing column before the migration is applied) is NOT the
+  // same as losing the race: surface it as a retryable failure instead of a silent
+  // no-op that would strand every email in the queue with no trace.
+  if (claimErr) {
+    await supabase
+      .from('email_ingests')
+      .update({ status: 'failed', error: `Could not claim the email: ${claimErr.message}`.slice(0, 500) })
+      .eq('id', ingest.id);
+    return;
+  }
+  if (!claimed) return; // someone else holds a live claim
+
+  const fail: FailFn = async (error, status = 'failed') => {
     await supabase
       .from('email_ingests')
       .update({ status, error: error.slice(0, 500), processed_at: new Date().toISOString() })
       .eq('id', ingest.id);
   };
 
+  try {
+    if (ingest.tag === 'quotes') {
+      await runQuoteRequest(supabase, ingest, fail);
+    } else {
+      await runDocumentIngest(supabase, ingest, fail);
+    }
+  } catch (err) {
+    await fail(err instanceof Error ? err.message : 'Processing failed.');
+  }
+}
+
+/** The document lane — attachments become Doc-U documents (and OrderFlow orders). */
+async function runDocumentIngest(supabase: SupabaseClient, ingest: IngestRow, fail: FailFn): Promise<void> {
+  const orgId = ingest.org_id;
+
   // Attachments already filed on an earlier attempt — re-filing them would duplicate
   // invoices, and the AI step is slow enough that a run really can die halfway.
   const alreadyDone = new Set(ingest.processed_attachment_ids ?? []);
 
-  try {
+  {
     const resend = new Resend(RESEND_INBOUND_KEY);
 
     // Full message — gives us the headers (SPF/DKIM) and the subject.
@@ -174,24 +333,8 @@ export async function processEmailIngest(supabase: SupabaseClient, ingestId: str
 
     // From: is spoofable — the allowlist only means something if the mail is
     // authentic AND the domain that passed matches who it claims to be from.
-    //
-    // Resend's header map is a curated subset and omits Authentication-Results, so
-    // fall back to the RAW message, which is where the receiving MTA stamps it.
     const fromEmail = parseEmailAddress(email.from) ?? '';
-    let authResults = authResultsFromHeaders(email.headers);
-    let authSource = authResults ? 'headers' : 'none';
-    if (!authResults && email.raw?.download_url) {
-      try {
-        const rawRes = await fetch(email.raw.download_url);
-        if (rawRes.ok) {
-          const rawText = await rawRes.text();
-          authResults = authResultsFromRawMime(rawText);
-          if (authResults) authSource = 'raw';
-        }
-      } catch {
-        /* fall through to the failure below, which reports what we found */
-      }
-    }
+    const { authResults, source: authSource } = await resolveSenderAuth(email);
 
     if (!passesSenderAuth(authResults, fromEmail)) {
       // Say precisely WHY, so a rejection is diagnosable instead of a dead end:
@@ -273,7 +416,125 @@ export async function processEmailIngest(supabase: SupabaseClient, ingestId: str
         processed_at: new Date().toISOString(),
       })
       .eq('id', ingest.id);
-  } catch (err) {
-    await fail(err instanceof Error ? err.message : 'Processing failed.');
   }
+}
+
+/**
+ * The quote lane — a website contact-form email becomes ONE triage row.
+ *
+ * Everything the extractor returns here was typed by an anonymous stranger into a
+ * public form, so the row records what they CLAIMED and links to nothing. In
+ * particular it never resolves to an of_customers row: "Woolworths" in a contact form
+ * is a claim, not an identity, and auto-linking it would let anyone on the internet
+ * attach themselves to a real customer's record.
+ */
+async function runQuoteRequest(supabase: SupabaseClient, ingest: IngestRow, fail: FailFn): Promise<void> {
+  const done = async () => {
+    await supabase
+      .from('email_ingests')
+      .update({ status: 'done', documents_created: 1, error: null, processed_at: new Date().toISOString() })
+      .eq('id', ingest.id);
+  };
+
+  // Put the row back in the queue for the daily cron to retry, bounded by the cron's
+  // give-up sweep (attempts >= MAX_ATTEMPTS). Used for transient faults where 'failed'
+  // would be a dead end — the cron only re-drives 'queued'/stale-'processing', never
+  // 'failed'. attempts was already bumped by the claim.
+  const requeue = async (why: string) => {
+    await supabase
+      .from('email_ingests')
+      .update({ status: 'queued', error: why.slice(0, 500) })
+      .eq('id', ingest.id);
+  };
+
+  // Already turned into a lead on an earlier attempt. Check BEFORE doing any work: the
+  // unique index on email_ingest_id keeps a retry from duplicating the lead, but it only
+  // does so at insert time — by then the Resend fetch and the AI call have already been
+  // paid for. The cron re-drives any row that died before its final status write, so
+  // this path is hit in normal operation, not just when someone clicks Retry.
+  const { data: existing, error: existingErr } = await supabase
+    .from('of_quote_requests')
+    .select('id')
+    .eq('email_ingest_id', ingest.id)
+    .maybeSingle();
+  // Fail CLOSED: if we can't tell whether a lead already exists, don't barrel into the
+  // paid Resend + AI path. The whole point of this check is to NOT re-pay on a retry.
+  if (existingErr) {
+    await requeue(`Could not check for an existing lead: ${existingErr.message}`);
+    return;
+  }
+  if (existing) {
+    await done();
+    return;
+  }
+
+  const resend = new Resend(RESEND_INBOUND_KEY);
+
+  const { data: email, error: getErr } = await resend.emails.receiving.get(ingest.resend_email_id);
+  if (getErr || !email) {
+    await fail(getErr?.message ?? 'Could not fetch the email from Resend.');
+    return;
+  }
+
+  const body = (email.text?.trim() || (email.html ? htmlToText(email.html) : '')).trim();
+  if (!body) {
+    await fail('The enquiry had no readable body.', 'ignored');
+    return;
+  }
+
+  // NOTE: no sender-auth check here, and deliberately not even a display-only one. The
+  // raw-MIME fetch it needs is an unbounded download of attacker-controlled bytes, and
+  // in this lane the attacker is any stranger — a real cost for a value that could tell
+  // us nothing anyway. A passing signature would only prove the WEBSITE's mailer sent
+  // the mail; it says nothing about who filled the form in, which is the only question
+  // that matters here.
+  const fromEmail = parseEmailAddress(email.from) ?? '';
+
+  const extraction = await extractQuoteRequest({
+    from: email.from ?? '',
+    subject: email.subject ?? '',
+    body,
+  });
+
+  // A malformed/truncated response is a FAULT, not a verdict. Treating it as "not an
+  // enquiry" would bin a real lead under a confidently wrong reason. Re-queue so the
+  // cron retries it (a terminal 'failed'/'ignored' would never be re-driven); a
+  // persistent fault is caught by the give-up sweep after MAX_ATTEMPTS.
+  if (!extraction.parsed_ok) {
+    await requeue('Could not read the enquiry yet (the extractor returned no usable JSON). Will retry.');
+    return;
+  }
+
+  // Auto-replies, bounces and newsletters are mail, not leads.
+  if (!extraction.is_enquiry) {
+    await fail('Not a sales enquiry (auto-reply, bounce or spam).', 'ignored');
+    return;
+  }
+
+  const { error: insErr } = await supabase.from('of_quote_requests').insert({
+    org_id: ingest.org_id,
+    source: 'email',
+    email_ingest_id: ingest.id,
+    from_email: fromEmail || null,
+    contact_name: extraction.contact_name,
+    contact_email: extraction.contact_email,
+    contact_phone: extraction.contact_phone,
+    business_name: extraction.business_name,
+    // Fall back to the subject so a lead is never completely blank in the list.
+    message: extraction.message ?? (email.subject ? email.subject.slice(0, 1500) : null),
+    requested_items: extraction.items,
+    status: 'new',
+    // When the enquiry ARRIVED, not when it was materialised — a cron re-drive can
+    // insert the lead days later, and the inbox sorts on this, so the default now()
+    // would file an old enquiry above genuinely newer ones.
+    received_at: ingest.created_at,
+  });
+
+  // Lost a race with a concurrent worker — it recorded the lead, so we're done.
+  if (insErr && !isUniqueViolation(insErr)) {
+    await fail(insErr.message ?? 'Could not record the enquiry.');
+    return;
+  }
+
+  await done();
 }

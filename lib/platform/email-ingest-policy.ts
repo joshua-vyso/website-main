@@ -45,12 +45,51 @@ export function parseEmailAddress(raw: string): string | null {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(candidate) ? candidate : null;
 }
 
-/** The address's local part, if it belongs to our ingest domain. */
+/**
+ * The two intake lanes.
+ *
+ *   'documents' — invoices, delivery notes, statements. Becomes financial records
+ *                 with no human in the loop, so the sender must be allowlisted AND
+ *                 pass SPF/DKIM aligned to their From domain.
+ *   'quotes'    — website enquiries. No allowlist (a public form is strangers by
+ *                 definition); rate-capped, and only ever produces a triage row.
+ *
+ * Each lane has its OWN secret local part, stored with its purpose. The lane is then
+ * whatever the matched address row says it is — never anything from the mail itself,
+ * since From/Subject/body are all attacker-controlled and a sender must not be able to
+ * choose which trust model they're judged under.
+ *
+ * The lanes are two separate secrets on purpose. They leak differently: the document
+ * address is handed to every supplier who forwards mail, and the quotes address is
+ * pasted into a website form vendor's config and rides in the To: header of every
+ * enquiry. Deriving one from the other (a "+quotes" tag on the same token, say) would
+ * mean leaking either one hands over both, and rotating either one silently blackholes
+ * the other.
+ */
+export type IngestTag = 'documents' | 'quotes';
+
+export function isIngestTag(value: unknown): value is IngestTag {
+  return value === 'documents' || value === 'quotes';
+}
+
+/**
+ * The local part to look up for an address on our ingest domain, or null if the address
+ * isn't ours.
+ *
+ * A `+tag` suffix is stripped before the lookup — mail clients and forwarding rules add
+ * them freely, and an invoice sent to `token+jan@…` must still find the mailbox. It has
+ * NO routing meaning: the lane comes from the address row we find, not from the tag.
+ */
 export function localPartForIngestDomain(address: string): string | null {
   if (!INGEST_DOMAIN) return null;
   const [local, domain] = address.split('@');
   if (!local || !domain) return null;
-  return domain.toLowerCase() === INGEST_DOMAIN ? local.toLowerCase() : null;
+  if (domain.toLowerCase() !== INGEST_DOMAIN) return null;
+
+  const lower = local.toLowerCase();
+  const plus = lower.indexOf('+');
+  const base = plus === -1 ? lower : lower.slice(0, plus);
+  return base || null;
 }
 
 /** A fresh secret local part for an org, e.g. "morco-3f9a2c7b41d8". */
@@ -208,6 +247,52 @@ export function passesSenderAuth(authResults: string | null, fromEmail: string):
     }
   }
   return false;
+}
+
+/**
+ * Best-effort HTML → text, for contact-form mail that has no plain-text part.
+ *
+ * This is NOT a sanitiser and its output is never rendered as HTML — it exists only
+ * to give the extractor readable prose instead of markup. Script and style bodies are
+ * dropped outright rather than flattened, because their contents are not text the
+ * enquirer wrote and would otherwise land in the extracted message.
+ */
+export function htmlToText(html: string): string {
+  return html
+    // Match to the closing tag OR to end-of-input: an unterminated <script>/<style>
+    // would otherwise fall through to the generic tag-stripper and dump its body into the
+    // "message" as if the enquirer had typed it. Safe here because that body is never
+    // prose the enquirer wrote.
+    .replace(/<(script|style)\b[^>]*>[\s\S]*?(?:<\/\1\s*>|$)/gi, ' ')
+    // <title> is chrome, not the enquiry — drop it (with the end-of-input fallback, since
+    // its content is never the message either).
+    .replace(/<title\b[^>]*>[\s\S]*?(?:<\/title\s*>|$)/gi, ' ')
+    // <head> WITHOUT an end-of-input fallback: a mangled, unterminated <head> must not eat
+    // the whole body and drop the enquiry. A missing </head> degrades to "body survives".
+    .replace(/<head\b[^>]*>[\s\S]*?<\/head\s*>/gi, ' ')
+    // Hidden preheader blocks (display:none / visibility:hidden / zero-size) are standard
+    // in HTML email and their text is invisible to a human reading the source — dropping
+    // the whole subtree keeps attacker text that appears ONLY in Vyso out of the lead.
+    .replace(
+      /<(\w+)\b[^>]*style\s*=\s*["'][^"']*(?:display\s*:\s*none|visibility\s*:\s*hidden|(?:max-)?height\s*:\s*0|font-size\s*:\s*0|opacity\s*:\s*0)[^"']*["'][^>]*>[\s\S]*?<\/\1\s*>/gi,
+      ' ',
+    )
+    .replace(/<!--[\s\S]*?-->/g, ' ')
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<\/(p|div|tr|li|h[1-6]|table)>/gi, '\n')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;|&apos;/gi, "'")
+    .replace(/[ \t]+/g, ' ')
+    .replace(/\n\s*\n\s*\n+/g, '\n\n')
+    .split('\n')
+    .map((l) => l.trim())
+    .join('\n')
+    .trim();
 }
 
 export interface AttachmentLite {

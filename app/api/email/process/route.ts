@@ -1,13 +1,11 @@
 import { NextResponse } from 'next/server';
 import { createServiceSupabase } from '@/lib/platform/supabase-service';
-import { processEmailIngest } from '@/lib/platform/email-ingest';
+import { processEmailIngest, STALE_PROCESSING_MS } from '@/lib/platform/email-ingest';
 
 export const maxDuration = 300;
 
 /** Give up on an email after this many attempts so a poison message can't loop. */
 const MAX_ATTEMPTS = 3;
-/** A row stuck in 'processing' longer than this lost its invocation (timeout/crash). */
-const STALE_PROCESSING_MS = 10 * 60 * 1000;
 /** Bounded per run so one invocation can't run past its budget. */
 const BATCH = 5;
 
@@ -47,13 +45,18 @@ export async function GET(req: Request) {
     .order('created_at', { ascending: true })
     .limit(BATCH);
 
+  // Staleness is measured from when a worker CLAIMED the row, not from when the email
+  // arrived. A NULL claimed_at (a row left 'processing' by pre-migration code, or any
+  // future writer that forgets to stamp it) must read as STALE — `claimed_at < x` is
+  // NULL-not-true in SQL, so without the explicit is.null it would be excluded forever
+  // and the email stranded with no recovery path.
   const { data: stale } = await supabase
     .from('email_ingests')
     .select('id')
     .eq('status', 'processing')
     .lt('attempts', MAX_ATTEMPTS)
-    .lt('created_at', staleBefore)
-    .order('created_at', { ascending: true })
+    .or(`claimed_at.is.null,claimed_at.lt.${staleBefore}`)
+    .order('claimed_at', { ascending: true, nullsFirst: true })
     .limit(BATCH);
 
   const ids = [

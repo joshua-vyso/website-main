@@ -322,6 +322,58 @@ export interface OfQuoteItem extends OfDocItem {
   quote_id: string;
 }
 
+// ---------------------------------------------------------------------------
+// Quote requests — website enquiries
+// ---------------------------------------------------------------------------
+
+/** A lead, not a quote: it has no prices and has never burned a QTE- number. */
+export type QuoteRequestStatus = 'new' | 'quoted' | 'dismissed';
+
+export interface QuoteRequestItem {
+  description: string;
+  quantity: string;
+  unit: string;
+}
+
+/**
+ * An enquiry from the public website contact form.
+ *
+ * Every field the enquirer supplied is UNTRUSTED — anyone can type "Woolworths" into
+ * an open form — so `customer_id` is null until a human links it, and `quote_id` is
+ * null until a human drafts the quote.
+ */
+export interface OfQuoteRequest {
+  id: string;
+  org_id: string;
+  source: string;
+  email_ingest_id: string | null;
+  /** The website's mailer — NOT the person who filled the form in. */
+  from_email: string | null;
+  contact_name: string | null;
+  contact_email: string | null;
+  contact_phone: string | null;
+  business_name: string | null;
+  message: string | null;
+  requested_items: QuoteRequestItem[];
+  status: QuoteRequestStatus;
+  quote_id: string | null;
+  customer_id: string | null;
+  received_at: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Who the enquiry is from, in one line, for a list row. */
+export function quoteRequestWho(r: OfQuoteRequest): string {
+  return (
+    r.contact_name?.trim() ||
+    r.business_name?.trim() ||
+    r.contact_email?.trim() ||
+    r.from_email?.trim() ||
+    'Unknown sender'
+  );
+}
+
 export interface OfCreditNote {
   id: string;
   org_id: string;
