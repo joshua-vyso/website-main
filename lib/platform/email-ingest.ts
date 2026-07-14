@@ -198,7 +198,7 @@ export async function processEmailIngest(supabase: SupabaseClient, ingestId: str
       // either we never found the results, or we found them and they didn't align.
       const seen = Object.keys(email.headers ?? {}).join(',') || 'none';
       const detail = authResults
-        ? `SPF/DKIM did not pass for ${fromEmail || 'the sender'} (source: ${authSource}): ${authResults.slice(0, 200)}`
+        ? `SPF/DKIM did not pass for ${fromEmail || 'the sender'} (source: ${authSource}): ${authResults.slice(0, 400)}`
         : `no Authentication-Results found (headers seen: ${seen}; raw available: ${Boolean(email.raw?.download_url)})`;
       await fail(`Rejected: ${detail}`, 'quarantined');
       return;

@@ -85,19 +85,17 @@ function domainsAlign(authDomain: string, fromDomain: string): boolean {
  */
 export function authResultsFromHeaders(headers: Record<string, string> | null): string | null {
   if (!headers) return null;
-  const keys = Object.keys(headers).filter((k) => k.toLowerCase() === 'authentication-results');
-  if (keys.length === 0) return null;
-  return keys.map((k) => headers[k] ?? '').join('; ');
+  const key = Object.keys(headers).find((k) => k.toLowerCase() === 'authentication-results');
+  return key ? (headers[key] ?? null) : null;
 }
 
 /**
  * Pull Authentication-Results out of a raw RFC-5322 message.
  *
- * The receiving MTA stamps this header when it accepts the mail, so the raw message
- * is the authoritative place to find it even when the API's header map omits it.
- * There can be several (one per hop); we keep them all — the alignment check below
- * only ever *accepts* on a pass that matches the From domain, so extra hops can add
- * evidence but never weaken the decision.
+ * ONLY THE TOPMOST ONE. Headers are prepended, so the first Authentication-Results
+ * is the one our receiving MTA stamped; any below it came in with the message and a
+ * sender can forge those at will. Trusting all of them would let an attacker ship
+ * their own "dkim=pass header.d=yourdomain" and have it counted as evidence.
  */
 export function authResultsFromRawMime(raw: string): string | null {
   if (!raw) return null;
@@ -106,11 +104,60 @@ export function authResultsFromRawMime(raw: string): string | null {
   const headerBlock = end === -1 ? raw : raw.slice(0, end);
   // Unfold: a header value continued on the next line starts with whitespace.
   const unfolded = headerBlock.replace(/\r?\n[ \t]+/g, ' ');
-  const found = unfolded
-    .split(/\r?\n/)
-    .filter((line) => /^authentication-results\s*:/i.test(line))
-    .map((line) => line.replace(/^[^:]*:\s*/, ''));
-  return found.length ? found.join('; ') : null;
+  const line = unfolded.split(/\r?\n/).find((l) => /^authentication-results\s*:/i.test(l));
+  return line ? line.replace(/^[^:]*:\s*/, '') : null;
+}
+
+/** Methods an Authentication-Results header can report on (RFC 8601). */
+const AUTH_METHODS = new Set(['spf', 'dkim', 'dmarc', 'arc', 'iprev', 'auth', 'sender-id', 'dkim-adsp']);
+
+interface AuthResult {
+  method: string;
+  result: string;
+  props: Record<string, string>;
+}
+
+/**
+ * Parse an Authentication-Results header into its method results.
+ *
+ * Written as a real parser rather than a regex because the header's layout varies by
+ * provider and regexes get it wrong in ways that fail *open* or *closed* silently:
+ *
+ *   Gmail:  dkim=pass header.d=vyso.co.za; spf=pass smtp.mailfrom=vyso.co.za
+ *   SES:    spf=pass (spfCheck: ...) client-ip=1.2.3.4; envelope-from=a@vyso.co.za;
+ *           helo=mail.google.com; dkim=pass header.i=@vyso.co.za
+ *
+ * Note SES splits one result's properties across several ';' segments and identifies
+ * the DKIM domain with `header.i=@domain` rather than `header.d=`. So we walk tokens,
+ * start a new result whenever we see a known method, and attach any later properties
+ * to it — regardless of which segment they landed in.
+ */
+export function parseAuthResults(header: string): AuthResult[] {
+  // Comments are free text and can contain '=' and ':'; drop them before tokenising.
+  const cleaned = header.replace(/\([^)]*\)/g, ' ');
+  const out: AuthResult[] = [];
+  let current: AuthResult | null = null;
+
+  for (const token of cleaned.split(/[;\s]+/)) {
+    const eq = token.indexOf('=');
+    if (eq <= 0) continue; // authserv-id, version, or noise
+    const key = token.slice(0, eq).toLowerCase();
+    const value = token.slice(eq + 1).toLowerCase().replace(/^"|"$/g, '');
+    if (!value) continue;
+    if (AUTH_METHODS.has(key)) {
+      current = { method: key, result: value, props: {} };
+      out.push(current);
+    } else if (current) {
+      current.props[key] = value;
+    }
+  }
+  return out;
+}
+
+/** "joshua@vyso.co.za" / "@vyso.co.za" / "vyso.co.za" → "vyso.co.za". */
+function domainOf(value: string): string {
+  const at = value.lastIndexOf('@');
+  return (at === -1 ? value : value.slice(at + 1)).replace(/^\.+|\.+$/g, '').toLowerCase();
 }
 
 /**
@@ -132,20 +179,33 @@ export function authResultsFromRawMime(raw: string): string | null {
  */
 export function passesSenderAuth(authResults: string | null, fromEmail: string): boolean {
   if (!authResults) return false;
-  const results = authResults.toLowerCase();
 
   const fromDomain = fromEmail.split('@')[1]?.trim().toLowerCase() ?? '';
   if (!fromDomain) return false;
 
-  // dkim=pass ... header.d=acme.co.za
-  for (const m of results.matchAll(/dkim=pass[^;]*?header\.d=([a-z0-9.-]+)/g)) {
-    if (domainsAlign(m[1], fromDomain)) return true;
-  }
-  // spf=pass ... smtp.mailfrom=user@acme.co.za (or envelope-from, or a bare domain)
-  for (const m of results.matchAll(
-    /spf=pass[^;]*?(?:smtp\.mailfrom|envelope-from)=(?:[^@\s;]*@)?([a-z0-9.-]+)/g,
-  )) {
-    if (domainsAlign(m[1], fromDomain)) return true;
+  for (const r of parseAuthResults(authResults)) {
+    if (r.result !== 'pass') continue;
+
+    // DMARC pass is the strongest signal there is: it already means "authenticated
+    // AND aligned to the From domain", which is exactly the question we're asking.
+    if (r.method === 'dmarc') {
+      const d = r.props['header.from'];
+      if (d && domainsAlign(domainOf(d), fromDomain)) return true;
+    }
+
+    // DKIM survives forwarding, so it's the one that usually carries a forwarded
+    // invoice. Gmail reports header.d=, SES reports header.i=@domain.
+    if (r.method === 'dkim') {
+      const d = r.props['header.d'] ?? r.props['header.i'];
+      if (d && domainsAlign(domainOf(d), fromDomain)) return true;
+    }
+
+    // SPF authenticates the envelope sender, which forwarding often rewrites — but
+    // when it does align, it's proof.
+    if (r.method === 'spf') {
+      const d = r.props['smtp.mailfrom'] ?? r.props['envelope-from'];
+      if (d && domainsAlign(domainOf(d), fromDomain)) return true;
+    }
   }
   return false;
 }
