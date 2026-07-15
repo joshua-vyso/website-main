@@ -4,6 +4,7 @@ import { extractDocument, extractOrderDocument } from '@/lib/ai/anthropic';
 import { syncOrderFromDocument } from '@/lib/platform/orderflow-from-doc';
 import { feedDocumentToProcurePulse, orgHasProcurePulse } from '@/lib/platform/procurepulse-feed';
 import { isUniqueViolation } from '@/lib/platform/db-errors';
+import type { DocumentType, ExtractedData } from '@/lib/platform/types';
 
 /**
  * The one document-ingest pipeline: classify → file into Doc-U → build the
@@ -105,6 +106,153 @@ export interface IngestDocumentInput {
   note?: string;
   /** Links the filed document back to the email it arrived on. */
   emailIngestId?: string | null;
+  /**
+   * Extract and FILE the document, but DON'T commit its side effects (OrderFlow
+   * orders/invoices, ProcurePulse stock movements). The document lands at status
+   * 'extracted', awaiting a human's Save in the Doc-U review queue.
+   *
+   * Used for inbound EMAIL only. Email arrives with no human present, and committing
+   * stock/orders off an unattended stranger- or supplier-sent document with no review
+   * is exactly what the queue exists to prevent. Chat and manual uploads commit inline
+   * (default false), because the person is right there reviewing as they go.
+   */
+  deferCommit?: boolean;
+}
+
+/**
+ * Run a document's downstream side effects: an order becomes an OrderFlow order (and,
+ * when confident, an invoice + stock movements); everything else feeds ProcurePulse
+ * (stock + supplier prices). Idempotent per source_document_id, so committing twice is
+ * safe. Touches NO document status — the caller owns that.
+ */
+export async function runDocumentSideEffects(
+  supabase: SupabaseClient,
+  doc: {
+    id: string;
+    org_id: string;
+    document_type: DocumentType | null;
+    filename: string;
+    supplier_id: string | null;
+    extracted_data: ExtractedData | null;
+  },
+): Promise<{ orderSync?: unknown }> {
+  if (doc.document_type === 'order') {
+    const orderSync = await syncOrderFromDocument(supabase, { documentId: doc.id, orgId: doc.org_id });
+    return { orderSync };
+  }
+  if (await orgHasProcurePulse(supabase, doc.org_id)) {
+    await feedDocumentToProcurePulse(supabase, {
+      id: doc.id,
+      org_id: doc.org_id,
+      filename: doc.filename,
+      document_type: doc.document_type,
+      supplier_id: doc.supplier_id,
+      extracted_data: doc.extracted_data,
+    });
+  }
+  return {};
+}
+
+/**
+ * A document being committed is "claimed" by stamping approved_at while it is still at
+ * status 'extracted'/'pending'. A claim older than this is treated as abandoned and may
+ * be re-taken. MUST stay larger than the review route's maxDuration (120s): a live
+ * commit holds a fresh claim and so can never be re-taken out from under itself, and a
+ * claim this old belongs to a dead worker, so re-running its (idempotent) side effects
+ * is safe.
+ */
+export const COMMIT_STALE_MS = 5 * 60 * 1000;
+
+/** PostgREST `.or()` predicate for "this document is free to Save or Discard". */
+export function reviewClaimableOr(staleBeforeIso: string): string {
+  return `approved_at.is.null,approved_at.lt.${staleBeforeIso}`;
+}
+
+/**
+ * Commit a document from the review queue: run its side effects (OrderFlow order/invoice,
+ * ProcurePulse stock + supplier prices), then mark it approved. Owner/admin gate + org
+ * scoping live in the calling route; the supplied client is RLS-scoped to the caller's org.
+ *
+ * ATOMIC CLAIM FIRST. Two Saves on one document (two admins, or one admin in two tabs)
+ * would otherwise both read 'extracted', both pass a status check, and both run the side
+ * effects — two orders, two invoices, stock decremented twice. So the claim is a
+ * conditional UPDATE whose WHERE is the lock: exactly one caller flips approved_at off a
+ * free/stale value under the row lock, and only that caller proceeds. The side effects
+ * are idempotent per source_document_id, so a lone retry after a mid-commit crash re-runs
+ * cleanly; the claim is what stops CONCURRENT runs, which idempotency alone cannot.
+ */
+export async function commitDocument(
+  supabase: SupabaseClient,
+  params: { documentId: string; orgId: string; userId: string },
+): Promise<{ ok: true; documentId: string } | { ok: false; status: number; error: string }> {
+  const { documentId, orgId, userId } = params;
+  const nowIso = new Date().toISOString();
+  const staleBefore = new Date(Date.now() - COMMIT_STALE_MS).toISOString();
+
+  // Claim: stamp approved_at while still 'extracted'/'pending', only if it's free or the
+  // previous claim went stale. The row lock makes this the single serialization point.
+  const { data: claimed, error: claimErr } = await supabase
+    .from('documents')
+    .update({ approved_at: nowIso, approved_by: userId })
+    .eq('id', documentId)
+    .eq('org_id', orgId)
+    .in('status', ['extracted', 'pending'])
+    .or(reviewClaimableOr(staleBefore))
+    .select('id, org_id, document_type, filename, supplier_id, extracted_data')
+    .maybeSingle();
+
+  if (claimErr) return { ok: false, status: 500, error: claimErr.message };
+
+  if (!claimed) {
+    // Not claimable. Distinguish the harmless cases from a live claim.
+    const { data: cur } = await supabase
+      .from('documents')
+      .select('status')
+      .eq('id', documentId)
+      .eq('org_id', orgId)
+      .maybeSingle();
+    const status = (cur as { status: string } | null)?.status;
+    if (!status) return { ok: false, status: 404, error: 'That document is not in your organisation.' };
+    if (status === 'approved') return { ok: true, documentId }; // already committed — the user's intent is met
+    if (status === 'rejected') return { ok: false, status: 409, error: 'That document was discarded.' };
+    return { ok: false, status: 409, error: 'That document is already being saved.' };
+  }
+
+  const row = claimed as {
+    id: string;
+    org_id: string;
+    document_type: DocumentType | null;
+    filename: string;
+    supplier_id: string | null;
+    extracted_data: ExtractedData | null;
+  };
+
+  try {
+    await runDocumentSideEffects(supabase, row);
+  } catch (err) {
+    // Release the claim so it returns to the queue for retry. Guard on approved_by so a
+    // stale re-claimer's row is never reset by a superseded worker.
+    await supabase
+      .from('documents')
+      .update({ approved_at: null, approved_by: null })
+      .eq('id', documentId)
+      .eq('org_id', orgId)
+      .eq('approved_by', userId)
+      .in('status', ['extracted', 'pending']);
+    return { ok: false, status: 500, error: err instanceof Error ? err.message : 'Could not save the document.' };
+  }
+
+  // Commit: only our own live claim may finalize (guards against a Discard or a stale
+  // re-claimer that slipped in).
+  await supabase
+    .from('documents')
+    .update({ status: 'approved' })
+    .eq('id', documentId)
+    .eq('org_id', orgId)
+    .eq('approved_by', userId)
+    .in('status', ['extracted', 'pending']);
+
+  return { ok: true, documentId };
 }
 
 export type IngestDocumentResult =
@@ -126,7 +274,7 @@ export type IngestDocumentResult =
  * review); everything else stores its extracted fields and feeds ProcurePulse.
  */
 export async function ingestDocument(input: IngestDocumentInput): Promise<IngestDocumentResult> {
-  const { supabase, orgId, userId, base64, mediaType, filename, note, emailIngestId = null } = input;
+  const { supabase, orgId, userId, base64, mediaType, filename, note, emailIngestId = null, deferCommit = false } = input;
 
   // 1. Classify (+ generic extract). One Haiku call decides the document type.
   let cls;
@@ -217,11 +365,22 @@ export async function ingestDocument(input: IngestDocumentInput): Promise<Ingest
       })
       .eq('id', documentId);
 
+    // Deferred (email): stop here. The order lands in the review queue at 'extracted';
+    // nothing is created in OrderFlow until a human clicks Save.
     let orderSync = null;
-    try {
-      orderSync = await syncOrderFromDocument(supabase, { documentId, orgId });
-    } catch {
-      /* extraction + filing already succeeded — the doc is there to review */
+    if (!deferCommit) {
+      try {
+        ({ orderSync = null } = await runDocumentSideEffects(supabase, {
+          id: documentId,
+          org_id: orgId,
+          document_type: 'order',
+          filename,
+          supplier_id: null,
+          extracted_data: null,
+        }));
+      } catch {
+        /* extraction + filing already succeeded — the doc is there to review */
+      }
     }
     return {
       ok: true,
@@ -254,19 +413,21 @@ export async function ingestDocument(input: IngestDocumentInput): Promise<Ingest
     })
     .eq('id', documentId);
 
-  try {
-    if (await orgHasProcurePulse(supabase, orgId)) {
-      await feedDocumentToProcurePulse(supabase, {
+  // Deferred (email): stop here. Stock and supplier prices are NOT touched until a
+  // human clicks Save in the review queue.
+  if (!deferCommit) {
+    try {
+      await runDocumentSideEffects(supabase, {
         id: documentId,
         org_id: orgId,
-        filename,
         document_type: documentType,
+        filename,
         supplier_id: supplierId,
         extracted_data: { fields: cls.fields, line_items: cls.line_items, supplier: cls.supplier },
       });
+    } catch {
+      /* best-effort — filing already succeeded */
     }
-  } catch {
-    /* best-effort — filing already succeeded */
   }
 
   return {

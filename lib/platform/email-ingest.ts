@@ -388,17 +388,24 @@ async function runDocumentIngest(supabase: SupabaseClient, ingest: IngestRow, fa
           filename: (att.filename ?? 'document').slice(0, 200),
           note,
           emailIngestId: ingest.id,
+          // Email documents are extracted and parked in the Doc-U review queue; a human
+          // clicks Save before anything touches stock, orders or invoices.
+          deferCommit: true,
         });
-        if (result.ok) {
-          created += 1;
+        // Mark the attachment done whenever a document row was FILED — even if extraction
+        // then failed (result.ok === false but a documentId came back). The file is
+        // already in Doc-U; re-running would upload it again and create a second row for
+        // the same attachment. Only a failure BEFORE filing (no documentId) is left for
+        // retry.
+        if (result.documentId) {
+          if (result.ok) created += 1;
           alreadyDone.add(att.id);
-          // Record progress per attachment, so a timeout on the NEXT one can't make a
-          // retry re-file this one.
           await supabase
             .from('email_ingests')
             .update({ documents_created: created, processed_attachment_ids: [...alreadyDone] })
             .eq('id', ingest.id);
-        } else {
+        }
+        if (!result.ok) {
           errors.push(`${att.filename ?? 'attachment'}: ${result.error}`);
         }
       } catch (err) {
