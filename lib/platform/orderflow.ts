@@ -356,6 +356,8 @@ export interface OfQuoteRequest {
   message: string | null;
   requested_items: QuoteRequestItem[];
   status: QuoteRequestStatus;
+  /** The AI's guess it's spam/a bounce — a triage hint, never a filter. */
+  flagged_spam: boolean;
   quote_id: string | null;
   customer_id: string | null;
   received_at: string;

@@ -80,6 +80,11 @@ create table if not exists of_quote_requests (
 
   -- Triage -------------------------------------------------------------------
   status text not null default 'new',              -- new | quoted | dismissed
+  -- The AI's guess that this is a bounce/auto-reply/spam rather than a real enquiry.
+  -- It is a HINT for the human triaging the inbox, never a filter: every quote-lane
+  -- email becomes a row regardless, and a person decides. (A model that silently binned
+  -- enquiries it misjudged was the whole problem this replaces.)
+  flagged_spam boolean not null default false,
   quote_id uuid references of_quotes(id) on delete set null,
   customer_id uuid references of_customers(id) on delete set null,  -- set BY A HUMAN
 
@@ -87,6 +92,9 @@ create table if not exists of_quote_requests (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+-- For an already-created table (this feature shipped without the column first).
+alter table of_quote_requests add column if not exists flagged_spam boolean not null default false;
 
 create index if not exists of_quote_requests_org_status_idx
   on of_quote_requests (org_id, status, received_at desc);

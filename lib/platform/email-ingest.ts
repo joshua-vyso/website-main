@@ -476,12 +476,6 @@ async function runQuoteRequest(supabase: SupabaseClient, ingest: IngestRow, fail
     return;
   }
 
-  const body = (email.text?.trim() || (email.html ? htmlToText(email.html) : '')).trim();
-  if (!body) {
-    await fail('The enquiry had no readable body.', 'ignored');
-    return;
-  }
-
   // NOTE: no sender-auth check here, and deliberately not even a display-only one. The
   // raw-MIME fetch it needs is an unbounded download of attacker-controlled bytes, and
   // in this lane the attacker is any stranger — a real cost for a value that could tell
@@ -489,26 +483,24 @@ async function runQuoteRequest(supabase: SupabaseClient, ingest: IngestRow, fail
   // the mail; it says nothing about who filled the form in, which is the only question
   // that matters here.
   const fromEmail = parseEmailAddress(email.from) ?? '';
+  const subject = typeof email.subject === 'string' ? email.subject : '';
 
-  const extraction = await extractQuoteRequest({
-    from: email.from ?? '',
-    subject: email.subject ?? '',
-    body,
-  });
+  const body = (email.text?.trim() || (email.html ? htmlToText(email.html) : '')).trim();
 
-  // A malformed/truncated response is a FAULT, not a verdict. Treating it as "not an
-  // enquiry" would bin a real lead under a confidently wrong reason. Re-queue so the
-  // cron retries it (a terminal 'failed'/'ignored' would never be re-driven); a
-  // persistent fault is caught by the give-up sweep after MAX_ATTEMPTS.
-  if (!extraction.parsed_ok) {
-    await requeue('Could not read the enquiry yet (the extractor returned no usable JSON). Will retry.');
-    return;
-  }
-
-  // Auto-replies, bounces and newsletters are mail, not leads.
-  if (!extraction.is_enquiry) {
-    await fail('Not a sales enquiry (auto-reply, bounce or spam).', 'ignored');
-    return;
+  // Read the body if there is one, but NEVER gate on the result. Every quote-lane email
+  // becomes a reviewable row and a human decides — the AI's "is this a real enquiry?"
+  // judgement is recorded as a spam FLAG, not used to silently drop mail. A blank email
+  // still surfaces (flagged), so nothing vanishes without a person seeing it.
+  let extraction: Awaited<ReturnType<typeof extractQuoteRequest>> | null = null;
+  if (body) {
+    extraction = await extractQuoteRequest({ from: email.from ?? '', subject, body });
+    // A malformed/truncated response is a transient FAULT, not a verdict — re-queue for
+    // the cron rather than guessing. (A terminal status would never be re-driven; the
+    // give-up sweep still stops a persistent fault after MAX_ATTEMPTS.)
+    if (!extraction.parsed_ok) {
+      await requeue('Could not read the enquiry yet (the extractor returned no usable JSON). Will retry.');
+      return;
+    }
   }
 
   const { error: insErr } = await supabase.from('of_quote_requests').insert({
@@ -516,13 +508,16 @@ async function runQuoteRequest(supabase: SupabaseClient, ingest: IngestRow, fail
     source: 'email',
     email_ingest_id: ingest.id,
     from_email: fromEmail || null,
-    contact_name: extraction.contact_name,
-    contact_email: extraction.contact_email,
-    contact_phone: extraction.contact_phone,
-    business_name: extraction.business_name,
+    contact_name: extraction?.contact_name ?? null,
+    contact_email: extraction?.contact_email ?? null,
+    contact_phone: extraction?.contact_phone ?? null,
+    business_name: extraction?.business_name ?? null,
     // Fall back to the subject so a lead is never completely blank in the list.
-    message: extraction.message ?? (email.subject ? email.subject.slice(0, 1500) : null),
-    requested_items: extraction.items,
+    message: extraction?.message ?? (subject ? subject.slice(0, 1500) : null),
+    requested_items: extraction?.items ?? [],
+    // The AI's guess becomes a hint for the human, not a gate: flag a no-body email or
+    // one the model judged not-an-enquiry, but keep it in the inbox either way.
+    flagged_spam: extraction ? !extraction.is_enquiry : true,
     status: 'new',
     // When the enquiry ARRIVED, not when it was materialised — a cron re-drive can
     // insert the lead days later, and the inbox sorts on this, so the default now()

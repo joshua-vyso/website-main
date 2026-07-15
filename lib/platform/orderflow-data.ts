@@ -89,11 +89,15 @@ export async function getOrderFlowSnapshot(orgId: string): Promise<OrderFlowSnap
     sb.from('of_credit_note_items').select('*').eq('org_id', orgId),
     sb.from('of_activity').select('*').eq('org_id', orgId).order('created_at', { ascending: false }).limit(40),
     sb.from('of_settings').select('*').eq('org_id', orgId).maybeSingle(),
+    // The tile means "real leads awaiting a quote", so it excludes the AI-flagged
+    // likely-spam — those still show on the Quotes page for a human to confirm, but
+    // shouldn't inflate the headline number.
     sb
       .from('of_quote_requests')
       .select('id', { count: 'exact', head: true })
       .eq('org_id', orgId)
-      .eq('status', 'new'),
+      .eq('status', 'new')
+      .eq('flagged_spam', false),
   ]);
   return {
     customers: rows<OfCustomer>(cus),
@@ -263,7 +267,9 @@ export interface QuotesData {
   requestsTotal: number;
 }
 
-const REQUEST_PAGE = 100;
+// Strictly larger than the daily rate cap (QUOTE_REQUESTS_PER_DAY = 100) so a single
+// day of abuse can never exactly fill the window and push genuine leads out of view.
+const REQUEST_PAGE = 200;
 
 export async function getQuotesData(orgId: string): Promise<QuotesData> {
   const sb = await createServerSupabase();
