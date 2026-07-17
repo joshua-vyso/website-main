@@ -13,6 +13,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/platform/supabase-browser';
 import { usePlatform } from '@/lib/platform/session';
+import { useIsAdmin } from '@/components/platform/RoleGate';
 import { logActivity } from '@/lib/platform/orderflow-activity';
 import {
   PAYMENT_METHODS,
@@ -96,9 +97,13 @@ export function InvoiceDetailV2({ data, orgName }: { data: InvoiceDetailData; or
   const balance = balanceDue(totals.total, paid, credited);
 
   const settled = eff === 'draft' || eff === 'cancelled' || eff === 'credited';
-  const canPay = !settled && balance > 0;
-  const canCredit = !settled;
-  const canCancel = paid <= 0.005 && credited <= 0.005 && eff !== 'cancelled' && eff !== 'credited' && eff !== 'paid';
+  // Editing/cancelling an invoice, recording a payment and issuing a credit note are
+  // money actions the RLS layer now restricts to owner/admin — hide them for members so
+  // they never click a control that would fail. Members keep view / duplicate / email.
+  const isAdmin = useIsAdmin();
+  const canPay = isAdmin && !settled && balance > 0;
+  const canCredit = isAdmin && !settled;
+  const canCancel = isAdmin && paid <= 0.005 && credited <= 0.005 && eff !== 'cancelled' && eff !== 'credited' && eff !== 'paid';
 
   const sheetLines: DocSheetLine[] = items.map((it) => ({
     id: it.id,
@@ -211,7 +216,7 @@ export function InvoiceDetailV2({ data, orgName }: { data: InvoiceDetailData; or
           <span className="text-[13px] tabular-nums text-[#9A9DA1]">{zar2(totals.total)}</span>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {eff === 'draft' ? (
+          {eff === 'draft' && isAdmin ? (
             <>
               <Link href={`/app/orderflow/invoices/new?edit=${inv.id}`} className={toolbarBtn}>
                 Edit draft

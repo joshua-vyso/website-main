@@ -12,6 +12,7 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useIsAdmin } from '@/components/platform/RoleGate';
 import type { CreditNotesData } from '@/lib/platform/orderflow-data';
 import {
   docTotals,
@@ -34,6 +35,8 @@ function fmtDate(iso: string | null): string {
 export function CreditNotesView({ data }: { data: CreditNotesData }) {
   const { creditNotes, items, invoices, customers } = data;
   const router = useRouter();
+  // Issuing credit notes is owner/admin-only (RLS). Members can view the list.
+  const isAdmin = useIsAdmin();
   const [search, setSearch] = useState('');
 
   const customerName = useMemo(() => new Map(customers.map((c) => [c.id, c.name])), [customers]);
@@ -87,12 +90,14 @@ export function CreditNotesView({ data }: { data: CreditNotesData }) {
           <h1 className="text-[26px] font-bold text-[#1A1C1E]">Credit notes</h1>
           <p className="mt-1 text-[14px] text-[#5F6368]">Credit a customer against an invoice for returns, shortfalls or adjustments</p>
         </div>
-        <Link
-          href="/app/orderflow/credit-notes/new"
-          className="inline-flex h-10 items-center rounded-xl bg-[#1E5E54] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#184D45]"
-        >
-          + New credit note
-        </Link>
+        {isAdmin ? (
+          <Link
+            href="/app/orderflow/credit-notes/new"
+            className="inline-flex h-10 items-center rounded-xl bg-[#1E5E54] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#184D45]"
+          >
+            + New credit note
+          </Link>
+        ) : null}
       </div>
 
       {/* KPI strip */}
@@ -131,12 +136,14 @@ export function CreditNotesView({ data }: { data: CreditNotesData }) {
                         title="No credit notes yet"
                         body="Credit a customer against an outstanding invoice — for returns, shortfalls or price corrections."
                         action={
+                          !isAdmin ? undefined : (
                           <Link
                             href="/app/orderflow/credit-notes/new"
                             className="inline-flex h-9 items-center rounded-lg bg-[#1E5E54] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174A42]"
                           >
                             + New credit note
                           </Link>
+                          )
                         }
                       />
                     </div>

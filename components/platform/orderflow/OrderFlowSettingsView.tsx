@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/platform/supabase-browser';
 import { usePlatform } from '@/lib/platform/session';
+import { useIsAdmin } from '@/components/platform/RoleGate';
 import { useToast } from '@/components/platform/orderflow/ui';
 import { Field, PrimaryBtn, inputClass } from '@/components/platform/coredata/ui';
 import { formatDocNumber, type OfSettings } from '@/lib/platform/orderflow';
@@ -73,6 +74,9 @@ export function OrderFlowSettingsView({
 }) {
   const { org } = usePlatform();
   const router = useRouter();
+  // Numbering + VAT/terms defaults are owner/admin-only (RLS). Hide the Save buttons for
+  // members so they don't hit an error; the fields stay visible (read-only in effect).
+  const isAdmin = useIsAdmin();
   const { node: toastNode, show: toast } = useToast();
 
   // --- Document numbering -------------------------------------------------
@@ -272,9 +276,13 @@ export function OrderFlowSettingsView({
 
         <div className="mt-4 flex items-center justify-end gap-3">
           {numberError ? <span className="text-[12px] text-[#A32D2D]">{numberError}</span> : null}
-          <PrimaryBtn onClick={saveNumbering} disabled={numberBusy}>
-            {numberBusy ? 'Saving…' : 'Save numbering'}
-          </PrimaryBtn>
+          {isAdmin ? (
+            <PrimaryBtn onClick={saveNumbering} disabled={numberBusy}>
+              {numberBusy ? 'Saving…' : 'Save numbering'}
+            </PrimaryBtn>
+          ) : (
+            <span className="text-[12px] text-[#9A9DA1]">Only an owner or admin can change this.</span>
+          )}
         </div>
       </Section>
 
@@ -344,9 +352,13 @@ export function OrderFlowSettingsView({
 
         <div className="mt-4 flex items-center justify-end gap-3">
           {defaultsError ? <span className="text-[12px] text-[#A32D2D]">{defaultsError}</span> : null}
+          {!isAdmin ? (
+            <span className="text-[12px] text-[#9A9DA1]">Only an owner or admin can change this.</span>
+          ) : (
           <PrimaryBtn onClick={saveDefaults} disabled={defaultsBusy}>
             {defaultsBusy ? 'Saving…' : 'Save defaults'}
           </PrimaryBtn>
+          )}
         </div>
       </Section>
 

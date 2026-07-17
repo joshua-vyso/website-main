@@ -21,6 +21,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/platform/supabase-browser';
 import { usePlatform } from '@/lib/platform/session';
+import { useIsAdmin } from '@/components/platform/RoleGate';
 import { logActivity } from '@/lib/platform/orderflow-activity';
 import { RecordPaymentModal } from '@/components/platform/orderflow/PaymentModal';
 import { Kpi, useToast } from '@/components/platform/orderflow/ui';
@@ -96,6 +97,8 @@ export function PaymentsView({
   creditNoteItems: OfCreditNoteItem[];
   customers: OfCustomer[];
 }) {
+  // Recording payments is owner/admin-only (RLS). Members can view the ledger but not add.
+  const isAdmin = useIsAdmin();
   const [query, setQuery] = useState('');
   const [method, setMethod] = useState<'all' | PaymentMethod>('all');
   const [fromDate, setFromDate] = useState('');
@@ -222,7 +225,7 @@ export function PaymentsView({
             Every receipt across your invoices — record payments and attach proof.
           </p>
         </div>
-        <PrimaryBtn onClick={() => setPicking(true)}>+ Record payment</PrimaryBtn>
+        {isAdmin ? <PrimaryBtn onClick={() => setPicking(true)}>+ Record payment</PrimaryBtn> : null}
       </div>
 
       <div className="mt-5 grid grid-cols-2 gap-3 lg:grid-cols-4">
@@ -284,7 +287,7 @@ export function PaymentsView({
           <EmptyState
             title="No payments recorded yet"
             body="Record a payment against an open invoice to start building your receipts ledger."
-            action={<PrimaryBtn onClick={() => setPicking(true)}>+ Record payment</PrimaryBtn>}
+            action={isAdmin ? <PrimaryBtn onClick={() => setPicking(true)}>+ Record payment</PrimaryBtn> : undefined}
           />
         ) : filtered.length === 0 ? (
           <EmptyState title="No matching payments" body="Try a different search, method or date range." />

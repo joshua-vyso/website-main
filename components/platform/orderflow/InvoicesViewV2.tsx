@@ -13,6 +13,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/platform/supabase-browser';
 import { usePlatform } from '@/lib/platform/session';
+import { useIsAdmin } from '@/components/platform/RoleGate';
 import { logActivity } from '@/lib/platform/orderflow-activity';
 import {
   INVOICE_STATUS_STYLE,
@@ -78,6 +79,9 @@ function friendlyError(message: string | undefined): string {
 export function InvoicesViewV2({ data }: { data: InvoicesData }) {
   const router = useRouter();
   const { org, email } = usePlatform();
+  // Money mutations (send, record payment, cancel, credit note) are owner/admin-only at
+  // the RLS layer — don't offer them to members as row actions that would then fail.
+  const isAdmin = useIsAdmin();
   const { node: toastNode, show: toast } = useToast();
 
   const [tab, setTab] = useState<TabKey>('all');
@@ -257,15 +261,15 @@ export function InvoicesViewV2({ data }: { data: InvoicesData }) {
     const href = `/app/orderflow/invoices/${r.inv.id}`;
     const settled = r.eff === 'draft' || r.eff === 'cancelled' || r.eff === 'credited';
     const actions: RowAction[] = [{ label: 'View', onClick: () => router.push(href) }];
-    if (r.eff === 'draft') {
+    if (r.eff === 'draft' && isAdmin) {
       actions.push({ label: 'Edit draft', onClick: () => router.push(`/app/orderflow/invoices/new?edit=${r.inv.id}`) });
       actions.push({ label: 'Send', onClick: () => void send(r) });
     }
     actions.push({ label: 'Download PDF', onClick: () => router.push(`${href}?print=1`) });
     actions.push({ label: 'Duplicate', onClick: () => router.push(`/app/orderflow/invoices/new?duplicate=${r.inv.id}`) });
-    if (!settled && r.balance > 0) actions.push({ label: 'Record payment', onClick: () => setPayRow(r) });
-    if (!settled) actions.push({ label: 'Create credit note', onClick: () => router.push(`/app/orderflow/credit-notes/new?invoice=${r.inv.id}`) });
-    if (r.eff === 'draft') actions.push({ label: 'Cancel draft', danger: true, onClick: () => setCancelRow(r) });
+    if (isAdmin && !settled && r.balance > 0) actions.push({ label: 'Record payment', onClick: () => setPayRow(r) });
+    if (isAdmin && !settled) actions.push({ label: 'Create credit note', onClick: () => router.push(`/app/orderflow/credit-notes/new?invoice=${r.inv.id}`) });
+    if (r.eff === 'draft' && isAdmin) actions.push({ label: 'Cancel draft', danger: true, onClick: () => setCancelRow(r) });
     return actions;
   }
 
