@@ -50,8 +50,19 @@ export function useRealtimeRefresh(tables: string | readonly string[]): void {
     }
     channel.subscribe();
 
+    // Self-heal if a realtime event is ever missed — a dropped socket, a laptop waking
+    // from sleep, or a spotty connection. Coming back to the tab reconciles against
+    // server truth, so the list is never silently stale even when the socket isn't.
+    const reconcileOnReturn = () => {
+      if (document.visibilityState === 'visible') refresh();
+    };
+    document.addEventListener('visibilitychange', reconcileOnReturn);
+    window.addEventListener('focus', reconcileOnReturn);
+
     return () => {
       if (timer) clearTimeout(timer);
+      document.removeEventListener('visibilitychange', reconcileOnReturn);
+      window.removeEventListener('focus', reconcileOnReturn);
       void supabase.removeChannel(channel);
     };
   }, [key, orgId, router]);

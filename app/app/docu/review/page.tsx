@@ -37,7 +37,7 @@ export default async function DocuReviewPage() {
   // be retried). A doc being actively saved (fresh approved_at) is correctly hidden.
   const supabase = await createServerSupabase();
   const staleBefore = new Date(Date.now() - COMMIT_STALE_MS).toISOString();
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from('documents')
     .select('*, supplier:suppliers(id,name,initials)')
     .eq('org_id', session.org?.id ?? '')
@@ -59,7 +59,18 @@ export default async function DocuReviewPage() {
           you Save.
         </p>
       </div>
-      <DocumentReviewQueue docs={docs} canReview={canReview} />
+      {/* Never let a failed query masquerade as an empty queue — that hid a missing-column
+          bug where documents were waiting but the filter errored. Surface it instead. */}
+      {error ? (
+        <div className="rounded-2xl border border-[#F0D0C4] bg-[#FBF1EC] px-6 py-5">
+          <p className="text-[15px] font-semibold text-[#9A3412]">Couldn’t load the review queue</p>
+          <p className="mt-1 text-[13px] text-[#9A3412]/80">
+            {error.message}. Your documents are safe — nothing has been actioned.
+          </p>
+        </div>
+      ) : (
+        <DocumentReviewQueue docs={docs} canReview={canReview} />
+      )}
     </div>
   );
 }
