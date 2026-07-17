@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { resolveUser, AI_CORS_HEADERS } from '@/lib/ai/auth';
 import { runPrompt, aiConfigured } from '@/lib/ai/anthropic';
+import { rateLimitAllowed } from '@/lib/platform/rate-limit';
 
 export async function OPTIONS() {
   return new NextResponse(null, { headers: AI_CORS_HEADERS });
@@ -18,6 +19,15 @@ export async function POST(req: Request) {
   const auth = await resolveUser(req);
   if (!auth) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: AI_CORS_HEADERS });
+  }
+
+  // Per-user hourly cap — this is an Opus-backed endpoint, so a runaway loop is a direct
+  // spend bomb even for one authenticated account.
+  if (!(await rateLimitAllowed(`ai-msg:${auth.userId}`, 60, 60 * 60))) {
+    return NextResponse.json({ error: 'You’ve hit the hourly AI limit. Please try again later.' }, {
+      status: 429,
+      headers: AI_CORS_HEADERS,
+    });
   }
 
   const body = (await req.json().catch(() => ({}))) as { prompt?: string; system?: string };

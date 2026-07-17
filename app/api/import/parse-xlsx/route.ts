@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import zlib from 'node:zlib';
 import { resolveUser } from '@/lib/ai/auth';
+import { rateLimitAllowed } from '@/lib/platform/rate-limit';
 
 /**
  * Dependency-free .xlsx → rows parser. An .xlsx is a ZIP of XML parts; we read
@@ -153,6 +154,11 @@ export async function POST(req: Request) {
     // dependency-free and hand-rolled, so it should never be reachable by the public.
     const auth = await resolveUser(req);
     if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
+    // Parsing is CPU-heavy; cap it per user so a stream of files can't tie up the fleet.
+    if (!(await rateLimitAllowed(`xlsx:${auth.userId}`, 30, 10 * 60))) {
+      return NextResponse.json({ error: 'Too many uploads — please wait a minute.' }, { status: 429 });
+    }
 
     const form = await req.formData();
     const file = form.get('file');

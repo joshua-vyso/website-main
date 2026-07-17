@@ -1,5 +1,6 @@
 import { Resend } from "resend";
 import { NextResponse } from "next/server";
+import { rateLimitAllowed } from "@/lib/platform/rate-limit";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -32,27 +33,14 @@ function escapeHtml(s: string): string {
     .replace(/'/g, "&#39;");
 }
 
-// Best-effort in-memory limiter: max requests per IP per window.
+// Max submissions per IP per 10-minute window (durable, fleet-wide — see rate-limit.ts).
 const RATE_MAX = 5;
-const RATE_WINDOW_MS = 10 * 60 * 1000;
-const hits = new Map<string, number[]>();
-
-function rateLimited(ip: string): boolean {
-  const now = Date.now();
-  const recent = (hits.get(ip) ?? []).filter((t) => now - t < RATE_WINDOW_MS);
-  recent.push(now);
-  hits.set(ip, recent);
-  // Opportunistic cleanup so the map can't grow unbounded across a long-lived instance.
-  if (hits.size > 5000) {
-    for (const [k, v] of hits) if (v.every((t) => now - t >= RATE_WINDOW_MS)) hits.delete(k);
-  }
-  return recent.length > RATE_MAX;
-}
+const RATE_WINDOW_SECONDS = 10 * 60;
 
 export async function POST(req: Request) {
   try {
     const ip = (req.headers.get("x-forwarded-for")?.split(",")[0] ?? "unknown").trim();
-    if (rateLimited(ip)) {
+    if (!(await rateLimitAllowed(`contact:${ip}`, RATE_MAX, RATE_WINDOW_SECONDS))) {
       return NextResponse.json({ error: "Too many messages. Please try again later." }, { status: 429 });
     }
 
