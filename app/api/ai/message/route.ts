@@ -25,6 +25,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'prompt is required' }, { status: 400, headers: AI_CORS_HEADERS });
   }
 
+  // Bound the input before it reaches the model. This is an open, Opus-backed endpoint, so
+  // an unbounded prompt+system is a direct cost bomb — ~4.5MB of text is ~1M input tokens,
+  // and it can be looped. 40k chars is generous for real document Q&A. (A per-user token
+  // quota / cheaper-model routing is the separate cost-controls decision.)
+  if ((body.prompt.length ?? 0) + (body.system?.length ?? 0) > 40_000) {
+    return NextResponse.json({ error: 'Input too large.' }, { status: 413, headers: AI_CORS_HEADERS });
+  }
+
   try {
     const text = await runPrompt(body.prompt, body.system);
     return NextResponse.json({ text }, { headers: AI_CORS_HEADERS });

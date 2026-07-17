@@ -224,6 +224,7 @@ export async function recentOrders(
   supabase: SupabaseClient,
   orgId: string,
   limit: number,
+  includeMoney: boolean,
 ): Promise<Array<Record<string, string | boolean>>> {
   const orders = must<OfOrder[]>(
     await supabase.from('of_orders').select('*').eq('org_id', orgId).order('created_at', { ascending: false }).limit(limit),
@@ -248,7 +249,9 @@ export async function recentOrders(
       order: o.order_number || o.invoice_number || o.id.slice(0, 8),
       customer: (o.customer_id && customers.get(o.customer_id)?.name) || 'Unknown',
       status: o.status,
-      subtotal_ex_vat: zar2(subtotal),
+      // Money is gated to the same capability as every other tool: a member must not
+      // receive order values through the AI that the UI redacts for them.
+      ...(includeMoney ? { subtotal_ex_vat: zar2(subtotal) } : {}),
       invoiced: !!o.invoice_id,
       date: (o.created_at ?? '').slice(0, 10),
     };

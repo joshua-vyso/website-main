@@ -3,6 +3,7 @@ import { resolveUser } from '@/lib/ai/auth';
 import { createServiceSupabase } from '@/lib/platform/supabase-service';
 import { processEmailIngest } from '@/lib/platform/email-ingest';
 import { parseEmailAddress } from '@/lib/platform/email-ingest-policy';
+import { isUniqueViolation } from '@/lib/platform/db-errors';
 
 export const maxDuration = 300;
 
@@ -53,31 +54,42 @@ export async function POST(req: Request) {
 
   // Upsert the sender's standing, scoped to the admin's own org.
   // eq(), not ilike(): `%`/`_` are legal in an email and are ilike wildcards.
-  const { data: existing } = await supabase
+  //
+  // FAIL CLOSED. This is a security control: a Block that silently no-ops would leave a
+  // compromised sender approved while telling the admin it's blocked, and their forged
+  // invoices keep flowing. So every write is checked and a failure is a hard 500.
+  const { data: existing, error: selErr } = await supabase
     .from('email_ingest_senders')
     .select('id')
     .eq('org_id', admin.orgId)
     .eq('email', email)
     .maybeSingle();
+  if (selErr) {
+    return NextResponse.json({ error: 'Could not update the sender.' }, { status: 500 });
+  }
 
-  if (existing) {
-    await supabase
+  const patch = { status, approved_by: admin.userId, approved_at: new Date().toISOString() };
+  const updateExisting = (id: string) =>
+    supabase.from('email_ingest_senders').update(patch).eq('id', id).eq('org_id', admin.orgId);
+
+  let writeErr = existing
+    ? (await updateExisting((existing as { id: string }).id)).error
+    : (await supabase.from('email_ingest_senders').insert({ org_id: admin.orgId, email, ...patch })).error;
+
+  // A unique violation means a concurrent request created the row between our select and
+  // insert — not a failure. Re-apply as an update so OUR decision (approve/block) wins.
+  if (writeErr && !existing && isUniqueViolation(writeErr)) {
+    const { data: raced } = await supabase
       .from('email_ingest_senders')
-      .update({
-        status,
-        approved_by: admin.userId,
-        approved_at: new Date().toISOString(),
-      })
-      .eq('id', (existing as { id: string }).id)
-      .eq('org_id', admin.orgId);
-  } else {
-    await supabase.from('email_ingest_senders').insert({
-      org_id: admin.orgId,
-      email,
-      status,
-      approved_by: admin.userId,
-      approved_at: new Date().toISOString(),
-    });
+      .select('id')
+      .eq('org_id', admin.orgId)
+      .eq('email', email)
+      .maybeSingle();
+    writeErr = raced ? (await updateExisting((raced as { id: string }).id)).error : writeErr;
+  }
+
+  if (writeErr) {
+    return NextResponse.json({ error: 'Could not update the sender. Please try again.' }, { status: 500 });
   }
 
   if (action === 'block') {
@@ -94,21 +106,27 @@ export async function POST(req: Request) {
     .limit(20);
 
   const ids = ((held ?? []) as { id: string }[]).map((r) => r.id);
+  let released = 0;
   if (ids.length) {
-    await supabase
+    // Only process what we actually re-queued. If the release write fails, don't kick off
+    // ingestion off stale state — the sender is approved, so the cron re-drives it later.
+    const { error: releaseErr } = await supabase
       .from('email_ingests')
       .update({ status: 'queued', error: null, attempts: 0 })
       .in('id', ids)
       .eq('org_id', admin.orgId);
 
-    after(async () => {
-      const client = createServiceSupabase();
-      if (!client) return;
-      for (const id of ids) {
-        await processEmailIngest(client, id);
-      }
-    });
+    if (!releaseErr) {
+      released = ids.length;
+      after(async () => {
+        const client = createServiceSupabase();
+        if (!client) return;
+        for (const id of ids) {
+          await processEmailIngest(client, id);
+        }
+      });
+    }
   }
 
-  return NextResponse.json({ ok: true, email, status, released: ids.length });
+  return NextResponse.json({ ok: true, email, status, released });
 }

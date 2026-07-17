@@ -218,23 +218,31 @@ export interface OrderExtractionResult {
 }
 
 /** A document/image content block for the model from a base64 file. */
+/** The image media types Anthropic's vision API actually accepts. */
+const SUPPORTED_IMAGE_TYPES = new Set(['image/jpeg', 'image/png', 'image/gif', 'image/webp']);
+
 function fileBlockFor(params: { base64: string; mediaType: string; filename: string }): Anthropic.ContentBlockParam {
   const isPdf =
     params.mediaType === 'application/pdf' || params.filename.toLowerCase().endsWith('.pdf');
-  return isPdf
-    ? { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: params.base64 } }
-    : {
-        type: 'image',
-        source: {
-          type: 'base64',
-          media_type: (params.mediaType || 'image/jpeg') as
-            | 'image/jpeg'
-            | 'image/png'
-            | 'image/gif'
-            | 'image/webp',
-          data: params.base64,
-        },
-      };
+  if (isPdf) {
+    return { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: params.base64 } };
+  }
+  // Validate rather than blind-cast. A cast of image/heic or image/bmp to a supported
+  // type produced an opaque Anthropic 400 far downstream; fail here with a clear message.
+  // Normalise the common image/jpg alias first (some cameras/mailers emit it).
+  const raw = (params.mediaType || 'image/jpeg').toLowerCase();
+  const mediaType = raw === 'image/jpg' ? 'image/jpeg' : raw;
+  if (!SUPPORTED_IMAGE_TYPES.has(mediaType)) {
+    throw new Error(`Unsupported file type "${mediaType}". Use a PDF, JPEG, PNG, GIF or WebP.`);
+  }
+  return {
+    type: 'image',
+    source: {
+      type: 'base64',
+      media_type: mediaType as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp',
+      data: params.base64,
+    },
+  };
 }
 
 const ORDER_EXTRACT_INSTRUCTION = `You are Doc-U's ORDER reader for an SME food & wholesale business in South Africa.

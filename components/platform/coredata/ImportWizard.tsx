@@ -62,6 +62,9 @@ interface ImportSummary {
   skippedMissing: number;
   errors: number;
   errorMessage?: string;
+  /** Mapped columns the DB didn't have, so they were dropped to let the row insert. The
+   *  rows landed, but WITHOUT these fields — the operator must be told, not silently lied to. */
+  droppedColumns?: string[];
 }
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -651,9 +654,14 @@ export function ImportWizard({ initialEntity }: { initialEntity: ImportEntity })
     let inserted = 0;
     let errors = 0;
     let errorMessage: string | undefined;
+    const droppedColumns = new Set<string>();
     for (let i = 0; i < payloads.length; i += CHUNK_SIZE) {
       const chunk = payloads.slice(i, i + CHUNK_SIZE);
-      const { error } = await insertDroppingMissing((rows) => supabase.from(def.table).insert(rows), chunk);
+      const { error, dropped } = await insertDroppingMissing((rows) => supabase.from(def.table).insert(rows), chunk);
+      // The rows DID insert, but any dropped column's mapped data was silently thrown
+      // away to make them fit. Record it so the operator is told rather than shown a clean
+      // "Imported N" over lost fields.
+      for (const c of dropped) droppedColumns.add(c);
       if (error) {
         errors += chunk.length;
         if (!errorMessage) {
@@ -667,7 +675,14 @@ export function ImportWizard({ initialEntity }: { initialEntity: ImportEntity })
     }
 
     setConfirming(false);
-    setSummary({ inserted, skippedDuplicate, skippedMissing, errors, errorMessage });
+    setSummary({
+      inserted,
+      skippedDuplicate,
+      skippedMissing,
+      errors,
+      errorMessage,
+      droppedColumns: droppedColumns.size ? [...droppedColumns] : undefined,
+    });
     setStep('summary');
     if (inserted > 0) {
       toast(`Imported ${inserted} ${def.label.toLowerCase()}`);
@@ -1222,6 +1237,17 @@ function SummaryStep({
       {summary.errorMessage ? (
         <div className="mt-3 rounded-xl border border-[#E7C9C9] bg-[#F9F0F0] px-3 py-2 text-[12px] text-[#A32D2D]">
           {summary.errorMessage}
+        </div>
+      ) : null}
+
+      {summary.droppedColumns && summary.droppedColumns.length > 0 ? (
+        <div className="mt-3 rounded-xl border border-[#F0E4CB] bg-[#FFFDF7] px-3 py-2 text-[12px] text-[#854F0B]">
+          <span className="font-medium">Heads up — some mapped fields weren&apos;t saved.</span> Your database is
+          missing {summary.droppedColumns.length === 1 ? 'a column' : 'columns'} for{' '}
+          {summary.droppedColumns.join(', ')}, so {summary.droppedColumns.length === 1 ? 'it was' : 'they were'}{' '}
+          dropped and the rest of each row was imported. Run{' '}
+          <code className="rounded bg-black/[0.05] px-1">supabase/import-fields.sql</code>, then re-import to fill{' '}
+          {summary.droppedColumns.length === 1 ? 'it' : 'them'} in.
         </div>
       ) : null}
 

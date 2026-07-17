@@ -335,7 +335,9 @@ export function Dashboard({
                     <th className="px-5 py-2.5 font-medium">Invoice</th>
                     <th className="px-5 py-2.5 font-medium">Customer</th>
                     <th className="px-5 py-2.5 font-medium">Status</th>
-                    <th className="px-5 py-2.5 text-right font-medium">Balance</th>
+                    {/* Balance is money — render the column only for admins, so it isn't
+                        shipped in the RSC/DOM payload to a member whose KPIs are redacted. */}
+                    {isAdmin ? <th className="px-5 py-2.5 text-right font-medium">Balance</th> : null}
                   </tr>
                 </thead>
                 <tbody>
@@ -353,7 +355,9 @@ export function Dashboard({
                       <td className="px-5 py-2.5">
                         <StatusPill status={r.status} />
                       </td>
-                      <td className="px-5 py-2.5 text-right tabular-nums text-[#1A1C1E]">{zar2(r.balance)}</td>
+                      {isAdmin ? (
+                        <td className="px-5 py-2.5 text-right tabular-nums text-[#1A1C1E]">{zar2(r.balance)}</td>
+                      ) : null}
                     </tr>
                   ))}
                 </tbody>

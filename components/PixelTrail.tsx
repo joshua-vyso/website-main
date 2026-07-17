@@ -1,6 +1,9 @@
 "use client";
 import React, { useCallback, useEffect, useMemo, useRef } from "react";
-import { motion, useAnimationControls } from "framer-motion";
+// Import through the declared `motion` package (motion/react re-exports framer-motion).
+// framer-motion is only a TRANSITIVE dep here, so a bare 'framer-motion' import breaks
+// under a strict installer or a `motion` major bump.
+import { motion, useAnimationControls } from "motion/react";
 import { useDimensions } from "@/components/hooks/use-debounced-dimensions";
 
 interface PixelTrailProps {

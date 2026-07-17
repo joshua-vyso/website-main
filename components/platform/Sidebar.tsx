@@ -7,6 +7,7 @@ import { MODULES } from '@/lib/platform/modules';
 import { SERVICEDEN_ACCOUNT_EMAIL } from '@/lib/platform/serviceden';
 import { usePlatform } from '@/lib/platform/session';
 import { createClient } from '@/lib/platform/supabase-browser';
+import { clearParsedOrder } from '@/lib/ai/vyso-agent/order-handoff';
 import { AppIcon } from './AppIcon';
 import { FeedbackModal } from './FeedbackModal';
 import { ModuleLockNotice } from './ModuleLockNotice';
@@ -28,6 +29,9 @@ export function Sidebar() {
   const [lockNotice, setLockNotice] = useState<string | null>(null);
 
   async function signOut() {
+    // Clear the client-side parsed-order draft (customer + line items + prices) so it
+    // can't survive sign-out into the next user's session on a shared workstation.
+    clearParsedOrder();
     const supabase = createClient();
     if (supabase) await supabase.auth.signOut();
     router.push('/login');

@@ -29,7 +29,10 @@ function normaliseIngestDomain(raw: string): string {
 export const INGEST_DOMAIN = normaliseIngestDomain(process.env.EMAIL_INGEST_DOMAIN ?? '');
 
 /** Only these become documents. Anything else in the email is ignored. */
-const ALLOWED_TYPES = /^(application\/pdf|image\/(png|jpe?g|webp|gif|heic|bmp))$/i;
+// Only the formats Anthropic's vision API actually reads. HEIC/BMP were advertised here
+// but Anthropic rejects them, so an iPhone-HEIC attachment would be selected, uploaded,
+// then fail extraction late — better to not select it in the first place.
+const ALLOWED_TYPES = /^(application\/pdf|image\/(png|jpe?g|webp|gif))$/i;
 /** ~13MB decoded — matches the chat ingest ceiling. */
 export const MAX_ATTACHMENT_BYTES = 13 * 1024 * 1024;
 /** Don't let one email fan out into an unbounded number of AI calls. */

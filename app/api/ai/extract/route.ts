@@ -50,6 +50,14 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Could not download the document' }, { status: 404, headers: AI_CORS_HEADERS });
   }
 
+  // Server-enforced ceiling — the stored object could be larger than any client cap
+  // (a direct Storage API PUT bypasses the browser entirely), and we're about to buffer
+  // the whole thing into memory and base64 it for the model.
+  const MAX_EXTRACT_BYTES = 15 * 1024 * 1024;
+  if (file.size > MAX_EXTRACT_BYTES) {
+    return NextResponse.json({ error: 'That file is too large to process.' }, { status: 413, headers: AI_CORS_HEADERS });
+  }
+
   const base64 = Buffer.from(await file.arrayBuffer()).toString('base64');
   const mediaType = file.type || (doc.filename.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'image/jpeg');
 

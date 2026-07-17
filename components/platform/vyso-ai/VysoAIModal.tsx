@@ -62,6 +62,11 @@ async function fileToPayload(file: File): Promise<{ base64: string; mediaType: s
 }
 
 const MAX_ORDER_BYTES = 13 * 1024 * 1024;
+// PDFs are sent base64-in-JSON to the ingest route; Vercel rejects request bodies over
+// 4.5MB at the edge BEFORE the handler runs, and base64 inflates by ~33%, so a PDF above
+// ~3.3MiB would fail as an opaque 413. Cap it client-side with a clear message. (Images
+// are downscaled to a small JPEG before send, so the 13MB gate is fine for them.)
+const MAX_PDF_BYTES = 3 * 1024 * 1024;
 /** How many order files we'll read from a single drop/selection. */
 const MAX_ORDER_FILES = 8;
 
@@ -407,13 +412,15 @@ export function VysoAIModal({
     const errs: string[] = [];
     const accepted: File[] = [];
     for (const file of files) {
-      const okType = file.type === 'application/pdf' || file.type.startsWith('image/');
+      const isImage = file.type.startsWith('image/');
+      const okType = file.type === 'application/pdf' || isImage;
       if (!okType) {
         errs.push(`${file.name}: not a PDF or image.`);
         continue;
       }
-      if (file.size > MAX_ORDER_BYTES) {
-        errs.push(`${file.name}: too large (max ~13MB).`);
+      const cap = isImage ? MAX_ORDER_BYTES : MAX_PDF_BYTES;
+      if (file.size > cap) {
+        errs.push(`${file.name}: too large (max ${isImage ? '~13MB' : '3MB for PDFs'}).`);
         continue;
       }
       accepted.push(file);

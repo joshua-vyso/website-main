@@ -138,9 +138,21 @@ export async function runDocumentSideEffects(
 ): Promise<{ orderSync?: unknown }> {
   if (doc.document_type === 'order') {
     const orderSync = await syncOrderFromDocument(supabase, { documentId: doc.id, orgId: doc.org_id });
+    // syncOrderFromDocument REPORTS failure by returning { ok: false, reason }, it does not
+    // throw. Returning that quietly let a caller's try/catch see success and mark the
+    // document approved with NO order behind it — the document then leaves the review
+    // queue, so the order is lost with no way to retry. An unsuccessful sub-result is a
+    // failure; make it one.
+    if (!orderSync.ok) {
+      throw new Error(`Could not build the order: ${orderSync.reason ?? 'unknown reason'}`);
+    }
     return { orderSync };
   }
   if (await orgHasProcurePulse(supabase, doc.org_id)) {
+    // Unlike the order sync, a `fed: false` here is NOT a failure — it means
+    // 'type-not-routed-to-stock' (e.g. a price list) or 'no-line-items', both of which are
+    // legitimate "nothing to do, the document is still fine to keep" outcomes. A real
+    // failure throws, and the caller's catch handles it. Don't "fix" this into a throw.
     await feedDocumentToProcurePulse(supabase, {
       id: doc.id,
       org_id: doc.org_id,
@@ -244,13 +256,33 @@ export async function commitDocument(
 
   // Commit: only our own live claim may finalize (guards against a Discard or a stale
   // re-claimer that slipped in).
-  await supabase
+  //
+  // Check the result rather than assuming it landed. The side effects have ALREADY run at
+  // this point, so a silent failure here would report success while leaving the document
+  // in the queue — the next Save would re-run the (idempotent) side effects, but the
+  // operator would have been told it was saved. Report the truth instead.
+  const { data: finalized, error: finalErr } = await supabase
     .from('documents')
     .update({ status: 'approved' })
     .eq('id', documentId)
     .eq('org_id', orgId)
     .eq('approved_by', userId)
-    .in('status', ['extracted', 'pending']);
+    .in('status', ['extracted', 'pending'])
+    .select('id')
+    .maybeSingle();
+
+  if (finalErr) {
+    return {
+      ok: false,
+      status: 500,
+      error: `Saved the document's data, but could not mark it approved: ${finalErr.message}. Try again — re-saving is safe.`,
+    };
+  }
+  if (!finalized) {
+    // Our claim was taken (a stale re-claim) or the row moved on. The side effects are
+    // idempotent, so this is not corruption — but don't claim success we can't prove.
+    return { ok: false, status: 409, error: 'That document was actioned by someone else. Refresh the queue.' };
+  }
 
   return { ok: true, documentId };
 }

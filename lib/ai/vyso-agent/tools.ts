@@ -88,7 +88,7 @@ const ORDERFLOW_TOOLS: AgentTool[] = [
   {
     name: 'orderflow_list_recent_orders',
     description:
-      'List the most recent customer orders (newest first) with order number, customer, status, ex-VAT subtotal, whether it has been invoiced yet, and date. Call this when the user asks about recent orders or orders awaiting invoicing.',
+      'List the most recent customer orders (newest first) with order number, customer, status, whether it has been invoiced yet, and date (order values are included only for users allowed to see money). Call this when the user asks about recent orders or orders awaiting invoicing.',
     input_schema: {
       type: 'object',
       properties: {
@@ -97,7 +97,7 @@ const ORDERFLOW_TOOLS: AgentTool[] = [
       additionalProperties: false,
     },
     run: (ctx, input) =>
-      recentOrders(ctx.supabase, ctx.orgId, clampLimit(input.limit, 8, 25)).then((r) => JSON.stringify(r)),
+      recentOrders(ctx.supabase, ctx.orgId, clampLimit(input.limit, 8, 25), ctx.canSeeMoney).then((r) => JSON.stringify(r)),
   },
   {
     name: 'orderflow_get_order_lines',

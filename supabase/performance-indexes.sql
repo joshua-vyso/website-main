@@ -27,3 +27,10 @@ CREATE INDEX IF NOT EXISTS idx_org_features_org_feature ON org_features (org_id,
 -- ProcurePulse stock + supplier-price lookups (feed path).
 CREATE INDEX IF NOT EXISTS idx_pp_stock_items_org_id           ON pp_stock_items (org_id);
 CREATE INDEX IF NOT EXISTS idx_pp_item_suppliers_stock_item_id ON pp_item_suppliers (stock_item_id);
+
+-- of_order_items is the fastest-growing table and PricePilot/analytics all filter it by
+-- org_id, but the only existing index is on order_id — so those queries seq-scan. The
+-- composite also serves the frequent (org_id, stock_item_id) product rollups.
+-- In production add CONCURRENTLY (a plain build briefly locks the table):
+--   CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_of_order_items_org ON of_order_items (org_id, stock_item_id);
+CREATE INDEX IF NOT EXISTS idx_of_order_items_org ON of_order_items (org_id, stock_item_id);

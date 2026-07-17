@@ -26,9 +26,17 @@ alter table feedback enable row level security;
 
 -- Any authenticated user submits feedback as themselves; they can read back
 -- their own submissions. (Review happens via the emailed copy for now.)
+--
+-- org_id must ALSO be the caller's own org, not just a client-supplied value — otherwise
+-- a Data-API caller could stamp another org's UUID onto a feedback row. `is not distinct
+-- from` (not `=`) is deliberate: the API route inserts org_id = null when the profile
+-- lookup fails, and `=` would reject that legitimate null path.
 drop policy if exists feedback_insert on feedback;
 create policy feedback_insert on feedback for insert
-  with check (user_id = auth.uid());
+  with check (
+    user_id = auth.uid()
+    and org_id is not distinct from (select p.org_id from profiles p where p.id = auth.uid())
+  );
 
 drop policy if exists feedback_select_own on feedback;
 create policy feedback_select_own on feedback for select

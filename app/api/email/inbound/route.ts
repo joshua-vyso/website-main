@@ -113,8 +113,9 @@ export async function POST(req: Request) {
 
   // 4. Sender policy — and the two lanes deliberately differ here.
   //
-  //    DOCUMENTS: the allowlist is the control. These attachments become invoices and
-  //    stock movements with no human in the loop, so an unknown sender is quarantined.
+  //    DOCUMENTS: the allowlist is the control. These attachments are extracted and
+  //    parked in the Doc-U review queue (a human Saves before they touch stock/invoices),
+  //    but an unapproved sender's mail shouldn't even reach that queue — so it's quarantined.
   //
   //    QUOTES: no allowlist. The enquiries come from a PUBLIC web form, so demanding
   //    that each stranger be pre-approved would defeat the feature — and an allowlist

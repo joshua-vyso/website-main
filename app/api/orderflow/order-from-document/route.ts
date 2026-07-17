@@ -34,11 +34,22 @@ export async function POST(req: Request) {
   }
 
   // The document row carries org_id; resolve it through RLS.
-  const { data: doc } = await supabase.from('documents').select('org_id').eq('id', body.documentId).maybeSingle();
+  const { data: doc } = await supabase
+    .from('documents')
+    .select('org_id, document_type')
+    .eq('id', body.documentId)
+    .maybeSingle();
   if (!doc) {
     return NextResponse.json({ error: 'Document not found' }, { status: 404, headers: AI_CORS_HEADERS });
   }
   const orgId = (doc as { org_id: string }).org_id;
+
+  // Only an ORDER may be turned into an order. Without this a member could point this at
+  // an invoice or statement with finalize:true and book a purchase as a sale — burning a
+  // real invoice number and decrementing stock off a document that was never an order.
+  if ((doc as { document_type: string | null }).document_type !== 'order') {
+    return NextResponse.json({ error: 'That document is not an order.' }, { status: 409, headers: AI_CORS_HEADERS });
+  }
 
   // A supplied customerId must belong to this document's org (the query is RLS-scoped,
   // so a foreign id resolves to null) — never stamp a foreign customer onto the order.

@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import zlib from 'node:zlib';
+import { resolveUser } from '@/lib/ai/auth';
 
 /**
  * Dependency-free .xlsx → rows parser. An .xlsx is a ZIP of XML parts; we read
@@ -15,13 +16,22 @@ import zlib from 'node:zlib';
 export const runtime = 'nodejs';
 const MAX_BYTES = 15 * 1024 * 1024;
 const MAX_ROWS = 20000;
+/** Excel's real hard limit is 16384 columns (XFD). Nothing legitimate exceeds it, and
+ *  bounding it stops a crafted cell ref (e.g. r="AAAAAAAAAA1") from producing a maxc in
+ *  the trillions and OOM-ing the function on the dense-fill loop. */
+const MAX_COLS = 16384;
+/** Cap each inflated ZIP part so a small compressed bomb can't expand without bound. */
+const MAX_INFLATED_BYTES = 64 * 1024 * 1024;
 
 function colIndex(ref: string): number | null {
-  const m = /^([A-Z]+)/.exec(ref);
+  // Bound the letter run at 3 (XFD): a longer run is not a real Excel column and is the
+  // shape a DoS ref takes, so reject it rather than compute an astronomical index.
+  const m = /^([A-Z]{1,3})/.exec(ref);
   if (!m) return null;
   let n = 0;
   for (const ch of m[1]) n = n * 26 + (ch.charCodeAt(0) - 64);
-  return n - 1;
+  const ci = n - 1;
+  return ci >= MAX_COLS ? null : ci;
 }
 
 function decodeEntities(s: string): string {
@@ -68,10 +78,11 @@ function unzip(buf: Buffer): Map<string, string> {
       const dataStart = localOff + 30 + lnameLen + lextraLen;
       const raw = buf.subarray(dataStart, dataStart + compSize);
       try {
-        const content = method === 0 ? raw : zlib.inflateRawSync(raw);
+        // maxOutputLength throws if the inflated size exceeds the cap — the zip-bomb guard.
+        const content = method === 0 ? raw : zlib.inflateRawSync(raw, { maxOutputLength: MAX_INFLATED_BYTES });
         out.set(name, content.toString('utf8'));
       } catch {
-        /* skip a part that won't inflate */
+        /* skip a part that won't inflate (or that blew the size cap) */
       }
     }
   }
@@ -137,6 +148,12 @@ function parseSheet(xml: string, shared: string[]): string[][] {
 
 export async function POST(req: Request) {
   try {
+    // Require a signed-in user. The importer only runs inside the authenticated app, and
+    // gating it removes the anonymous attack surface — the parser is intentionally
+    // dependency-free and hand-rolled, so it should never be reachable by the public.
+    const auth = await resolveUser(req);
+    if (!auth) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
     const form = await req.formData();
     const file = form.get('file');
     if (!(file instanceof File)) return NextResponse.json({ error: 'No file.' }, { status: 400 });
