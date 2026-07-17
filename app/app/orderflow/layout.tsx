@@ -19,19 +19,25 @@ const TABS = [
   { label: 'Settings', href: '/app/orderflow/settings' },
 ];
 
+// Whether the v2 tables are missing is a GLOBAL, deploy-time fact (the table either
+// exists in the DB or doesn't) — not per-org data. It used to be probed on EVERY
+// OrderFlow navigation, an extra DB round-trip on a hot path. Cache it at module scope so
+// it runs at most once per serverless instance instead of once per click.
+let setupProbe: boolean | null = null;
+async function needsOrderFlowSetup(): Promise<boolean> {
+  if (setupProbe !== null) return setupProbe;
+  const sb = await createServerSupabase();
+  const { error } = await sb.from('of_invoices').select('id').limit(1);
+  setupProbe = !!error && isSetupError(error.message);
+  return setupProbe;
+}
+
 /** OrderFlow chrome: sub-nav across the invoicing hub's screens. */
 export default async function OrderFlowLayout({ children }: { children: React.ReactNode }) {
   const session = await getPlatformSession();
   if (!session) redirect('/login');
 
-  // Cheap once-per-navigation probe: if the v2 tables are missing (core-data.sql
-  // not yet run), nudge the user to finish setup above the chrome.
-  let needsSetup = false;
-  if (session.org) {
-    const sb = await createServerSupabase();
-    const { error } = await sb.from('of_invoices').select('id').limit(1);
-    needsSetup = !!error && isSetupError(error.message);
-  }
+  const needsSetup = session.org ? await needsOrderFlowSetup() : false;
 
   return (
     <div className="px-8 py-7">

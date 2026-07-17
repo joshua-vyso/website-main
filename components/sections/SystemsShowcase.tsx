@@ -231,6 +231,8 @@ export function SystemsShowcase() {
                       <img
                         src={mod.image}
                         alt={mod.title}
+                        loading="lazy"
+                        decoding="async"
                         style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }}
                       />
                     )}

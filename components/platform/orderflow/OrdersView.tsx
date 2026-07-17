@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useRealtimeRefresh } from '@/lib/platform/useRealtimeRefresh';
 import { createClient } from '@/lib/platform/supabase-browser';
 import { usePlatform } from '@/lib/platform/session';
 import { logActivity } from '@/lib/platform/orderflow-activity';
@@ -132,6 +133,7 @@ export function OrdersView({
   orgUnits?: string[];
 }) {
   const router = useRouter();
+  useRealtimeRefresh('of_orders');
   const { org, email } = usePlatform();
   const { node: toastNode, show: toast } = useToast();
   const now = Date.now();

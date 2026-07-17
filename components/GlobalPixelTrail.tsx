@@ -2,7 +2,12 @@
 
 import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { PixelTrail } from "./PixelTrail";
+import dynamic from "next/dynamic";
+
+// Load PixelTrail (and its `motion` runtime) only when it's actually rendered — on the
+// marketing pages. A static import would bake motion into the shared client bundle that
+// /app downloads, even though this component renders null there.
+const PixelTrail = dynamic(() => import("./PixelTrail").then((m) => m.PixelTrail), { ssr: false });
 
 export function GlobalPixelTrail() {
   const pathname = usePathname();

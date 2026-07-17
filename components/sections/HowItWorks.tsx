@@ -299,6 +299,8 @@ export function HowItWorks() {
               <img
                 src={step.image}
                 alt={`${step.title} mockup`}
+                loading="lazy"
+                decoding="async"
                 style={{
                   width:          "100%",
                   height:         "100%",

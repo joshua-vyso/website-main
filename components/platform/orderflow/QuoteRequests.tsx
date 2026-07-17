@@ -20,6 +20,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useRealtimeRefresh } from '@/lib/platform/useRealtimeRefresh';
 import { createClient } from '@/lib/platform/supabase-browser';
 import { quoteRequestWho, type OfQuoteRequest } from '@/lib/platform/orderflow';
 import { useToast } from './ui';
@@ -32,6 +33,7 @@ function fmtWhen(iso: string): string {
 
 export function QuoteRequests({ requests, total }: { requests: OfQuoteRequest[]; total: number }) {
   const router = useRouter();
+  useRealtimeRefresh('of_quote_requests');
   const { node: toastNode, show: toast } = useToast();
   const [busy, setBusy] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);

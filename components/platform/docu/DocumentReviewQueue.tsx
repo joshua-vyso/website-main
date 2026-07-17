@@ -15,6 +15,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useRealtimeRefresh } from '@/lib/platform/useRealtimeRefresh';
 import type { DocumentWithSupplier, ExtractedLineItem } from '@/lib/platform/types';
 
 const TYPE_LABEL: Record<string, string> = {
@@ -37,6 +38,8 @@ function lineLabel(it: ExtractedLineItem): string {
 
 export function DocumentReviewQueue({ docs, canReview }: { docs: DocumentWithSupplier[]; canReview: boolean }) {
   const router = useRouter();
+  // A forwarded document now appears the moment it's extracted — no manual refresh.
+  useRealtimeRefresh('documents');
   const [busy, setBusy] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<string | null>(null);

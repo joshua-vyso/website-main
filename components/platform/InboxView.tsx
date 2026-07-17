@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useRealtimeRefresh } from '@/lib/platform/useRealtimeRefresh';
 import { DocumentStatsCards } from './docu/DocumentStatsCards';
 import { DocumentFilters } from './docu/DocumentFilters';
 import { DocumentTable } from './docu/DocumentTable';
@@ -50,6 +51,7 @@ export function InboxView({
   emptyBody?: string;
 }) {
   const router = useRouter();
+  useRealtimeRefresh('documents');
   const [search, setSearch] = useState('');
   const [activeType, setActiveType] = useState<DocumentType | null>(null);
   const [activeFolderId, setActiveFolderId] = useState<string | null>(null);

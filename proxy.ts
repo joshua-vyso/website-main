@@ -32,10 +32,24 @@ export async function proxy(request: NextRequest) {
     },
   });
 
-  // Triggers a refresh if the access token is stale; setAll above captures the new
-  // cookies onto `response`. Best-effort — a failure here must not break the request.
+  // Only pay the network refresh when the access token is actually near expiry.
+  //
+  // getSession() reads the token from the cookie LOCALLY (no network); getUser() is a
+  // round-trip to Supabase Auth that also triggers the refresh. Calling getUser() on
+  // every /app request added a full auth hop to every navigation on top of the page's
+  // own getPlatformSession() check. So decode expiry locally and only refresh when we're
+  // within two minutes of it — on a fresh token we skip the network entirely.
+  //
+  // (expires_at here is only used for refresh TIMING, never for authorization — the
+  // page still does the real getUser() validation.)
   try {
-    await supabase.auth.getUser();
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    const now = Math.floor(Date.now() / 1000);
+    if (session && (session.expires_at ?? 0) - now < 120) {
+      await supabase.auth.getUser();
+    }
   } catch {
     /* leave the session as-is; the page's own auth check still runs */
   }

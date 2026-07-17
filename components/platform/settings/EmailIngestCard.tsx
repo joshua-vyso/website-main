@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { useRealtimeRefresh } from '@/lib/platform/useRealtimeRefresh';
 
 export interface IngestSender {
   id: string;
@@ -54,6 +55,7 @@ export function EmailIngestCard({
   canManage: boolean;
 }) {
   const router = useRouter();
+  useRealtimeRefresh('email_ingests');
   const [busy, setBusy] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);

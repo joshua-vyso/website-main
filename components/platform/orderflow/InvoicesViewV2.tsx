@@ -11,6 +11,7 @@
 import { useMemo, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useRealtimeRefresh } from '@/lib/platform/useRealtimeRefresh';
 import { createClient } from '@/lib/platform/supabase-browser';
 import { usePlatform } from '@/lib/platform/session';
 import { useIsAdmin } from '@/components/platform/RoleGate';
@@ -78,6 +79,7 @@ function friendlyError(message: string | undefined): string {
 
 export function InvoicesViewV2({ data }: { data: InvoicesData }) {
   const router = useRouter();
+  useRealtimeRefresh('of_invoices');
   const { org, email } = usePlatform();
   // Money mutations (send, record payment, cancel, credit note) are owner/admin-only at
   // the RLS layer — don't offer them to members as row actions that would then fail.
