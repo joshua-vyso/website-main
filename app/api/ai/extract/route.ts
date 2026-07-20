@@ -2,10 +2,12 @@ import { NextResponse } from 'next/server';
 import { resolveUser, AI_CORS_HEADERS } from '@/lib/ai/auth';
 import { extractDocument, extractOrderDocument, aiConfigured } from '@/lib/ai/anthropic';
 import { feedDocumentToProcurePulse, orgHasProcurePulse } from '@/lib/platform/procurepulse-feed';
+import { feedDocumentToSupplySync, orgHasSupplySync } from '@/lib/platform/supplysync-feed';
 import { syncOrderFromDocument } from '@/lib/platform/orderflow-from-doc';
-// Shared with the chat + inbound-email ingest so supplier dedup behaves identically
-// everywhere (re-selects the winner if it loses a race against the unique index).
-import { resolveSupplierId } from '@/lib/platform/document-ingest';
+// Shared with the chat + inbound-email ingest so supplier resolution behaves
+// identically everywhere: alias ruling → suppliers row (race-safe) → SupplySync
+// profile, with the org's own name never becoming a supplier.
+import { resolveSupplierProfile } from '@/lib/platform/document-ingest';
 import type { Document } from '@/lib/platform/types';
 
 // Multi-page statements with many line items can take a while to parse.
@@ -145,7 +147,7 @@ export async function POST(req: Request) {
   let supplierId = doc.supplier_id;
   if (result.supplier) {
     try {
-      supplierId = await resolveSupplierId(supabase, doc.org_id, result.supplier);
+      supplierId = (await resolveSupplierProfile(supabase, doc.org_id, result.supplier)) ?? doc.supplier_id;
     } catch {
       /* keep the existing supplier_id */
     }
@@ -186,6 +188,25 @@ export async function POST(req: Request) {
           line_items: result.line_items,
           supplier: result.supplier,
         },
+      });
+    }
+  } catch {
+    /* swallow — extraction already succeeded */
+  }
+
+  // Feed SupplySync too (profile timeline + spend rollups), so a manually scanned
+  // invoice reaches the supplier's SupplySync profile exactly like the chat/email
+  // paths. Best-effort — intelligence must never fail extraction.
+  try {
+    if (supplierId && (await orgHasSupplySync(supabase, doc.org_id))) {
+      await feedDocumentToSupplySync(supabase, {
+        id: doc.id,
+        org_id: doc.org_id,
+        document_type: documentType,
+        filename: doc.filename,
+        supplier_id: supplierId,
+        extracted_data: { fields: result.fields, line_items: result.line_items, supplier: result.supplier },
+        created_at: doc.created_at,
       });
     }
   } catch {

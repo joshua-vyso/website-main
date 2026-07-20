@@ -37,6 +37,10 @@ Supabase dashboard → **Authentication → Users → Add user**
 
 > Tip: paste all the schema files in one go, then all the seed files.
 
+> After seeding, also run `supabase/supplysync-link.sql` (repo root supabase/):
+> it bridges the seeded `ss_suppliers` to core `suppliers` rows so Doc-U
+> documents land on the SupplySync profiles.
+
 > The 4 real modules (6–9) reuse tables that already exist in your DB from the
 > Turn 'n Slice setup — they need **no schema step**, just the seed. Their rows
 > are org-scoped to Fresh Valley, so your existing data is untouched.

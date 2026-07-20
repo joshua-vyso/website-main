@@ -11,6 +11,7 @@
  */
 
 import { createServerSupabase } from './supabase-server';
+import { docTotal } from '@/lib/platform/docu/extract';
 
 export type SupplierStatus = 'preferred' | 'active' | 'review';
 export type SupplierRisk = 'low' | 'medium' | 'high';
@@ -52,6 +53,18 @@ export interface SupplierDocument {
   status: SupplierDocumentStatus;
   expiry: string | null;
   daysRemaining: number | null;
+}
+
+/** A Doc-U document filed against this supplier (via the suppliers bridge) —
+ *  Doc-U stays the file source of truth; this is a read-through, not a copy. */
+export interface SupplierLinkedDoc {
+  id: string;
+  filename: string;
+  docType: string | null;
+  status: string;
+  confidence: number | null;
+  total: number | null;
+  date: string | null;
 }
 
 export interface SupplierPerformanceMetric {
@@ -163,6 +176,7 @@ export interface Supplier {
   notes: SupplierNote[];
   contacts: SupplierContact[];
   docs: SupplierDocument[];
+  linkedDocs: SupplierLinkedDoc[];
   pricing: SupplierPricingRecord[];
   risks: SupplierRiskItem[];
   history: SupplierHistoryEvent[];
@@ -239,13 +253,23 @@ function deriveOverall(s: { reliability: number; quality: number; deliveryConsis
 
 export async function getSupplySyncData(orgId: string): Promise<SupplySyncData> {
   const sb = await createServerSupabase();
-  const [sup, con, doc, pri, rsk, his] = await Promise.all([
+  const [sup, con, doc, pri, rsk, his, dcs] = await Promise.all([
     sb.from('ss_suppliers').select('*').eq('org_id', orgId).order('name'),
     sb.from('ss_supplier_contacts').select('*').eq('org_id', orgId).order('sort_order'),
     sb.from('ss_supplier_documents').select('*').eq('org_id', orgId),
     sb.from('ss_supplier_pricing').select('*').eq('org_id', orgId).order('sort_order'),
     sb.from('ss_supplier_risks').select('*').eq('org_id', orgId),
     sb.from('ss_supplier_history').select('*').eq('org_id', orgId).order('event_date', { ascending: false }),
+    // Doc-U documents filed against a core supplier — joined to the profile via
+    // the ss_suppliers.supplier_id bridge below. Recent-first, sanely capped.
+    sb
+      .from('documents')
+      .select('id, filename, document_type, status, confidence, created_at, supplier_id, extracted_data')
+      .eq('org_id', orgId)
+      .not('supplier_id', 'is', null)
+      .not('status', 'in', '(rejected,archived,error)')
+      .order('created_at', { ascending: false })
+      .limit(400),
   ]);
 
   const nameById = new Map<string, string>();
@@ -278,6 +302,24 @@ export async function getSupplySyncData(orgId: string): Promise<SupplySyncData> 
       daysRemaining: daysUntil(d.expiry ?? null),
     });
     docsBy.set(d.supplier_id, arr);
+  }
+
+  // Keyed by CORE supplier id (documents.supplier_id), not the ss profile id.
+  const linkedBy = new Map<string, SupplierLinkedDoc[]>();
+  for (const d of (dcs.data as any[]) ?? []) {
+    if (!d.supplier_id) continue;
+    const arr = linkedBy.get(d.supplier_id) ?? [];
+    arr.push({
+      id: d.id,
+      filename: d.filename ?? '',
+      docType: d.document_type ?? null,
+      status: d.status ?? '',
+      confidence: d.confidence ?? null,
+      total: docTotal({ extracted_data: d.extracted_data ?? null }),
+      // created_at is a timestamptz; the drawer's fmtDate wants a date-only string.
+      date: d.created_at ? String(d.created_at).slice(0, 10) : null,
+    });
+    linkedBy.set(d.supplier_id, arr);
   }
 
   const pricingBy = new Map<string, SupplierPricingRecord[]>();
@@ -403,6 +445,7 @@ export async function getSupplySyncData(orgId: string): Promise<SupplySyncData> 
       notes: Array.isArray(r.notes) ? (r.notes as SupplierNote[]) : [],
       contacts: contactsBy.get(r.id) ?? [],
       docs,
+      linkedDocs: r.supplier_id ? linkedBy.get(r.supplier_id) ?? [] : [],
       pricing: supPricing,
       risks,
       history: historyBy.get(r.id) ?? [],

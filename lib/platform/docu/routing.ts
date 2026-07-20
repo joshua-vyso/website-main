@@ -10,17 +10,21 @@ const RULES: Record<DocumentType, { key: FeatureKey; reason: string; recommended
   invoice: [
     { key: 'pricepilot', reason: 'Track unit prices and margin', recommended: true },
     { key: 'procurepulse', reason: 'Update stock + spend', recommended: true },
+    { key: 'suppliers', reason: 'File on the supplier profile + spend history', recommended: true },
   ],
   statement: [
     { key: 'procurepulse', reason: 'Reconcile stock from market lines', recommended: true },
+    { key: 'suppliers', reason: 'File on the supplier profile + spend history', recommended: true },
     { key: 'reportgen', reason: 'Feed spend analytics', recommended: false },
   ],
   delivery_note: [
     { key: 'procurepulse', reason: 'Confirm received stock', recommended: true },
+    { key: 'suppliers', reason: 'Log on the supplier timeline', recommended: false },
     { key: 'wastelog', reason: 'Flag shrinkage vs ordered', recommended: false },
   ],
   price_list: [
     { key: 'pricepilot', reason: 'Refresh supplier price benchmarks', recommended: true },
+    { key: 'suppliers', reason: 'Track pricing intel on the profile', recommended: false },
   ],
   order: [
     { key: 'orderflow', reason: 'Track the purchase order', recommended: true },

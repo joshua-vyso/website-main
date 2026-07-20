@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { ModuleHeader, PrimaryAction } from '@/components/platform/module-ui';
 import { MODULE_META } from '@/lib/platform/module-meta';
 import { SubNav } from '@/components/platform/SubNav';
+import { useRealtimeRefresh } from '@/lib/platform/useRealtimeRefresh';
 import { useSupplySync } from './context';
 import { SupplierProfileDrawer } from './SupplierProfileDrawer';
 import { CompareDrawer, CompareBar } from './CompareDrawer';
@@ -27,6 +28,10 @@ const TABS = [
  */
 export function SupplySyncChrome({ children }: { children: ReactNode }) {
   const ss = useSupplySync();
+  // A committed Doc-U document writes the profile rollups + timeline, and the
+  // "From Doc-U" list reads `documents` directly — subscribe to all three so a
+  // scanned invoice appears on the profile live.
+  useRealtimeRefresh(['ss_suppliers', 'ss_supplier_history', 'documents']);
 
   return (
     <>

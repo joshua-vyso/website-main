@@ -9,11 +9,14 @@
  * internal sub-tabs. SupplySync only *surfaces* pricing and *recommends*
  * suppliers — no stock/inventory or buying workflow lives here (that is
  * ProcurePulse). Two actions persist to Supabase: adding a contact
- * (ss_supplier_contacts) and adding a note (ss_suppliers.notes jsonb). Document
- * upload/request are honest (demo) placeholders until Doc-U is wired.
+ * (ss_supplier_contacts) and adding a note (ss_suppliers.notes jsonb). The
+ * Documents tab also lists REAL Doc-U documents filed against this supplier
+ * (via the suppliers bridge — supabase/supplysync-link.sql); upload/request
+ * remain honest (demo) placeholders.
  */
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import type {
@@ -506,9 +509,44 @@ function DocumentsTab({ supplier, show }: { supplier: Supplier; show: (m: string
           </div>
         </div>
       ) : null}
+
+      {supplier.linkedDocs.length ? (
+        <div>
+          <SectionLabel>From Doc-U</SectionLabel>
+          <div className="mt-2 space-y-2">
+            {supplier.linkedDocs.map((d) => (
+              <Link
+                key={d.id}
+                href={`/app/docu/${d.id}`}
+                className="flex items-center justify-between gap-3 rounded-2xl border border-[#E7E7E2] bg-white p-3.5 transition-colors hover:border-[#B0466A]/40"
+              >
+                <div className="min-w-0">
+                  <div className="truncate text-[13px] font-medium text-[#1A1C1E]">{d.filename}</div>
+                  <div className="mt-0.5 text-[12px] text-[#9A9DA1]">
+                    {[LINKED_DOC_LABEL[d.docType ?? ''] ?? 'Document', d.date ? fmtDate(d.date) : null]
+                      .filter(Boolean)
+                      .join(' · ')}
+                  </div>
+                </div>
+                <div className="shrink-0 text-[13px] font-semibold tabular-nums text-[#1A1C1E]">
+                  {d.total != null ? zar(d.total) : ''}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }
+
+const LINKED_DOC_LABEL: Record<string, string> = {
+  invoice: 'Invoice',
+  statement: 'Statement',
+  delivery_note: 'Delivery note',
+  price_list: 'Price list',
+  order: 'Order',
+};
 
 function DocRow({ doc, show }: { doc: SupplierDocument; show: (m: string) => void }) {
   const meta = DOC_STATUS_META[doc.status];

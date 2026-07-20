@@ -3,6 +3,14 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { extractDocument, extractOrderDocument } from '@/lib/ai/anthropic';
 import { syncOrderFromDocument } from '@/lib/platform/orderflow-from-doc';
 import { feedDocumentToProcurePulse, orgHasProcurePulse } from '@/lib/platform/procurepulse-feed';
+import {
+  ensureSupplySyncProfile,
+  escapeLike,
+  feedDocumentToSupplySync,
+  lookupSupplierAlias,
+  normalizeSupplierName,
+  orgHasSupplySync,
+} from '@/lib/platform/supplysync-feed';
 import { isUniqueViolation } from '@/lib/platform/db-errors';
 import type { DocumentType, ExtractedData } from '@/lib/platform/types';
 
@@ -34,11 +42,13 @@ export function supplierInitials(name: string): string {
 export async function resolveSupplierId(supabase: SupabaseClient, orgId: string, name: string): Promise<string> {
   const trimmed = name.trim();
   const findExisting = async () => {
+    // escapeLike: `trimmed` can be an extracted supplier name — match it as a
+    // literal so a name containing % or _ can't match every supplier.
     const { data } = await supabase
       .from('suppliers')
       .select('id')
       .eq('org_id', orgId)
-      .ilike('name', trimmed)
+      .ilike('name', escapeLike(trimmed))
       .order('created_at', { ascending: true })
       .limit(1)
       .maybeSingle();
@@ -57,6 +67,71 @@ export async function resolveSupplierId(supabase: SupabaseClient, orgId: string,
     if (winner) return winner;
   }
   throw error ?? new Error('Could not create supplier');
+}
+
+/**
+ * Resolve an extracted supplier name to a linked supplier id — the full chain:
+ *
+ *   self-name guard → alias ruling → resolveSupplierId → SupplySync profile
+ *
+ * Returns null (file the document UNLINKED, for review) rather than guessing when:
+ *   - the name is the org itself (an outgoing/own document — the extractor reads
+ *     the ISSUING party, so the org's own invoices surface as its own name; a
+ *     "supplier" must never be created from it), or
+ *   - the org has dismissed this name in supplier_aliases.
+ *
+ * The SupplySync profile creation is best-effort: linking the document is the
+ * money path, the profile is intelligence — a missing ss migration must not
+ * stop documents being filed against suppliers.
+ */
+export async function resolveSupplierProfile(
+  supabase: SupabaseClient,
+  orgId: string,
+  rawName: string,
+): Promise<string | null> {
+  const trimmed = rawName.trim();
+  if (!trimmed) return null;
+
+  const { data: org } = await supabase
+    .from('organisations')
+    .select('name, locked_modules')
+    .eq('id', orgId)
+    .maybeSingle<{ name: string; locked_modules: string[] | null }>();
+  // Only EXACT normalized equality means "the org's own name". Substring
+  // containment was far too broad — it dropped legitimate suppliers whose name
+  // overlaps the org's (org "Fresh Valley Produce" vs supplier "Valley Produce"),
+  // filing their invoices permanently unlinked. normalizeSupplierName already
+  // strips legal suffixes, so "Fresh Valley Produce (Pty) Ltd" still matches the
+  // bare org name.
+  const orgNorm = org?.name ? normalizeSupplierName(org.name) : '';
+  const nameNorm = normalizeSupplierName(trimmed);
+  if (orgNorm && nameNorm && orgNorm === nameNorm) {
+    return null; // the org's own name — outgoing/own document, not a supplier
+  }
+
+  let supplierId: string | null = null;
+  try {
+    const alias = await lookupSupplierAlias(supabase, orgId, trimmed);
+    if (alias?.status === 'dismissed') return null;
+    if (alias?.status === 'confirmed' && alias.supplierId) supplierId = alias.supplierId;
+  } catch {
+    /* alias table not migrated yet — fall through to name resolution */
+  }
+
+  if (!supplierId) supplierId = await resolveSupplierId(supabase, orgId, trimmed);
+
+  // Create the SupplySync profile unless the org has SupplySync LOCKED. Gate on
+  // locked_modules (the app's real module override) — not org_features, which is
+  // force-overridden to all-on in getPlatformSession and so is empty for most orgs.
+  const supplySyncLocked = (org?.locked_modules ?? []).includes('suppliers');
+  if (!supplySyncLocked) {
+    try {
+      await ensureSupplySyncProfile(supabase, orgId, supplierId, trimmed);
+    } catch (err) {
+      console.error('[supplysync] could not ensure the supplier profile:', err);
+    }
+  }
+  return supplierId;
 }
 
 /**
@@ -134,6 +209,8 @@ export async function runDocumentSideEffects(
     filename: string;
     supplier_id: string | null;
     extracted_data: ExtractedData | null;
+    /** When the document was filed — dates the SupplySync timeline event. */
+    created_at?: string | null;
   },
 ): Promise<{ orderSync?: unknown }> {
   if (doc.document_type === 'order') {
@@ -161,6 +238,18 @@ export async function runDocumentSideEffects(
       supplier_id: doc.supplier_id,
       extracted_data: doc.extracted_data,
     });
+  }
+  // SupplySync intelligence (profile timeline + spend rollups) is DERIVED data,
+  // recomputed per feed and healed by the next commit for the same supplier — so
+  // a failure here must never fail the Save and strand the document in the queue
+  // (the exact incident docu-review-columns.sql exists to document). Gated on the
+  // org actually using SupplySync, like the ProcurePulse feed above. Log and move on.
+  try {
+    if (await orgHasSupplySync(supabase, doc.org_id)) {
+      await feedDocumentToSupplySync(supabase, doc);
+    }
+  } catch (err) {
+    console.error('[supplysync] feed failed (non-fatal):', err);
   }
   return {};
 }
@@ -210,7 +299,7 @@ export async function commitDocument(
     .eq('org_id', orgId)
     .in('status', ['extracted', 'pending'])
     .or(reviewClaimableOr(staleBefore))
-    .select('id, org_id, document_type, filename, supplier_id, extracted_data')
+    .select('id, org_id, document_type, filename, supplier_id, extracted_data, created_at')
     .maybeSingle();
 
   if (claimErr) return { ok: false, status: 500, error: claimErr.message };
@@ -237,6 +326,7 @@ export async function commitDocument(
     filename: string;
     supplier_id: string | null;
     extracted_data: ExtractedData | null;
+    created_at: string | null;
   };
 
   try {
@@ -424,12 +514,13 @@ export async function ingestDocument(input: IngestDocumentInput): Promise<Ingest
     };
   }
 
-  // 4b. NON-ORDER → store the extracted fields, resolve the supplier, feed
-  //     ProcurePulse. Reuses the classification result (no second model call).
+  // 4b. NON-ORDER → store the extracted fields, resolve the supplier (alias
+  //     ruling → suppliers row → SupplySync profile; null for the org's own
+  //     name), feed ProcurePulse. Reuses the classification result.
   let supplierId: string | null = null;
   if (cls.supplier) {
     try {
-      supplierId = await resolveSupplierId(supabase, orgId, cls.supplier);
+      supplierId = await resolveSupplierProfile(supabase, orgId, cls.supplier);
     } catch {
       /* keep it unlinked */
     }
