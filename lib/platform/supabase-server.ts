@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { SUPABASE_URL, SUPABASE_ANON_KEY, supabaseConfigured } from './env';
 import { FEATURE_KEYS } from './modules';
+import { isVysoAiEnabled } from '@/lib/ai/vyso-agent/config';
 import type { FeatureKey, Organisation, OrgFeature, Profile } from './types';
 
 /**
@@ -35,6 +36,9 @@ export interface PlatformSession {
   features: Record<FeatureKey, boolean>;
   /** Module feature-keys this org may NOT open (locked in the sidebar + guarded). */
   lockedModules: FeatureKey[];
+  /** Whether Vyso AI is enabled platform-wide (env kill switch). Client reads this
+   *  to decide whether to render the launcher; the API enforces it server-side. */
+  vysoAiEnabled: boolean;
 }
 
 const emptyFeatures = (): Record<FeatureKey, boolean> =>
@@ -90,5 +94,13 @@ export const getPlatformSession = cache(async (): Promise<PlatformSession | null
     (FEATURE_KEYS as readonly string[]).includes(k),
   );
 
-  return { userId: user.id, email: user.email ?? '', profile: profile ?? null, org, features, lockedModules };
+  return {
+    userId: user.id,
+    email: user.email ?? '',
+    profile: profile ?? null,
+    org,
+    features,
+    lockedModules,
+    vysoAiEnabled: isVysoAiEnabled(),
+  };
 });

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { usePlatform } from '@/lib/platform/session';
-import { isVysoAiAllowed } from '@/lib/ai/vyso-agent/config';
 import { readParsedOrder, clearParsedOrder, type ParsedOrder } from '@/lib/ai/vyso-agent/order-handoff';
 
 /**
@@ -12,12 +11,12 @@ import { readParsedOrder, clearParsedOrder, type ParsedOrder } from '@/lib/ai/vy
  * appears when there's actually a handed-over order.
  */
 export function VysoAIOrderPrefill({ onLoad }: { onLoad: (order: ParsedOrder) => void }) {
-  const { email } = usePlatform();
+  const { email, vysoAiEnabled } = usePlatform();
   const [order, setOrder] = useState<ParsedOrder | null>(null);
 
   useEffect(() => {
-    if (isVysoAiAllowed(email)) setOrder(readParsedOrder());
-  }, [email]);
+    if (vysoAiEnabled && email) setOrder(readParsedOrder());
+  }, [vysoAiEnabled, email]);
 
   if (!order) return null;
 

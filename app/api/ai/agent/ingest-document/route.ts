@@ -19,7 +19,7 @@ export async function OPTIONS() {
  * statement / delivery note / price list), FILE it into Doc-U, and — when it's a
  * customer order — build the OrderFlow order, auto-invoicing when the customer is
  * confidently matched (else holding a draft for review, exactly like the "Upload
- * order" button). Preview-gated to VYSO_AI_EMAILS.
+ * order" button). Gated by the VYSO_AI_ENABLED kill switch.
  *
  * The pipeline itself lives in lib/platform/document-ingest so the chat and the
  * inbound-email worker share ONE audited write path. This route owns auth: all
