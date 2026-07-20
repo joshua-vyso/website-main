@@ -6,6 +6,7 @@ import { SubNav } from '@/components/platform/SubNav';
 import { ServiceDenProvider } from '@/components/platform/serviceden/context';
 
 const TABS = [
+  { label: 'Leads', href: '/app/serviceden/leads' },
   { label: 'Customers', href: '/app/serviceden' },
   { label: 'Services', href: '/app/serviceden/services' },
   { label: 'Invoices', href: '/app/serviceden/invoices' },
@@ -20,7 +21,7 @@ const TABS = [
 export default async function ServiceDenLayout({ children }: { children: React.ReactNode }) {
   const session = await getPlatformSession();
   if (!session) redirect('/login');
-  if (session.email !== SERVICEDEN_ACCOUNT_EMAIL) redirect('/app');
+  if (session.email.trim().toLowerCase() !== SERVICEDEN_ACCOUNT_EMAIL) redirect('/app');
 
   const data = session.org ? await getServiceDenData(session.org.id) : EMPTY_SERVICEDEN;
 
@@ -36,7 +37,7 @@ export default async function ServiceDenLayout({ children }: { children: React.R
         </span>
         <div className="min-w-0">
           <h1 className="text-[24px] font-bold leading-tight text-[#1A1C1E]">ServiceDen</h1>
-          <p className="mt-0.5 text-[14px] text-[#5F6368]">Customers, services and invoicing for service businesses.</p>
+          <p className="mt-0.5 text-[14px] text-[#5F6368]">Leads, customers, services and invoicing for service businesses.</p>
         </div>
       </div>
 

@@ -9,6 +9,35 @@ export const SERVICEDEN_ACCOUNT_EMAIL = 'joshua@vyso.co.za';
 
 export type SdInvoiceStatus = 'draft' | 'sent' | 'paid';
 export type SdServiceUnit = 'hour' | 'day' | 'fixed' | 'project' | 'month' | 'unit';
+export type SdLeadStage =
+  | 'new'
+  | 'contacted'
+  | 'replied'
+  | 'discovery'
+  | 'pilot_proposed'
+  | 'founding_customer'
+  | 'nurture'
+  | 'won'
+  | 'lost';
+export type SdLeadReviewStatus = 'suggested' | 'accepted' | 'rejected';
+export type SdLeadSource = 'manual' | 'gmail_agent' | 'gmail_label' | 'referral' | 'website' | 'other';
+
+export const LEAD_STAGE_META: Record<SdLeadStage, { label: string; tone: 'neutral' | 'positive' | 'warning' | 'info' }> = {
+  new: { label: 'New', tone: 'neutral' },
+  contacted: { label: 'Contacted', tone: 'info' },
+  replied: { label: 'Replied', tone: 'positive' },
+  discovery: { label: 'Discovery', tone: 'positive' },
+  pilot_proposed: { label: 'Pilot proposed', tone: 'warning' },
+  founding_customer: { label: 'Founding customer', tone: 'positive' },
+  nurture: { label: 'Nurture', tone: 'neutral' },
+  won: { label: 'Won', tone: 'positive' },
+  lost: { label: 'Lost', tone: 'neutral' },
+};
+
+export const LEAD_STAGES = Object.entries(LEAD_STAGE_META).map(([value, meta]) => ({
+  value: value as SdLeadStage,
+  label: meta.label,
+}));
 
 export const SERVICE_UNITS: { value: SdServiceUnit; label: string }[] = [
   { value: 'hour', label: 'Per hour' },
@@ -83,6 +112,76 @@ export interface SdSettings {
   paymentReference: string | null;
   /** Logo as a base64 data URL (data:image/...;base64,...). */
   logoData: string | null;
+}
+
+export interface SdLead {
+  id: string;
+  ownerUserId: string;
+  gmailConnectionId: string | null;
+  convertedCustomerId: string | null;
+  contactName: string;
+  company: string | null;
+  email: string;
+  phone: string | null;
+  source: SdLeadSource;
+  stage: SdLeadStage;
+  reviewStatus: SdLeadReviewStatus;
+  primaryPain: string | null;
+  summary: string | null;
+  agentNextAction: string | null;
+  agentConfidence: number;
+  lastInboundAt: string | null;
+  lastOutboundAt: string | null;
+  nextFollowUpAt: string | null;
+  followUpCount: number;
+  notes: string | null;
+  wonAt: string | null;
+  lostAt: string | null;
+  lostReason: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface SdGmailConnection {
+  id: string;
+  emailAddress: string;
+  scopes: string[];
+  status: 'connected' | 'syncing' | 'error' | 'reauth_required' | 'disconnected';
+  lastSyncedAt: string | null;
+  lastError: string | null;
+}
+
+export interface SdLeadPageData {
+  leads: SdLead[];
+  gmailConnection: SdGmailConnection | null;
+  gmailConfigured: boolean;
+  schemaReady: boolean;
+}
+
+export interface SdMailMessage {
+  id: string;
+  direction: 'inbound' | 'outbound';
+  fromAddress: string;
+  toAddresses: string[];
+  ccAddresses: string[];
+  subject: string | null;
+  sentAt: string;
+  snippet: string | null;
+  bodyText: string | null;
+}
+
+export interface SdMailThread {
+  id: string;
+  providerThreadId: string;
+  subject: string | null;
+  participants: string[];
+  latestMessageAt: string | null;
+  messages: SdMailMessage[];
+}
+
+export interface SdLeadDetail {
+  lead: SdLead;
+  threads: SdMailThread[];
 }
 
 export const EMPTY_SD_SETTINGS: SdSettings = {
