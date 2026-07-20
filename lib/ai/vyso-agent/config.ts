@@ -19,14 +19,31 @@ export function isAgentModule(value: unknown): value is AgentModule {
 }
 
 /**
- * Accounts allowed to use Vyso AI while it's in preview. Gating is enforced on
- * BOTH the client (button only renders for these) and the server (the route
- * rejects everyone else) — never trust the client alone. Lower-cased compare.
+ * Platform-wide kill switch for Vyso AI. Defaults ON — every authenticated user
+ * gets it. Set `VYSO_AI_ENABLED` to a falsy value ('false' | '0' | 'off' | 'no')
+ * to turn the whole feature off (UI hidden + every /api/ai/agent/* route rejects)
+ * without a redeploy.
+ *
+ * SERVER-ONLY: reads a non-`NEXT_PUBLIC_` var, so it is `undefined` in the browser
+ * (→ treated as ON). Never call this from a client component to decide UI
+ * visibility — during a kill the browser can't see the var and would keep showing
+ * the button. Client components read the server-resolved `vysoAiEnabled` flag off
+ * the platform session instead (see lib/platform/supabase-server.ts).
  */
-export const VYSO_AI_EMAILS: readonly string[] = ['test@example.com'];
+export function isVysoAiEnabled(): boolean {
+  const flag = process.env.VYSO_AI_ENABLED;
+  if (flag == null || flag.trim() === '') return true; // default ON
+  return !['false', '0', 'off', 'no'].includes(flag.trim().toLowerCase());
+}
 
+/**
+ * Server-side access gate for the /api/ai/agent/* routes: Vyso AI is available to
+ * every authenticated user while the feature is enabled. Enforced on the server
+ * (the routes reject everyone else); the client hides the affordance via the
+ * session flag. Never trust the client alone.
+ */
 export function isVysoAiAllowed(email: string | null | undefined): boolean {
-  return !!email && VYSO_AI_EMAILS.includes(email.toLowerCase());
+  return isVysoAiEnabled() && !!email;
 }
 
 /**

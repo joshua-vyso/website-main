@@ -11,6 +11,8 @@ export interface PlatformContextValue {
   features: Record<FeatureKey, boolean>;
   /** Module feature-keys this org may NOT open (locked in the sidebar + guarded). */
   lockedModules: FeatureKey[];
+  /** Whether Vyso AI is enabled platform-wide (server-resolved env kill switch). */
+  vysoAiEnabled: boolean;
 }
 
 const PlatformContext = createContext<PlatformContextValue | undefined>(undefined);

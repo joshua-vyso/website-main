@@ -16,7 +16,7 @@ export async function OPTIONS() {
 /**
  * Vyso AI — parse an uploaded order document into structured line items (Haiku),
  * for the "read an order in chat → paste into a new order" flow. Read-only: this
- * does NOT upload or create anything. Preview-gated to VYSO_AI_EMAILS.
+ * does NOT upload or create anything. Gated by the VYSO_AI_ENABLED kill switch.
  * Body: { base64, mediaType, filename }.
  */
 export async function POST(req: Request) {

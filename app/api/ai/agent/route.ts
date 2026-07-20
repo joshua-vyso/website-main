@@ -72,7 +72,8 @@ export async function OPTIONS() {
  * Vyso AI chat — streams a Haiku reply as Server-Sent Events, with tool use so
  * the agent can read the caller's live OrderFlow data (via their RLS-scoped
  * Supabase client — a tool can only ever touch the caller's own org). Preview-
- * gated to VYSO_AI_EMAILS on the server. Body: { messages, module, orgName? }.
+ * gated by the platform-wide kill switch on the server (isVysoAiAllowed →
+ * VYSO_AI_ENABLED). Body: { messages, module, orgName? }.
  */
 export async function POST(req: Request) {
   if (!agentConfigured) {
