@@ -1,11 +1,22 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { getPlatformSession } from '@/lib/platform/supabase-server';
 import { PlatformProvider } from '@/lib/platform/session';
 import { Sidebar } from '@/components/platform/Sidebar';
 import { ModuleLockGuard } from '@/components/platform/ModuleLockGuard';
 
-export const metadata = {
+export const metadata: Metadata = {
   title: 'Vyso — Platform',
+  robots: {
+    index: false,
+    follow: false,
+    nocache: true,
+    googleBot: {
+      index: false,
+      follow: false,
+      noimageindex: true,
+    },
+  },
 };
 
 /** Auth guard for the desktop platform. Redirects to /login when unauthenticated. */

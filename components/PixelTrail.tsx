@@ -1,5 +1,5 @@
 "use client";
-import React, { useCallback, useEffect, useMemo, useRef } from "react";
+import React, { useCallback, useEffect, useId, useMemo, useRef } from "react";
 // Import through the declared `motion` package (motion/react re-exports framer-motion).
 // framer-motion is only a TRANSITIVE dep here, so a bare 'framer-motion' import breaks
 // under a strict installer or a `motion` major bump.
@@ -23,11 +23,7 @@ export function PixelTrail({
 }: PixelTrailProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const dimensions   = useDimensions(containerRef);
-  const trailId      = useRef(
-    typeof crypto !== "undefined"
-      ? crypto.randomUUID()
-      : Math.random().toString(36).slice(2),
-  );
+  const trailId      = useId().replaceAll(":", "");
 
   const columns = useMemo(
     () => (dimensions.width  > 0 ? Math.ceil(dimensions.width  / pixelSize) : 0),
@@ -50,15 +46,23 @@ export function PixelTrail({
         e.clientY < rect.top  || e.clientY > rect.bottom
       ) return;
 
+      // Keep the decorative trail out of copy and controls. The global trail is
+      // meant to animate open space, never sit over a heading or make text harder
+      // to read.
+      const underPointer = document.elementFromPoint(e.clientX, e.clientY);
+      if (underPointer?.closest(
+        "h1, h2, h3, h4, p, a, button, label, input, textarea, select, [role='button']",
+      )) return;
+
       const x = Math.floor((e.clientX - rect.left) / pixelSize);
       const y = Math.floor((e.clientY - rect.top)  / pixelSize);
-      const el = document.getElementById(`${trailId.current}-px-${x}-${y}`);
+      const el = document.getElementById(`${trailId}-px-${x}-${y}`);
       if (el) {
         const fn = (el as HTMLElement & { __animatePixel?: () => void }).__animatePixel;
         if (fn) fn();
       }
     },
-    [pixelSize],
+    [pixelSize, trailId],
   );
 
   useEffect(() => {
@@ -83,7 +87,7 @@ export function PixelTrail({
           {Array.from({ length: columns }).map((_, col) => (
             <PixelDot
               key={col}
-              id={`${trailId.current}-px-${col}-${row}`}
+              id={`${trailId}-px-${col}-${row}`}
               size={pixelSize}
               fadeDuration={fadeDuration}
               delay={delay}

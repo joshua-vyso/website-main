@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useEffect, useRef, useCallback } from "react";
 import { useInView } from "@/hooks/useInView";
 
@@ -21,10 +22,14 @@ const MARKERS = [
   { location: [-26.2, 28.04] as [number, number], size: 0.08 },  // Johannesburg
   { location: [-33.93, 18.42] as [number, number], size: 0.06 },  // Cape Town
   { location: [-29.86, 31.02] as [number, number], size: 0.05 },  // Durban
-  { location: [51.51, -0.13] as [number, number], size: 0.04 },   // London
-  { location: [1.35, 103.82] as [number, number], size: 0.04 },   // Singapore
-  { location: [40.71, -74.01] as [number, number], size: 0.04 },  // New York
+  { location: [-25.75, 28.19] as [number, number], size: 0.045 }, // Pretoria
+  { location: [-33.96, 25.60] as [number, number], size: 0.04 },  // Gqeberha
+  { location: [-29.12, 26.22] as [number, number], size: 0.04 },  // Bloemfontein
 ];
+
+const SOUTH_AFRICA_PHI = -2.06;
+const SOUTH_AFRICA_THETA = -0.48;
+const ROTATION_SPEED = 0.00035;
 
 function VysoGlobe() {
   const canvasRef        = useRef<HTMLCanvasElement>(null);
@@ -72,7 +77,7 @@ function VysoGlobe() {
     if (!canvas) return;
     let globe: { update: (opts: object) => void; destroy: () => void } | null = null;
     let rafId: number;
-    let phi = 1.4;  // start roughly centred on Africa
+    let phi = SOUTH_AFRICA_PHI;
 
     const init = async () => {
       const w = canvas.offsetWidth;
@@ -84,8 +89,8 @@ function VysoGlobe() {
         devicePixelRatio: Math.min(window.devicePixelRatio || 1, 2),
         width:            w * 2,
         height:           w * 2,
-        phi:              1.4,
-        theta:            -0.3,
+        phi:              SOUTH_AFRICA_PHI,
+        theta:            SOUTH_AFRICA_THETA,
         dark:             0,           // light mode
         diffuse:          1.4,
         mapSamples:       20000,
@@ -101,10 +106,10 @@ function VysoGlobe() {
       });
 
       const tick = () => {
-        if (!isPaused.current) phi += 0.0025;
+        if (!isPaused.current) phi += ROTATION_SPEED;
         globe!.update({
           phi:   phi + phiOffset.current   + dragOffset.current.phi,
-          theta: -0.3 + thetaOffset.current + dragOffset.current.theta,
+          theta: SOUTH_AFRICA_THETA + thetaOffset.current + dragOffset.current.theta,
         });
         rafId = requestAnimationFrame(tick);
       };
@@ -216,9 +221,10 @@ export function TrustStrip() {
               maxWidth:   440,
               margin:     0,
             }}>
-              From procurement and staffing to reporting and automation,
-              Vyso helps teams gain visibility, eliminate manual work,
-              and scale with confidence.
+              Built in South Africa for South African operators. From food
+              suppliers and restaurants to farms and growing teams across the
+              country, Vyso creates clearer workflows with less admin — shaped
+              around local realities and the way your people already work.
             </p>
           </div>
 
@@ -244,6 +250,8 @@ export function TrustStrip() {
           flexDirection: "column",
           gap:           "1rem",
           maxWidth:      680,
+          margin:        "0 auto",
+          textAlign:     "center",
         }}>
           {/* Quote mark */}
           <div style={{
@@ -253,7 +261,7 @@ export function TrustStrip() {
             color:      "hsl(22,69%,44%)",
             opacity:    0.4,
           }}>
-            "
+            &ldquo;
           </div>
 
           {/* Quote text */}
@@ -265,12 +273,13 @@ export function TrustStrip() {
             fontStyle:  "italic",
             margin:     0,
           }}>
-            Vyso gave us visibility we never had before. We caught R40,000 in monthly
-            wastage in the first week.
+            Vyso is automating our entire invoicing operation. We can build price
+            lists in seconds and manage every customer account from one central
+            operational brain.
           </p>
 
           {/* Attribution */}
-          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "0.75rem" }}>
             {/* Avatar initials */}
             <div style={{
               width:          38,
@@ -309,6 +318,18 @@ export function TrustStrip() {
               </div>
             </div>
           </div>
+          <Link
+            href="/case-studies/turn-n-slice"
+            style={{
+              color: "hsl(22,69%,44%)",
+              fontFamily: "var(--font-body, var(--font-sans))",
+              fontSize: "0.8rem",
+              fontWeight: 700,
+              textDecoration: "none",
+            }}
+          >
+            Read the founding-customer story <span aria-hidden="true">→</span>
+          </Link>
         </div>
 
       </div>

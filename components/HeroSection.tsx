@@ -66,7 +66,7 @@ export function HeroSection() {
           letterSpacing: "0.18em",
           textTransform: "uppercase",
         }}>
-          AI-powered operations for SMEs
+          Configurable operations for SMEs
         </GradientText>
 
         <h1 className="hero-headline" style={{

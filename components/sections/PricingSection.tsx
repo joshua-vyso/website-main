@@ -1,5 +1,6 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
+import Link from "next/link";
 import { useInView } from "@/hooks/useInView";
 
 /* ── Blend helpers ────────────────────────────────────────────────────────── */
@@ -89,7 +90,7 @@ function AuditBanner() {
           </h3>
           <p style={{ fontFamily: "var(--font-sans)", fontSize: "1.1rem", fontWeight: 700,
             color: "hsl(22,69%,44%)", margin: "0.1rem 0 0" }}>
-            R3,000 <span style={{ fontSize: "0.78rem", fontWeight: 500, color: "#888" }}>once-off</span>
+            R2,000 <span style={{ fontSize: "0.78rem", fontWeight: 500, color: "#888" }}>once-off</span>
           </p>
         </div>
       </div>
@@ -98,17 +99,17 @@ function AuditBanner() {
       <div style={{ flexShrink: 0, maxWidth: 240 }}>
         <p style={{ fontFamily: "var(--font-body, var(--font-sans))", fontSize: "0.83rem",
           color: "#666", lineHeight: 1.55, margin: "0 0 0.35rem" }}>
-          7-day operational diagnostics before any engagement. De-risks delivery.
+          One week of operational diagnostics before any engagement. De-risks delivery.
         </p>
         <p style={{ fontFamily: "var(--font-body, var(--font-sans))", fontSize: "0.75rem",
           color: "hsl(22,69%,44%)", lineHeight: 1.45, margin: 0 }}>
-          Founding clients: R3,000 credited toward their tier fee.
+          A clear plan before setup or monthly work begins.
         </p>
       </div>
 
       {/* Feature list */}
       <div className="audit-features" style={{ display: "flex", gap: "0.5rem 2.2rem", flex: 1, flexWrap: "wrap", minWidth: 0 }}>
-        {["Operations review","Bottleneck identification","Automation opportunities","Recommendations report","7-day diagnostic period"]
+        {["Operations review","Bottleneck identification","Automation opportunities","Recommendations report","One-week diagnostic period"]
           .map(f => (
             <div key={f} style={{ display: "flex", alignItems: "center", gap: "0.45rem" }}>
               <Check muted />
@@ -120,8 +121,8 @@ function AuditBanner() {
 
       {/* CTA */}
       <div style={{ flexShrink: 0, textAlign: "center" }}>
-        <button
-          onClick={() => { document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" }); }}
+        <Link
+          href="/contact"
           style={{
             display: "inline-flex", alignItems: "center", gap: "0.4rem",
             padding: "0.65rem 1.4rem", borderRadius: 50,
@@ -130,19 +131,19 @@ function AuditBanner() {
             fontFamily: "var(--font-body, var(--font-sans))", fontSize: "0.85rem",
             fontWeight: 600, cursor: "pointer",
             transition: "background 0.2s, color 0.2s", whiteSpace: "nowrap",
-            outline: "none",
+            outline: "none", textDecoration: "none",
           }}
           onMouseEnter={e => { const el = e.currentTarget; el.style.background = "hsl(22,69%,44%)"; el.style.color = "#fff"; }}
           onMouseLeave={e => { const el = e.currentTarget; el.style.background = "transparent"; el.style.color = "hsl(22,69%,44%)"; }}
         >
-          Book a free discovery call
+          Discuss the audit
           <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor"
             strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
             <path d="M2.5 7h9M8 3.5L11.5 7 8 10.5"/>
           </svg>
-        </button>
+        </Link>
         <p style={{ fontFamily: "var(--font-body, var(--font-sans))", fontSize: "0.68rem",
-          color: "#aaa", margin: "0.4rem 0 0" }}>Free 15 min · no commitment</p>
+          color: "#aaa", margin: "0.4rem 0 0" }}>Clear scope · no commitment</p>
       </div>
     </div>
   );
@@ -162,8 +163,8 @@ const TIERS = [
       { text: "30-day support period post-setup",          sub: "" },
     ],
     pricing: [
-      { label: "Setup (once-off)", value: "R10,000",       unit: "" },
-      { label: "Retainer",        value: "R5,000",         unit: "/month", note: "+R1,000/month per extra automation (max 3)" },
+      { label: "Setup (once-off)", value: "R5,000", unit: "" },
+      { label: "Retainer", value: "R3,000", unit: "/month" },
     ],
     cta: "Get started",
   },
@@ -178,26 +179,26 @@ const TIERS = [
       { text: "One round of post-launch revisions",         sub: "" },
     ],
     pricing: [
-      { label: "Build fee",        value: "From R30,000", unit: "",       note: "includes automation migration" },
-      { label: "Retainer",         value: "R10,000",      unit: "/month" },
+      { label: "Setup (once-off)", value: "R20,000", unit: "" },
+      { label: "Retainer", value: "R6,000", unit: "/month", note: "+R3,000/month per additional module" },
     ],
     cta: "Talk to us",
   },
   {
     num:      "Tier 3",
     name:     "Scale",
-    tagline:  "We connect unlimited modules into a full ops platform.",
+    tagline:  "We connect your modules into a full ops platform.",
     features: [
-      { text: "Everything in Build",                        sub: "" },
-      { text: "2 to unlimited Vyso modules",               sub: "" },
+      { text: "Everything in Create",                       sub: "" },
+      { text: "Add modules as your operation grows",        sub: "" },
       { text: "Two-way integrations with outside systems",  sub: "accounting, POS, banking" },
-      { text: "24/7 support and dedicated support line",    sub: "" },
+      { text: "Ongoing support for agreed workflows",       sub: "" },
       { text: "Monthly ops reports",                        sub: "" },
       { text: "Priority development",                       sub: "" },
     ],
     pricing: [
-      { label: "Setup fee",  value: "From R50,000", unit: "",       note: "includes build + integrations" },
-      { label: "Retainer",   value: "R15,000",      unit: "/month", note: "+R5,000/month per additional module" },
+      { label: "Setup (once-off)", value: "R30,000", unit: "" },
+      { label: "Retainer", value: "R8,000", unit: "/month", note: "+R3,000/month per additional module" },
     ],
     cta: "Talk to us",
   },
@@ -225,7 +226,7 @@ function TierCard({ tier, active }: { tier: typeof TIERS[0]; active: boolean }) 
   return (
     <div style={{
       ...GLASS,
-      width: CARD_W, height: CARD_H,
+      width: "100%", height: CARD_H,
       borderRadius: 22,
       boxShadow: active ? GLASS_SHADOW_ACTIVE : GLASS_SHADOW,
       display: "flex", flexDirection: "column",
@@ -314,8 +315,8 @@ function TierCard({ tier, active }: { tier: typeof TIERS[0]; active: boolean }) 
       </div>
 
       {/* CTA — flowing orange→blue gradient when active, plain glass when not */}
-      <button
-        onClick={() => { document.getElementById("contact")?.scrollIntoView({ behavior: "smooth" }); }}
+      <Link
+        href="/contact"
         className={active ? "price-btn-active" : "price-btn-inactive"}
         style={{
           width: "100%", padding: "0.78rem 1.4rem", borderRadius: 50,
@@ -327,17 +328,17 @@ function TierCard({ tier, active }: { tier: typeof TIERS[0]; active: boolean }) 
           outline: "none",
           /* active gradient is set via CSS class below */
           background: active ? undefined : "rgba(255,255,255,0.6)",
-          transition: "opacity 0.2s",
+          transition: "opacity 0.2s", textDecoration: "none", boxSizing: "border-box",
         }}
-        onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "0.85"; }}
-        onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.opacity = "1"; }}
+        onMouseEnter={e => { e.currentTarget.style.opacity = "0.85"; }}
+        onMouseLeave={e => { e.currentTarget.style.opacity = "1"; }}
       >
         {tier.cta}
         <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor"
           strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
           <path d="M2.5 7h9M8 3.5L11.5 7 8 10.5"/>
         </svg>
-      </button>
+      </Link>
       <p style={{ fontFamily: "var(--font-body, var(--font-sans))", fontSize: "0.68rem",
         color: active ? "rgba(255,255,255,0.55)" : "#aaa", margin: "0.5rem 0 0", textAlign: "center" }}>
         Starts with a free 15-min discovery call
@@ -360,11 +361,16 @@ const NAV_BTN_BASE: React.CSSProperties = {
 };
 
 /* ── Main component ───────────────────────────────────────────────────────── */
-export function PricingSection() {
+interface PricingSectionProps {
+  headingLevel?: "h1" | "h2";
+}
+
+export function PricingSection({ headingLevel = "h2" }: PricingSectionProps) {
   const { ref: sectionRef, inView } = useInView<HTMLElement>({ threshold: 0.05 });
   const stageRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(1);
   const n = TIERS.length;
+  const Heading = headingLevel;
 
   const prev = useCallback(() => setActive(a => Math.max(0, a - 1)), []);
   const next = useCallback(() => setActive(a => Math.min(n - 1, a + 1)), [n]);
@@ -435,7 +441,7 @@ export function PricingSection() {
           }}>
             Pricing
           </p>
-          <h2 style={{
+          <Heading style={{
             fontFamily: "var(--font-sans)",
             fontSize: "clamp(2.2rem, 5vw, 4rem)", fontWeight: 700,
             letterSpacing: "-0.03em", margin: "0 0 0.9rem", lineHeight: 1.05,
@@ -444,7 +450,7 @@ export function PricingSection() {
             <br />
             <span className="blend-h-plain" style={blendWhite}>No </span>
             <span className="blend-h-orange" style={blendOrange}>surprises.</span>
-          </h2>
+          </Heading>
           <p style={{
             fontFamily: "var(--font-body, var(--font-sans))",
             fontSize: "clamp(0.9rem, 1.5vw, 1rem)", color: "#666",
@@ -485,7 +491,7 @@ export function PricingSection() {
               return (
                 <div key={tier.name} onClick={() => setActive(i)} style={{
                   position: "absolute", top: "50%", left: "50%",
-                  width: CARD_W, height: CARD_H,
+                  width: `min(100%, ${CARD_W}px)`, height: CARD_H,
                   cursor: diff !== 0 ? "pointer" : "default",
                   zIndex: t.zi, opacity: t.op,
                   transform: `translate(-50%,-50%) translateX(${t.tx}px) scale(${t.scale}) rotateY(${t.ry}deg)`,

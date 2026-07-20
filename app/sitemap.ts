@@ -3,38 +3,65 @@ import type { MetadataRoute } from "next";
 const BASE_URL = "https://vyso.co.za";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const lastModified = new Date();
-
   return [
-    // Primary one-page site — highest priority
+    // Core marketing pages.
     {
       url: BASE_URL,
-      lastModified,
       changeFrequency: "weekly",
       priority: 1,
     },
-    // Secondary standalone pages
     {
-      url: `${BASE_URL}/services`,
-      lastModified,
+      url: `${BASE_URL}/platform`,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/platform/vyso-ai`,
       changeFrequency: "monthly",
       priority: 0.8,
     },
     {
-      url: `${BASE_URL}/apps`,
-      lastModified,
+      url: `${BASE_URL}/platform/vyso-for-smes`,
       changeFrequency: "monthly",
       priority: 0.8,
     },
     {
-      url: `${BASE_URL}/about`,
-      lastModified,
+      url: `${BASE_URL}/founding-client`,
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/industries/restaurants`,
       changeFrequency: "monthly",
-      priority: 0.7,
+      priority: 0.8,
+    },
+    {
+      url: `${BASE_URL}/industries/food-suppliers`,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/industries/farms`,
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${BASE_URL}/case-studies/turn-n-slice`,
+      changeFrequency: "yearly",
+      priority: 0.8,
+    },
+    {
+      url: `${BASE_URL}/pricing`,
+      changeFrequency: "monthly",
+      priority: 0.9,
+    },
+    {
+      url: `${BASE_URL}/faq`,
+      changeFrequency: "monthly",
+      priority: 0.8,
     },
     {
       url: `${BASE_URL}/contact`,
-      lastModified,
       changeFrequency: "monthly",
       priority: 0.7,
     },

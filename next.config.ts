@@ -23,6 +23,22 @@ const nextConfig: NextConfig = {
         destination: "https://vyso.co.za/:path*",
         permanent: true,
       },
+      // Retired marketing URLs now consolidate on their canonical replacements.
+      {
+        source: "/about",
+        destination: "/platform",
+        permanent: true,
+      },
+      {
+        source: "/apps",
+        destination: "/platform/vyso-for-smes",
+        permanent: true,
+      },
+      {
+        source: "/services",
+        destination: "/pricing",
+        permanent: true,
+      },
     ];
   },
 };

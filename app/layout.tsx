@@ -29,19 +29,75 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Vyso — AI-Powered Operations for SMEs",
+  title: "Vyso | Operations Software & Automation for SMEs",
   description:
-    "AI-powered operations for SMEs. Vyso automates day-to-day operations — stock tracking, wastage logging, supplier management, and custom apps — all in one place.",
+    "Replace WhatsApp threads and spreadsheets with a configurable operations platform. Vyso audits, automates and implements practical systems for growing SMEs.",
   metadataBase: new URL("https://vyso.co.za"),
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
-    title: "Vyso — AI-Powered Operations for SMEs",
+    title: "Vyso | Operations Software & Automation for SMEs",
     description:
-      "Stop running your business on WhatsApp and spreadsheets. Vyso builds AI-powered automation systems and simple custom apps for SMEs.",
+      "Replace WhatsApp threads and spreadsheets with a configurable operations platform. Vyso audits, automates and implements practical systems for growing SMEs.",
     url:      "https://vyso.co.za",
     siteName: "Vyso",
     locale:   "en_ZA",
     type:     "website",
+    images: [
+      {
+        url: "/og.png",
+        width: 1200,
+        height: 630,
+        alt: "Vyso — Operations, connected.",
+      },
+    ],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Vyso | Operations Software & Automation for SMEs",
+    description:
+      "Replace WhatsApp threads and spreadsheets with a configurable operations platform. Vyso audits, automates and implements practical systems for growing SMEs.",
+    images: ["/og.png"],
+  },
+};
+
+const siteSchema = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://vyso.co.za/#organization",
+      name: "Vyso",
+      url: "https://vyso.co.za",
+      logo: "https://vyso.co.za/icon.svg",
+      email: "joshua@vyso.co.za",
+      contactPoint: {
+        "@type": "ContactPoint",
+        contactType: "sales",
+        email: "joshua@vyso.co.za",
+        url: "https://vyso.co.za/contact",
+        areaServed: "ZA",
+        availableLanguage: "en-ZA",
+      },
+      areaServed: {
+        "@type": "Country",
+        name: "South Africa",
+      },
+      description:
+        "A configurable operations platform for SMEs, implemented with hands-on support.",
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://vyso.co.za/#website",
+      url: "https://vyso.co.za",
+      name: "Vyso",
+      inLanguage: "en-ZA",
+      publisher: {
+        "@id": "https://vyso.co.za/#organization",
+      },
+    },
+  ],
 };
 
 export default function RootLayout({
@@ -49,10 +105,17 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html
-      lang="en"
+      lang="en-ZA"
+      data-scroll-behavior="smooth"
       className={`${barlowCondensed.variable} ${dmSans.variable} ${inter.variable} h-full antialiased`}
     >
       <body className="min-h-full">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(siteSchema).replace(/</g, "\\u003c"),
+          }}
+        />
         {/* Global SVG filter for LiquidButton glass effect */}
         <LiquidGlassFilter />
         {/* Orange pixel trail — follows the cursor across every page */}

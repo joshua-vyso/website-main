@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
-import Link from "next/link";
 
 type Status = "idle" | "loading" | "success" | "error";
 
@@ -183,10 +182,10 @@ export default function ContactForm() {
           }}
         >
           <option value="" disabled>Select a tier (optional)</option>
-          <option value="Audit">Audit — Operational health check (R3,000)</option>
-          <option value="Starter">Starter — Quick wins with existing tools</option>
-          <option value="Create">Create — Custom app + automations</option>
-          <option value="Scale">Scale — Full ops platform</option>
+          <option value="Audit">One-week audit — R2,000 once-off</option>
+          <option value="Start">Start — R5,000 setup + R3,000/month</option>
+          <option value="Create">Create — R20,000 setup + R6,000/month</option>
+          <option value="Scale">Scale — R30,000 setup + R8,000/month</option>
           <option value="Not sure">Not sure yet</option>
         </select>
       </div>

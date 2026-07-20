@@ -1,13 +1,35 @@
 "use client";
 import Link from "next/link";
 
-const NAV = [
-  { label: "Home",         href: "/"              },
-  { label: "How it works", href: "/#how-it-works" },
-  { label: "Our toolkit",  href: "/#our-toolkit"  },
-  { label: "Pricing",      href: "/#pricing"      },
-  { label: "Contact",      href: "/#contact"      },
-];
+const NAV_GROUPS = [
+  {
+    label: "Platform",
+    links: [
+      { label: "Overview", href: "/platform" },
+      { label: "OrderFlow", href: "/platform#orderflow" },
+      { label: "Vyso AI", href: "/platform/vyso-ai" },
+      { label: "Vyso for SMEs", href: "/platform/vyso-for-smes" },
+    ],
+  },
+  {
+    label: "For food businesses",
+    links: [
+      { label: "Restaurants", href: "/industries/restaurants" },
+      { label: "Food suppliers", href: "/industries/food-suppliers" },
+      { label: "Farms & producers", href: "/industries/farms" },
+      { label: "Turn 'n Slice story", href: "/case-studies/turn-n-slice" },
+    ],
+  },
+  {
+    label: "Work with Vyso",
+    links: [
+      { label: "Founding clients", href: "/founding-client" },
+      { label: "Pricing", href: "/pricing" },
+      { label: "FAQ", href: "/faq" },
+      { label: "Contact", href: "/contact" },
+    ],
+  },
+] as const;
 
 /* Inline Vyso wordmark — same paths as Navbar but via a tiny self-contained SVG */
 function VysoMark() {
@@ -43,7 +65,7 @@ export function SiteFooter() {
         maxWidth:        1160,
         margin:          "0 auto",
         display:         "flex",
-        alignItems:      "center",
+        alignItems:      "flex-start",
         justifyContent:  "space-between",
         flexWrap:        "wrap",
         gap:             "2rem",
@@ -64,49 +86,51 @@ export function SiteFooter() {
           </span>
         </div>
 
-        {/* Center — nav links */}
-        <nav aria-label="Footer navigation">
-          <ul style={{
-            listStyle:  "none",
-            display:    "flex",
-            flexWrap:   "wrap",
-            gap:        "0.25rem 2rem",
-            padding:    0,
-            margin:     0,
+        {/* Center — crawlable product, audience and company links */}
+        <nav aria-label="Footer navigation" style={{ flex: "1 1 620px" }}>
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fit, minmax(145px, 1fr))",
+            gap: "1.5rem 2.5rem",
           }}>
-            {NAV.map(({ label, href }) => (
-              <li key={href}>
-                <Link
-                  href={href}
-                  style={{
-                    fontFamily:    "var(--font-body, var(--font-sans))",
-                    fontSize:      "0.85rem",
-                    color:         "#888",
-                    textDecoration: "none",
-                    letterSpacing: "0.01em",
-                    transition:    "color 0.15s",
-                  }}
-                  onMouseEnter={e => ((e.target as HTMLElement).style.color = "#0d0d0d")}
-                  onMouseLeave={e => ((e.target as HTMLElement).style.color = "#888")}
-                >
-                  {label}
-                </Link>
-              </li>
+            {NAV_GROUPS.map((group) => (
+              <div key={group.label}>
+                <p style={{
+                  margin: "0 0 0.7rem",
+                  color: "#0d0d0d",
+                  fontFamily: "var(--font-sans)",
+                  fontSize: "0.8rem",
+                  fontWeight: 700,
+                  letterSpacing: "0.08em",
+                  textTransform: "uppercase",
+                }}>
+                  {group.label}
+                </p>
+                <ul style={{ listStyle: "none", display: "grid", gap: "0.42rem", padding: 0, margin: 0 }}>
+                  {group.links.map(({ label, href }) => (
+                    <li key={href}>
+                      <Link
+                        href={href}
+                        style={{
+                          color: "#777",
+                          fontFamily: "var(--font-body, var(--font-sans))",
+                          fontSize: "0.82rem",
+                          letterSpacing: "0.01em",
+                          textDecoration: "none",
+                          transition: "color 0.15s",
+                        }}
+                        onMouseEnter={e => ((e.currentTarget as HTMLElement).style.color = "#0d0d0d")}
+                        onMouseLeave={e => ((e.currentTarget as HTMLElement).style.color = "#777")}
+                      >
+                        {label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
             ))}
-          </ul>
+          </div>
         </nav>
-
-        {/* Right — tagline */}
-        <p style={{
-          fontFamily:  "var(--font-body, var(--font-sans))",
-          fontSize:    "0.85rem",
-          color:       "#bbb",
-          fontStyle:   "italic",
-          margin:      0,
-          textAlign:   "right",
-        }}>
-          Built to replace chaos with clarity.
-        </p>
       </div>
 
       {/* Bottom copyright line */}

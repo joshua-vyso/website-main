@@ -1,19 +1,55 @@
-import { Calendar, Mail, MessageCircle } from "lucide-react";
-import Link from "next/link";
+import { Mail, MessageCircle } from "lucide-react";
 import ContactForm from "@/components/ContactForm";
-import { AuroraBackground } from "@/components/AuroraBackground";
+import { WebGLShaderBackground } from "@/components/WebGLShaderBackground";
 import { Navbar } from "@/components/Navbar";
 import { SiteFooter } from "@/components/sections/SiteFooter";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Contact — Vyso",
+  title: "Contact Vyso | Discuss Your Operations",
   description:
-    "Get in touch with Vyso. Send an enquiry or book a free 15-minute call to talk through your operational challenges.",
+    "Tell Vyso where your operations are breaking down. Send an enquiry and get a practical response about the clearest next step.",
+  alternates: {
+    canonical: "/contact",
+  },
+  openGraph: {
+    title: "Contact Vyso | Discuss Your Operations",
+    description:
+      "Tell Vyso where your operations are breaking down. Send an enquiry and get a practical response about the clearest next step.",
+    url: "/contact",
+    siteName: "Vyso",
+    locale: "en_ZA",
+    type: "website",
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Vyso — Operations, connected." }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Contact Vyso | Discuss Your Operations",
+    description:
+      "Tell Vyso where your operations are breaking down. Send an enquiry and get a practical response about the clearest next step.",
+    images: ["/og.png"],
+  },
 };
 
 const FONT: React.CSSProperties = { fontFamily: "var(--font-sans)" };
 const BODY: React.CSSProperties = { fontFamily: "var(--font-body, var(--font-sans))" };
+
+const blendText: React.CSSProperties = {
+  color: "white",
+  mixBlendMode: "difference",
+  display: "inline",
+};
+
+const blendOrange: React.CSSProperties = {
+  background:
+    "linear-gradient(135deg, hsl(219,72%,50%), hsl(202,69%,56%), hsl(199,66%,64%))",
+  WebkitBackgroundClip: "text",
+  backgroundClip: "text",
+  WebkitTextFillColor: "transparent",
+  color: "transparent",
+  mixBlendMode: "difference",
+  display: "inline",
+};
 
 // Liquid-glass card — same recipe as SystemsShowcase
 const GLASS: React.CSSProperties = {
@@ -43,12 +79,32 @@ const ICON_WRAP: React.CSSProperties = {
   flexShrink:      0,
 };
 
+const contactSchema = {
+  "@context": "https://schema.org",
+  "@type": "ContactPage",
+  "@id": "https://vyso.co.za/contact#webpage",
+  url: "https://vyso.co.za/contact",
+  name: "Contact Vyso",
+  description:
+    "Contact Vyso about a broken or inefficient operational workflow in a South African SME.",
+  isPartOf: { "@id": "https://vyso.co.za/#website" },
+  about: { "@id": "https://vyso.co.za/#organization" },
+  inLanguage: "en-ZA",
+};
+
 export default function ContactPage() {
   return (
-    <>
+    <div style={{ position: "relative", isolation: "isolate" }}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(contactSchema).replace(/</g, "\\u003c"),
+        }}
+      />
+      <WebGLShaderBackground global />
       <Navbar visible />
 
-      <AuroraBackground showRadialGradient style={{ minHeight: "100vh" }}>
+      <main style={{ minHeight: "100vh" }}>
         {/* Hero text */}
         <section
           style={{
@@ -72,27 +128,18 @@ export default function ContactPage() {
             Get in touch
           </p>
 
-          <h1 style={{
+          <h1 className="contact-headline" style={{
             ...FONT,
             fontSize:      "clamp(3rem, 7vw, 5.6rem)",
             fontWeight:    700,
             lineHeight:    1.0,
             letterSpacing: "-0.03em",
-            color:         "#0d0d0d",
             margin:        "0 0 1.2rem",
             maxWidth:      660,
           }}>
-            Let&apos;s solve your{" "}
-            <span style={{
-              background:           "linear-gradient(135deg, hsl(22,69%,44%), hsl(30,82%,57%), hsl(14,72%,36%))",
-              WebkitBackgroundClip: "text",
-              backgroundClip:       "text",
-              WebkitTextFillColor:  "transparent",
-              color:                "transparent",
-            }}>
-              ops
-            </span>{" "}
-            together.
+            <span className="blend-h-plain" style={blendText}>Let&apos;s solve your </span>
+            <span className="blend-h-orange" style={blendOrange}>ops</span>
+            <span className="blend-h-plain" style={blendText}> together.</span>
           </h1>
 
           <p style={{
@@ -104,8 +151,9 @@ export default function ContactPage() {
             maxWidth:   480,
             margin:     0,
           }}>
-            Send an enquiry and we&apos;ll get back within 24 hours — or book a free
-            15-minute call directly.
+            Tell us what is breaking down — orders, stock, suppliers, staffing,
+            documents or reporting. Send the messy version; we&apos;ll reply within
+            24 hours with the clearest useful next step.
           </p>
         </section>
 
@@ -146,29 +194,6 @@ export default function ContactPage() {
             {/* ── Sidebar ───────────────────────────────────────────────────── */}
             <div style={{ display: "flex", flexDirection: "column", gap: "1.2rem" }}>
 
-              {/* Book a call */}
-              <div style={GLASS}>
-                <div style={ICON_WRAP}>
-                  <Calendar size={16} color="hsl(22,69%,44%)" />
-                </div>
-                <h3 style={{ ...FONT, fontSize: "0.98rem", fontWeight: 600, color: "#0d0d0d",
-                  margin: "0 0 0.45rem" }}>Book a call</h3>
-                <p style={{ ...BODY, fontSize: "0.84rem", color: "#666", lineHeight: 1.6,
-                  margin: "0 0 1rem" }}>
-                  Prefer to talk it through? Book a free 15-minute call at a time
-                  that suits you.
-                </p>
-                <Link
-                  href="https://calendly.com/joshua-vyso/new-meeting"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{ ...BODY, fontSize: "0.85rem", fontWeight: 600,
-                    color: "hsl(22,69%,44%)", textDecoration: "none" }}
-                >
-                  Schedule on Calendly →
-                </Link>
-              </div>
-
               {/* Email */}
               <div style={GLASS}>
                 <div style={ICON_WRAP}>
@@ -201,8 +226,8 @@ export default function ContactPage() {
                   {[
                     "Reply within 24 hours",
                     "No hard sell — just an honest conversation",
-                    "A Calendly link in your inbox immediately",
-                    "Free discovery call, no commitment",
+                    "A practical view on whether Vyso fits",
+                    "A clear next step, with no commitment",
                   ].map(item => (
                     <li key={item} style={{ ...BODY, fontSize: "0.83rem", color: "#666",
                       lineHeight: 1.5, display: "flex", gap: "0.5rem" }}>
@@ -224,7 +249,7 @@ export default function ContactPage() {
                 {[
                   { icon: "🔒", label: "Your data stays yours", sub: "We never sell your data" },
                   { icon: "⚡", label: "Real people. Fast replies.", sub: "No bots, no runaround." },
-                  { icon: "🛡️", label: "Secure by design", sub: "Enterprise-grade security" },
+                  { icon: "🛡️", label: "Secure by design", sub: "Access-controlled platform" },
                   { icon: "⚙️", label: "Every operation is unique", sub: "Solutions built around you" },
                 ].map(t => (
                   <div key={t.label}>
@@ -240,9 +265,9 @@ export default function ContactPage() {
             </div>
           </div>
         </section>
-      </AuroraBackground>
+      </main>
 
       <SiteFooter />
-    </>
+    </div>
   );
 }

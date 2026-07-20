@@ -1,4 +1,6 @@
 "use client";
+import Link from "next/link";
+import Image from "next/image";
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useInView } from "@/hooks/useInView";
 import {
@@ -20,8 +22,8 @@ const blendOrange: React.CSSProperties = {
   display:              "inline",
 };
 
-/* ── Custom icon ─────────────────────────────────────────────────────────── */
-function CustomIcon({ size = 52 }: { size?: number }) {
+/* ── Module icons that are not part of the original sprite ───────────────── */
+function DocUIcon({ size = 52 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 310 310" fill="none">
       <defs>
@@ -30,7 +32,24 @@ function CustomIcon({ size = 52 }: { size?: number }) {
         </linearGradient>
       </defs>
       <rect width="310" height="310" rx="52" fill="url(#ci-bg3)"/>
-      <path d="M155 85V225M85 155H225" stroke="#FFF" strokeWidth="30" strokeLinecap="round"/>
+      <path d="M96 63h82l48 48v136H96V63Z" fill="rgba(255,255,255,.18)" stroke="#FFF" strokeWidth="14" strokeLinejoin="round"/>
+      <path d="M178 63v52h48M122 155h78M122 190h64" stroke="#FFF" strokeWidth="13" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  );
+}
+
+function PlanWiseIcon({ size = 52 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 310 310" fill="none">
+      <defs>
+        <linearGradient id="pw-bg" x1="0" y1="0" x2="310" y2="310">
+          <stop stopColor="#F39B45"/><stop offset="1" stopColor="#B9571E"/>
+        </linearGradient>
+      </defs>
+      <rect width="310" height="310" rx="52" fill="url(#pw-bg)"/>
+      <circle cx="155" cy="155" r="82" stroke="rgba(255,255,255,.45)" strokeWidth="16"/>
+      <circle cx="155" cy="155" r="44" stroke="#FFF" strokeWidth="16"/>
+      <path d="M155 155L222 88M190 88h32v32" stroke="#FFF" strokeWidth="16" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
   );
 }
@@ -38,29 +57,29 @@ function CustomIcon({ size = 52 }: { size?: number }) {
 /* ── App data ─────────────────────────────────────────────────────────────── */
 const APPS = [
   {
-    name:    "Custom",
-    tagline: "We build what you need.",
-    Icon:    CustomIcon,
+    name:    "Doc-U",
+    tagline: "Documents in. Clean data out.",
+    Icon:    DocUIcon,
     color:   "#7B5CF0",
     image:   null as string | null,
   },
   {
-    name:    "StockPulse",
-    tagline: "Real-time inventory, always in control.",
+    name:    "ProcurePulse",
+    tagline: "Procurement and stock intelligence.",
     Icon:    StockPulseIcon,
     color:   "#8D75F4",
     image:   "/assets/app-stockpulse.png",
   },
   {
-    name:    "WasteLog",
-    tagline: "Track waste. Cut costs.",
+    name:    "WasteWatch",
+    tagline: "Make preventable waste visible.",
     Icon:    WasteLogIcon,
     color:   "#086B62",
     image:   "/assets/app-wastelog.png",
   },
   {
-    name:    "SupplierHub",
-    tagline: "Supplier management, simplified.",
+    name:    "SupplySync",
+    tagline: "Supplier relationships, searchable.",
     Icon:    SupplierHubIcon,
     color:   "#1167D8",
     image:   "/assets/app-supplierhub.png",
@@ -80,15 +99,22 @@ const APPS = [
     image:   "/assets/app-orderflow.png",
   },
   {
-    name:    "MarginView",
-    tagline: "Know your margins, live.",
+    name:    "PricePilot",
+    tagline: "Pricing and margin recommendations.",
     Icon:    MarginViewIcon,
     color:   "#17A858",
     image:   "/assets/app-marginview.png",
   },
   {
-    name:    "ReportGen",
-    tagline: "Reports that tell you what matters.",
+    name:    "PlanWise",
+    tagline: "Budgeting and forecasting that stays useful.",
+    Icon:    PlanWiseIcon,
+    color:   "#B9571E",
+    image:   null as string | null,
+  },
+  {
+    name:    "InsightGen",
+    tagline: "Operational reports that explain what matters.",
     Icon:    ReportGenIcon,
     color:   "#E6A800",
     image:   "/assets/app-reportgen.png",
@@ -115,7 +141,7 @@ const FEATURES = [
     ),
     color: "#1167D8",
     title: "Secure & reliable",
-    sub:   "Enterprise-grade security you can trust.",
+    sub:   "Access controls and dependable workflows.",
   },
   {
     icon: (
@@ -221,12 +247,12 @@ function AppCard({ app, active }: { app: typeof APPS[0]; active: boolean }) {
         position:   "relative",
       }}>
         {app.image ? (
-          <img
+          <Image
             src={app.image}
             alt={app.name}
             draggable={false}
-            loading="lazy"
-            decoding="async"
+            fill
+            sizes={`${CARD_W}px`}
             style={{ width: "100%", height: "100%", objectFit: "cover", objectPosition: "top center", display: "block" }}
           />
         ) : (
@@ -264,7 +290,7 @@ function AppCard({ app, active }: { app: typeof APPS[0]; active: boolean }) {
               color: `${app.color}99`, margin: 0,
               textAlign: "center", lineHeight: 1.5,
             }}>
-              Your idea.<br />Our build.
+              {app.name}.<br />Connected to your operation.
             </p>
           </div>
         )}
@@ -381,8 +407,25 @@ export function AppsShowcase() {
           fontSize: "clamp(0.9rem, 1.6vw, 1.05rem)",
           color: "#666", maxWidth: 500, margin: "0 auto", lineHeight: 1.65,
         }}>
-          Whatever your operation needs — we build the tools and systems to make it run smarter.
+          Start with the workflow causing the most friction, then add connected
+          modules as the next operational need becomes clear.
         </p>
+        <Link
+          href="/platform/vyso-for-smes"
+          style={{
+            display: "inline-flex",
+            alignItems: "center",
+            gap: "0.45rem",
+            marginTop: "1rem",
+            color: "hsl(22,69%,44%)",
+            fontFamily: "var(--font-body, var(--font-sans))",
+            fontSize: "0.86rem",
+            fontWeight: 700,
+            textDecoration: "none",
+          }}
+        >
+          Explore the Vyso platform <span aria-hidden="true">→</span>
+        </Link>
       </div>
 
       {/* ── Coverflow stage ─────────────────────────────────────────────── */}
