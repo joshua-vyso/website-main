@@ -82,7 +82,7 @@ const APPS = [
     tagline: "Documents in. Clean data out.",
     Icon:    DocUIcon,
     color:   "#7B5CF0",
-    image:   "/assets/app-docu.png",
+    image:   "/assets/app-docu-dashboard.png",
   },
   {
     name:    "ProcurePulse",
