@@ -23,6 +23,20 @@ const blendOrange: React.CSSProperties = {
 };
 
 /* ── Module icons that are not part of the original sprite ───────────────── */
+function CustomIcon({ size = 52 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 310 310" fill="none">
+      <defs>
+        <linearGradient id="custom-module-bg" x1="0" y1="0" x2="310" y2="310">
+          <stop stopColor="#9B7FF6"/><stop offset="1" stopColor="#5B3DD6"/>
+        </linearGradient>
+      </defs>
+      <rect width="310" height="310" rx="52" fill="url(#custom-module-bg)"/>
+      <path d="M155 85V225M85 155H225" stroke="#FFF" strokeWidth="30" strokeLinecap="round"/>
+    </svg>
+  );
+}
+
 function DocUIcon({ size = 52 }: { size?: number }) {
   return (
     <svg width={size} height={size} viewBox="0 0 310 310" fill="none">
@@ -57,11 +71,18 @@ function PlanWiseIcon({ size = 52 }: { size?: number }) {
 /* ── App data ─────────────────────────────────────────────────────────────── */
 const APPS = [
   {
+    name:    "Custom Modules",
+    tagline: "Built around the way you work.",
+    Icon:    CustomIcon,
+    color:   "#7B5CF0",
+    image:   null as string | null,
+  },
+  {
     name:    "Doc-U",
     tagline: "Documents in. Clean data out.",
     Icon:    DocUIcon,
     color:   "#7B5CF0",
-    image:   null as string | null,
+    image:   "/assets/app-docu.png",
   },
   {
     name:    "ProcurePulse",
