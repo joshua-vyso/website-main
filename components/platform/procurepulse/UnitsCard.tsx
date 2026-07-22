@@ -56,9 +56,9 @@ export function UnitsCard({ initialCustom }: { initialCustom: string[] }) {
   }
 
   return (
-    <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
-      <div className="mb-1 text-[15px] font-medium text-[#1A1C1E]">Units of measurement</div>
-      <p className="mb-3 text-[12px] text-[#9A9DA1]">
+    <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+      <div className="of-display mb-1 text-[16px] font-semibold text-[#171A17]">Units of measurement</div>
+      <p className="mb-3 text-[13px] text-[#6B6F68]">
         Built-in units plus your own. These appear in the unit dropdown on every product.
       </p>
 
@@ -66,7 +66,7 @@ export function UnitsCard({ initialCustom }: { initialCustom: string[] }) {
         {BUILT_IN_UNITS.map((u) => (
           <span
             key={u}
-            className="inline-flex items-center rounded-full bg-[#F2F2EF] px-2.5 py-1 text-[12px] text-[#5F6368]"
+            className="inline-flex items-center rounded-full bg-[#F2F2EF] px-2.5 py-1 text-[12px] text-[#6B6F68]"
           >
             {u}
           </span>
@@ -74,7 +74,7 @@ export function UnitsCard({ initialCustom }: { initialCustom: string[] }) {
         {units.map((u) => (
           <span
             key={u}
-            className="inline-flex items-center gap-1 rounded-full bg-[#E7EEF8] px-2.5 py-1 text-[12px] font-medium text-[#174C87]"
+            className="inline-flex items-center gap-1 rounded-full bg-[#EAF2FC] px-2.5 py-1 text-[12px] font-medium text-[#174C87]"
           >
             {u}
             <button
@@ -90,7 +90,7 @@ export function UnitsCard({ initialCustom }: { initialCustom: string[] }) {
         ))}
       </div>
 
-      <div className="mt-3 flex items-center gap-2 border-t border-[#EFEFEC] pt-3">
+      <div className="mt-3 flex items-center gap-2 border-t border-[#EEF1F5] pt-3">
         <input
           type="text"
           value={value}
@@ -99,13 +99,13 @@ export function UnitsCard({ initialCustom }: { initialCustom: string[] }) {
             if (e.key === 'Enter') add();
           }}
           placeholder="Add a custom unit (e.g. sack, dozen)"
-          className="h-9 flex-1 rounded-lg border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
+          className="h-11 flex-1 rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]"
         />
         <button
           type="button"
           onClick={add}
           disabled={busy || !value.trim()}
-          className="h-9 shrink-0 rounded-lg bg-[#1F5FA8] px-3.5 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
+          className="inline-flex h-[42px] shrink-0 items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
         >
           {busy ? '…' : 'Add'}
         </button>

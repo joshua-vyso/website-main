@@ -25,7 +25,7 @@ export function SubNav({
 }) {
   const pathname = usePathname() ?? '';
   return (
-    <nav className="flex flex-wrap items-center gap-x-5 gap-y-1 border-b border-[#E7E7E2]">
+    <nav className="flex flex-wrap items-center gap-x-5 gap-y-1 border-b border-[#EAEDF2]">
       {tabs.map((t) => {
         const active =
           t.href === rootHref ? pathname === t.href : pathname === t.href || pathname.startsWith(`${t.href}/`);
@@ -34,7 +34,7 @@ export function SubNav({
             key={t.href}
             href={t.href}
             className={`-mb-px border-b-2 pb-2.5 pt-1 text-[14px] transition-colors ${
-              active ? 'font-medium text-[#1A1C1E]' : 'border-transparent text-[#5F6368] hover:text-[#1A1C1E]'
+              active ? 'font-medium text-[#171A17]' : 'border-transparent text-[#6B6F68] hover:text-[#171A17]'
             }`}
             style={active ? { borderBottomColor: accent } : undefined}
           >

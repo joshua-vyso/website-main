@@ -70,7 +70,7 @@ export function UnitCombobox({
         onBlur={() => setTimeout(() => setOpen(false), 120)}
         className={`${className} pr-6`}
       />
-      <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-[#9A9DA1]" aria-hidden>
+      <span className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-[10px] text-[#A0A49C]" aria-hidden>
         ▾
       </span>
 
@@ -78,7 +78,7 @@ export function UnitCombobox({
         <div
           ref={dropRef}
           style={{ position: 'fixed', top: pos.top, left: pos.left, width: Math.max(pos.width, 120) }}
-          className="z-[70] max-h-[220px] overflow-y-auto rounded-xl border border-[#D7D7D2] bg-white p-1 shadow-[0_18px_50px_-8px_rgba(26,28,30,0.4)]"
+          className="z-[70] max-h-[220px] overflow-y-auto rounded-[12px] border border-[#E2E6EC] bg-white p-1 shadow-[0_18px_50px_-8px_rgba(26,28,30,0.4)]"
         >
           {list.map((u) => (
             <button
@@ -89,8 +89,8 @@ export function UnitCombobox({
                 onChange(u);
                 setOpen(false);
               }}
-              className={`flex w-full items-center rounded-lg px-2.5 py-1.5 text-left text-[13px] transition-colors hover:bg-[#FAFAF8] ${
-                u.toLowerCase() === q ? 'bg-[#E7EEF8] font-medium text-[#174C87]' : 'text-[#1A1C1E]'
+              className={`flex w-full items-center rounded-[9px] px-2.5 py-1.5 text-left text-[14px] transition-colors hover:bg-[#F5F9FE] ${
+                u.toLowerCase() === q ? 'bg-[#EAF2FC] font-semibold text-[#174C87]' : 'text-[#171A17]'
               }`}
             >
               {u}

@@ -179,17 +179,17 @@ function PaymentForm({
       }
     >
       <div className="space-y-4">
-        <div className="grid grid-cols-3 gap-2 rounded-xl border border-[#E7E7E2] bg-[#FBFBF9] p-3 text-[13px]">
+        <div className="grid grid-cols-3 gap-2 rounded-xl border border-[#EAEDF2] bg-[#FBFCFE] p-3 text-[13px]">
           <div>
-            <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">Total</div>
-            <div className="mt-0.5 tabular-nums font-medium text-[#1A1C1E]">{zar2(total)}</div>
+            <div className="text-[11px] uppercase tracking-wide text-[#8A8E86]">Total</div>
+            <div className="mt-0.5 tabular-nums font-medium text-[#171A17]">{zar2(total)}</div>
           </div>
           <div>
-            <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">Paid</div>
+            <div className="text-[11px] uppercase tracking-wide text-[#8A8E86]">Paid</div>
             <div className="mt-0.5 tabular-nums font-medium text-[#0F6E56]">{zar2(paidSoFar)}</div>
           </div>
           <div>
-            <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">Balance</div>
+            <div className="text-[11px] uppercase tracking-wide text-[#8A8E86]">Balance</div>
             <div className="mt-0.5 tabular-nums font-semibold text-[#854F0B]">{zar2(balance)}</div>
           </div>
         </div>

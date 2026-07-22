@@ -45,7 +45,7 @@ export function DocumentRename({ documentId, filename }: { documentId: string; f
           }
         }}
         aria-label="Rename document"
-        className="w-full max-w-[420px] rounded-lg border border-[#3E7BC4]/40 bg-white px-2 py-0.5 text-[20px] font-bold leading-tight text-[#1A1C1E] focus:outline-none"
+        className="of-display w-full max-w-[420px] rounded-[10px] border border-[#3E7BC4] bg-white px-2.5 py-0.5 text-[24px] font-semibold leading-tight tracking-[-0.015em] text-[#171A17] outline-none"
       />
     );
   }
@@ -61,14 +61,14 @@ export function DocumentRename({ documentId, filename }: { documentId: string; f
       title="Rename document"
       className="group inline-flex max-w-full items-center gap-1.5 text-left disabled:opacity-60"
     >
-      <span className="truncate text-[20px] font-bold leading-tight text-[#1A1C1E]">{filename}</span>
+      <span className="of-display truncate text-[24px] font-semibold leading-tight tracking-[-0.015em] text-[#171A17]">{filename}</span>
       <svg
         width="14"
         height="14"
         viewBox="0 0 16 16"
         fill="none"
         aria-hidden
-        className="shrink-0 text-[#C9CCC8] transition-colors group-hover:text-[#5F6368]"
+        className="shrink-0 text-[#BFC5CC] transition-colors group-hover:text-[#1F5FA8]"
       >
         <path
           d="M11.5 2.5l2 2L6 12l-2.5.5L4 10l7.5-7.5z"

@@ -95,25 +95,25 @@ function fmtDate(v: string | null): string {
 
 function Chip({ children }: { children: React.ReactNode }) {
   return (
-    <span className="rounded-full border border-[#E7E7E2] bg-white px-2.5 py-1 text-[12px] text-[#5F6368]">{children}</span>
+    <span className="rounded-full border border-[#EAEDF2] bg-white px-2.5 py-1 text-[12px] text-[#6B6F68]">{children}</span>
   );
 }
 
 function DetailRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-start justify-between gap-3 border-b border-[#F6F6F2] py-2 last:border-0">
-      <span className="shrink-0 text-[12px] text-[#9A9DA1]">{label}</span>
-      <span className="min-w-0 text-right text-[13px] text-[#1A1C1E]">{children}</span>
+    <div className="flex items-start justify-between gap-3 border-b border-[#F5F9FE] py-2 last:border-0">
+      <span className="shrink-0 text-[12px] text-[#8A8E86]">{label}</span>
+      <span className="min-w-0 text-right text-[14px] text-[#171A17]">{children}</span>
     </div>
   );
 }
 
 function MiniStat({ label, value, color = INK, sub }: { label: string; value: string; color?: string; sub?: string }) {
   return (
-    <div className="rounded-2xl border border-[#E7E7E2] bg-white p-3.5">
-      <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">{label}</div>
-      <div className="mt-1 text-[20px] font-bold leading-none tabular-nums" style={{ color }}>{value}</div>
-      {sub ? <div className="mt-1 text-[11px] text-[#9A9DA1]">{sub}</div> : null}
+    <div className="rounded-[14px] border border-[#EEF1F5] bg-white p-3.5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+      <div className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">{label}</div>
+      <div className="of-num mt-2 text-[22px] font-semibold leading-none tracking-[-0.02em]" style={{ color }}>{value}</div>
+      {sub ? <div className="mt-1.5 text-[12px] text-[#A0A49C]">{sub}</div> : null}
     </div>
   );
 }
@@ -121,7 +121,7 @@ function MiniStat({ label, value, color = INK, sub }: { label: string; value: st
 function SectionLabel({ children, right }: { children: React.ReactNode; right?: React.ReactNode }) {
   return (
     <div className="flex items-center justify-between">
-      <h4 className="text-[13px] font-semibold text-[#1A1C1E]">{children}</h4>
+      <h4 className="of-display text-[15px] font-semibold text-[#171A17]">{children}</h4>
       {right}
     </div>
   );
@@ -154,7 +154,7 @@ function ProfileBody({ supplier }: { supplier: Supplier }) {
           if (!ss.isComparing(supplier.id)) ss.toggleCompare(supplier.id);
           ss.openCompare();
         }}
-        className="rounded-lg border border-[#E7E7E2] px-2.5 py-1 text-[12px] font-medium text-[#5F6368] transition-colors hover:bg-[#F0F0EC] hover:text-[#1A1C1E]"
+        className="inline-flex h-9 items-center rounded-[10px] border border-[#E2E6EC] bg-white px-3.5 text-[13px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]"
       >
         {ss.isComparing(supplier.id) ? 'In compare' : 'Compare'}
       </button>
@@ -165,38 +165,38 @@ function ProfileBody({ supplier }: { supplier: Supplier }) {
     <Drawer open onClose={ss.closeProfile} title={supplier.name} subtitle={subtitle} right={right} width={640}>
       {/* Header strip */}
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <div className="rounded-2xl border border-[#E7E7E2] bg-white p-3.5">
-          <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">Overall</div>
+        <div className="rounded-[14px] border border-[#EEF1F5] bg-white p-3.5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <div className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">Overall</div>
           <div className="mt-1 flex items-baseline gap-2">
-            <span className="text-[22px] font-bold leading-none tabular-nums" style={{ color: scoreColor(supplier.scorecard.overall) }}>
+            <span className="of-num text-[22px] font-semibold leading-none tracking-[-0.02em]" style={{ color: scoreColor(supplier.scorecard.overall) }}>
               {supplier.scorecard.overall}
             </span>
             <ScorePill value={supplier.scorecard.overall} />
           </div>
         </div>
-        <div className="rounded-2xl border border-[#E7E7E2] bg-white p-3.5">
-          <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">Risk</div>
+        <div className="rounded-[14px] border border-[#EEF1F5] bg-white p-3.5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <div className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">Risk</div>
           <div className="mt-1.5"><SupplierRiskBadge risk={supplier.risk} /></div>
         </div>
-        <div className="rounded-2xl border border-[#E7E7E2] bg-white p-3.5">
-          <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">Rating</div>
+        <div className="rounded-[14px] border border-[#EEF1F5] bg-white p-3.5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <div className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">Rating</div>
           <div className="mt-1.5"><Stars rating={supplier.rating} /></div>
         </div>
-        <div className="rounded-2xl border border-[#E7E7E2] bg-white p-3.5">
-          <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">Avg / month</div>
-          <div className="mt-1 text-[18px] font-bold leading-none tabular-nums text-[#1A1C1E]">{zar(supplier.avgMonthlySpend)}</div>
+        <div className="rounded-[14px] border border-[#EEF1F5] bg-white p-3.5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <div className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">Avg / month</div>
+          <div className="of-num mt-2 text-[22px] font-semibold leading-none tracking-[-0.02em] text-[#171A17]">{zar(supplier.avgMonthlySpend)}</div>
         </div>
       </div>
 
       {/* Sub-tabs */}
-      <div className="mt-5 flex flex-wrap gap-x-4 gap-y-1 border-b border-[#F0F0EC] pb-2">
+      <div className="mt-5 flex flex-wrap gap-x-4 gap-y-1 border-b border-[#EEF1F5] pb-2">
         {TABS.map((t) => (
           <button
             key={t}
             type="button"
             onClick={() => setTab(t)}
-            className={`-mb-px border-b-2 pb-1.5 pt-1 text-[13px] transition-colors ${
-              tab === t ? 'border-[#B0466A] font-medium text-[#1A1C1E]' : 'border-transparent text-[#9A9DA1] hover:text-[#5F6368]'
+            className={`-mb-px border-b-2 pb-2 pt-1 text-[14px] transition-colors ${
+              tab === t ? 'border-[#1F5FA8] font-semibold text-[#171A17]' : 'border-transparent text-[#8A8E86] hover:text-[#6B6F68]'
             }`}
           >
             {t}
@@ -256,7 +256,7 @@ function OverviewTab({ supplier }: { supplier: Supplier }) {
 
       <div>
         <SectionLabel>Details</SectionLabel>
-        <div className="mt-2 rounded-2xl border border-[#E7E7E2] bg-white px-4 py-1.5">
+        <div className="mt-2 rounded-2xl border border-[#EAEDF2] bg-white px-4 py-1.5">
           <DetailRow label="Categories">
             {supplier.categories.length ? (
               <span className="inline-flex flex-wrap justify-end gap-1.5">
@@ -275,7 +275,7 @@ function OverviewTab({ supplier }: { supplier: Supplier }) {
           <DetailRow label="Backup contact">{backup ? `${backup.name}${backup.role ? ` · ${backup.role}` : ''}` : '—'}</DetailRow>
           <DetailRow label="Linked documents">{supplier.docs.length}</DetailRow>
           <DetailRow label="Latest note">
-            {latestNote ? <span className="text-[#5F6368]">{latestNote.body}</span> : '—'}
+            {latestNote ? <span className="text-[#6B6F68]">{latestNote.body}</span> : '—'}
           </DetailRow>
         </div>
       </div>
@@ -364,7 +364,7 @@ function ContactsTab({ supplier, show }: { supplier: Supplier; show: (m: string)
             <button
               type="button"
               onClick={() => setAdding(true)}
-              className="rounded-lg border border-[#E7E7E2] px-2.5 py-1 text-[12px] font-medium text-[#5F6368] transition-colors hover:bg-[#F0F0EC] hover:text-[#1A1C1E]"
+              className="inline-flex h-9 items-center rounded-[10px] border border-[#E2E6EC] bg-white px-3.5 text-[13px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]"
             >
               + Add contact
             </button>
@@ -375,7 +375,7 @@ function ContactsTab({ supplier, show }: { supplier: Supplier; show: (m: string)
       </SectionLabel>
 
       {adding ? (
-        <div className="rounded-2xl border border-[#E7E7E2] bg-[#FBFBF9] p-4">
+        <div className="rounded-2xl border border-[#EAEDF2] bg-[#FBFCFE] p-4">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <Field label="Name">
               <input value={name} onChange={(e) => setName(e.target.value)} className={inputCls} placeholder="Full name" />
@@ -401,7 +401,7 @@ function ContactsTab({ supplier, show }: { supplier: Supplier; show: (m: string)
               type="button"
               onClick={save}
               disabled={saving}
-              className="rounded-lg bg-[#1A1C1E] px-3 py-1.5 text-[12px] font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+              className="inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-50"
             >
               {saving ? 'Saving…' : 'Save contact'}
             </button>
@@ -411,7 +411,7 @@ function ContactsTab({ supplier, show }: { supplier: Supplier; show: (m: string)
                 setAdding(false);
                 setError(null);
               }}
-              className="rounded-lg px-3 py-1.5 text-[12px] font-medium text-[#5F6368] transition-colors hover:text-[#1A1C1E]"
+              className="rounded-lg px-3 py-1.5 text-[12px] font-medium text-[#6B6F68] transition-colors hover:text-[#171A17]"
             >
               Cancel
             </button>
@@ -420,7 +420,7 @@ function ContactsTab({ supplier, show }: { supplier: Supplier; show: (m: string)
       ) : null}
 
       {supplier.contacts.length === 0 && !adding ? (
-        <p className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-4 py-6 text-center text-[13px] text-[#9A9DA1]">
+        <p className="rounded-2xl border border-dashed border-[#E2E6EC] bg-[#FBFCFE] px-4 py-6 text-center text-[13px] text-[#8A8E86]">
           No contacts captured yet. Add the person you deal with most.
         </p>
       ) : (
@@ -436,26 +436,26 @@ function ContactsTab({ supplier, show }: { supplier: Supplier; show: (m: string)
 
 function ContactCard({ contact }: { contact: SupplierContact }) {
   return (
-    <div className="rounded-2xl border border-[#E7E7E2] bg-white p-3.5">
+    <div className="rounded-[14px] border border-[#EEF1F5] bg-white p-3.5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="flex items-center gap-1.5">
-            <span className="text-[14px] font-semibold text-[#1A1C1E]">{contact.name}</span>
+            <span className="of-display text-[15px] font-semibold text-[#171A17]">{contact.name}</span>
             {contact.isPrimary ? <span className="text-[13px]" style={{ color: '#C9A227' }} aria-label="Primary contact">★</span> : null}
           </div>
-          <div className="mt-0.5 text-[12px] text-[#5F6368]">{contact.role}</div>
+          <div className="mt-0.5 text-[12px] text-[#6B6F68]">{contact.role}</div>
         </div>
         <span
           className="shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium"
-          style={{ backgroundColor: '#F0F0EC', color: MUTE }}
+          style={{ backgroundColor: '#EEF1F5', color: MUTE }}
         >
           Prefers {contact.preferredMethod}
         </span>
       </div>
-      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-[#5F6368]">
+      <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-[#6B6F68]">
         {contact.email ? <span>{contact.email}</span> : null}
         {contact.phone ? <span>{contact.phone}</span> : null}
-        {!contact.email && !contact.phone ? <span className="text-[#9A9DA1]">No email or phone on file</span> : null}
+        {!contact.email && !contact.phone ? <span className="text-[#8A8E86]">No email or phone on file</span> : null}
       </div>
     </div>
   );
@@ -475,7 +475,7 @@ function DocumentsTab({ supplier, show }: { supplier: Supplier; show: (m: string
       <SectionLabel>Compliance documents</SectionLabel>
 
       {present.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-4 py-6 text-center text-[13px] text-[#9A9DA1]">
+        <p className="rounded-2xl border border-dashed border-[#E2E6EC] bg-[#FBFCFE] px-4 py-6 text-center text-[13px] text-[#8A8E86]">
           No documents on file yet.
         </p>
       ) : (
@@ -491,9 +491,9 @@ function DocumentsTab({ supplier, show }: { supplier: Supplier; show: (m: string
           <SectionLabel>Missing from standard set</SectionLabel>
           <div className="mt-2 space-y-2">
             {missing.map((label) => (
-              <div key={label} className="flex items-center justify-between gap-3 rounded-2xl border border-[#E7E7E2] bg-white p-3.5">
+              <div key={label} className="flex items-center justify-between gap-3 rounded-2xl border border-[#EAEDF2] bg-white p-3.5">
                 <div className="min-w-0">
-                  <div className="text-[13px] font-medium text-[#1A1C1E]">{label}</div>
+                  <div className="text-[14px] font-semibold text-[#171A17]">{label}</div>
                   <div className="mt-0.5"><DocStatusBadge status="missing" /></div>
                 </div>
                 <div className="flex shrink-0 items-center gap-2">
@@ -518,17 +518,17 @@ function DocumentsTab({ supplier, show }: { supplier: Supplier; show: (m: string
               <Link
                 key={d.id}
                 href={`/app/docu/${d.id}`}
-                className="flex items-center justify-between gap-3 rounded-2xl border border-[#E7E7E2] bg-white p-3.5 transition-colors hover:border-[#B0466A]/40"
+                className="flex items-center justify-between gap-3 rounded-2xl border border-[#EAEDF2] bg-white p-3.5 transition-colors hover:border-[#3E7BC4]/40"
               >
                 <div className="min-w-0">
-                  <div className="truncate text-[13px] font-medium text-[#1A1C1E]">{d.filename}</div>
-                  <div className="mt-0.5 text-[12px] text-[#9A9DA1]">
+                  <div className="truncate text-[13px] font-medium text-[#171A17]">{d.filename}</div>
+                  <div className="mt-0.5 text-[12px] text-[#8A8E86]">
                     {[LINKED_DOC_LABEL[d.docType ?? ''] ?? 'Document', d.date ? fmtDate(d.date) : null]
                       .filter(Boolean)
                       .join(' · ')}
                   </div>
                 </div>
-                <div className="shrink-0 text-[13px] font-semibold tabular-nums text-[#1A1C1E]">
+                <div className="shrink-0 text-[13px] font-semibold of-num text-[#171A17]">
                   {d.total != null ? zar(d.total) : ''}
                 </div>
               </Link>
@@ -557,12 +557,12 @@ function DocRow({ doc, show }: { doc: SupplierDocument; show: (m: string) => voi
         ? `Expires ${fmtDate(doc.expiry)}${doc.daysRemaining != null ? ` · ${doc.daysRemaining < 0 ? `${Math.abs(doc.daysRemaining)}d overdue` : `${doc.daysRemaining}d left`}` : ''}`
         : 'No expiry';
   return (
-    <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#E7E7E2] bg-white p-3.5">
+    <div className="flex items-center justify-between gap-3 rounded-2xl border border-[#EAEDF2] bg-white p-3.5">
       <div className="min-w-0">
-        <div className="text-[13px] font-medium text-[#1A1C1E]">{doc.label}</div>
+        <div className="text-[14px] font-semibold text-[#171A17]">{doc.label}</div>
         <div className="mt-1 flex items-center gap-2">
           <DocStatusBadge status={doc.status} />
-          <span className="text-[12px]" style={{ color: doc.status === 'expired' || doc.status === 'missing' ? RED : meta.color }}>
+          <span className="of-num text-[12px]" style={{ color: doc.status === 'expired' || doc.status === 'missing' ? RED : meta.color }}>
             {expiryText}
           </span>
         </div>
@@ -613,29 +613,29 @@ function PerformanceTab({ supplier }: { supplier: Supplier }) {
         {hasTrends ? (
           <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-3">
             {trends.map((t) => (
-              <div key={t.label} className="rounded-2xl border border-[#E7E7E2] bg-white p-3.5">
-                <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">{t.label}</div>
+              <div key={t.label} className="rounded-[14px] border border-[#EEF1F5] bg-white p-3.5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+                <div className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">{t.label}</div>
                 <div className="mt-2">
                   {t.data.length > 1 ? (
                     <Sparkline data={t.data} color={t.color} width={180} height={44} />
                   ) : (
-                    <span className="text-[12px] text-[#9A9DA1]">Not enough data</span>
+                    <span className="text-[12px] text-[#8A8E86]">Not enough data</span>
                   )}
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          <p className="mt-2 rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-4 py-6 text-center text-[13px] text-[#9A9DA1]">
+          <p className="mt-2 rounded-2xl border border-dashed border-[#E2E6EC] bg-[#FBFCFE] px-4 py-6 text-center text-[13px] text-[#8A8E86]">
             No trend history captured yet.
           </p>
         )}
       </div>
 
       {supplier.lastIssue ? (
-        <div className="rounded-2xl border border-[#E7E7E2] bg-[#FBFBF9] p-3.5">
-          <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">Last issue</div>
-          <div className="mt-1 text-[13px] text-[#1A1C1E]">{supplier.lastIssue}</div>
+        <div className="rounded-2xl border border-[#EAEDF2] bg-[#FBFCFE] p-3.5">
+          <div className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">Last issue</div>
+          <div className="mt-1 text-[13px] text-[#171A17]">{supplier.lastIssue}</div>
         </div>
       ) : null}
     </div>
@@ -651,22 +651,22 @@ function PricingTab({ supplier }: { supplier: Supplier }) {
     const pos = POSITION_META[p.position];
     return [
       <div key="item" className="min-w-0">
-        <div className="font-medium text-[#1A1C1E]">{p.item}</div>
-        <div className="text-[11px] text-[#9A9DA1]">{p.category} · per {p.unit}</div>
+        <div className="font-medium text-[#171A17]">{p.item}</div>
+        <div className="text-[11px] text-[#8A8E86]">{p.category} · per {p.unit}</div>
       </div>,
-      <span key="cur" className="tabular-nums text-[#1A1C1E]">{zar(p.currentPrice)}</span>,
-      <span key="prev" className="tabular-nums text-[#9A9DA1]">{zar(p.previousPrice)}</span>,
-      <span key="chg" className="tabular-nums font-medium" style={{ color: p.changePct > 0 ? RED : p.changePct < 0 ? GREEN : MUTE }}>
+      <span key="cur" className="of-num text-[#171A17]">{zar(p.currentPrice)}</span>,
+      <span key="prev" className="of-num text-[#8A8E86]">{zar(p.previousPrice)}</span>,
+      <span key="chg" className="of-num font-medium" style={{ color: p.changePct > 0 ? RED : p.changePct < 0 ? GREEN : MUTE }}>
         {p.changePct > 0 ? '+' : ''}{p.changePct}%
       </span>,
-      <span key="mkt" className="tabular-nums text-[#5F6368]">{zar(p.marketAvg)}</span>,
+      <span key="mkt" className="of-num text-[#6B6F68]">{zar(p.marketAvg)}</span>,
       <span key="pos" className="font-medium" style={{ color: pos.color }}>
         {pos.label}
         <span className="ml-1 text-[11px]" style={{ color: marketDiffColor(p.diffVsMarketPct) }}>
           ({p.diffVsMarketPct > 0 ? '+' : ''}{p.diffVsMarketPct}%)
         </span>
       </span>,
-      <span key="upd" className="text-[12px] text-[#9A9DA1]">{fmtDate(p.lastUpdated)}</span>,
+      <span key="upd" className="of-num text-[12px] text-[#8A8E86]">{fmtDate(p.lastUpdated)}</span>,
       p.trend.length > 1 ? (
         <Sparkline key="spark" data={p.trend} color={p.changePct > 0 ? RED : ACCENT} width={72} height={26} />
       ) : (
@@ -692,7 +692,7 @@ function PricingTab({ supplier }: { supplier: Supplier }) {
         rows={rows}
         empty="No pricing captured for this supplier yet."
       />
-      <p className="text-[12px] text-[#9A9DA1]">
+      <p className="text-[12px] text-[#8A8E86]">
         Pricing is surfaced for comparison only. Place and manage orders in ProcurePulse.
       </p>
     </div>
@@ -745,7 +745,7 @@ function NotesTab({ supplier, show }: { supplier: Supplier; show: (m: string) =>
           onChange={(e) => setBody(e.target.value)}
           rows={3}
           placeholder="Add a note about this supplier — a call outcome, a quality flag, a pricing agreement…"
-          className="w-full resize-none rounded-2xl border border-[#E7E7E2] bg-white px-3.5 py-2.5 text-[13px] text-[#1A1C1E] outline-none placeholder:text-[#9A9DA1] focus:border-[#B0466A]"
+          className="w-full resize-none rounded-[12px] border border-[#E4E9F0] bg-white px-4 py-3 text-[14px] text-[#171A17] outline-none transition-colors placeholder:text-[#A0A49C] focus:border-[#3E7BC4]"
         />
         {error ? <p className="mt-1 text-[12px] text-[#A32D2D]">{error}</p> : null}
         <div className="mt-2 flex justify-end">
@@ -753,7 +753,7 @@ function NotesTab({ supplier, show }: { supplier: Supplier; show: (m: string) =>
             type="button"
             onClick={addNote}
             disabled={saving}
-            className="rounded-lg bg-[#1A1C1E] px-3 py-1.5 text-[12px] font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+            className="inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-50"
           >
             {saving ? 'Adding…' : 'Add note'}
           </button>
@@ -761,16 +761,16 @@ function NotesTab({ supplier, show }: { supplier: Supplier; show: (m: string) =>
       </div>
 
       {notes.length === 0 ? (
-        <p className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-4 py-6 text-center text-[13px] text-[#9A9DA1]">
+        <p className="rounded-2xl border border-dashed border-[#E2E6EC] bg-[#FBFCFE] px-4 py-6 text-center text-[13px] text-[#8A8E86]">
           No notes yet.
         </p>
       ) : (
         <div className="space-y-2">
           {notes.map((n, i) => (
-            <div key={`${n.date}-${i}`} className="rounded-2xl border border-[#E7E7E2] bg-white p-3.5">
-              <p className="text-[13px] text-[#1A1C1E]">{n.body}</p>
-              <div className="mt-1.5 flex items-center gap-2 text-[11px] text-[#9A9DA1]">
-                <span>{fmtDate(n.date)}</span>
+            <div key={`${n.date}-${i}`} className="rounded-[14px] border border-[#EEF1F5] bg-white p-3.5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+              <p className="text-[14px] leading-relaxed text-[#2C333B]">{n.body}</p>
+              <div className="mt-2 flex items-center gap-2 text-[12px] text-[#A0A49C]">
+                <span className="of-num">{fmtDate(n.date)}</span>
                 {n.author ? <span>· {n.author}</span> : null}
               </div>
             </div>
@@ -789,13 +789,13 @@ function HistoryTab({ supplier }: { supplier: Supplier }) {
   const events = supplier.history;
   if (events.length === 0) {
     return (
-      <p className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-4 py-6 text-center text-[13px] text-[#9A9DA1]">
+      <p className="rounded-2xl border border-dashed border-[#E2E6EC] bg-[#FBFCFE] px-4 py-6 text-center text-[13px] text-[#8A8E86]">
         No relationship history yet.
       </p>
     );
   }
   return (
-    <ol className="relative ml-1 space-y-4 border-l border-[#F0F0EC] pl-5">
+    <ol className="relative ml-1 space-y-4 border-l border-[#EEF1F5] pl-5">
       {events.map((ev) => (
         <TimelineItem key={ev.id} event={ev} />
       ))}
@@ -813,21 +813,21 @@ function TimelineItem({ event }: { event: SupplierHistoryEvent }) {
       />
       <div className="flex items-center justify-between gap-3">
         <span className="text-[13px] font-semibold" style={{ color: meta.color }}>{meta.label}</span>
-        <span className="shrink-0 text-[11px] text-[#9A9DA1]">{fmtDate(event.date)}</span>
+        <span className="of-num shrink-0 text-[12px] text-[#A0A49C]">{fmtDate(event.date)}</span>
       </div>
-      {event.summary ? <p className="mt-0.5 text-[13px] text-[#1A1C1E]">{event.summary}</p> : null}
-      <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-[#9A9DA1]">
+      {event.summary ? <p className="mt-0.5 text-[13px] text-[#171A17]">{event.summary}</p> : null}
+      <div className="mt-1 flex flex-wrap gap-x-3 gap-y-0.5 text-[11px] text-[#8A8E86]">
         {event.contactName ? <span>{event.contactName}</span> : null}
         {event.channel ? <span>· {event.channel}</span> : null}
         {event.owner ? <span>· {event.owner}</span> : null}
       </div>
       {event.followUp ? (
-        <div className="mt-1.5 rounded-lg border border-[#E7E7E2] bg-[#FBFBF9] px-2.5 py-1.5 text-[12px]">
+        <div className="mt-1.5 rounded-lg border border-[#EAEDF2] bg-[#FBFCFE] px-2.5 py-1.5 text-[12px]">
           <span className="font-medium" style={{ color: event.followUpDone ? GREEN : AMBER }}>
             {event.followUpDone ? 'Follow-up done' : 'Follow-up'}
           </span>
-          <span className="text-[#5F6368]"> — {event.followUp}</span>
-          {event.followUpDate ? <span className="text-[#9A9DA1]"> ({fmtDate(event.followUpDate)})</span> : null}
+          <span className="text-[#6B6F68]"> — {event.followUp}</span>
+          {event.followUpDate ? <span className="text-[#8A8E86]"> ({fmtDate(event.followUpDate)})</span> : null}
         </div>
       ) : null}
     </li>
@@ -839,15 +839,15 @@ function TimelineItem({ event }: { event: SupplierHistoryEvent }) {
 // ---------------------------------------------------------------------------
 
 const inputCls =
-  'w-full rounded-lg border border-[#E7E7E2] bg-white px-2.5 py-1.5 text-[13px] text-[#1A1C1E] outline-none placeholder:text-[#9A9DA1] focus:border-[#B0466A]';
+  'h-11 w-full rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] outline-none transition-colors placeholder:text-[#A0A49C] focus:border-[#3E7BC4]';
 
 const ghostBtn =
-  'rounded-lg border border-[#E7E7E2] px-2.5 py-1 text-[12px] font-medium text-[#5F6368] transition-colors hover:bg-[#F0F0EC] hover:text-[#1A1C1E]';
+  'inline-flex h-9 items-center rounded-[10px] border border-[#E2E6EC] bg-white px-3.5 text-[13px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]';
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-1 block text-[11px] uppercase tracking-wide text-[#9A9DA1]">{label}</span>
+      <span className="mb-1.5 block text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">{label}</span>
       {children}
     </label>
   );

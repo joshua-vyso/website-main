@@ -221,7 +221,7 @@ export function computeOpportunities(
 export const PRIORITY_STYLE: Record<Opportunity['priority'], { bg: string; fg: string; label: string }> = {
   high: { bg: '#FCEBEB', fg: '#A32D2D', label: 'High' },
   medium: { bg: '#FBEEDA', fg: '#854F0B', label: 'Medium' },
-  low: { bg: '#F0F0EC', fg: '#5F6368', label: 'Low' },
+  low: { bg: '#EEF1F5', fg: '#6B6F68', label: 'Low' },
 };
 
 export type Confidence = 'high' | 'medium' | 'low';
@@ -229,7 +229,7 @@ export type Confidence = 'high' | 'medium' | 'low';
 export const CONFIDENCE_STYLE: Record<Confidence, { bg: string; fg: string; label: string }> = {
   high: { bg: '#E1F5EE', fg: '#0F6E56', label: 'High confidence' },
   medium: { bg: '#FBEEDA', fg: '#854F0B', label: 'Medium confidence' },
-  low: { bg: '#F0F0EC', fg: '#5F6368', label: 'Low confidence' },
+  low: { bg: '#EEF1F5', fg: '#6B6F68', label: 'Low confidence' },
 };
 
 /** Deterministic confidence + plain-language reasoning for a suggested price change. */
@@ -459,7 +459,7 @@ export const VALIDITY_STYLE: Record<ValidityStatus, { bg: string; fg: string; la
   scheduled: { bg: '#E6F1FB', fg: '#0C447C', label: 'Scheduled' },
   expiring: { bg: '#FBEEDA', fg: '#854F0B', label: 'Expiring soon' },
   expired: { bg: '#FCEBEB', fg: '#A32D2D', label: 'Expired' },
-  none: { bg: '#F0F0EC', fg: '#5F6368', label: 'No expiry' },
+  none: { bg: '#EEF1F5', fg: '#6B6F68', label: 'No expiry' },
 };
 
 /** Days within which an upcoming expiry counts as "expiring soon". */
@@ -520,7 +520,7 @@ export interface PpNotification {
 export const NOTIF_SEVERITY_STYLE: Record<NotificationSeverity, { dot: string; bg: string; fg: string; label: string }> = {
   high: { dot: '#A32D2D', bg: '#FCEBEB', fg: '#A32D2D', label: 'Action needed' },
   medium: { dot: '#854F0B', bg: '#FBEEDA', fg: '#854F0B', label: 'Review' },
-  low: { dot: '#5F6368', bg: '#F0F0EC', fg: '#5F6368', label: 'Note' },
+  low: { dot: '#6B6F68', bg: '#EEF1F5', fg: '#6B6F68', label: 'Note' },
 };
 
 export interface NotificationInput {

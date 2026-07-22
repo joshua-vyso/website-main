@@ -230,11 +230,11 @@ export function QuoteBuilder({
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <div className="flex items-center gap-3">
-            <Link href="/app/orderflow/quotes" className="text-[13px] font-medium text-[#5F6368] transition-colors hover:text-[#1A1C1E]">
+            <Link href="/app/orderflow/quotes" className="text-[13px] font-medium text-[#6B6F68] transition-colors hover:text-[#171A17]">
               ← Quotes
             </Link>
           </div>
-          <h1 className="mt-1 text-[26px] font-bold text-[#1A1C1E]">New quote</h1>
+          <h1 className="mt-1 text-[26px] font-bold text-[#171A17]">New quote</h1>
         </div>
       </div>
 
@@ -244,26 +244,26 @@ export function QuoteBuilder({
       {quoteRequest ? (
         <div className="mt-4 rounded-2xl border border-[#FBEEDA] bg-[#FFFDF7] p-4">
           <div className="text-[12px] font-medium uppercase tracking-wide text-[#854F0B]">Website enquiry</div>
-          <div className="mt-1 text-[14px] font-medium text-[#1A1C1E]">
+          <div className="mt-1 text-[14px] font-medium text-[#171A17]">
             {quoteRequestWho(quoteRequest)}
             {quoteRequest.business_name ? (
-              <span className="font-normal text-[#5F6368]"> · {quoteRequest.business_name}</span>
+              <span className="font-normal text-[#6B6F68]"> · {quoteRequest.business_name}</span>
             ) : null}
           </div>
-          <div className="mt-0.5 flex flex-wrap gap-x-3 text-[12px] text-[#5F6368]">
+          <div className="mt-0.5 flex flex-wrap gap-x-3 text-[12px] text-[#6B6F68]">
             {quoteRequest.contact_email ? <span>{quoteRequest.contact_email}</span> : null}
             {quoteRequest.contact_phone ? <span>{quoteRequest.contact_phone}</span> : null}
           </div>
           {quoteRequest.message ? (
-            <p className="mt-2 whitespace-pre-wrap text-[13px] leading-snug text-[#1A1C1E]">{quoteRequest.message}</p>
+            <p className="mt-2 whitespace-pre-wrap text-[13px] leading-snug text-[#171A17]">{quoteRequest.message}</p>
           ) : null}
-          <p className="mt-2 text-[11px] text-[#9A9DA1]">
+          <p className="mt-2 text-[11px] text-[#8A8E86]">
             Typed into a public form — unverified, and not copied onto the quote. Saving marks this enquiry as quoted.
           </p>
         </div>
       ) : null}
 
-      <div className="mt-6 space-y-5 rounded-2xl border border-[#E7E7E2] bg-white p-6">
+      <div className="mt-6 space-y-5 rounded-2xl border border-[#EAEDF2] bg-white p-6">
         {/* Customer + dates */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Customer">
@@ -287,7 +287,7 @@ export function QuoteBuilder({
 
         {/* Line items */}
         <div>
-          <div className="mb-2 text-[13px] font-medium text-[#1A1C1E]">Line items</div>
+          <div className="mb-2 text-[13px] font-medium text-[#171A17]">Line items</div>
           <LineItemsEditor
             products={products}
             priceList={priceList}
@@ -305,7 +305,7 @@ export function QuoteBuilder({
               onChange={(e) => setDeliveryAddress(e.target.value)}
               rows={3}
               placeholder="Where the goods go"
-              className="w-full rounded-lg border border-[#D7DAD8] bg-white px-3 py-2 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/50 focus:outline-none"
+              className="w-full rounded-lg border border-[#E2E6EC] bg-white px-3 py-2 text-[13px] text-[#171A17] placeholder:text-[#8A8E86] focus:border-[#3E7BC4]/50 focus:outline-none"
             />
           </Field>
           <Field label="Notes" hint="shown on the quote">
@@ -314,35 +314,35 @@ export function QuoteBuilder({
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
               placeholder="Anything the customer should see"
-              className="w-full rounded-lg border border-[#D7DAD8] bg-white px-3 py-2 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/50 focus:outline-none"
+              className="w-full rounded-lg border border-[#E2E6EC] bg-white px-3 py-2 text-[13px] text-[#171A17] placeholder:text-[#8A8E86] focus:border-[#3E7BC4]/50 focus:outline-none"
             />
           </Field>
         </div>
 
         {/* Totals */}
-        <div className="flex justify-end border-t border-[#F0F0EC] pt-4">
+        <div className="flex justify-end border-t border-[#EEF1F5] pt-4">
           <div className="w-full max-w-[280px] space-y-2 text-[13px]">
             <div className="flex justify-between">
-              <span className="text-[#5F6368]">Subtotal</span>
-              <span className="tabular-nums text-[#1A1C1E]">{zar2(totals.subtotal)}</span>
+              <span className="text-[#6B6F68]">Subtotal</span>
+              <span className="tabular-nums text-[#171A17]">{zar2(totals.subtotal)}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-[#5F6368]">
+              <span className="text-[#6B6F68]">
                 VAT
                 <input
                   value={String(vatRate)}
                   onChange={(e) => setVatRate(Number(e.target.value) || 0)}
                   inputMode="decimal"
                   aria-label="VAT rate"
-                  className="mx-1.5 h-6 w-12 rounded-md border border-[#E7E7E2] px-1 text-right text-[12px] tabular-nums text-[#1A1C1E] focus:border-[#3E7BC4]/50 focus:outline-none"
+                  className="mx-1.5 h-6 w-12 rounded-md border border-[#EAEDF2] px-1 text-right text-[12px] tabular-nums text-[#171A17] focus:border-[#3E7BC4]/50 focus:outline-none"
                 />
                 %
               </span>
-              <span className="tabular-nums text-[#1A1C1E]">{zar2(totals.vat)}</span>
+              <span className="tabular-nums text-[#171A17]">{zar2(totals.vat)}</span>
             </div>
-            <div className="flex justify-between border-t border-[#E7E7E2] pt-2 text-[16px] font-bold">
-              <span className="text-[#1A1C1E]">Total</span>
-              <span className="tabular-nums text-[#1A1C1E]">{zar2(totals.total)}</span>
+            <div className="flex justify-between border-t border-[#EAEDF2] pt-2 text-[16px] font-bold">
+              <span className="text-[#171A17]">Total</span>
+              <span className="tabular-nums text-[#171A17]">{zar2(totals.total)}</span>
             </div>
           </div>
         </div>
@@ -352,7 +352,7 @@ export function QuoteBuilder({
       <div className="mt-4 flex flex-wrap items-center justify-end gap-2.5">
         <Link
           href="/app/orderflow/quotes"
-          className="inline-flex h-9 items-center justify-center rounded-lg border border-[#D7DAD8] bg-white px-4 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:bg-[#F0F0EC]"
+          className="inline-flex h-9 items-center justify-center rounded-lg border border-[#E2E6EC] bg-white px-4 text-[13px] font-medium text-[#171A17] transition-colors hover:bg-[#EEF1F5]"
         >
           Cancel
         </Link>
@@ -360,7 +360,7 @@ export function QuoteBuilder({
           type="button"
           onClick={() => void save('draft')}
           disabled={!!busy || !canSave}
-          className="inline-flex h-9 items-center justify-center rounded-lg border border-[#D7DAD8] bg-white px-4 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:bg-[#F0F0EC] disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex h-9 items-center justify-center rounded-lg border border-[#E2E6EC] bg-white px-4 text-[13px] font-medium text-[#171A17] transition-colors hover:bg-[#EEF1F5] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {busy === 'draft' ? 'Saving…' : 'Save draft'}
         </button>

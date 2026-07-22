@@ -61,17 +61,19 @@ export function AnalyticsView({ windows, target }: AnalyticsViewProps) {
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-[26px] font-bold text-[#1A1C1E]">Analytics</h1>
-          <p className="mt-1 text-[14px] text-[#5F6368]">Where your revenue and gross profit come from</p>
+          <h1 className="of-display text-[28px] font-semibold tracking-[-0.015em] text-[#171A17]">Analytics</h1>
+          <p className="mt-1 text-[14px] text-[#8A8E86]">Where your revenue and gross profit come from</p>
         </div>
-        <div className="inline-flex rounded-lg bg-[#F2F2EF] p-0.5">
+        <div className="inline-flex rounded-[10px] border border-[#EEF1F5] bg-[#F6F8FB] p-0.5">
           {WINDOWS.map((w) => (
             <button
               key={w.key}
               type="button"
               onClick={() => setWin(w.key)}
-              className={`rounded-[7px] px-2.5 py-1 text-[12px] font-medium transition-colors ${
-                win === w.key ? 'bg-white text-[#1A1C1E] shadow-sm' : 'text-[#9A9DA1] hover:text-[#5F6368]'
+              className={`rounded-[8px] px-2.5 py-1.5 text-[12px] font-medium transition-colors ${
+                win === w.key
+                  ? 'bg-white text-[#171A17] shadow-[0_1px_2px_rgba(20,24,20,0.06)]'
+                  : 'text-[#8A8E86] hover:text-[#174C87]'
               }`}
             >
               {w.label}
@@ -106,8 +108,10 @@ export function AnalyticsView({ windows, target }: AnalyticsViewProps) {
             key={d.key}
             type="button"
             onClick={() => setDim(d.key)}
-            className={`rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors ${
-              dim === d.key ? 'bg-[#1A1C1E] text-white' : 'border border-[#E7E7E2] bg-white text-[#5F6368] hover:bg-black/[0.03]'
+            className={`h-8 rounded-lg border px-3 text-[12px] font-medium transition-colors ${
+              dim === d.key
+                ? 'border-[#3E7BC4] bg-[#1F5FA8] text-white'
+                : 'border-[#E2E6EC] bg-white text-[#6B6F68] hover:border-[#3E7BC4]/40'
             }`}
           >
             {d.label}
@@ -115,11 +119,11 @@ export function AnalyticsView({ windows, target }: AnalyticsViewProps) {
         ))}
       </div>
 
-      <div className="mt-3 overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
+      <div className="mt-3 overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
         <div className="overflow-x-auto">
-          <table className="w-full text-[13px]">
+          <table className="w-full text-[14px]">
             <thead>
-              <tr className="border-b border-[#F0F0EC] bg-[#FBFBF9] text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+              <tr className="border-b border-[#EEF1F5] bg-[#FBFCFE] text-[11px] uppercase tracking-[0.06em] text-[#A0A49C]">
                 <th className="px-5 py-2.5 text-left font-medium">{dimMeta.singular}</th>
                 <th className="px-3 py-2.5 text-right font-medium">Revenue</th>
                 <th className="px-3 py-2.5 text-right font-medium">Gross profit</th>
@@ -130,31 +134,31 @@ export function AnalyticsView({ windows, target }: AnalyticsViewProps) {
             <tbody>
               {rows.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-5 py-10 text-center text-[13px] text-[#9A9DA1]">
+                  <td colSpan={5} className="px-5 py-10 text-center text-[13px] text-[#8A8E86]">
                     No sales in this period yet.
                   </td>
                 </tr>
               ) : (
                 rows.map((r) => (
-                  <tr key={r.key} className="border-b border-[#F6F6F2] last:border-0 hover:bg-[#FAFAF8]">
-                    <td className="px-5 py-3 font-medium text-[#1A1C1E]">{r.label}</td>
-                    <td className="px-3 py-3 text-right tabular-nums text-[#5F6368]">{zar(r.revenue)}</td>
-                    <td className="px-3 py-3 text-right tabular-nums font-medium text-[#1A1C1E]">{zar(r.profit)}</td>
+                  <tr key={r.key} className="border-b border-[#F4F5F7] last:border-0 hover:bg-[#F5F9FE]">
+                    <td className="px-5 py-3 font-semibold text-[#171A17]">{r.label}</td>
+                    <td className="of-num px-3 py-3 text-right text-[#6B6F68]">{zar(r.revenue)}</td>
+                    <td className="of-num px-3 py-3 text-right font-semibold text-[#171A17]">{zar(r.profit)}</td>
                     <td
-                      className="px-3 py-3 text-right tabular-nums font-medium"
-                      style={{ color: r.margin == null ? '#9A9DA1' : r.margin >= target ? '#0F6E56' : '#854F0B' }}
+                      className="of-num px-3 py-3 text-right font-semibold"
+                      style={{ color: r.margin == null ? '#8A8E86' : r.margin >= target ? '#0F6E56' : '#854F0B' }}
                     >
                       {r.margin != null ? `${Math.round(r.margin)}%` : '—'}
                     </td>
                     <td className="px-5 py-3">
                       <div className="flex items-center gap-2">
-                        <div className="h-2 flex-1 overflow-hidden rounded-full bg-[#F0F0EC]">
+                        <div className="h-2 flex-1 overflow-hidden rounded-full bg-[#EEF1F5]">
                           <div
                             className="h-full rounded-full bg-[#1F5FA8]"
                             style={{ width: `${r.contributionPct <= 0 ? 0 : Math.max(3, (r.contributionPct / maxContribution) * 100)}%` }}
                           />
                         </div>
-                        <span className="w-10 shrink-0 text-right text-[12px] tabular-nums text-[#9A9DA1]">
+                        <span className="of-num w-10 shrink-0 text-right text-[12px] text-[#8A8E86]">
                           {Math.round(r.contributionPct)}%
                         </span>
                       </div>
@@ -166,7 +170,7 @@ export function AnalyticsView({ windows, target }: AnalyticsViewProps) {
           </table>
         </div>
       </div>
-      <p className="mt-2 text-[12px] text-[#9A9DA1]">
+      <p className="mt-2 text-[12px] text-[#A0A49C]">
         Margin and gross profit use each product&rsquo;s latest cost; lines without a recorded cost are excluded from the
         profit figures.
       </p>
@@ -177,17 +181,17 @@ export function AnalyticsView({ windows, target }: AnalyticsViewProps) {
 function PerformerCard({ title, rows, tone }: { title: string; rows: AnalyticsRow[]; tone: 'up' | 'down' }) {
   const color = tone === 'up' ? '#0F6E56' : '#A32D2D';
   return (
-    <div className="rounded-2xl border border-[#E7E7E2] bg-white p-5">
-      <h2 className="text-[13px] font-semibold text-[#9A9DA1]">{title}</h2>
+    <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+      <h2 className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">{title}</h2>
       <div className="mt-3 flex flex-col gap-2.5">
         {rows.map((r) => (
-          <div key={r.key} className="flex items-center justify-between gap-3 text-[13px]">
-            <span className="min-w-0 truncate font-medium text-[#1A1C1E]">{r.label}</span>
+          <div key={r.key} className="flex items-center justify-between gap-3 text-[14px]">
+            <span className="min-w-0 truncate font-medium text-[#171A17]">{r.label}</span>
             <span className="flex shrink-0 items-center gap-3">
-              <span className="tabular-nums font-semibold" style={{ color }}>
+              <span className="of-num font-semibold" style={{ color }}>
                 {r.margin != null ? `${Math.round(r.margin)}%` : '—'}
               </span>
-              <span className="w-20 text-right tabular-nums text-[#9A9DA1]">{zar(r.profit)}</span>
+              <span className="of-num w-20 text-right text-[#8A8E86]">{zar(r.profit)}</span>
             </span>
           </div>
         ))}

@@ -35,7 +35,7 @@ export const NOTIFICATION_KINDS: Record<PpNotificationKind, { bg: string; fg: st
 
 export const TREND_UP = '#0F6E56';
 export const TREND_DOWN = '#A32D2D';
-export const TREND_FLAT = '#9A9DA1';
+export const TREND_FLAT = '#8A8E86';
 
 // ---------------------------------------------------------------------------
 // Derivations
@@ -376,8 +376,8 @@ export const CATEGORY_COLORS: Record<string, string> = {
   Herbs: '#3E7BC4',
   'Salad & Leafy Greens': '#0F6E56',
   Mushrooms: '#854F0B',
-  Other: '#9A9DA1',
-  Uncategorised: '#D7DAD8',
+  Other: '#8A8E86',
+  Uncategorised: '#E2E6EC',
 };
 
 export interface CategorySlice {

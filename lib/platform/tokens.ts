@@ -11,13 +11,13 @@ export const VYSO = {
   /** Card / surface background. */
   surface: '#FFFFFF',
   /** Hairline borders. */
-  border: '#E7E7E2',
+  border: '#EAEDF2',
   /** Primary text. */
-  textPrimary: '#1A1C1E',
+  textPrimary: '#171A17',
   /** Secondary text. */
-  textSecondary: '#5F6368',
+  textSecondary: '#6B6F68',
   /** Muted / placeholder text. */
-  muted: '#9A9DA1',
+  muted: '#8A8E86',
   /** Brand accent (blue). */
   accent: '#3E7BC4',
   /** Weak blue tint (selected nav, avatars, accent wells). */
@@ -34,7 +34,7 @@ export const STATUS_COLORS: Record<DocumentStatus, { bg: string; fg: string }> =
   error: { bg: '#FCEBEB', fg: '#A32D2D' },
   approved: { bg: '#E1F5EE', fg: '#0F6E56' },
   rejected: { bg: '#FCEBEB', fg: '#A32D2D' },
-  archived: { bg: '#F0F0EC', fg: '#5F6368' },
+  archived: { bg: '#EEF1F5', fg: '#6B6F68' },
 };
 
 export const STATUS_LABELS: Record<DocumentStatus, string> = {

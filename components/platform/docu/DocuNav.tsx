@@ -26,7 +26,7 @@ export function DocuNav({ reviewCount = 0 }: { reviewCount?: number }) {
           : 'documents'; // /app/docu, /app/docu/folder/*, /app/docu/[id], awaiting/confidence/flagged
 
   return (
-    <div className="flex items-center gap-5 border-b border-[#E7E7E2]">
+    <div className="flex items-center gap-5 border-b border-[#EAEDF2]">
       {TABS.map((t) => {
         const active = t.match === current;
         return (
@@ -35,8 +35,8 @@ export function DocuNav({ reviewCount = 0 }: { reviewCount?: number }) {
             href={t.href}
             className={`-mb-px border-b-2 pb-2.5 pt-1 text-[14px] transition-colors ${
               active
-                ? 'border-[#3E7BC4] font-medium text-[#1A1C1E]'
-                : 'border-transparent text-[#5F6368] hover:text-[#1A1C1E]'
+                ? 'border-[#3E7BC4] font-medium text-[#171A17]'
+                : 'border-transparent text-[#6B6F68] hover:text-[#171A17]'
             }`}
           >
             {t.label}

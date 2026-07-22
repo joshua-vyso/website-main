@@ -289,7 +289,7 @@ export function DeliveryNoteDetail({
     <div>
       {/* Back link + toolbar */}
       <div className="flex flex-wrap items-center justify-between gap-3 print:hidden">
-        <Link href="/app/orderflow/delivery-notes" className="text-[13px] text-[#5F6368] transition-colors hover:text-[#1A1C1E]">
+        <Link href="/app/orderflow/delivery-notes" className="text-[13px] text-[#6B6F68] transition-colors hover:text-[#171A17]">
           ← Delivery notes
         </Link>
         <div className="flex flex-wrap items-center gap-2">
@@ -333,9 +333,9 @@ export function DeliveryNoteDetail({
         {/* Operational side panel */}
         <div className="space-y-4 print:hidden">
           {/* Delivery details */}
-          <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
+          <div className="rounded-2xl border border-[#EAEDF2] bg-white p-4">
             <div className="flex items-center justify-between gap-3">
-              <h3 className="text-[13px] font-semibold text-[#1A1C1E]">Delivery</h3>
+              <h3 className="text-[13px] font-semibold text-[#171A17]">Delivery</h3>
               <button
                 type="button"
                 onClick={() => {
@@ -355,23 +355,23 @@ export function DeliveryNoteDetail({
               <Row label="Driver" value={note.driver_name || 'Not assigned'} muted={!note.driver_name} />
               <Row label="Vehicle" value={note.vehicle || 'Not assigned'} muted={!note.vehicle} />
             </dl>
-            <p className="mt-3 text-[11px] text-[#9A9DA1]">Driver &amp; vehicle are placeholders for the Fleet module.</p>
+            <p className="mt-3 text-[11px] text-[#8A8E86]">Driver &amp; vehicle are placeholders for the Fleet module.</p>
           </div>
 
           {/* Source */}
           {order || invoice ? (
-            <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
-              <h3 className="text-[13px] font-semibold text-[#1A1C1E]">Source</h3>
+            <div className="rounded-2xl border border-[#EAEDF2] bg-white p-4">
+              <h3 className="text-[13px] font-semibold text-[#171A17]">Source</h3>
               <div className="mt-3 space-y-2 text-[13px]">
                 {order ? (
                   <Link href={`/app/orderflow/orders/${order.id}`} className="flex items-center justify-between gap-3 text-[#1F5FA8] hover:text-[#174C87]">
-                    <span className="text-[#5F6368]">Order</span>
+                    <span className="text-[#6B6F68]">Order</span>
                     <span className="font-medium">{order.order_number || 'View order'}</span>
                   </Link>
                 ) : null}
                 {invoice ? (
                   <Link href={`/app/orderflow/invoices/${invoice.id}`} className="flex items-center justify-between gap-3 text-[#1F5FA8] hover:text-[#174C87]">
-                    <span className="text-[#5F6368]">Invoice</span>
+                    <span className="text-[#6B6F68]">Invoice</span>
                     <span className="font-medium">{invoice.invoice_number}</span>
                   </Link>
                 ) : null}
@@ -380,14 +380,14 @@ export function DeliveryNoteDetail({
           ) : null}
 
           {/* Proof of delivery */}
-          <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
+          <div className="rounded-2xl border border-[#EAEDF2] bg-white p-4">
             <div className="flex items-center justify-between gap-3">
-              <h3 className="text-[13px] font-semibold text-[#1A1C1E]">Proof of delivery</h3>
+              <h3 className="text-[13px] font-semibold text-[#171A17]">Proof of delivery</h3>
               <button
                 type="button"
                 onClick={() => fileRef.current?.click()}
                 disabled={uploading}
-                className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/40 disabled:opacity-60"
+                className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#E2E6EC] bg-white px-3 text-[12px] font-medium text-[#171A17] transition-colors hover:border-[#3E7BC4]/40 disabled:opacity-60"
               >
                 {uploading ? 'Uploading…' : podDoc ? '↑ Replace' : '↑ Upload'}
               </button>
@@ -409,13 +409,13 @@ export function DeliveryNoteDetail({
                 type="button"
                 onClick={() => void openPod()}
                 disabled={!podDoc.storage_path || opening}
-                className="mt-3 block max-w-full truncate text-left text-[13px] font-medium text-[#1F5FA8] transition-colors hover:text-[#174C87] disabled:text-[#9A9DA1]"
+                className="mt-3 block max-w-full truncate text-left text-[13px] font-medium text-[#1F5FA8] transition-colors hover:text-[#174C87] disabled:text-[#8A8E86]"
                 title={podDoc.filename}
               >
                 {opening ? 'Opening…' : `✓ ${podDoc.filename}`}
               </button>
             ) : (
-              <p className="mt-3 text-[13px] text-[#9A9DA1]">No proof of delivery uploaded yet.</p>
+              <p className="mt-3 text-[13px] text-[#8A8E86]">No proof of delivery uploaded yet.</p>
             )}
           </div>
         </div>
@@ -486,8 +486,8 @@ export function DeliveryNoteDetail({
 function Row({ label, value, muted }: { label: string; value: string; muted?: boolean }) {
   return (
     <div className="flex items-center justify-between gap-3">
-      <dt className="text-[#9A9DA1]">{label}</dt>
-      <dd className={muted ? 'text-[#9A9DA1]' : 'text-[#1A1C1E]'}>{value}</dd>
+      <dt className="text-[#8A8E86]">{label}</dt>
+      <dd className={muted ? 'text-[#8A8E86]' : 'text-[#171A17]'}>{value}</dd>
     </div>
   );
 }

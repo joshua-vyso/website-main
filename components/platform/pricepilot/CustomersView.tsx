@@ -45,12 +45,12 @@ export function CustomersView({
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-[26px] font-bold text-[#1A1C1E]">Customers</h1>
-          <p className="mt-1 text-[14px] text-[#5F6368]">Contract and negotiated pricing, with validity and expiry</p>
+          <h1 className="of-display text-[28px] font-semibold tracking-[-0.015em] text-[#171A17]">Customers</h1>
+          <p className="mt-1 text-[14px] text-[#8A8E86]">Contract and negotiated pricing, with validity and expiry</p>
         </div>
         <Link
           href="/app/pricepilot/price-lists"
-          className="inline-flex items-center justify-center rounded-lg bg-[#1F5FA8] px-4 py-2.5 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87]"
+          className="inline-flex h-[42px] items-center justify-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87]"
         >
           New price list →
         </Link>
@@ -64,16 +64,16 @@ export function CustomersView({
       </div>
 
       {reminders.length > 0 ? (
-        <div className="mt-5 rounded-2xl border border-[#FBEEDA] bg-[#FFFBF4] p-5">
-          <h2 className="text-[14px] font-semibold text-[#854F0B]">Expiry reminders</h2>
+        <div className="mt-5 rounded-2xl border border-[#FBEEDA] bg-[#FFFBF4] p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <h2 className="of-display text-[16px] font-semibold text-[#854F0B]">Expiry reminders</h2>
           <div className="mt-3 flex flex-col gap-2">
             {reminders.map((r) => {
               const vs = VALIDITY_STYLE[r.list.validity.status];
               return (
-                <div key={r.list.id} className="flex flex-wrap items-center justify-between gap-2 text-[13px]">
-                  <span className="text-[#1A1C1E]">
-                    <span className="font-medium">{r.customer}</span>{' '}
-                    <span className="text-[#9A9DA1]">· {r.list.name}</span>
+                <div key={r.list.id} className="flex flex-wrap items-center justify-between gap-2 text-[14px]">
+                  <span className="text-[#171A17]">
+                    <span className="font-semibold">{r.customer}</span>{' '}
+                    <span className="text-[#8A8E86]">· {r.list.name}</span>
                   </span>
                   <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium" style={{ backgroundColor: vs.bg, color: vs.fg }}>
                     {r.list.validity.label}
@@ -87,19 +87,19 @@ export function CustomersView({
 
       <div className="mt-5 flex flex-col gap-3">
         {customers.length === 0 ? (
-          <div className="rounded-2xl border border-[#E7E7E2] bg-white px-6 py-12 text-center">
-            <p className="text-[15px] font-semibold text-[#1A1C1E]">No customers yet</p>
-            <p className="mx-auto mt-2 max-w-md text-[13px] text-[#5F6368]">
+          <div className="rounded-2xl border border-[#EAEDF2] bg-white px-6 py-12 text-center shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+            <p className="of-display text-[16px] font-semibold text-[#171A17]">No customers yet</p>
+            <p className="mx-auto mt-2 max-w-md text-[13px] text-[#6B6F68]">
               Customers flow in from OrderFlow. Once you have some, set up their contract pricing here.
             </p>
           </div>
         ) : (
           customers.map((c) => (
-            <div key={c.id} className="rounded-2xl border border-[#E7E7E2] bg-white p-5">
+            <div key={c.id} className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <span className="text-[15px] font-semibold text-[#1A1C1E]">{c.name}</span>
+                <span className="of-display text-[16px] font-semibold text-[#171A17]">{c.name}</span>
                 {c.lists.length === 0 ? (
-                  <span className="text-[12px] text-[#9A9DA1]">
+                  <span className="of-num text-[12px] text-[#A0A49C]">
                     Standard pricing{baseMargin != null ? ` · ${Math.round(baseMargin)}% margin` : ''}
                   </span>
                 ) : null}
@@ -108,7 +108,7 @@ export function CustomersView({
               {c.lists.length === 0 ? (
                 <Link
                   href="/app/pricepilot/price-lists"
-                  className="mt-2 inline-block text-[13px] font-medium text-[#1F5FA8] hover:underline"
+                  className="mt-2 inline-block text-[13px] font-semibold text-[#1F5FA8] hover:underline"
                 >
                   Set up contract pricing →
                 </Link>
@@ -161,27 +161,27 @@ function ContractRow({ list, target }: { list: CustomerListRow; target: number }
   }
 
   return (
-    <div className="rounded-xl border border-[#F0F0EC] bg-[#FCFCFB] p-4">
+    <div className="rounded-[14px] border border-[#EEF1F5] bg-[#FBFCFE] p-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[13px]">
-          <span className="font-medium text-[#1A1C1E]">{list.name}</span>
-          <span className="text-[#9A9DA1]">{CADENCE_LABEL[list.cadence]}</span>
-          <span className="text-[#5F6368]">
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[14px]">
+          <span className="font-semibold text-[#171A17]">{list.name}</span>
+          <span className="text-[#8A8E86]">{CADENCE_LABEL[list.cadence]}</span>
+          <span className="of-num text-[#6B6F68]">
             {Math.round(list.margin)}% margin
-            <span className="text-[#9A9DA1]"> · target {Math.round(target)}%</span>
+            <span className="text-[#A0A49C]"> · target {Math.round(target)}%</span>
           </span>
           <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-medium" style={{ backgroundColor: vs.bg, color: vs.fg }}>
             {list.validity.label}
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <Link href={`/app/pricepilot/price-lists/${list.id}`} className="text-[12px] font-medium text-[#1F5FA8] hover:underline">
+          <Link href={`/app/pricepilot/price-lists/${list.id}`} className="text-[13px] font-semibold text-[#1F5FA8] hover:underline">
             Open
           </Link>
           <button
             type="button"
             onClick={() => setOpen((o) => !o)}
-            className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[12px] font-medium text-[#5F6368] transition-colors hover:border-[#3E7BC4]/40"
+            className="inline-flex h-9 items-center rounded-[10px] border border-[#E2E6EC] bg-white px-3 text-[12px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]"
           >
             {open ? 'Close' : 'Edit dates'}
           </button>
@@ -189,30 +189,30 @@ function ContractRow({ list, target }: { list: CustomerListRow; target: number }
       </div>
 
       {open ? (
-        <div className="mt-3 flex flex-wrap items-end gap-3 border-t border-[#F0F0EC] pt-3">
-          <label className="text-[12px] text-[#9A9DA1]">
+        <div className="mt-3 flex flex-wrap items-end gap-3 border-t border-[#EEF1F5] pt-3">
+          <label className="text-[12px] text-[#8A8E86]">
             <span className="mb-1 block">Valid from</span>
             <input
               type="date"
               value={from}
               onChange={(e) => setFrom(e.target.value)}
-              className="rounded-lg border border-[#D7DAD8] bg-white px-2.5 py-2 text-[13px] text-[#1A1C1E] outline-none focus:border-[#3E7BC4]"
+              className="of-num h-11 rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] outline-none focus:border-[#3E7BC4]"
             />
           </label>
-          <label className="text-[12px] text-[#9A9DA1]">
+          <label className="text-[12px] text-[#8A8E86]">
             <span className="mb-1 block">Valid until</span>
             <input
               type="date"
               value={until}
               onChange={(e) => setUntil(e.target.value)}
-              className="rounded-lg border border-[#D7DAD8] bg-white px-2.5 py-2 text-[13px] text-[#1A1C1E] outline-none focus:border-[#3E7BC4]"
+              className="of-num h-11 rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] outline-none focus:border-[#3E7BC4]"
             />
           </label>
           <button
             type="button"
             disabled={busy}
             onClick={save}
-            className="inline-flex h-[38px] items-center rounded-lg bg-[#1F5FA8] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-50"
+            className="inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-50"
           >
             {busy ? 'Saving…' : 'Save'}
           </button>
@@ -224,7 +224,7 @@ function ContractRow({ list, target }: { list: CustomerListRow; target: number }
                 setFrom('');
                 setUntil('');
               }}
-              className="inline-flex h-[38px] items-center rounded-lg px-3 text-[13px] font-medium text-[#9A9DA1] hover:text-[#5F6368]"
+              className="inline-flex h-[42px] items-center rounded-[11px] px-3 text-[14px] font-medium text-[#8A8E86] transition-colors hover:text-[#174C87]"
             >
               Clear
             </button>

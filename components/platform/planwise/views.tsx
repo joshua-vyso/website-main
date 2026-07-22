@@ -19,8 +19,8 @@ const M = MODULE_META.planwise;
 function PageTitle({ title, subtitle }: { title: string; subtitle?: string }) {
   return (
     <div className="min-w-0">
-      <h1 className="text-[24px] font-bold leading-tight text-[#1A1C1E]">{title}</h1>
-      {subtitle ? <p className="mt-0.5 text-[14px] text-[#5F6368]">{subtitle}</p> : null}
+      <h1 className="of-display text-[28px] font-semibold leading-tight tracking-[-0.015em] text-[#171A17]">{title}</h1>
+      {subtitle ? <p className="mt-1.5 text-[14px] text-[#8A8E86]">{subtitle}</p> : null}
     </div>
   );
 }
@@ -44,9 +44,9 @@ export function OverviewView() {
         {node}
         {header}
         {budgetModal}
-        <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
-          <p className="text-[15px] font-medium text-[#1A1C1E]">No plan set up yet</p>
-          <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">Set a budget, goals and a forecast to see your revenue target, budget health and the decisions that close the gap here.</p>
+        <div className="rounded-2xl border border-dashed border-[#E2E6EC] bg-[#FBFCFE] px-6 py-12 text-center">
+          <p className="of-display text-[18px] font-semibold text-[#171A17]">No plan set up yet</p>
+          <p className="mx-auto mt-2 max-w-md text-[14px] text-[#6B6F68]">Set a budget, goals and a forecast to see your revenue target, budget health and the decisions that close the gap here.</p>
         </div>
       </div>
     );
@@ -97,9 +97,9 @@ export function ForecastView() {
     return (
       <div className="space-y-5">
         <PageTitle title="Forecast" subtitle="Where the business is expected to finish — and why" />
-        <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
-          <p className="text-[15px] font-medium text-[#1A1C1E]">No forecast yet</p>
-          <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">Once there&rsquo;s revenue, expense and cash history, PlanWise will project where the month is likely to land.</p>
+        <div className="rounded-2xl border border-dashed border-[#E2E6EC] bg-[#FBFCFE] px-6 py-12 text-center">
+          <p className="of-display text-[18px] font-semibold text-[#171A17]">No forecast yet</p>
+          <p className="mx-auto mt-2 max-w-md text-[14px] text-[#6B6F68]">Once there&rsquo;s revenue, expense and cash history, PlanWise will project where the month is likely to land.</p>
         </div>
       </div>
     );
@@ -122,9 +122,9 @@ export function ScenariosView() {
     return (
       <div className="space-y-5">
         <PageTitle title="Scenarios" subtitle="Adjust the assumptions and watch the outcome recalculate live" />
-        <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
-          <p className="text-[15px] font-medium text-[#1A1C1E]">Nothing to model yet</p>
-          <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">Scenarios build on your revenue and expense baseline. Add a budget to start exploring what-ifs here.</p>
+        <div className="rounded-2xl border border-dashed border-[#E2E6EC] bg-[#FBFCFE] px-6 py-12 text-center">
+          <p className="of-display text-[18px] font-semibold text-[#171A17]">Nothing to model yet</p>
+          <p className="mx-auto mt-2 max-w-md text-[14px] text-[#6B6F68]">Scenarios build on your revenue and expense baseline. Add a budget to start exploring what-ifs here.</p>
         </div>
       </div>
     );

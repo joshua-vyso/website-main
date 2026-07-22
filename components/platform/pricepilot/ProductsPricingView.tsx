@@ -25,7 +25,7 @@ function statusOf(r: ProductPriceRow, target: number): 'below' | 'on' | 'nocost'
 const STATUS_STYLE = {
   below: { bg: '#FCEBEB', fg: '#A32D2D', label: 'Below target' },
   on: { bg: '#E1F5EE', fg: '#0F6E56', label: 'On target' },
-  nocost: { bg: '#F0F0EC', fg: '#5F6368', label: 'No cost' },
+  nocost: { bg: '#EEF1F5', fg: '#6B6F68', label: 'No cost' },
 } as const;
 
 /** Pricing catalogue — every product with its cost, margin, sell price and target gap. */
@@ -78,16 +78,16 @@ export function ProductsPricingView({
   if (!hasBaseList) {
     return (
       <div>
-        <h1 className="text-[26px] font-bold text-[#1A1C1E]">Products</h1>
-        <div className="mt-6 rounded-2xl border border-[#E7E7E2] bg-white px-6 py-12 text-center">
-          <p className="text-[15px] font-semibold text-[#1A1C1E]">No pricing yet</p>
-          <p className="mx-auto mt-2 max-w-md text-[13px] text-[#5F6368]">
+        <h1 className="of-display text-[28px] font-semibold tracking-[-0.015em] text-[#171A17]">Products</h1>
+        <div className="mt-6 rounded-2xl border border-[#EAEDF2] bg-white px-6 py-12 text-center shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <p className="of-display text-[16px] font-semibold text-[#171A17]">No pricing yet</p>
+          <p className="mx-auto mt-2 max-w-md text-[13px] text-[#6B6F68]">
             Create a price list to set margins on your catalogue. Your products and their costs are already here from
             ProcurePulse.
           </p>
           <Link
             href="/app/pricepilot/price-lists"
-            className="mt-4 inline-flex items-center justify-center rounded-lg bg-[#1F5FA8] px-4 py-2.5 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87]"
+            className="mt-4 inline-flex h-[42px] items-center justify-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87]"
           >
             Create a price list →
           </Link>
@@ -107,14 +107,14 @@ export function ProductsPricingView({
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-[26px] font-bold text-[#1A1C1E]">Products</h1>
-          <p className="mt-1 text-[14px] text-[#5F6368]">
+          <h1 className="of-display text-[28px] font-semibold tracking-[-0.015em] text-[#171A17]">Products</h1>
+          <p className="of-num mt-1 text-[14px] text-[#8A8E86]">
             {rows.length} products · avg {avgMargin}% margin · target {Math.round(target)}%
           </p>
         </div>
         <Link
           href="/app/pricepilot/recommendations"
-          className="inline-flex items-center justify-center rounded-lg border border-[#D7DAD8] bg-white px-4 py-2.5 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/40"
+          className="inline-flex h-[42px] items-center justify-center rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]"
         >
           {belowCount > 0 ? `Review ${belowCount} below target →` : 'Recommendations →'}
         </Link>
@@ -125,7 +125,7 @@ export function ProductsPricingView({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search products…"
-          className="h-9 w-56 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] outline-none placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]"
+          className="h-9 w-56 rounded-[10px] border border-[#E4E9F0] bg-white px-3 text-[13px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]"
         />
         <div className="flex flex-wrap gap-1.5">
           {filters.map((f) => (
@@ -133,8 +133,10 @@ export function ProductsPricingView({
               key={f.key}
               type="button"
               onClick={() => setFilter(f.key)}
-              className={`rounded-full px-3 py-1.5 text-[12px] font-medium transition-colors ${
-                filter === f.key ? 'bg-[#1F5FA8] text-white' : 'border border-[#E7E7E2] bg-white text-[#5F6368] hover:border-[#3E7BC4]/30'
+              className={`h-8 rounded-lg border px-3 text-[12px] font-medium transition-colors ${
+                filter === f.key
+                  ? 'border-[#3E7BC4] bg-[#1F5FA8] text-white'
+                  : 'border-[#E2E6EC] bg-white text-[#6B6F68] hover:border-[#3E7BC4]/40'
               }`}
             >
               {f.label}
@@ -144,7 +146,7 @@ export function ProductsPricingView({
         <select
           value={sort}
           onChange={(e) => setSort(e.target.value as Sort)}
-          className="ml-auto h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#3E7BC4]"
+          className="ml-auto h-9 rounded-[10px] border border-[#E4E9F0] bg-white px-2.5 text-[13px] text-[#6B6F68] outline-none focus:border-[#3E7BC4]"
         >
           <option value="margin-asc">Lowest margin first</option>
           <option value="margin-desc">Highest margin first</option>
@@ -154,11 +156,11 @@ export function ProductsPricingView({
         </select>
       </div>
 
-      <div className="mt-4 overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
+      <div className="mt-4 overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
         <div className="overflow-x-auto">
-          <table className="w-full text-[13px]">
+          <table className="w-full text-[14px]">
             <thead>
-              <tr className="border-b border-[#F0F0EC] bg-[#FBFBF9] text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+              <tr className="border-b border-[#EEF1F5] bg-[#FBFCFE] text-[11px] uppercase tracking-[0.06em] text-[#A0A49C]">
                 <th className="px-5 py-2.5 text-left font-medium">Product</th>
                 <th className="px-3 py-2.5 text-left font-medium">Category</th>
                 <th className="px-3 py-2.5 text-right font-medium">Cost</th>
@@ -171,7 +173,7 @@ export function ProductsPricingView({
             <tbody>
               {shown.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-10 text-center text-[13px] text-[#9A9DA1]">
+                  <td colSpan={7} className="px-5 py-10 text-center text-[13px] text-[#8A8E86]">
                     No products match.
                   </td>
                 </tr>
@@ -180,21 +182,21 @@ export function ProductsPricingView({
                   const st = statusOf(r, target);
                   const ss = STATUS_STYLE[st];
                   return (
-                    <tr key={r.id} className="border-b border-[#F6F6F2] last:border-0 hover:bg-[#FAFAF8]">
-                      <td className="px-5 py-3 font-medium text-[#1A1C1E]">
+                    <tr key={r.id} className="border-b border-[#F4F5F7] last:border-0 hover:bg-[#F5F9FE]">
+                      <td className="px-5 py-3 font-semibold text-[#171A17]">
                         <Link href={`/app/pricepilot/products/${r.id}`} className="hover:text-[#174C87]">
                           {r.name}
                         </Link>
                       </td>
-                      <td className="px-3 py-3 text-[#5F6368]">{r.category ?? '—'}</td>
-                      <td className="px-3 py-3 text-right tabular-nums text-[#5F6368]">
+                      <td className="px-3 py-3 text-[#6B6F68]">{r.category ?? '—'}</td>
+                      <td className="of-num px-3 py-3 text-right text-[#6B6F68]">
                         {r.cost != null ? zar2(r.cost) : '—'}
                       </td>
-                      <td className="px-3 py-3 text-right font-medium tabular-nums text-[#1A1C1E]">{Math.round(r.margin)}%</td>
-                      <td className="px-3 py-3 text-right tabular-nums text-[#1A1C1E]">
+                      <td className="of-num px-3 py-3 text-right font-semibold text-[#171A17]">{Math.round(r.margin)}%</td>
+                      <td className="of-num px-3 py-3 text-right text-[#171A17]">
                         {r.cost != null ? zar2(r.sell) : '—'}
                       </td>
-                      <td className="px-3 py-3 text-right tabular-nums text-[#9A9DA1]">{r.units > 0 ? Math.round(r.units) : '—'}</td>
+                      <td className="of-num px-3 py-3 text-right text-[#A0A49C]">{r.units > 0 ? Math.round(r.units) : '—'}</td>
                       <td className="px-5 py-3 text-right">
                         <span
                           className="inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium"

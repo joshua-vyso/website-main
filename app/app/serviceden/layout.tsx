@@ -28,7 +28,7 @@ export default async function ServiceDenLayout({ children }: { children: React.R
   return (
     <div className="px-8 py-7">
       <div className="flex items-start gap-3">
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl" style={{ backgroundColor: '#E9E6FB', color: '#5B53C0' }} aria-hidden>
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl" style={{ backgroundColor: '#EAF2FC', color: '#1F5FA8' }} aria-hidden>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
             <rect x="2" y="7" width="20" height="14" rx="2" />
             <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
@@ -36,8 +36,8 @@ export default async function ServiceDenLayout({ children }: { children: React.R
           </svg>
         </span>
         <div className="min-w-0">
-          <h1 className="text-[24px] font-bold leading-tight text-[#1A1C1E]">ServiceDen</h1>
-          <p className="mt-0.5 text-[14px] text-[#5F6368]">Leads, customers, services and invoicing for service businesses.</p>
+          <h1 className="of-display text-[28px] font-semibold leading-tight tracking-[-0.015em] text-[#171A17]">ServiceDen</h1>
+          <p className="mt-1.5 text-[14px] text-[#8A8E86]">Leads, customers, services and invoicing for service businesses.</p>
         </div>
       </div>
 

@@ -60,7 +60,7 @@ export function PushToButton({
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-[#1F5FA8] px-3.5 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87]"
+        className="inline-flex h-[38px] items-center gap-1.5 rounded-[11px] bg-[#1F5FA8] px-4 text-[13px] font-semibold text-white transition-colors hover:bg-[#174C87]"
         aria-expanded={open}
       >
         Push to…
@@ -75,9 +75,9 @@ export function PushToButton({
             onClick={() => setOpen(false)}
             className="fixed inset-0 z-40 cursor-default"
           />
-          <div className="absolute right-0 top-full z-50 mt-2 w-[260px] rounded-2xl border border-[#E7E7E2] bg-white p-1.5 shadow-[0_12px_40px_-12px_rgba(26,28,30,0.25)]">
+          <div className="absolute right-0 top-full z-50 mt-2 w-[260px] rounded-2xl border border-[#EAEDF2] bg-white p-1.5 shadow-[0_12px_40px_-12px_rgba(26,28,30,0.25)]">
             {options.length === 0 ? (
-              <p className="px-2.5 py-2 text-[12px] text-[#9A9DA1]">
+              <p className="px-2.5 py-2 text-[12px] text-[#8A8E86]">
                 No connected modules for this document type.
               </p>
             ) : (
@@ -93,22 +93,22 @@ export function PushToButton({
                     disabled={!live || isBusy}
                     onClick={() => push(o.key)}
                     className={`flex w-full items-center justify-between gap-2 rounded-xl px-2.5 py-2 text-left text-[13px] transition-colors ${
-                      live ? 'text-[#1A1C1E] hover:bg-[#FAFAF8]' : 'cursor-not-allowed text-[#9A9DA1]'
+                      live ? 'text-[#171A17] hover:bg-[#F5F9FE]' : 'cursor-not-allowed text-[#8A8E86]'
                     }`}
                   >
                     <span className="min-w-0">
-                      <span className="block truncate font-medium">{o.label}</span>
-                      <span className="block truncate text-[11px] text-[#9A9DA1]">{o.reason}</span>
+                      <span className="block truncate font-semibold">{o.label}</span>
+                      <span className="block truncate text-[11px] text-[#A0A49C]">{o.reason}</span>
                     </span>
                     <span className="shrink-0 text-[12px]">
                       {!live ? (
-                        <span className="text-[#9A9DA1]">Soon</span>
+                        <span className="text-[#A0A49C]">Soon</span>
                       ) : isBusy ? (
-                        <span className="text-[#5F6368]">Pushing…</span>
+                        <span className="text-[#6B6F68]">Pushing…</span>
                       ) : isDone ? (
-                        <span className="font-medium text-[#0F6E56]">Pushed ✓</span>
+                        <span className="font-semibold text-[#0F6E56]">Pushed ✓</span>
                       ) : (
-                        <span className="font-medium text-[#1F5FA8]">Push</span>
+                        <span className="font-semibold text-[#1F5FA8]">Push</span>
                       )}
                     </span>
                   </button>

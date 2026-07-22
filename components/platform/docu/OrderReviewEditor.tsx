@@ -187,19 +187,19 @@ export function OrderReviewEditor({
   }
 
   const cell =
-    'h-9 w-full rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:border-[#3E7BC4]/40 focus:outline-none';
+    'h-10 w-full rounded-[10px] border border-[#E4E9F0] bg-white px-3 text-[13px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]';
 
   return (
-    <div className="flex flex-col rounded-2xl border border-[#E7E7E2] bg-white">
-      <div className="border-b border-[#F0F0EC] px-6 py-5">
-        <h2 className="text-[16px] font-bold text-[#1A1C1E]">Customer order</h2>
-        <p className="mt-1 text-[13px] text-[#5F6368]">Confirm the customer and items, then invoice</p>
+    <div className="flex flex-col rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+      <div className="border-b border-[#EEF1F5] px-6 py-5">
+        <h2 className="of-display text-[16px] font-semibold text-[#171A17]">Customer order</h2>
+        <p className="mt-1 text-[13px] text-[#8A8E86]">Confirm the customer and items, then invoice</p>
       </div>
 
       <div className="px-6 py-5">
         {/* Customer */}
         <div className="mb-5">
-          <label className="mb-1.5 block text-[13px] text-[#5F6368]">Customer</label>
+          <label className="mb-1.5 block text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">Customer</label>
           <div className="relative max-w-md">
             <input
               value={query}
@@ -211,10 +211,10 @@ export function OrderReviewEditor({
               onFocus={() => setOpenList(true)}
               onBlur={() => setTimeout(() => setOpenList(false), 150)}
               placeholder="Search customers or type a new name"
-              className="h-10 w-full rounded-xl border border-[#E7E7E2] bg-white px-3.5 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
+              className="h-11 w-full rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]"
             />
             {openList && (matches.length > 0 || (query.trim() && !exactExists)) ? (
-              <div className="absolute left-0 right-0 top-[44px] z-20 max-h-[240px] overflow-auto rounded-xl border border-[#E7E7E2] bg-white py-1 shadow-[0_18px_50px_-8px_rgba(26,28,30,0.25)]">
+              <div className="absolute left-0 right-0 top-[48px] z-20 max-h-[240px] overflow-auto rounded-[14px] border border-[#EAEDF2] bg-white py-1 shadow-[0_18px_50px_-8px_rgba(26,28,30,0.25)]">
                 {matches.map((c) => (
                   <button
                     key={c.id}
@@ -225,7 +225,7 @@ export function OrderReviewEditor({
                       setQuery(c.name);
                       setOpenList(false);
                     }}
-                    className="block w-full truncate px-3 py-2 text-left text-[13px] text-[#1A1C1E] hover:bg-[#FAFAF8]"
+                    className="block w-full truncate px-3 py-2 text-left text-[13px] text-[#171A17] hover:bg-[#F5F9FE]"
                   >
                     {c.name}
                   </button>
@@ -238,7 +238,7 @@ export function OrderReviewEditor({
                       setCustomerId(null);
                       setOpenList(false);
                     }}
-                    className="block w-full truncate border-t border-[#F0F0EC] px-3 py-2 text-left text-[13px] font-medium text-[#1F5FA8] hover:bg-[#FAFAF8]"
+                    className="block w-full truncate border-t border-[#EEF1F5] px-3 py-2 text-left text-[13px] font-medium text-[#1F5FA8] hover:bg-[#F5F9FE]"
                   >
                     + Create “{query.trim()}”
                   </button>
@@ -247,8 +247,8 @@ export function OrderReviewEditor({
             ) : null}
           </div>
           {extractedName ? (
-            <p className="mt-1.5 text-[12px] text-[#9A9DA1]">
-              Read from the document: <span className="text-[#5F6368]">{extractedName}</span>
+            <p className="mt-1.5 text-[12px] text-[#A0A49C]">
+              Read from the document: <span className="text-[#6B6F68]">{extractedName}</span>
               {extractedConf != null ? ` · ${extractedConf}% sure` : ''}
               {extractedConf != null && extractedConf < 80 ? ' — please confirm' : ''}
             </p>
@@ -259,16 +259,16 @@ export function OrderReviewEditor({
 
         {/* Lines */}
         <div className="mb-2 flex items-center justify-between">
-          <h3 className="text-[14px] font-semibold text-[#1A1C1E]">Items ({lines.length})</h3>
+          <h3 className="of-display text-[16px] font-semibold text-[#171A17]">Items (<span className="of-num">{lines.length}</span>)</h3>
           <button
             type="button"
             onClick={addLine}
-            className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[13px] font-medium text-[#1F5FA8] transition-colors hover:border-[#3E7BC4]/40"
+            className="inline-flex h-9 items-center rounded-[10px] border border-[#E2E6EC] bg-white px-3.5 text-[13px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]"
           >
             + Add item
           </button>
         </div>
-        <div className="grid grid-cols-[1fr_64px_72px_84px_24px] gap-2 px-1 pb-1.5 text-[11px] text-[#5F6368]">
+        <div className="grid grid-cols-[1fr_64px_72px_84px_24px] gap-2 px-1 pb-1.5 text-[11px] font-medium uppercase tracking-[0.06em] text-[#A0A49C]">
           <span>Product</span>
           <span className="text-right">Qty</span>
           <span>Unit</span>
@@ -276,13 +276,13 @@ export function OrderReviewEditor({
           <span />
         </div>
         {lines.length === 0 ? (
-          <p className="py-6 text-center text-[13px] text-[#9A9DA1]">No items read — add what the customer ordered.</p>
+          <p className="py-6 text-center text-[13px] text-[#8A8E86]">No items read — add what the customer ordered.</p>
         ) : (
           <div className="space-y-2">
             {lines.map((l, i) => (
               <div key={l.key} className="grid grid-cols-[1fr_64px_72px_84px_24px] items-center gap-2">
                 <input className={cell} value={l.description} onChange={(e) => updateLine(i, { description: e.target.value })} />
-                <input className={`${cell} text-right`} inputMode="numeric" value={l.quantity} onChange={(e) => updateLine(i, { quantity: e.target.value.replace(/[^0-9.]/g, '') })} />
+                <input className={`${cell} of-num text-right`} inputMode="numeric" value={l.quantity} onChange={(e) => updateLine(i, { quantity: e.target.value.replace(/[^0-9.]/g, '') })} />
                 <select
                   className={`${cell} cursor-pointer pr-1`}
                   value={l.unit}
@@ -296,12 +296,12 @@ export function OrderReviewEditor({
                     </option>
                   ))}
                 </select>
-                <input className={`${cell} text-right`} inputMode="decimal" placeholder="from list" value={l.unit_price} onChange={(e) => updateLine(i, { unit_price: sanitizeDecimal(e.target.value) })} />
+                <input className={`${cell} of-num text-right`} inputMode="decimal" placeholder="from list" value={l.unit_price} onChange={(e) => updateLine(i, { unit_price: sanitizeDecimal(e.target.value) })} />
                 <button
                   type="button"
                   onClick={() => removeLine(i)}
                   aria-label="Remove item"
-                  className="flex h-9 w-6 items-center justify-center rounded-lg text-[#9A9DA1] transition-colors hover:bg-[#FCEBEB] hover:text-[#A32D2D]"
+                  className="flex h-10 w-6 items-center justify-center rounded-[10px] text-[#A0A49C] transition-colors hover:bg-[#FCEBEB] hover:text-[#A32D2D]"
                 >
                   ✕
                 </button>
@@ -310,19 +310,19 @@ export function OrderReviewEditor({
           </div>
         )}
 
-        <div className="mt-4 flex items-center justify-between border-t border-[#EFEFEC] pt-3 text-[13px]">
-          <span className="text-[#9A9DA1]">Subtotal (excl. VAT) · blank prices fill from the price list</span>
-          <span className="font-medium text-[#1A1C1E]">{zar(subtotal)}</span>
+        <div className="mt-4 flex items-center justify-between border-t border-[#EEF1F5] pt-3 text-[13px]">
+          <span className="text-[#8A8E86]">Subtotal (excl. VAT) · blank prices fill from the price list</span>
+          <span className="of-num text-[16px] font-semibold text-[#171A17]">{zar(subtotal)}</span>
         </div>
       </div>
 
-      <div className="flex items-center justify-end gap-3 rounded-b-2xl border-t border-[#F0F0EC] bg-white px-6 py-4">
+      <div className="flex items-center justify-end gap-3 rounded-b-2xl border-t border-[#EEF1F5] bg-white px-6 py-4">
         {doneInvoice ? (
-          <div className="mr-auto flex items-center gap-2 text-[13px] text-[#0F6E56]">
+          <div className="mr-auto flex items-center gap-2 text-[13px] font-medium text-[#0F6E56]">
             <span className="h-1.5 w-1.5 rounded-full bg-[#0F6E56]" />
-            Invoiced {doneInvoice}
+            Invoiced <span className="of-num">{doneInvoice}</span>
             {orderId ? (
-              <Link href={`/app/orderflow/orders/${orderId}`} className="ml-1 font-medium text-[#1F5FA8] hover:underline">
+              <Link href={`/app/orderflow/orders/${orderId}`} className="ml-1 font-semibold text-[#1F5FA8] hover:underline">
                 View order ›
               </Link>
             ) : null}
@@ -334,7 +334,7 @@ export function OrderReviewEditor({
           type="button"
           onClick={() => void confirm()}
           disabled={busy}
-          className="inline-flex h-10 items-center rounded-xl bg-[#D9730D] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#C2650B] disabled:opacity-60"
+          className="inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-60"
         >
           {busy ? 'Working…' : doneInvoice ? 'Re-sync order' : 'Confirm & invoice'}
         </button>

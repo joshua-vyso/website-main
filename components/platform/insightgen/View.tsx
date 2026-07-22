@@ -11,7 +11,7 @@ import { createClient } from '@/lib/platform/supabase-browser';
 import type { InsightGenData, GenInsight, InsightSeverity, ReportStatus } from '@/lib/platform/insightgen-data';
 
 const M = MODULE_META.insightgen;
-const MODAL_STYLE = { fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties;
+const MODAL_STYLE = { fontFamily: 'var(--font-instrument)', ['--radius' as string]: '0.625rem' } as React.CSSProperties;
 const AREAS = ['Executive snapshot', 'AI insights', 'Saved reports', 'Anomalies'] as const;
 type Area = (typeof AREAS)[number];
 
@@ -67,14 +67,14 @@ export function InsightGenView({ data }: { data: InsightGenData }) {
       />
 
       {empty ? (
-        <div className="mt-8 rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
-          <p className="text-[15px] font-medium text-[#1A1C1E]">No insights yet</p>
-          <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">As your other modules fill with data, Vyso AI will surface cross-module insights, anomalies and reports here.</p>
+        <div className="mt-8 rounded-2xl border border-dashed border-[#D8DFE8] bg-white px-6 py-12 text-center">
+          <p className="of-display text-[18px] font-semibold text-[#171A17]">No insights yet</p>
+          <p className="mx-auto mt-2 max-w-md text-[14px] text-[#6B6F68]">As your other modules fill with data, Vyso AI will surface cross-module insights, anomalies and reports here.</p>
         </div>
       ) : (
         <>
           <div className="mt-6">
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+            <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
               <Kpi label="New AI insights" value={String(insights.length)} accent="#0F6E56" />
               <Kpi label="Anomalies detected" value={String(anomalies.length)} accent={anomalies.length > 0 ? '#A32D2D' : undefined} />
               <Kpi label="Saved reports" value={String(reports.length)} />
@@ -84,9 +84,9 @@ export function InsightGenView({ data }: { data: InsightGenData }) {
           </div>
 
           {/* Areas */}
-          <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-1 border-b border-[#E7E7E2]">
+          <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-1 border-b border-[#EAEDF2]">
             {AREAS.map((a) => (
-              <button key={a} type="button" onClick={() => setArea(a)} className={`-mb-px border-b-2 pb-2.5 pt-1 text-[14px] transition-colors ${area === a ? 'border-[#3E7BC4] font-medium text-[#1A1C1E]' : 'border-transparent text-[#5F6368] hover:text-[#1A1C1E]'}`}>{a}</button>
+              <button key={a} type="button" onClick={() => setArea(a)} className={`-mb-px border-b-2 pb-2.5 pt-1 text-[14px] transition-colors ${area === a ? 'border-[#3E7BC4] font-medium text-[#171A17]' : 'border-transparent text-[#6B6F68] hover:text-[#171A17]'}`}>{a}</button>
             ))}
           </div>
 
@@ -94,11 +94,11 @@ export function InsightGenView({ data }: { data: InsightGenData }) {
             {area === 'Executive snapshot' ? (
               <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_360px]">
                 <SectionCard title="Business snapshot">
-                  <p className="text-[14px] leading-relaxed text-[#1A1C1E]">
-                    Vyso AI surfaced <span className="font-semibold text-[#1A1C1E]">{insights.length}</span> insight{insights.length === 1 ? '' : 's'} this cycle —{' '}
-                    <span className="font-semibold text-[#A32D2D]">{sevCount('critical')} critical</span>,{' '}
-                    <span className="font-semibold text-[#854F0B]">{sevCount('warning')} to watch</span> and{' '}
-                    <span className="font-semibold text-[#0F6E56]">{sevCount('positive')} positive</span>. {anomalies[0] ? <>Top concern: {anomalies[0].text}</> : null}
+                  <p className="text-[14px] leading-relaxed text-[#171A17]">
+                    Vyso AI surfaced <span className="of-num font-semibold text-[#171A17]">{insights.length}</span> insight{insights.length === 1 ? '' : 's'} this cycle —{' '}
+                    <span className="font-semibold text-[#A32D2D]"><span className="of-num">{sevCount('critical')}</span> critical</span>,{' '}
+                    <span className="font-semibold text-[#854F0B]"><span className="of-num">{sevCount('warning')}</span> to watch</span> and{' '}
+                    <span className="font-semibold text-[#0F6E56]"><span className="of-num">{sevCount('positive')}</span> positive</span>. {anomalies[0] ? <>Top concern: {anomalies[0].text}</> : null}
                   </p>
                   <div className="mt-4 grid grid-cols-2 gap-3">
                     <PlaceholderChart data={[410, 430, 425, 460, 480, 470, 500]} caption="Revenue trend — illustrative" height={90} />
@@ -107,13 +107,13 @@ export function InsightGenView({ data }: { data: InsightGenData }) {
                 </SectionCard>
                 <SectionCard title="Operational alerts">
                   {anomalies.length === 0 ? (
-                    <p className="text-[13px] text-[#9A9DA1]">No anomalies right now.</p>
+                    <p className="text-[13px] text-[#8A8E86]">No anomalies right now.</p>
                   ) : (
                     <div className="flex flex-col gap-2.5">
                       {anomalies.map((a) => (
                         <div key={a.id} className="flex items-start gap-2.5 text-[13px]">
                           <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#A32D2D]" />
-                          <span className="text-[#5F6368]"><span className="font-medium text-[#1A1C1E]">{moduleName(a.sourceModule)}:</span> {a.text}</span>
+                          <span className="text-[#6B6F68]"><span className="font-medium text-[#171A17]">{moduleName(a.sourceModule)}:</span> {a.text}</span>
                         </div>
                       ))}
                     </div>
@@ -130,11 +130,11 @@ export function InsightGenView({ data }: { data: InsightGenData }) {
                     <Chip key={m} active={moduleFilter === m} onClick={() => setModuleFilter(m)}>{moduleName(m)}</Chip>
                   ))}
                 </div>
-                <div className="overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
+                <div className="overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
                   {shown.map((ins, i) => (
-                    <div key={ins.id} className={`flex items-start gap-3 px-5 py-3.5 ${i > 0 ? 'border-t border-[#F0F0EC]' : ''}`}>
+                    <div key={ins.id} className={`flex items-start gap-3 px-5 py-3.5 transition-colors hover:bg-[#F5F9FE] ${i > 0 ? 'border-t border-[#F4F5F7]' : ''}`}>
                       <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: SEV_DOT[ins.severity] }} />
-                      <span className="min-w-0 flex-1 text-[14px] text-[#1A1C1E]">{ins.text}{ins.metricValue ? <span className="ml-1.5 text-[12px] text-[#9A9DA1]">· {ins.metricLabel ? `${ins.metricLabel} ` : ''}{ins.metricValue}</span> : null}</span>
+                      <span className="min-w-0 flex-1 text-[14px] text-[#171A17]">{ins.text}{ins.metricValue ? <span className="ml-1.5 text-[12px] text-[#A0A49C]">· {ins.metricLabel ? `${ins.metricLabel} ` : ''}<span className="of-num">{ins.metricValue}</span></span> : null}</span>
                       <span className="shrink-0"><Badge label={moduleName(ins.sourceModule)} tone="info" /></span>
                     </div>
                   ))}
@@ -150,7 +150,7 @@ export function InsightGenView({ data }: { data: InsightGenData }) {
                   r.scope ?? '—',
                   reportModules(r.modules),
                   r.schedule.charAt(0).toUpperCase() + r.schedule.slice(1),
-                  dateLabel(r.lastRun),
+                  <span key="lr" className="of-num">{dateLabel(r.lastRun)}</span>,
                   r.owner ?? '—',
                   <span key="s" className="inline-flex justify-end"><Badge label={STATUS_LABEL[r.status]} tone={STATUS_TONE[r.status]} /></span>,
                 ])}
@@ -161,14 +161,14 @@ export function InsightGenView({ data }: { data: InsightGenData }) {
             {area === 'Anomalies' ? (
               <SectionCard title="Anomalies detected">
                 {anomalies.length === 0 ? (
-                  <p className="text-[13px] text-[#9A9DA1]">No anomalies detected.</p>
+                  <p className="text-[13px] text-[#8A8E86]">No anomalies detected.</p>
                 ) : (
                   <div className="flex flex-col gap-3">
                     {anomalies.map((a) => (
-                      <div key={a.id} className="flex items-center justify-between gap-3 rounded-xl border border-[#F0F0EC] bg-[#FCFCFB] px-4 py-3">
+                      <div key={a.id} className="flex items-center justify-between gap-3 rounded-[14px] border border-[#EEF1F5] bg-white px-4 py-3 transition-colors hover:border-[#C9DEF7] hover:bg-[#F5F9FE]">
                         <div className="flex items-start gap-2.5 text-[13px]">
                           <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#A32D2D]" />
-                          <span className="text-[#5F6368]"><span className="font-medium text-[#1A1C1E]">{moduleName(a.sourceModule)}:</span> {a.text}</span>
+                          <span className="text-[#6B6F68]"><span className="font-medium text-[#171A17]">{moduleName(a.sourceModule)}:</span> {a.text}</span>
                         </div>
                         <button type="button" onClick={() => toast('Investigate (demo)')} className="shrink-0 text-[12px] font-medium text-[#1F5FA8] hover:underline">Investigate</button>
                       </div>
@@ -186,7 +186,7 @@ export function InsightGenView({ data }: { data: InsightGenData }) {
 
 function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
-    <button type="button" onClick={onClick} className={`rounded-full px-3 py-1.5 text-[12px] font-medium transition-colors ${active ? 'bg-[#1A1C1E] text-white' : 'border border-[#E7E7E2] bg-white text-[#5F6368] hover:border-[#3E7BC4]/30'}`}>
+    <button type="button" onClick={onClick} className={`inline-flex h-[32px] items-center rounded-full border px-3.5 text-[13px] font-medium transition-all ${active ? 'border-transparent bg-[#1F5FA8] text-white' : 'border-[#E2E6EC] bg-white text-[#3E4A57] hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]'}`}>
       {children}
     </button>
   );
@@ -245,21 +245,21 @@ function CreateReportModal({ open, onClose, onSaved }: { open: boolean; onClose:
   }
 
   if (!mounted || !open) return null;
-  const input = 'h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none';
+  const input = 'h-11 w-full rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]';
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={MODAL_STYLE}>
-      <div className="absolute inset-0 bg-[#1A1C1E]/25 backdrop-blur-[1px]" onClick={() => !busy && onClose()} />
-      <div role="dialog" aria-modal="true" className="relative w-full max-w-[440px] rounded-2xl border border-[#E7E7E2] bg-white p-5 shadow-[0_24px_70px_-20px_rgba(26,28,30,0.45)]">
+      <div className="absolute inset-0 bg-[#171A17]/25 backdrop-blur-[1px]" onClick={() => !busy && onClose()} />
+      <div role="dialog" aria-modal="true" className="relative w-full max-w-[440px] rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_24px_70px_-20px_rgba(26,28,30,0.45)]">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-[16px] font-semibold text-[#1A1C1E]">Create report</h2>
-            <p className="mt-0.5 text-[13px] text-[#5F6368]">A saved cross-module report definition.</p>
+            <h2 className="of-display text-[16px] font-semibold text-[#171A17]">Create report</h2>
+            <p className="mt-1 text-[13px] text-[#6B6F68]">A saved cross-module report definition.</p>
           </div>
-          <button type="button" onClick={onClose} aria-label="Close" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[18px] text-[#9A9DA1] transition-colors hover:bg-[#F0F0EC] hover:text-[#1A1C1E]">✕</button>
+          <button type="button" onClick={onClose} aria-label="Close" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[18px] text-[#8A8E86] transition-colors hover:bg-[#EEF1F5] hover:text-[#171A17]">✕</button>
         </div>
         <div className="mt-4 space-y-3">
           <div>
-            <label className="mb-1 block text-[13px] font-medium text-[#1A1C1E]">Report name</label>
+            <label className="mb-1.5 block text-[13px] font-medium text-[#171A17]">Report name</label>
             <input autoFocus value={name} onChange={(e) => { setName(e.target.value); if (error) setError(null); }} onKeyDown={(e) => { if (e.key === 'Enter') save(); }} placeholder="e.g. Weekly business brief" className={input} />
           </div>
           <div className="grid grid-cols-2 gap-3">
@@ -267,18 +267,18 @@ function CreateReportModal({ open, onClose, onSaved }: { open: boolean; onClose:
             <select value={schedule} onChange={(e) => setSchedule(e.target.value)} className={input}><option value="daily">Daily</option><option value="weekly">Weekly</option><option value="monthly">Monthly</option><option value="manual">Manual</option></select>
           </div>
           <div>
-            <div className="mb-1.5 text-[13px] font-medium text-[#1A1C1E]">Modules <span className="font-normal text-[#9A9DA1]">(none = all)</span></div>
+            <div className="mb-1.5 text-[13px] font-medium text-[#171A17]">Modules <span className="font-normal text-[#8A8E86]">(none = all)</span></div>
             <div className="flex flex-wrap gap-1.5">
               {REPORT_MODULES.map((m) => (
-                <button key={m} type="button" onClick={() => toggleModule(m)} className={`rounded-full px-2.5 py-1 text-[12px] font-medium transition-colors ${modules.includes(m) ? 'bg-[#1A1C1E] text-white' : 'border border-[#E7E7E2] bg-white text-[#5F6368] hover:border-[#3E7BC4]/30'}`}>{MODULE_META[m].name}</button>
+                <button key={m} type="button" onClick={() => toggleModule(m)} className={`inline-flex h-[30px] items-center rounded-full border px-3 text-[12px] font-medium transition-all ${modules.includes(m) ? 'border-transparent bg-[#1F5FA8] text-white' : 'border-[#E2E6EC] bg-white text-[#3E4A57] hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]'}`}>{MODULE_META[m].name}</button>
               ))}
             </div>
           </div>
           {error ? <p className="text-[12px] text-[#A32D2D]">{error}</p> : null}
         </div>
         <div className="mt-5 flex justify-end gap-2">
-          <button type="button" onClick={onClose} disabled={busy} className="rounded-lg px-3.5 py-2 text-[13px] text-[#5F6368] hover:bg-black/[0.03] disabled:opacity-50">Cancel</button>
-          <button type="button" onClick={save} disabled={busy} className="rounded-lg bg-[#1F5FA8] px-4 py-2 text-[13px] font-medium text-white hover:bg-[#174C87] disabled:opacity-60">{busy ? 'Saving…' : 'Create report'}</button>
+          <button type="button" onClick={onClose} disabled={busy} className="inline-flex h-[42px] items-center rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87] disabled:opacity-50">Cancel</button>
+          <button type="button" onClick={save} disabled={busy} className="inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-60">{busy ? 'Saving…' : 'Create report'}</button>
         </div>
       </div>
     </div>,

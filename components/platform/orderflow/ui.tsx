@@ -50,12 +50,12 @@ export function CustomerHealthBadge({ health }: { health: CustomerHealth }) {
 
 export function Kpi({ label, value, accent, sub }: { label: string; value: string; accent?: string; sub?: ReactNode }) {
   return (
-    <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
-      <div className="text-[12px] text-[#9A9DA1]">{label}</div>
-      <div className="mt-1.5 text-[22px] font-bold leading-none" style={accent ? { color: accent } : { color: '#1A1C1E' }}>
+    <div className="rounded-2xl border border-[#EAEDF2] bg-white p-4">
+      <div className="text-[12px] text-[#8A8E86]">{label}</div>
+      <div className="mt-1.5 text-[22px] font-bold leading-none" style={accent ? { color: accent } : { color: '#171A17' }}>
         {value}
       </div>
-      {sub != null ? <div className="mt-1.5 text-[11px] text-[#9A9DA1]">{sub}</div> : null}
+      {sub != null ? <div className="mt-1.5 text-[11px] text-[#8A8E86]">{sub}</div> : null}
     </div>
   );
 }
@@ -103,16 +103,16 @@ export function Drawer({
   return createPortal(
     // Portals mount on document.body, outside the platform subtree's --radius
     // override, so re-declare it here or rounded-lg/xl collapse to square corners.
-    <div className="fixed inset-0 z-[90]" style={{ fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties}>
-      <div className="absolute inset-0 bg-[#1A1C1E]/20 backdrop-blur-[1px]" onClick={onClose} />
+    <div className="fixed inset-0 z-[90]" style={{ fontFamily: 'var(--font-instrument)', ['--radius' as string]: '0.625rem' } as React.CSSProperties}>
+      <div className="absolute inset-0 bg-[#171A17]/20 backdrop-blur-[1px]" onClick={onClose} />
       <div
         className="absolute right-0 top-0 flex h-full flex-col bg-white shadow-[0_0_60px_-15px_rgba(26,28,30,0.4)]"
         style={{ width: `min(96vw, ${width}px)` }}
       >
-        <div className="flex items-start justify-between gap-3 border-b border-[#F0F0EC] px-5 py-4">
+        <div className="flex items-start justify-between gap-3 border-b border-[#EEF1F5] px-5 py-4">
           <div className="min-w-0">
-            <div className="truncate text-[16px] font-semibold text-[#1A1C1E]">{title}</div>
-            {subtitle ? <div className="mt-0.5 text-[13px] text-[#5F6368]">{subtitle}</div> : null}
+            <div className="truncate text-[16px] font-semibold text-[#171A17]">{title}</div>
+            {subtitle ? <div className="mt-0.5 text-[13px] text-[#6B6F68]">{subtitle}</div> : null}
           </div>
           <div className="flex shrink-0 items-center gap-2">
             {right}
@@ -120,14 +120,14 @@ export function Drawer({
               type="button"
               onClick={onClose}
               aria-label="Close"
-              className="flex h-8 w-8 items-center justify-center rounded-lg text-[18px] text-[#9A9DA1] transition-colors hover:bg-[#F0F0EC] hover:text-[#1A1C1E]"
+              className="flex h-8 w-8 items-center justify-center rounded-lg text-[18px] text-[#8A8E86] transition-colors hover:bg-[#EEF1F5] hover:text-[#171A17]"
             >
               ✕
             </button>
           </div>
         </div>
         <div className="flex-1 overflow-y-auto px-5 py-5">{children}</div>
-        {footer ? <div className="border-t border-[#F0F0EC] px-5 py-3.5">{footer}</div> : null}
+        {footer ? <div className="border-t border-[#EEF1F5] px-5 py-3.5">{footer}</div> : null}
       </div>
     </div>,
     document.body,
@@ -152,7 +152,7 @@ export function useToast() {
   const node =
     mounted && msg
       ? createPortal(
-          <div className="fixed bottom-6 left-1/2 z-[110] -translate-x-1/2 rounded-xl bg-[#1A1C1E] px-4 py-2.5 text-[13px] font-medium text-white shadow-[0_12px_40px_-12px_rgba(26,28,30,0.5)]" style={{ fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties}>
+          <div className="fixed bottom-6 left-1/2 z-[110] -translate-x-1/2 rounded-xl bg-[#171A17] px-4 py-2.5 text-[13px] font-medium text-white shadow-[0_12px_40px_-12px_rgba(26,28,30,0.5)]" style={{ fontFamily: 'var(--font-instrument)', ['--radius' as string]: '0.625rem' } as React.CSSProperties}>
             {msg}
           </div>,
           document.body,
@@ -203,7 +203,7 @@ export function RowActionsMenu({ actions }: { actions: RowAction[] }) {
         type="button"
         onClick={toggle}
         aria-label="Actions"
-        className="flex h-8 w-8 items-center justify-center rounded-lg text-[#9A9DA1] transition-colors hover:bg-[#F0F0EC] hover:text-[#1A1C1E]"
+        className="flex h-8 w-8 items-center justify-center rounded-lg text-[#8A8E86] transition-colors hover:bg-[#EEF1F5] hover:text-[#171A17]"
       >
         ⋯
       </button>
@@ -212,8 +212,8 @@ export function RowActionsMenu({ actions }: { actions: RowAction[] }) {
             <>
               <div className="fixed inset-0 z-[95]" onClick={() => setOpen(false)} />
               <div
-                style={{ position: 'fixed', top: pos.top, left: pos.left, zIndex: 96, fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties}
-                className="w-[184px] overflow-hidden rounded-xl border border-[#E7E7E2] bg-white py-1 shadow-[0_12px_40px_-12px_rgba(26,28,30,0.25)]"
+                style={{ position: 'fixed', top: pos.top, left: pos.left, zIndex: 96, fontFamily: 'var(--font-instrument)', ['--radius' as string]: '0.625rem' } as React.CSSProperties}
+                className="w-[184px] overflow-hidden rounded-xl border border-[#EAEDF2] bg-white py-1 shadow-[0_12px_40px_-12px_rgba(26,28,30,0.25)]"
               >
                 {actions.map((a, i) => (
                   <button
@@ -223,8 +223,8 @@ export function RowActionsMenu({ actions }: { actions: RowAction[] }) {
                       setOpen(false);
                       a.onClick();
                     }}
-                    className={`block w-full px-3.5 py-2 text-left text-[13px] transition-colors hover:bg-[#FAFAF8] ${
-                      a.danger ? 'text-[#A32D2D]' : 'text-[#1A1C1E]'
+                    className={`block w-full px-3.5 py-2 text-left text-[13px] transition-colors hover:bg-[#F5F9FE] ${
+                      a.danger ? 'text-[#A32D2D]' : 'text-[#171A17]'
                     }`}
                   >
                     {a.label}

@@ -18,10 +18,10 @@ export function MissingDocumentsCard({ insights }: { insights: MissingDocInsight
   if (insights.length === 0) return null;
 
   return (
-    <div className="rounded-2xl border border-[#E7E7E2] bg-white px-5 py-4">
+    <div className="rounded-2xl border border-[#EAEDF2] bg-white px-5 py-4 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
       <div className="flex items-center gap-2">
-        <h3 className="text-[15px] font-semibold text-[#1A1C1E]">Missing documents</h3>
-        <span className="rounded-full bg-[#F0F0EC] px-1.5 py-0.5 text-[10px] text-[#9A9DA1]">demo</span>
+        <h3 className="of-display text-[16px] font-semibold text-[#171A17]">Missing documents</h3>
+        <span className="rounded-full bg-[#EEF1F5] px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.05em] text-[#A0A49C]">demo</span>
       </div>
 
       <div className="mt-3 space-y-2.5">
@@ -32,8 +32,8 @@ export function MissingDocumentsCard({ insights }: { insights: MissingDocInsight
               style={{ backgroundColor: SEVERITY_DOT[insight.severity] }}
             />
             <div className="min-w-0">
-              <p className="text-[13px] font-medium text-[#1A1C1E]">{insight.title}</p>
-              <p className="mt-0.5 text-[12px] text-[#5F6368]">{insight.detail}</p>
+              <p className="text-[13px] font-semibold text-[#171A17]">{insight.title}</p>
+              <p className="mt-0.5 text-[12px] text-[#A0A49C]">{insight.detail}</p>
             </div>
           </div>
         ))}

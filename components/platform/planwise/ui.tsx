@@ -30,7 +30,7 @@ export function MonthlyGoalCard() {
         <Metric label="Gap" value={`${gap >= 0 ? '+' : '−'}${zar(Math.abs(gap))}`} color={gap >= 0 ? '#0F6E56' : '#A32D2D'} />
         <Metric label="Goal progress" value={`${pct}%`} color={color} />
       </div>
-      <div className="mt-4 h-2.5 w-full overflow-hidden rounded-full bg-[#F0F0EC]">
+      <div className="mt-4 h-2.5 w-full overflow-hidden rounded-full bg-[#EEF1F5]">
         <div className="h-full rounded-full" style={{ width: `${Math.min(100, pct)}%`, backgroundColor: color, transition: 'width 0.7s cubic-bezier(0.22,1,0.36,1)' }} />
       </div>
     </SectionCard>
@@ -40,8 +40,8 @@ export function MonthlyGoalCard() {
 export function Metric({ label, value, color }: { label: string; value: string; color?: string }) {
   return (
     <div>
-      <div className="text-[12px] text-[#9A9DA1]">{label}</div>
-      <div className="mt-1 text-[20px] font-bold leading-none" style={color ? { color } : { color: '#1A1C1E' }}>{value}</div>
+      <div className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">{label}</div>
+      <div className="of-num mt-2 text-[22px] font-semibold leading-none tracking-[-0.02em]" style={color ? { color } : { color: '#171A17' }}>{value}</div>
     </div>
   );
 }
@@ -64,15 +64,15 @@ export function GoalSummaryCards() {
         const pct = goalProgress(g);
         const color = goalToneColor(goalTone(pct));
         return (
-          <div key={g.id} className="rounded-2xl border border-[#E7E7E2] bg-white p-4 transition-shadow hover:shadow-sm">
-            <div className="flex items-center justify-between">
-              <span className="text-[12px] text-[#9A9DA1]">{g.label}</span>
-              <span className="rounded-full px-2 py-0.5 text-[10px] font-medium" style={{ backgroundColor: `${color}1A`, color }}>{pct}%</span>
+          <div key={g.id} className="rounded-[14px] border border-[#EEF1F5] bg-white p-4 shadow-[0_1px_2px_rgba(20,24,20,0.03)] transition-shadow hover:shadow-sm">
+            <div className="flex items-center justify-between gap-2">
+              <span className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">{g.label}</span>
+              <span className="of-num rounded-full px-2 py-0.5 text-[11px] font-medium" style={{ backgroundColor: `${color}1A`, color }}>{pct}%</span>
             </div>
-            <div className="mt-2 text-[18px] font-bold leading-none text-[#1A1C1E]">{fmtGoal(g, g.target)}</div>
+            <div className="of-num mt-2 text-[22px] font-semibold leading-none tracking-[-0.02em] text-[#171A17]">{fmtGoal(g, g.target)}</div>
             <div className="mt-2 flex items-center justify-between text-[12px]">
-              <span className="text-[#9A9DA1]">now {fmtGoal(g, g.current)}</span>
-              <span style={{ color: variance >= 0 ? '#0F6E56' : '#A32D2D' }}>{variance >= 0 ? '+' : '−'}{fmtGoal(g, Math.abs(variance))}</span>
+              <span className="text-[#A0A49C]">now <span className="of-num">{fmtGoal(g, g.current)}</span></span>
+              <span className="of-num font-medium" style={{ color: variance >= 0 ? '#0F6E56' : '#A32D2D' }}>{variance >= 0 ? '+' : '−'}{fmtGoal(g, Math.abs(variance))}</span>
             </div>
           </div>
         );
@@ -125,7 +125,7 @@ export function BudgetTable({ filter }: { filter?: string | null }) {
 
 export function MobileSnapshotCards() {
   const { monthlyGoal, totalBudget, totalActual, scenarioBase } = usePlanWise();
-  const color = (s: string) => (s === 'positive' ? '#0F6E56' : s === 'warning' ? '#854F0B' : s === 'critical' ? '#A32D2D' : '#1A1C1E');
+  const color = (s: string) => (s === 'positive' ? '#0F6E56' : s === 'warning' ? '#854F0B' : s === 'critical' ? '#A32D2D' : '#171A17');
 
   const revProgress = monthlyGoal.targetRevenue > 0 ? Math.round((monthlyGoal.currentForecast / monthlyGoal.targetRevenue) * 100) : 0;
   const budgetUsed = totalBudget > 0 ? Math.round((totalActual / totalBudget) * 100) : 0;
@@ -140,12 +140,12 @@ export function MobileSnapshotCards() {
 
   return (
     <div>
-      <h2 className="mb-2 text-[13px] font-semibold text-[#9A9DA1]">Mobile snapshot — widgets the companion app will surface</h2>
+      <h2 className="of-display mb-2.5 text-[12px] font-semibold uppercase tracking-[0.05em] text-[#8A8E86]">Mobile snapshot — widgets the companion app will surface</h2>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {widgets.map((w) => (
-          <div key={w.id} className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
-            <div className="text-[12px] text-[#9A9DA1]">{w.label}</div>
-            <div className="mt-1.5 text-[22px] font-bold leading-none" style={{ color: color(w.severity) }}>{w.value}</div>
+          <div key={w.id} className="rounded-[14px] border border-[#EEF1F5] bg-white p-4 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+            <div className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">{w.label}</div>
+            <div className="of-num mt-2 text-[22px] font-semibold leading-none tracking-[-0.02em]" style={{ color: color(w.severity) }}>{w.value}</div>
           </div>
         ))}
       </div>

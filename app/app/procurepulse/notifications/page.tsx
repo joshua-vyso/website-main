@@ -28,7 +28,7 @@ function NotifRow({ n }: { n: PpNotification }) {
   return (
     <div className="flex items-start gap-3.5 py-3.5">
       <div
-        className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-lg"
+        className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-[11px]"
         style={{ backgroundColor: k.bg }}
       >
         <span
@@ -37,10 +37,10 @@ function NotifRow({ n }: { n: PpNotification }) {
         />
       </div>
       <div className="min-w-0 flex-1">
-        <div className="text-[14px] font-medium text-[#1A1C1E]">{n.title}</div>
-        {n.body ? <div className="mt-0.5 text-[12px] text-[#9A9DA1]">{n.body}</div> : null}
+        <div className="text-[14px] font-semibold text-[#171A17]">{n.title}</div>
+        {n.body ? <div className="mt-0.5 text-[13px] text-[#6B6F68]">{n.body}</div> : null}
       </div>
-      <div className="shrink-0 pt-0.5 text-[12px] text-[#9A9DA1]">
+      <div className="of-num shrink-0 pt-0.5 text-[12px] text-[#A0A49C]">
         {timeLabel(n.created_at, new Date())}
       </div>
     </div>
@@ -51,10 +51,10 @@ function Group({ label, notifs }: { label: string; notifs: PpNotification[] }) {
   if (notifs.length === 0) return null;
   return (
     <div>
-      <div className="mb-2 text-[11px] uppercase tracking-wide text-[#9A9DA1]">{label}</div>
-      <div className="rounded-2xl border border-[#E7E7E2] bg-white px-4 py-1">
+      <div className="mb-2 text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">{label}</div>
+      <div className="rounded-2xl border border-[#EAEDF2] bg-white px-5 py-1 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
         {notifs.map((n, i) => (
-          <div key={n.id} className={i > 0 ? 'border-t border-[#EFEFEC]' : ''}>
+          <div key={n.id} className={i > 0 ? 'border-t border-[#F4F5F7]' : ''}>
             <NotifRow n={n} />
           </div>
         ))}
@@ -89,7 +89,7 @@ export default async function ProcurePulseNotifications() {
     <div className="space-y-5">
       <Link
         href="/app/procurepulse"
-        className="inline-flex h-8 items-center gap-1 rounded-full border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#5F6368] transition-colors hover:border-[#3E7BC4]/30 hover:text-[#1A1C1E]"
+        className="inline-flex h-8 items-center gap-1 rounded-full border border-[#EAEDF2] bg-white px-3 text-[13px] text-[#6B6F68] transition-colors hover:border-[#3E7BC4]/30 hover:text-[#171A17]"
       >
         <span aria-hidden>‹</span> Dashboard
       </Link>
@@ -97,18 +97,18 @@ export default async function ProcurePulseNotifications() {
       <PageHead
         title="Notifications"
         right={
-          <div className="flex rounded-lg bg-[#ECECE8] p-[3px]">
-            <span className="rounded-md bg-white px-4 py-1.5 text-[13px] font-medium text-[#1A1C1E]">
+          <div className="flex rounded-[11px] bg-[#ECECE8] p-[3px]">
+            <span className="rounded-[9px] bg-white px-4 py-1.5 text-[13px] font-semibold text-[#171A17] shadow-[0_1px_2px_rgba(20,24,20,0.06)]">
               All
             </span>
-            <span className="px-4 py-1.5 text-[13px] font-medium text-[#5F6368]">Alerts</span>
-            <span className="px-4 py-1.5 text-[13px] font-medium text-[#5F6368]">Documents</span>
+            <span className="px-4 py-1.5 text-[13px] font-medium text-[#6B6F68]">Alerts</span>
+            <span className="px-4 py-1.5 text-[13px] font-medium text-[#6B6F68]">Documents</span>
           </div>
         }
       />
 
       {notifs.length === 0 ? (
-        <div className="rounded-2xl border border-[#E7E7E2] bg-white px-4 py-10 text-center text-[13px] text-[#9A9DA1]">
+        <div className="rounded-2xl border border-[#EAEDF2] bg-white px-5 py-12 text-center text-[14px] text-[#8A8E86] shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
           No notifications yet.
         </div>
       ) : (

@@ -173,8 +173,8 @@ export function RebatesView({ customers }: { customers: OfCustomer[] }) {
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-[26px] font-bold text-[#1A1C1E]">Rebates</h1>
-          <p className="mt-1 text-[14px] text-[#5F6368]">
+          <h1 className="text-[26px] font-bold text-[#171A17]">Rebates</h1>
+          <p className="mt-1 text-[14px] text-[#6B6F68]">
             A standing rebate % per customer — auto-deducted from that customer&apos;s future invoices (after any
             discount, before VAT).
           </p>
@@ -198,11 +198,11 @@ export function RebatesView({ customers }: { customers: OfCustomer[] }) {
           </div>
 
           {/* Table */}
-          <div className="mt-4 overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
+          <div className="mt-4 overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white">
             <div className="overflow-x-auto">
               <table className="w-full text-[13px]">
                 <thead>
-                  <tr className="border-b border-[#F0F0EC] bg-[#FBFBF9] text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+                  <tr className="border-b border-[#EEF1F5] bg-[#FBFCFE] text-[11px] uppercase tracking-wide text-[#8A8E86]">
                     <th className="px-4 py-2.5 text-left font-medium">Customer</th>
                     <th className="px-2 py-2.5 text-right font-medium">Rebate %</th>
                     <th className="px-4 py-2.5 text-right font-medium">&nbsp;</th>
@@ -211,17 +211,17 @@ export function RebatesView({ customers }: { customers: OfCustomer[] }) {
                 <tbody>
                   {filtered.length === 0 ? (
                     <tr>
-                      <td colSpan={3} className="px-5 py-12 text-center text-[14px] text-[#9A9DA1]">
+                      <td colSpan={3} className="px-5 py-12 text-center text-[14px] text-[#8A8E86]">
                         No customers match your search.
                       </td>
                     </tr>
                   ) : (
                     filtered.map((c) => (
-                      <tr key={c.id} className="border-b border-[#F6F6F2] last:border-0 hover:bg-[#FAFAF8]">
+                      <tr key={c.id} className="border-b border-[#F5F9FE] last:border-0 hover:bg-[#F5F9FE]">
                         <td className="px-4 py-3">
-                          <div className="font-medium text-[#1A1C1E]">{c.name}</div>
+                          <div className="font-medium text-[#171A17]">{c.name}</div>
                           {c.trading_name ? (
-                            <div className="max-w-[280px] truncate text-[11px] text-[#9A9DA1]">{c.trading_name}</div>
+                            <div className="max-w-[280px] truncate text-[11px] text-[#8A8E86]">{c.trading_name}</div>
                           ) : null}
                         </td>
                         <td className="px-2 py-3 text-right">
@@ -240,9 +240,9 @@ export function RebatesView({ customers }: { customers: OfCustomer[] }) {
                               disabled={busyId === c.id}
                               inputMode="decimal"
                               aria-label={`Rebate % for ${c.name}`}
-                              className="h-8 w-[80px] rounded-lg border border-[#D7DAD8] bg-white px-2 text-right text-[13px] text-[#1A1C1E] tabular-nums placeholder:text-[#C9CCCA] focus:border-[#3E7BC4]/50 focus:outline-none disabled:opacity-50"
+                              className="h-8 w-[80px] rounded-lg border border-[#E2E6EC] bg-white px-2 text-right text-[13px] text-[#171A17] tabular-nums placeholder:text-[#C9CCCA] focus:border-[#3E7BC4]/50 focus:outline-none disabled:opacity-50"
                             />
-                            <span className="text-[12px] text-[#9A9DA1]">%</span>
+                            <span className="text-[12px] text-[#8A8E86]">%</span>
                           </div>
                         </td>
                         <td className="px-4 py-3 text-right">
@@ -265,7 +265,7 @@ export function RebatesView({ customers }: { customers: OfCustomer[] }) {
         </>
       )}
 
-      <p className="mt-4 text-[11px] text-[#9A9DA1]">
+      <p className="mt-4 text-[11px] text-[#8A8E86]">
         The rebate is snapshotted onto each new invoice and deducted after any discount, before VAT. Rebates need
         supabase/rebates.sql to be run.
       </p>
@@ -288,7 +288,7 @@ export function RebatesView({ customers }: { customers: OfCustomer[] }) {
         <div className="space-y-4">
           <Field label="Customer">
             {candidates.length === 0 ? (
-              <p className="text-[13px] text-[#9A9DA1]">
+              <p className="text-[13px] text-[#8A8E86]">
                 {customers.length === 0
                   ? 'No customers yet — add customers in OrderFlow → Customers first.'
                   : 'Every customer already has a rebate. Edit or remove one in the list.'}

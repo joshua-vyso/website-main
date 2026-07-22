@@ -52,10 +52,10 @@ function AlertRow({ alert, onOpen }: { alert: Alert; onOpen: (id: string) => voi
     <button
       type="button"
       onClick={() => onOpen(alert.supplierId)}
-      className="flex w-full items-start gap-2.5 rounded-xl px-2 py-2 text-left transition-colors hover:bg-[#FAFAF8]"
+      className="flex w-full items-start gap-2.5 rounded-[11px] px-2.5 py-2 text-left transition-colors hover:bg-[#F5F9FE]"
     >
-      <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: alert.color }} />
-      <span className="text-[13px] leading-snug text-[#1A1C1E]">{alert.text}</span>
+      <span className="mt-[7px] h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: alert.color }} />
+      <span className="text-[14px] leading-snug text-[#2C333B]">{alert.text}</span>
     </button>
   );
 }
@@ -63,9 +63,9 @@ function AlertRow({ alert, onOpen }: { alert: Alert; onOpen: (id: string) => voi
 /** One compact mobile-snapshot card: faint label + severity-coloured value. */
 function SnapshotCard({ label, value, color }: { label: string; value: string; color: string }) {
   return (
-    <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
-      <div className="text-[11px] text-[#9A9DA1]">{label}</div>
-      <div className="mt-1.5 text-[16px] font-bold leading-tight" style={{ color }}>
+    <div className="rounded-[14px] border border-[#EEF1F5] bg-white p-4 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+      <div className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">{label}</div>
+      <div className="of-display mt-2 text-[16px] font-semibold leading-tight tracking-[-0.01em]" style={{ color }}>
         {value}
       </div>
     </div>
@@ -114,7 +114,7 @@ export function SupplySyncOverview() {
         color: RED,
         text: (
           <>
-            <span className="font-medium text-[#1A1C1E]">{s.name}</span> is flagged high-risk
+            <span className="font-medium text-[#171A17]">{s.name}</span> is flagged high-risk
             {s.lastIssue ? ` — ${s.lastIssue.toLowerCase()}.` : '.'}
           </>
         ),
@@ -130,7 +130,7 @@ export function SupplySyncOverview() {
         color: AMBER,
         text: (
           <>
-            <span className="font-medium text-[#1A1C1E]">{s.name}</span> has {s.docsToAction} compliance
+            <span className="font-medium text-[#171A17]">{s.name}</span> has <span className="of-num">{s.docsToAction}</span> compliance
             {' '}document{s.docsToAction === 1 ? '' : 's'} outstanding.
           </>
         ),
@@ -146,8 +146,8 @@ export function SupplySyncOverview() {
         color: AMBER,
         text: (
           <>
-            <span className="font-medium text-[#1A1C1E]">{s.name}</span> on-time delivery has slipped to{' '}
-            {Math.round(s.onTimePct)}%.
+            <span className="font-medium text-[#171A17]">{s.name}</span> on-time delivery has slipped to{' '}
+            <span className="of-num">{Math.round(s.onTimePct)}%</span>.
           </>
         ),
       });
@@ -159,7 +159,7 @@ export function SupplySyncOverview() {
   const topSuppliers = [...suppliers].sort((a, b) => b.scorecard.overall - a.scorecard.overall).slice(0, 6);
   const topRows: ReactNode[][] = topSuppliers.map((s) => [
     <SupplierNameButton key="name" id={s.id} name={s.name} />,
-    <span key="cat" className="text-[#5F6368]">{s.category || '—'}</span>,
+    <span key="cat" className="text-[#6B6F68]">{s.category || '—'}</span>,
     <ScorePill key="overall" value={s.scorecard.overall} />,
     <ScorePill key="rel" value={s.scorecard.reliability} />,
     <ScorePill key="price" value={s.scorecard.priceStability} />,
@@ -207,7 +207,7 @@ export function SupplySyncOverview() {
         right={<Badge label={`${alertRows.length} flagged`} tone={alertRows.length > 0 ? 'warning' : 'positive'} />}
       >
         {alertRows.length === 0 ? (
-          <p className="py-6 text-center text-[13px] text-[#5F6368]">
+          <p className="py-6 text-center text-[13px] text-[#6B6F68]">
             No open risk flags — every supplier is compliant and delivering on time.
           </p>
         ) : (
@@ -239,24 +239,24 @@ export function SupplySyncOverview() {
       {/* 4) Supplier opportunities */}
       <SectionCard title="Supplier opportunities">
         {topOpportunities.length === 0 ? (
-          <p className="py-6 text-center text-[13px] text-[#5F6368]">
+          <p className="py-6 text-center text-[13px] text-[#6B6F68]">
             No standout pricing signals right now — pricing is tracking the market across the base.
           </p>
         ) : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {topOpportunities.map((o) => (
-              <div key={o.id} className="flex flex-col rounded-2xl border border-[#E7E7E2] bg-[#FBFBF9] p-4">
+              <div key={o.id} className="flex flex-col rounded-[14px] border border-[#EEF1F5] bg-[#FBFCFE] p-4">
                 <div className="flex items-start justify-between gap-2">
-                  <div className="text-[14px] font-semibold text-[#1A1C1E]">{o.title}</div>
+                  <div className="of-display text-[15px] font-semibold text-[#171A17]">{o.title}</div>
                   <Badge label={OPP_LABEL[o.kind]} tone={OPP_TONE[o.kind]} />
                 </div>
-                <p className="mt-1.5 text-[13px] leading-snug text-[#5F6368]">{o.body}</p>
-                <p className="mt-2 text-[12px] font-medium text-[#1A1C1E]">{o.suggestedAction}</p>
+                <p className="mt-1.5 text-[13px] leading-snug text-[#6B6F68]">{o.body}</p>
+                <p className="mt-2 text-[12px] font-medium text-[#171A17]">{o.suggestedAction}</p>
                 {o.supplierId ? (
                   <button
                     type="button"
                     onClick={() => openProfile(o.supplierId as string)}
-                    className="mt-3 self-start text-[12px] font-medium text-[#B0466A] hover:underline"
+                    className="mt-3 self-start text-[13px] font-semibold text-[#1F5FA8] transition-colors hover:text-[#174C87] hover:underline"
                   >
                     View supplier →
                   </button>
@@ -269,7 +269,7 @@ export function SupplySyncOverview() {
 
       {/* 5) Mobile snapshot */}
       <div>
-        <h2 className="text-[15px] font-semibold text-[#1A1C1E]">
+        <h2 className="of-display text-[16px] font-semibold text-[#171A17]">
           Mobile snapshot — widgets the companion app will surface
         </h2>
         <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -304,7 +304,7 @@ export function SupplySyncOverview() {
             color={highRiskCount > 0 ? RED : GREEN}
           />
         </div>
-        <p className="mt-2 text-[11px] text-[#9A9DA1]">Values shown are live from this org — the companion app renders these as home-screen cards.</p>
+        <p className="mt-2.5 text-[12px] text-[#A0A49C]">Values shown are live from this org — the companion app renders these as home-screen cards.</p>
       </div>
     </div>
   );

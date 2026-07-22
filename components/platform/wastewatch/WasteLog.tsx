@@ -51,21 +51,21 @@ export function WasteLog({ initialCategory }: { initialCategory?: string }) {
   }, [events, search, category, employee, device, recipe, reason]);
 
   const open = openId ? events.find((e) => e.id === openId) ?? null : null;
-  const sel = 'h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#3E7BC4]';
+  const sel = 'h-11 rounded-[12px] border border-[#E4E9F0] bg-white px-3.5 text-[14px] text-[#3E4A57] outline-none transition-colors hover:border-[#C9DEF7] focus:border-[#3E7BC4]';
 
   return (
     <div className="space-y-5">
       {node}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-[24px] font-bold leading-tight text-[#1A1C1E]">Waste log</h1>
-          <p className="mt-0.5 text-[14px] text-[#5F6368]">Every waste event — item, recipe, employee and the device that measured it</p>
+          <h1 className="of-display text-[28px] font-semibold leading-tight tracking-[-0.015em] text-[#171A17]">Waste log</h1>
+          <p className="mt-1.5 text-[14px] text-[#8A8E86]">Every waste event — item, recipe, employee and the device that measured it</p>
         </div>
-        <button type="button" onClick={() => setLogOpen(true)} className="inline-flex h-10 items-center rounded-xl bg-[#1F5FA8] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87]">+ Log waste</button>
+        <button type="button" onClick={() => setLogOpen(true)} className="inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87]">+ Log waste</button>
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search item, recipe, employee…" className="h-9 min-w-[220px] flex-1 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] outline-none placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]" />
+        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search item, recipe, employee…" className="h-11 min-w-[220px] flex-1 rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]" />
         <select value={category} onChange={(e) => setCategory(e.target.value)} className={sel}><option value="all">All categories</option>{categories.map((c) => <option key={c.id} value={c.name}>{c.name}</option>)}</select>
         <select value={employee} onChange={(e) => setEmployee(e.target.value)} className={sel}><option value="all">All employees</option>{employees.map((c) => <option key={c} value={c}>{c}</option>)}</select>
         <select value={device} onChange={(e) => setDevice(e.target.value)} className={sel}><option value="all">All devices</option>{devices.map((c) => <option key={c} value={c}>{c}</option>)}</select>
@@ -73,11 +73,11 @@ export function WasteLog({ initialCategory }: { initialCategory?: string }) {
         <select value={reason} onChange={(e) => setReason(e.target.value)} className={sel}><option value="all">All reasons</option>{WASTE_REASONS.map((c) => <option key={c} value={c}>{c}</option>)}</select>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
+      <div className="overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
         <div className="overflow-x-auto">
-          <table className="w-full text-[13px]">
+          <table className="w-full text-[14px]">
             <thead>
-              <tr className="border-b border-[#F0F0EC] bg-[#FBFBF9] text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+              <tr className="border-b border-[#EEF1F5] bg-[#FBFCFE] text-[11px] uppercase tracking-[0.06em] text-[#A0A49C]">
                 {['Date', 'Time', 'Item', 'Category', 'Qty', 'Cost', 'Reason', 'Recipe', 'Employee', 'Device', 'Location'].map((h) => (
                   <th key={h} className={`px-3 py-2.5 font-medium ${h === 'Qty' || h === 'Cost' ? 'text-right' : 'text-left'}`}>{h}</th>
                 ))}
@@ -85,21 +85,21 @@ export function WasteLog({ initialCategory }: { initialCategory?: string }) {
             </thead>
             <tbody>
               {filtered.length === 0 ? (
-                <tr><td colSpan={11} className="px-5 py-12 text-center text-[14px] text-[#9A9DA1]">No waste events match your filters.</td></tr>
+                <tr><td colSpan={11} className="px-5 py-12 text-center text-[14px] text-[#8A8E86]">No waste events match your filters.</td></tr>
               ) : (
                 filtered.map((e) => (
-                  <tr key={e.id} onClick={() => setOpenId(e.id)} className="cursor-pointer border-b border-[#F6F6F2] last:border-0 hover:bg-[#FAFAF8]">
-                    <td className="px-3 py-3 text-[#5F6368]">{e.date}</td>
-                    <td className="px-3 py-3 text-[#9A9DA1]">{e.time}</td>
-                    <td className="px-3 py-3 font-medium text-[#1A1C1E]">{e.item}</td>
-                    <td className="px-3 py-3"><CategoryBadge cat={e.category} /></td>
-                    <td className="px-3 py-3 text-right tabular-nums text-[#5F6368]">{e.qty} {e.unit}</td>
-                    <td className="px-3 py-3 text-right tabular-nums font-medium" style={{ color: '#A32D2D' }}>{zar(e.cost)}</td>
-                    <td className="px-3 py-3"><Badge label={e.reason} tone={e.preventable ? 'warning' : 'neutral'} /></td>
-                    <td className="px-3 py-3 text-[#5F6368]">{e.recipe ?? '—'}</td>
-                    <td className="px-3 py-3 text-[#5F6368]">{e.employee}</td>
-                    <td className="px-3 py-3 text-[#5F6368]">{e.device}</td>
-                    <td className="px-3 py-3 text-[#9A9DA1]">{e.location}</td>
+                  <tr key={e.id} onClick={() => setOpenId(e.id)} className="cursor-pointer border-b border-[#F4F5F7] last:border-0 hover:bg-[#F5F9FE]">
+                    <td className="of-num px-3 py-3.5 text-[13px] text-[#6B6F68]">{e.date}</td>
+                    <td className="of-num px-3 py-3.5 text-[13px] text-[#A0A49C]">{e.time}</td>
+                    <td className="px-3 py-3.5 font-semibold text-[#171A17]">{e.item}</td>
+                    <td className="px-3 py-3.5"><CategoryBadge cat={e.category} /></td>
+                    <td className="of-num px-3 py-3.5 text-right text-[#2C333B]">{e.qty} {e.unit}</td>
+                    <td className="of-num px-3 py-3.5 text-right font-semibold" style={{ color: '#A32D2D' }}>{zar(e.cost)}</td>
+                    <td className="px-3 py-3.5"><Badge label={e.reason} tone={e.preventable ? 'warning' : 'neutral'} /></td>
+                    <td className="px-3 py-3.5 text-[#2C333B]">{e.recipe ?? '—'}</td>
+                    <td className="px-3 py-3.5 text-[#2C333B]">{e.employee}</td>
+                    <td className="px-3 py-3.5 text-[#2C333B]">{e.device}</td>
+                    <td className="px-3 py-3.5 text-[#A0A49C]">{e.location}</td>
                   </tr>
                 ))
               )}
@@ -140,22 +140,22 @@ function WasteDetail({ e }: { e: WasteEvent }) {
       <Section title="Photos">
         <div className="flex gap-2">
           {[0, 1].map((i) => (
-            <div key={i} className="flex h-20 w-20 items-center justify-center rounded-xl border border-dashed border-[#E7E7E2] bg-[#FAFAF8] text-[11px] text-[#9A9DA1]">No photo</div>
+            <div key={i} className="flex h-20 w-20 items-center justify-center rounded-[14px] border border-dashed border-[#D8DFE8] bg-[#F5F9FE] text-[11px] text-[#A0A49C]">No photo</div>
           ))}
         </div>
       </Section>
 
       <Section title="Linked ingredient — ProcurePulse">
-        <div className="rounded-xl border border-[#F0F0EC] bg-[#FCFCFB] px-3.5 py-3 text-[13px]">
+        <div className="rounded-[14px] border border-[#EEF1F5] bg-white px-4 py-3.5 text-[14px]">
           {e.ingredient ? (
-            <div className="space-y-1">
-              <div className="flex justify-between"><span className="text-[#9A9DA1]">Ingredient</span><span className="text-[#1A1C1E]">{e.ingredient}</span></div>
-              {e.supplier ? <div className="flex justify-between"><span className="text-[#9A9DA1]">Supplier</span><span className="text-[#1A1C1E]">{e.supplier}</span></div> : null}
-              {e.batch ? <div className="flex justify-between"><span className="text-[#9A9DA1]">Batch</span><span className="text-[#1A1C1E]">{e.batch}</span></div> : null}
-              {e.expectedQty != null ? <div className="flex justify-between"><span className="text-[#9A9DA1]">Expected qty</span><span className="text-[#1A1C1E]">{e.expectedQty} {e.unit}</span></div> : null}
+            <div className="space-y-1.5">
+              <div className="flex justify-between"><span className="text-[#8A8E86]">Ingredient</span><span className="font-medium text-[#171A17]">{e.ingredient}</span></div>
+              {e.supplier ? <div className="flex justify-between"><span className="text-[#8A8E86]">Supplier</span><span className="font-medium text-[#171A17]">{e.supplier}</span></div> : null}
+              {e.batch ? <div className="flex justify-between"><span className="text-[#8A8E86]">Batch</span><span className="of-num font-medium text-[#171A17]">{e.batch}</span></div> : null}
+              {e.expectedQty != null ? <div className="flex justify-between"><span className="text-[#8A8E86]">Expected qty</span><span className="of-num font-medium text-[#171A17]">{e.expectedQty} {e.unit}</span></div> : null}
             </div>
           ) : (
-            <p className="text-[#9A9DA1]">Will link to the ProcurePulse ingredient, supplier and purchase batch once connected.</p>
+            <p className="text-[13px] text-[#8A8E86]">Will link to the ProcurePulse ingredient, supplier and purchase batch once connected.</p>
           )}
         </div>
       </Section>
@@ -163,12 +163,12 @@ function WasteDetail({ e }: { e: WasteEvent }) {
       <Section title="AI suggestions">
         <div className="flex flex-col gap-2">
           {suggestions.map((s, i) => (
-            <div key={i} className="flex items-start gap-2.5 text-[13px]"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1F5FA8]" /><span className="text-[#5F6368]">{s}</span></div>
+            <div key={i} className="flex items-start gap-2.5 text-[14px]"><span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1F5FA8]" /><span className="text-[#6B6F68]">{s}</span></div>
           ))}
         </div>
       </Section>
 
-      {e.notes ? <Section title="Notes"><p className="text-[13px] text-[#5F6368]">{e.notes}</p></Section> : null}
+      {e.notes ? <Section title="Notes"><p className="text-[14px] text-[#6B6F68]">{e.notes}</p></Section> : null}
     </div>
   );
 }
@@ -176,15 +176,15 @@ function WasteDetail({ e }: { e: WasteEvent }) {
 function Field({ label, value, color }: { label: string; value: string; color?: string }) {
   return (
     <div>
-      <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">{label}</div>
-      <div className="mt-1 text-[14px] font-medium" style={{ color: color ?? '#1A1C1E' }}>{value}</div>
+      <div className="text-[11px] font-medium uppercase tracking-[0.06em] text-[#A0A49C]">{label}</div>
+      <div className="of-num mt-1 text-[14px] font-semibold" style={{ color: color ?? '#171A17' }}>{value}</div>
     </div>
   );
 }
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h3 className="mb-2 text-[13px] font-semibold text-[#1A1C1E]">{title}</h3>
+      <h3 className="of-display mb-2.5 text-[14px] font-semibold text-[#171A17]">{title}</h3>
       {children}
     </div>
   );

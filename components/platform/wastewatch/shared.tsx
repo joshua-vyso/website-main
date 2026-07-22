@@ -10,7 +10,7 @@ import { createClient } from '@/lib/platform/supabase-browser';
 import { DEVICE_STATUS_STYLE, WASTE_REASONS, type DeviceStatus, type WasteCategory } from '@/lib/platform/wastewatch';
 import { useWasteWatch } from './categories';
 
-const MODAL_RADIUS = { fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties;
+const MODAL_RADIUS = { fontFamily: 'var(--font-instrument)', ['--radius' as string]: '0.625rem' } as React.CSSProperties;
 
 const UNITS = ['kg', 'units', 'crates', 'L'];
 /** Reasons that stem from a controllable process (vs. natural spoilage). */
@@ -29,7 +29,7 @@ export function DeviceStatusBadge({ status }: { status: DeviceStatus }) {
 export function CategoryBadge({ cat }: { cat: WasteCategory }) {
   const { colorOf } = useWasteWatch();
   return (
-    <span className="inline-flex items-center gap-1.5 text-[13px] text-[#5F6368]">
+    <span className="inline-flex items-center gap-1.5 text-[14px] text-[#2C333B]">
       <span className="h-2 w-2 rounded-full" style={{ backgroundColor: colorOf(cat) }} />
       {cat}
     </span>
@@ -37,10 +37,10 @@ export function CategoryBadge({ cat }: { cat: WasteCategory }) {
 }
 
 export function BatteryPill({ level }: { level: number | null }) {
-  if (level == null) return <span className="text-[12px] text-[#9A9DA1]">—</span>;
+  if (level == null) return <span className="of-num text-[12px] text-[#A0A49C]">—</span>;
   const color = level <= 20 ? '#A32D2D' : level <= 50 ? '#854F0B' : '#0F6E56';
   return (
-    <span className="inline-flex items-center gap-1.5 text-[12px] tabular-nums" style={{ color }}>
+    <span className="of-num inline-flex items-center gap-1.5 text-[12px] font-medium" style={{ color }}>
       <span className="relative inline-block h-3 w-6 rounded-sm border" style={{ borderColor: color }}>
         <span className="absolute inset-y-0.5 left-0.5 rounded-[1px]" style={{ width: `${Math.max(8, level * 0.18)}px`, backgroundColor: color }} />
       </span>
@@ -50,14 +50,14 @@ export function BatteryPill({ level }: { level: number | null }) {
 }
 
 export function TrendArrow({ dir }: { dir: 'up' | 'down' | 'flat' }) {
-  const map = { up: { g: '▲', c: '#A32D2D' }, down: { g: '▼', c: '#0F6E56' }, flat: { g: '→', c: '#9A9DA1' } };
+  const map = { up: { g: '▲', c: '#A32D2D' }, down: { g: '▼', c: '#0F6E56' }, flat: { g: '→', c: '#8A8E86' } };
   return <span style={{ color: map[dir].c }}>{map[dir].g}</span>;
 }
 
 export function MobileWidgets({ onAction }: { onAction?: () => void }) {
   return (
     <div>
-      <h2 className="mb-2 text-[13px] font-semibold text-[#9A9DA1]">Mobile snapshot — widgets the companion app will surface</h2>
+      <h2 className="mb-2.5 text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">Mobile snapshot — widgets the companion app will surface</h2>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {widgetsFor('wastewatch').map((w) => (
           <ModuleWidgetCard key={w.id} widget={w} onAction={onAction} />
@@ -120,7 +120,7 @@ export function LogWasteModal({ open, onClose, onSaved }: { open: boolean; onClo
 
   if (!mounted || !open) return null;
 
-  const input = 'h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none';
+  const input = 'h-11 w-full rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]';
   const title = step === 'manual' ? 'Enter waste manually' : step === 'choose' ? 'Log waste' : 'Connect to a device';
   const subtitle = step === 'choose' ? 'How would you like to record this?' : step === 'manual' ? 'Type the details yourself' : 'Start a measuring session';
 
@@ -163,14 +163,14 @@ export function LogWasteModal({ open, onClose, onSaved }: { open: boolean; onClo
 
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={MODAL_RADIUS}>
-      <div className="absolute inset-0 bg-[#1A1C1E]/25 backdrop-blur-[1px]" onClick={onClose} />
-      <div role="dialog" aria-modal="true" className="relative w-full max-w-[440px] rounded-2xl border border-[#E7E7E2] bg-white p-5 shadow-[0_24px_70px_-20px_rgba(26,28,30,0.45)]">
+      <div className="absolute inset-0 bg-[#171A17]/25 backdrop-blur-[1px]" onClick={onClose} />
+      <div role="dialog" aria-modal="true" className="relative w-full max-w-[440px] rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_24px_70px_-20px_rgba(26,28,30,0.45)]">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-[16px] font-semibold text-[#1A1C1E]">{title}</h2>
-            <p className="mt-0.5 text-[13px] text-[#5F6368]">{subtitle}</p>
+            <h2 className="of-display text-[18px] font-semibold tracking-[-0.015em] text-[#171A17]">{title}</h2>
+            <p className="mt-1 text-[13px] text-[#6B6F68]">{subtitle}</p>
           </div>
-          <button type="button" onClick={onClose} aria-label="Close" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[18px] text-[#9A9DA1] transition-colors hover:bg-[#F0F0EC] hover:text-[#1A1C1E]">✕</button>
+          <button type="button" onClick={onClose} aria-label="Close" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[18px] text-[#8A8E86] transition-colors hover:bg-[#EEF1F5] hover:text-[#171A17]">✕</button>
         </div>
 
         {step === 'choose' ? (
@@ -194,14 +194,14 @@ export function LogWasteModal({ open, onClose, onSaved }: { open: boolean; onClo
           <>
             <div className="mt-4 space-y-4">
               <div>
-                <label className="mb-1 block text-[13px] font-medium text-[#1A1C1E]">Your name</label>
+                <label className="mb-1.5 block text-[13px] font-medium text-[#171A17]">Your name</label>
                 <input autoFocus value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && name.trim()) setStep('device-done'); }} placeholder="e.g. Thandi Mokoena" className={input} />
               </div>
-              <p className="rounded-lg bg-[#F5F9FE] px-3 py-2 text-[12px] text-[#5F6368]">Once a scale is linked to your account, your waste is weighed and logged automatically — no typing. We’ll wire up the hardware connection here soon.</p>
+              <p className="rounded-[12px] border border-[#EAF2FC] bg-[#F5F9FE] px-3.5 py-2.5 text-[12px] leading-relaxed text-[#6B6F68]">Once a scale is linked to your account, your waste is weighed and logged automatically — no typing. We’ll wire up the hardware connection here soon.</p>
             </div>
             <div className="mt-5 flex justify-between gap-2">
-              <button type="button" onClick={() => setStep('choose')} className="rounded-lg px-3.5 py-2 text-[13px] text-[#5F6368] hover:bg-black/[0.03]">Back</button>
-              <button type="button" disabled={!name.trim()} onClick={() => setStep('device-done')} className="rounded-lg bg-[#1F5FA8] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:cursor-not-allowed disabled:opacity-40">Continue</button>
+              <button type="button" onClick={() => setStep('choose')} className="inline-flex h-[42px] items-center rounded-[11px] px-[18px] text-[14px] font-medium text-[#6B6F68] transition-colors hover:bg-[#F2F4F7] hover:text-[#171A17]">Back</button>
+              <button type="button" disabled={!name.trim()} onClick={() => setStep('device-done')} className="inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:cursor-not-allowed disabled:opacity-40">Continue</button>
             </div>
           </>
         ) : null}
@@ -213,13 +213,13 @@ export function LogWasteModal({ open, onClose, onSaved }: { open: boolean; onClo
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6 9 17l-5-5" /></svg>
               </span>
               <div>
-                <div className="text-[15px] font-semibold text-[#1A1C1E]">You’re set{name.trim() ? `, ${name.trim().split(/\s+/)[0]}` : ''}</div>
-                <p className="mx-auto mt-1 max-w-[320px] text-[13px] text-[#5F6368]">Connect your scale to start capturing waste automatically. For now you can log it manually.</p>
+                <div className="of-display text-[16px] font-semibold text-[#171A17]">You’re set{name.trim() ? `, ${name.trim().split(/\s+/)[0]}` : ''}</div>
+                <p className="mx-auto mt-1.5 max-w-[320px] text-[13px] text-[#6B6F68]">Connect your scale to start capturing waste automatically. For now you can log it manually.</p>
               </div>
             </div>
             <div className="mt-2 flex justify-between gap-2">
-              <button type="button" onClick={() => setStep('manual')} className="rounded-lg px-3.5 py-2 text-[13px] font-medium text-[#1F5FA8] hover:bg-black/[0.03]">Log manually instead</button>
-              <button type="button" onClick={onClose} className="rounded-lg bg-[#1F5FA8] px-4 py-2 text-[13px] font-medium text-white hover:bg-[#174C87]">Done</button>
+              <button type="button" onClick={() => setStep('manual')} className="inline-flex h-[42px] items-center rounded-[11px] px-[18px] text-[14px] font-medium text-[#1F5FA8] transition-colors hover:bg-[#EAF2FC] hover:text-[#174C87]">Log manually instead</button>
+              <button type="button" onClick={onClose} className="inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87]">Done</button>
             </div>
           </>
         ) : null}
@@ -238,12 +238,12 @@ export function LogWasteModal({ open, onClose, onSaved }: { open: boolean; onClo
                 <select value={reason} onChange={(e) => setReason(e.target.value)} className={input}>{WASTE_REASONS.map((r) => <option key={r} value={r}>{r}</option>)}</select>
               </div>
               <input value={recipe} onChange={(e) => setRecipe(e.target.value)} className={input} placeholder="Recipe (optional)" />
-              <textarea value={notes} onChange={(e) => setNotes(e.target.value)} className={`${input} h-20 py-2`} placeholder="Notes (optional)" />
+              <textarea value={notes} onChange={(e) => setNotes(e.target.value)} className={`${input} h-20 py-2.5`} placeholder="Notes (optional)" />
               {error ? <p className="text-[12px] text-[#A32D2D]">{error}</p> : null}
             </div>
             <div className="mt-5 flex justify-between gap-2">
-              <button type="button" onClick={() => setStep('choose')} className="rounded-lg px-3.5 py-2 text-[13px] text-[#5F6368] hover:bg-black/[0.03]">Back</button>
-              <button type="button" disabled={!canSave} onClick={submitManual} className="rounded-lg bg-[#1F5FA8] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:cursor-not-allowed disabled:opacity-40">{saving ? 'Logging…' : 'Log waste'}</button>
+              <button type="button" onClick={() => setStep('choose')} className="inline-flex h-[42px] items-center rounded-[11px] px-[18px] text-[14px] font-medium text-[#6B6F68] transition-colors hover:bg-[#F2F4F7] hover:text-[#171A17]">Back</button>
+              <button type="button" disabled={!canSave} onClick={submitManual} className="inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:cursor-not-allowed disabled:opacity-40">{saving ? 'Logging…' : 'Log waste'}</button>
             </div>
           </>
         ) : null}
@@ -255,11 +255,11 @@ export function LogWasteModal({ open, onClose, onSaved }: { open: boolean; onClo
 
 function ChoiceTile({ icon, title, desc, onClick }: { icon: React.ReactNode; title: string; desc: string; onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} className="flex w-full items-center gap-3.5 rounded-xl border border-[#E7E7E2] bg-white p-4 text-left transition-all hover:-translate-y-0.5 hover:border-[#3E7BC4]/40 hover:shadow-sm">
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#EAF2FC] text-[#1F5FA8]">{icon}</span>
+    <button type="button" onClick={onClick} className="flex w-full items-center gap-3.5 rounded-[14px] border border-[#EEF1F5] bg-white p-4 text-left transition-all hover:-translate-y-0.5 hover:border-[#C9DEF7] hover:bg-[#FBFCFE] hover:shadow-[0_6px_18px_-10px_rgba(20,24,20,0.28)]">
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] bg-[#EAF2FC] text-[#1F5FA8]">{icon}</span>
       <span className="min-w-0 flex-1">
-        <span className="block text-[14px] font-semibold text-[#1A1C1E]">{title}</span>
-        <span className="block text-[12px] text-[#5F6368]">{desc}</span>
+        <span className="block text-[14px] font-semibold text-[#171A17]">{title}</span>
+        <span className="mt-0.5 block text-[12px] text-[#8A8E86]">{desc}</span>
       </span>
       <span className="shrink-0 text-[#C4C7CA]">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 18 6-6-6-6" /></svg>

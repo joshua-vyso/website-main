@@ -153,15 +153,15 @@ export function CustomerSelect({
         onClick={() => setOpen((o) => !o)}
         className={`${inputClass} flex items-center justify-between gap-2 text-left`}
       >
-        <span className={`truncate ${selected || allLabel ? 'text-[#1A1C1E]' : 'text-[#9A9DA1]'}`}>
+        <span className={`truncate ${selected || allLabel ? 'text-[#171A17]' : 'text-[#8A8E86]'}`}>
           {selected ? selected.name : allLabel ?? 'Select customer…'}
         </span>
-        <span className="shrink-0 text-[10px] text-[#9A9DA1]">▾</span>
+        <span className="shrink-0 text-[10px] text-[#8A8E86]">▾</span>
       </button>
 
       {open ? (
-        <div className="absolute left-0 right-0 top-full z-30 mt-1 overflow-hidden rounded-xl border border-[#E7E7E2] bg-white shadow-[0_12px_40px_-12px_rgba(26,28,30,0.25)]">
-          <div className="border-b border-[#F0F0EC] p-2">
+        <div className="absolute left-0 right-0 top-full z-30 mt-1 overflow-hidden rounded-xl border border-[#EAEDF2] bg-white shadow-[0_12px_40px_-12px_rgba(26,28,30,0.25)]">
+          <div className="border-b border-[#EEF1F5] p-2">
             <input
               ref={searchRef}
               value={query}
@@ -175,7 +175,7 @@ export function CustomerSelect({
                 }
               }}
               placeholder="Search customers…"
-              className="h-8 w-full rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] focus:border-[#3E7BC4]/50 focus:outline-none"
+              className="h-8 w-full rounded-lg border border-[#E2E6EC] bg-white px-2.5 text-[13px] focus:border-[#3E7BC4]/50 focus:outline-none"
             />
           </div>
           <div className="max-h-60 overflow-y-auto py-1">
@@ -183,15 +183,15 @@ export function CustomerSelect({
               <button
                 type="button"
                 onClick={() => pick(null)}
-                className={`block w-full px-3 py-2 text-left transition-colors hover:bg-[#FAFAF8] ${value === null ? 'bg-[#F2F7F5]' : ''}`}
+                className={`block w-full px-3 py-2 text-left transition-colors hover:bg-[#F5F9FE] ${value === null ? 'bg-[#F2F7F5]' : ''}`}
               >
-                <span className="block truncate text-[13px] text-[#1A1C1E]">{allLabel}</span>
+                <span className="block truncate text-[13px] text-[#171A17]">{allLabel}</span>
               </button>
             ) : value ? (
               <button
                 type="button"
                 onClick={() => pick(null)}
-                className="block w-full px-3 py-1.5 text-left text-[12px] text-[#9A9DA1] transition-colors hover:bg-[#FAFAF8]"
+                className="block w-full px-3 py-1.5 text-left text-[12px] text-[#8A8E86] transition-colors hover:bg-[#F5F9FE]"
               >
                 Clear selection
               </button>
@@ -201,16 +201,16 @@ export function CustomerSelect({
                 key={o.id}
                 type="button"
                 onClick={() => pick(o.id)}
-                className={`block w-full px-3 py-2 text-left transition-colors hover:bg-[#FAFAF8] ${
+                className={`block w-full px-3 py-2 text-left transition-colors hover:bg-[#F5F9FE] ${
                   o.id === value ? 'bg-[#F2F7F5]' : ''
                 }`}
               >
-                <span className="block truncate text-[13px] text-[#1A1C1E]">{o.name}</span>
-                {o.sub ? <span className="block truncate text-[11px] text-[#9A9DA1]">{o.sub}</span> : null}
+                <span className="block truncate text-[13px] text-[#171A17]">{o.name}</span>
+                {o.sub ? <span className="block truncate text-[11px] text-[#8A8E86]">{o.sub}</span> : null}
               </button>
             ))}
             {filtered.length === 0 && !(allowCreate && q) ? (
-              <p className="px-3 py-3 text-[12px] text-[#9A9DA1]">
+              <p className="px-3 py-3 text-[12px] text-[#8A8E86]">
                 {options.length === 0
                   ? allowCreate
                     ? 'No customers yet — type a name to add one.'
@@ -229,7 +229,7 @@ export function CustomerSelect({
               </button>
             ) : null}
           </div>
-          {error ? <p className="border-t border-[#F0F0EC] px-3 py-2 text-[12px] text-[#A32D2D]">{error}</p> : null}
+          {error ? <p className="border-t border-[#EEF1F5] px-3 py-2 text-[12px] text-[#A32D2D]">{error}</p> : null}
         </div>
       ) : null}
     </div>
@@ -249,7 +249,7 @@ const SOURCE_HINT: Record<PriceSource, string> = {
 };
 
 const numCell =
-  'h-8 w-full rounded-md border border-[#E7E7E2] px-1.5 text-right text-[13px] tabular-nums text-[#1A1C1E] focus:border-[#3E7BC4]/50 focus:outline-none';
+  'h-8 w-full rounded-md border border-[#EAEDF2] px-1.5 text-right text-[13px] tabular-nums text-[#171A17] focus:border-[#3E7BC4]/50 focus:outline-none';
 
 export function LineItemsEditor({
   products,
@@ -374,7 +374,7 @@ export function LineItemsEditor({
             className={inputClass}
           />
           {open ? (
-            <div className="absolute left-0 right-0 top-full z-30 mt-1 overflow-hidden rounded-xl border border-[#E7E7E2] bg-white py-1 shadow-[0_12px_40px_-12px_rgba(26,28,30,0.25)]">
+            <div className="absolute left-0 right-0 top-full z-30 mt-1 overflow-hidden rounded-xl border border-[#EAEDF2] bg-white py-1 shadow-[0_12px_40px_-12px_rgba(26,28,30,0.25)]">
               {matches.map((p) => {
                 const r = resolvedById.get(p.id);
                 return (
@@ -382,20 +382,20 @@ export function LineItemsEditor({
                     key={p.id}
                     type="button"
                     onClick={() => addProduct(p)}
-                    className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left transition-colors hover:bg-[#FAFAF8]"
+                    className="flex w-full items-center justify-between gap-3 px-3 py-2 text-left transition-colors hover:bg-[#F5F9FE]"
                   >
                     <span className="min-w-0">
-                      <span className="block truncate text-[13px] text-[#1A1C1E]">{p.name}</span>
-                      <span className="block truncate text-[11px] text-[#9A9DA1]">
+                      <span className="block truncate text-[13px] text-[#171A17]">{p.name}</span>
+                      <span className="block truncate text-[11px] text-[#8A8E86]">
                         {[p.category, p.unit].filter(Boolean).join(' · ')}
                       </span>
                     </span>
-                    <span className="shrink-0 text-[12px] tabular-nums text-[#5F6368]">{zar2(r?.price ?? 0)}</span>
+                    <span className="shrink-0 text-[12px] tabular-nums text-[#6B6F68]">{zar2(r?.price ?? 0)}</span>
                   </button>
                 );
               })}
               {matches.length === 0 ? (
-                <p className="px-3 py-3 text-[12px] text-[#9A9DA1]">
+                <p className="px-3 py-3 text-[12px] text-[#8A8E86]">
                   {products.length === 0
                     ? 'No products yet — add them in Doc-U → Databases → Products, or use a custom line.'
                     : 'No products match.'}
@@ -407,23 +407,23 @@ export function LineItemsEditor({
         <button
           type="button"
           onClick={addCustom}
-          className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-dashed border-[#D7DAD8] bg-white px-3 text-[13px] text-[#5F6368] transition-colors hover:border-[#3E7BC4]/50 hover:text-[#1A1C1E]"
+          className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-dashed border-[#E2E6EC] bg-white px-3 text-[13px] text-[#6B6F68] transition-colors hover:border-[#3E7BC4]/50 hover:text-[#171A17]"
         >
           + Custom line
         </button>
       </div>
 
       {priceList ? (
-        <p className="text-[12px] text-[#9A9DA1]">
-          Pricing from <span className="font-medium text-[#5F6368]">{priceList.name}</span>
+        <p className="text-[12px] text-[#8A8E86]">
+          Pricing from <span className="font-medium text-[#6B6F68]">{priceList.name}</span>
         </p>
       ) : null}
 
       {lines.length > 0 ? (
-        <div className="overflow-x-auto rounded-xl border border-[#E7E7E2]">
+        <div className="overflow-x-auto rounded-xl border border-[#EAEDF2]">
           <table className="w-full min-w-[560px] text-[13px]">
             <thead>
-              <tr className="border-b border-[#F0F0EC] bg-[#FBFBF9] text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+              <tr className="border-b border-[#EEF1F5] bg-[#FBFCFE] text-[11px] uppercase tracking-wide text-[#8A8E86]">
                 <th className="px-3 py-2 text-left font-medium">Item</th>
                 <th className="w-[72px] px-2 py-2 text-right font-medium">Qty</th>
                 <th className="w-[84px] px-2 py-2 text-left font-medium">Unit</th>
@@ -452,7 +452,7 @@ export function LineItemsEditor({
           </table>
         </div>
       ) : (
-        <p className="rounded-xl border border-dashed border-[#E7E7E2] bg-[#FBFBF9] px-4 py-6 text-center text-[13px] text-[#9A9DA1]">
+        <p className="rounded-xl border border-dashed border-[#EAEDF2] bg-[#FBFCFE] px-4 py-6 text-center text-[13px] text-[#8A8E86]">
           Search a product above or add a custom line.
         </p>
       )}
@@ -480,19 +480,19 @@ function FragmentRow({
   const reasonMissing = overridden && !(l.override_note ?? '').trim();
   return (
     <>
-      <tr className={`border-b ${overridden ? 'border-transparent' : 'border-[#F6F6F2]'} last:border-0`}>
+      <tr className={`border-b ${overridden ? 'border-transparent' : 'border-[#F5F9FE]'} last:border-0`}>
         <td className="px-3 py-2">
           {custom ? (
             <input
               value={l.name}
               onChange={(e) => onUpdate({ name: e.target.value })}
               placeholder="Description"
-              className="h-8 w-full rounded-md border border-transparent bg-transparent px-1 text-[13px] text-[#1A1C1E] focus:border-[#E7E7E2] focus:outline-none"
+              className="h-8 w-full rounded-md border border-transparent bg-transparent px-1 text-[13px] text-[#171A17] focus:border-[#EAEDF2] focus:outline-none"
             />
           ) : (
             <div className="min-w-0">
-              <span className="block truncate text-[#1A1C1E]">{l.name}</span>
-              {hint ? <span className="block text-[11px] text-[#9A9DA1]">{hint}</span> : null}
+              <span className="block truncate text-[#171A17]">{l.name}</span>
+              {hint ? <span className="block text-[11px] text-[#8A8E86]">{hint}</span> : null}
             </div>
           )}
         </td>
@@ -510,10 +510,10 @@ function FragmentRow({
               value={l.unit ?? ''}
               onChange={(e) => onUpdate({ unit: e.target.value || null })}
               placeholder="unit"
-              className="h-8 w-full rounded-md border border-[#E7E7E2] px-1.5 text-[13px] text-[#1A1C1E] focus:border-[#3E7BC4]/50 focus:outline-none"
+              className="h-8 w-full rounded-md border border-[#EAEDF2] px-1.5 text-[13px] text-[#171A17] focus:border-[#3E7BC4]/50 focus:outline-none"
             />
           ) : (
-            <span className="text-[#5F6368]">{l.unit ?? '—'}</span>
+            <span className="text-[#6B6F68]">{l.unit ?? '—'}</span>
           )}
         </td>
         <td className="px-2 py-2">
@@ -524,7 +524,7 @@ function FragmentRow({
             className={`${numCell} ${overridden ? 'border-[#D9A441] bg-[#FFFDF5]' : ''}`}
           />
         </td>
-        <td className="px-3 py-2 text-right tabular-nums text-[#1A1C1E]">
+        <td className="px-3 py-2 text-right tabular-nums text-[#171A17]">
           {zar2((Number(l.qty) || 0) * (Number(l.unit_price) || 0))}
         </td>
         <td className="px-2 py-2 text-right">
@@ -532,14 +532,14 @@ function FragmentRow({
             type="button"
             onClick={onRemove}
             aria-label="Remove line"
-            className="text-[#9A9DA1] transition-colors hover:text-[#A32D2D]"
+            className="text-[#8A8E86] transition-colors hover:text-[#A32D2D]"
           >
             ✕
           </button>
         </td>
       </tr>
       {overridden ? (
-        <tr className="border-b border-[#F6F6F2] bg-[#FFFDF5] last:border-0">
+        <tr className="border-b border-[#F5F9FE] bg-[#FFFDF5] last:border-0">
           <td colSpan={6} className="px-3 pb-2.5 pt-0.5">
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-[11px] font-medium text-[#854F0B]">
@@ -549,8 +549,8 @@ function FragmentRow({
                 value={l.override_note ?? ''}
                 onChange={(e) => onUpdate({ override_note: e.target.value ? e.target.value : null })}
                 placeholder="Why is this price different?"
-                className={`h-7 min-w-[220px] flex-1 rounded-md border px-2 text-[12px] text-[#1A1C1E] focus:outline-none ${
-                  reasonMissing ? 'border-[#D9A441] bg-white' : 'border-[#E7E7E2] bg-white focus:border-[#3E7BC4]/50'
+                className={`h-7 min-w-[220px] flex-1 rounded-md border px-2 text-[12px] text-[#171A17] focus:outline-none ${
+                  reasonMissing ? 'border-[#D9A441] bg-white' : 'border-[#EAEDF2] bg-white focus:border-[#3E7BC4]/50'
                 }`}
               />
             </div>

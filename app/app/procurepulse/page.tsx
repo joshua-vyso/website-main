@@ -68,14 +68,14 @@ export default async function ProcurePulseDashboard() {
         <div className="flex h-[76px] w-[76px] items-center justify-center rounded-[20px] bg-[#EAF2FC]">
           <span className="h-[30px] w-[30px] rounded-[7px] bg-[#1F5FA8]" />
         </div>
-        <h1 className="mt-4 text-[24px] font-bold text-[#1A1C1E]">Connect ProcurePulse to Doc-U</h1>
-        <p className="mt-2 max-w-md text-[14px] text-[#5F6368]">
+        <h1 className="of-display mt-4 text-[24px] font-semibold tracking-[-0.015em] text-[#171A17]">Connect ProcurePulse to Doc-U</h1>
+        <p className="mt-2 max-w-md text-[14px] text-[#6B6F68]">
           Your live stock builds automatically from the documents you scan in Doc-U — direct
           supplier invoices and Joburg Fresh Produce Market statements.
         </p>
         <Link
           href="/app/docu"
-          className="mt-5 inline-flex items-center rounded-lg bg-[#1F5FA8] px-5 py-3 text-[15px] font-medium text-white"
+          className="mt-5 inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87]"
         >
           Use my Doc-U documents
         </Link>
@@ -104,7 +104,7 @@ export default async function ProcurePulseDashboard() {
   );
 
   const recentNotifs = notifs.slice(0, 5);
-  const NOTIF_FALLBACK = { bg: '#F0F0EC', fg: '#5F6368', label: 'Update' };
+  const NOTIF_FALLBACK = { bg: '#EEF1F5', fg: '#6B6F68', label: 'Update' };
 
   // Stock activity — recent stock MOVEMENTS (the actual stock changes). Document
   // extraction events live in Notifications, not here. Wastage is never shown.
@@ -136,8 +136,8 @@ export default async function ProcurePulseDashboard() {
         <KpiCard label="Count variance" value="—" />
       </div>
 
-      <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
-        <div className="text-[14px] font-medium text-[#1A1C1E]">Stock by category</div>
+      <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+        <div className="of-display text-[16px] font-semibold text-[#171A17]">Stock by category</div>
         <div className="mt-4 flex flex-col items-center gap-6 sm:flex-row">
           <DonutChart
             segments={categories}
@@ -149,9 +149,9 @@ export default async function ProcurePulseDashboard() {
               <div key={c.label} className="flex items-center justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-2">
                   <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: c.color }} />
-                  <span className="truncate text-[13px] text-[#1A1C1E]">{c.label}</span>
+                  <span className="truncate text-[13px] text-[#171A17]">{c.label}</span>
                 </div>
-                <span className="shrink-0 text-[13px] text-[#5F6368]">
+                <span className="of-num shrink-0 text-[13px] text-[#6B6F68]">
                   {c.value} · {Math.round((c.value / items.length) * 100)}%
                 </span>
               </div>
@@ -161,26 +161,26 @@ export default async function ProcurePulseDashboard() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1.6fr_1fr]">
-        <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
+        <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
           <div className="flex items-center justify-between">
-            <div className="text-[14px] font-medium text-[#1A1C1E]">Stock value over time</div>
-            <div className="text-[13px] font-medium text-[#0F6E56]">▲ 6.2%</div>
+            <div className="of-display text-[16px] font-semibold text-[#171A17]">Stock value over time</div>
+            <div className="of-num text-[13px] font-semibold text-[#0F6E56]">▲ 6.2%</div>
           </div>
           <div className="mt-3">
             <AreaChart data={series} />
           </div>
         </div>
 
-        <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
-          <div className="text-[14px] font-medium text-[#1A1C1E]">Needs attention</div>
+        <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <div className="of-display text-[16px] font-semibold text-[#171A17]">Needs attention</div>
           <div className="mt-3 space-y-3">
             {alerts.length === 0 ? (
-              <p className="text-[13px] text-[#9A9DA1]">Everything is well stocked.</p>
+              <p className="text-[13px] text-[#8A8E86]">Everything is well stocked.</p>
             ) : (
               alerts.map((a) => (
                 <div key={a.item.id} className="flex items-center justify-between gap-3">
                   <div className="min-w-0">
-                    <div className="text-[13px] font-medium text-[#1A1C1E]">{a.item.name}</div>
+                    <div className="text-[13px] font-medium text-[#171A17]">{a.item.name}</div>
                     <div className="text-[12px]" style={{ color: a.status === 'out' ? '#A32D2D' : '#854F0B' }}>
                       {a.status === 'out'
                         ? `Out of stock · order ${a.suggested} ${a.item.unit}`
@@ -189,7 +189,7 @@ export default async function ProcurePulseDashboard() {
                   </div>
                   <Link
                     href="/app/procurepulse/reorder"
-                    className="shrink-0 rounded-lg bg-[#1F5FA8] px-3.5 py-2 text-[13px] font-medium text-white"
+                    className="inline-flex h-[38px] shrink-0 items-center rounded-[11px] bg-[#1F5FA8] px-4 text-[13px] font-semibold text-white transition-colors hover:bg-[#174C87]"
                   >
                     Order
                   </Link>
@@ -201,11 +201,11 @@ export default async function ProcurePulseDashboard() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
-          <div className="text-[14px] font-medium text-[#1A1C1E]">Stock activity</div>
+        <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <div className="of-display text-[16px] font-semibold text-[#171A17]">Stock activity</div>
           <div className="mt-3 space-y-3.5">
             {activityFeed.length === 0 ? (
-              <p className="text-[13px] text-[#9A9DA1]">No stock activity yet.</p>
+              <p className="text-[13px] text-[#8A8E86]">No stock activity yet.</p>
             ) : (
               activityFeed.map((e) => (
                 <div key={e.id} className="flex items-center gap-3">
@@ -219,14 +219,14 @@ export default async function ProcurePulseDashboard() {
                     />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="truncate text-[13px] font-medium text-[#1A1C1E]">{e.name}</div>
-                    <div className="text-[12px] text-[#9A9DA1]">
+                    <div className="truncate text-[13px] font-medium text-[#171A17]">{e.name}</div>
+                    <div className="text-[12px] text-[#8A8E86]">
                       {e.label}
                       {e.when ? ` · ${e.when}` : ''}
                     </div>
                   </div>
                   <div
-                    className="shrink-0 text-[13px] font-medium"
+                    className="of-num shrink-0 text-[13px] font-semibold"
                     style={{ color: e.change >= 0 ? '#0F6E56' : '#A32D2D' }}
                   >
                     {e.change >= 0 ? '+' : ''}
@@ -238,19 +238,19 @@ export default async function ProcurePulseDashboard() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
+        <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
           <div className="flex items-center justify-between">
-            <div className="text-[14px] font-medium text-[#1A1C1E]">Notifications</div>
+            <div className="of-display text-[16px] font-semibold text-[#171A17]">Notifications</div>
             <Link
               href="/app/procurepulse/notifications"
-              className="text-[12px] font-medium text-[#1F5FA8] hover:underline"
+              className="text-[13px] font-semibold text-[#1F5FA8] hover:underline"
             >
               Show all
             </Link>
           </div>
           <div className="mt-3 space-y-3">
             {recentNotifs.length === 0 ? (
-              <p className="text-[13px] text-[#9A9DA1]">No notifications yet.</p>
+              <p className="text-[13px] text-[#8A8E86]">No notifications yet.</p>
             ) : (
               recentNotifs.map((n) => {
                 const k = NOTIFICATION_KINDS[n.kind] ?? NOTIF_FALLBACK;
@@ -260,8 +260,8 @@ export default async function ProcurePulseDashboard() {
                       <span className="h-3 w-3 rounded-[3px]" style={{ backgroundColor: k.fg }} />
                     </div>
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-[13px] font-medium text-[#1A1C1E]">{n.title}</div>
-                      {n.body ? <div className="truncate text-[12px] text-[#9A9DA1]">{n.body}</div> : null}
+                      <div className="truncate text-[13px] font-medium text-[#171A17]">{n.title}</div>
+                      {n.body ? <div className="truncate text-[12px] text-[#8A8E86]">{n.body}</div> : null}
                     </div>
                   </div>
                 );

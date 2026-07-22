@@ -27,7 +27,7 @@ export function ModuleLockNotice({
           <SecondaryBtn onClick={onClose}>Close</SecondaryBtn>
           <a
             href={mailto}
-            className="inline-flex h-9 items-center justify-center rounded-lg bg-[#1F5FA8] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87]"
+            className="inline-flex h-[42px] items-center justify-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87]"
           >
             Email Joshua
           </a>
@@ -35,15 +35,15 @@ export function ModuleLockNotice({
       }
     >
       <div className="flex flex-col items-center py-2 text-center">
-        <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#F0EFEA] text-[#854F0B]" aria-hidden>
+        <span className="mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#FBEEDA] text-[#854F0B]" aria-hidden>
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
             <rect x="3" y="11" width="18" height="11" rx="2" />
             <path d="M7 11V7a5 5 0 0 1 10 0v4" />
           </svg>
         </span>
-        <p className="max-w-[300px] text-[13px] leading-relaxed text-[#5F6368]">
+        <p className="max-w-[300px] text-[13px] leading-relaxed text-[#6B6F68]">
           This module isn&apos;t part of your plan yet. Contact{' '}
-          <span className="font-medium text-[#1A1C1E]">joshua@vyso.co.za</span> to unlock it.
+          <span className="font-medium text-[#171A17]">joshua@vyso.co.za</span> to unlock it.
         </p>
       </div>
     </Modal>

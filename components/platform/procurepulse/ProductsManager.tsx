@@ -270,7 +270,7 @@ export function ProductsManager({
   const pageRows = filtered.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE);
 
   const cell =
-    'h-9 w-full rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:border-[#3E7BC4]/40 focus:outline-none';
+    'h-10 w-full rounded-[10px] border border-[#E4E9F0] bg-white px-3 text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]';
   const COLS = 'grid grid-cols-[minmax(170px,1fr)_120px_104px_104px_128px_40px] gap-2 items-center';
 
   return (
@@ -282,7 +282,7 @@ export function ProductsManager({
           right={
             <Link
               href="/app/orderflow/orders"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#D7DAD8] bg-white px-3.5 py-2.5 text-[14px] font-medium text-[#5F6368] transition-colors hover:border-[#3E7BC4]/30"
+              className="inline-flex h-[42px] items-center gap-1.5 rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]"
             >
               Create order in OrderFlow
               <span aria-hidden>→</span>
@@ -302,16 +302,16 @@ export function ProductsManager({
               setPage(0);
             }}
             placeholder="Search products…"
-            className="h-10 w-72 rounded-xl border border-[#E7E7E2] bg-white px-4 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
+            className="h-11 w-72 rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]"
           />
-          <span className="text-[13px] text-[#9A9DA1]">{filtered.length} products</span>
+          <span className="of-num text-[13px] text-[#8A8E86]">{filtered.length} products</span>
         </div>
         <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={undo}
             disabled={past.length === 0}
-            className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-[#E7E7E2] bg-white px-3.5 text-[14px] text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/30 disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex h-[42px] items-center gap-1.5 rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87] disabled:cursor-not-allowed disabled:opacity-40"
           >
             ↶ Undo
           </button>
@@ -319,14 +319,14 @@ export function ProductsManager({
             type="button"
             onClick={redo}
             disabled={future.length === 0}
-            className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-[#E7E7E2] bg-white px-3.5 text-[14px] text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/30 disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex h-[42px] items-center gap-1.5 rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87] disabled:cursor-not-allowed disabled:opacity-40"
           >
             ↷ Redo
           </button>
           <button
             type="button"
             onClick={addProduct}
-            className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-[#3E7BC4]/40 bg-white px-3.5 text-[14px] font-medium text-[#1F5FA8] transition-colors hover:bg-[#E7EEF8]"
+            className="inline-flex h-[42px] items-center gap-1.5 rounded-[11px] border border-[#C9DEF7] bg-white px-[18px] text-[14px] font-medium text-[#1F5FA8] transition-all hover:bg-[#EAF2FC] hover:text-[#174C87]"
           >
             + Add product
           </button>
@@ -334,7 +334,7 @@ export function ProductsManager({
             type="button"
             onClick={() => void save()}
             disabled={busy || dirtyCount === 0}
-            className="inline-flex h-10 items-center rounded-xl bg-[#1F5FA8] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:cursor-not-allowed disabled:opacity-40"
           >
             {busy ? 'Saving…' : dirtyCount > 0 ? `Save changes (${dirtyCount})` : 'Saved'}
           </button>
@@ -342,8 +342,8 @@ export function ProductsManager({
       </div>
 
       {/* Table */}
-      <div className="mt-4 overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
-        <div className={`${COLS} border-b border-[#F0F0EC] bg-[#FBFBF9] px-4 py-2.5 text-[12px] text-[#5F6368]`}>
+      <div className="mt-4 overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+        <div className={`${COLS} border-b border-[#EEF1F5] bg-[#FBFCFE] px-4 py-2.5 text-[11px] font-medium uppercase tracking-[0.06em] text-[#A0A49C]`}>
           <span>Product name</span>
           <span>Unit</span>
           <span>Low threshold</span>
@@ -352,7 +352,7 @@ export function ProductsManager({
           <span />
         </div>
         {pageRows.length === 0 ? (
-          <div className="px-4 py-12 text-center text-[14px] text-[#9A9DA1]">
+          <div className="px-4 py-12 text-center text-[14px] text-[#8A8E86]">
             {working.length === 0 ? 'No products yet — add your first.' : 'No products match your search.'}
           </div>
         ) : (
@@ -370,7 +370,7 @@ export function ProductsManager({
               r.unit.trim().toLowerCase() !== baseUnit.trim().toLowerCase() &&
               crossesDimension(baseUnit, r.unit);
             return (
-              <div key={r.id} className={`${COLS} border-b border-[#F0F0EC] px-4 py-2 last:border-b-0`}>
+              <div key={r.id} className={`${COLS} border-b border-[#F4F5F7] px-4 py-2 last:border-b-0`}>
                 <input
                   className={cell}
                   value={r.name}
@@ -384,13 +384,13 @@ export function ProductsManager({
                   onChange={(v) => editField(r.id, 'unit', v)}
                 />
                 <input
-                  className={`${cell} text-right`}
+                  className={`${cell} of-num text-right`}
                   inputMode="numeric"
                   value={String(r.low_threshold)}
                   onChange={(e) => editField(r.id, 'low_threshold', Number(e.target.value.replace(/[^0-9.]/g, '')) || 0)}
                 />
                 <input
-                  className={`${cell} text-right`}
+                  className={`${cell} of-num text-right`}
                   inputMode="decimal"
                   value={r.avg_unit_price == null ? '' : String(r.avg_unit_price)}
                   placeholder="—"
@@ -399,25 +399,25 @@ export function ProductsManager({
                     editField(r.id, 'avg_unit_price', v === '' ? null : Number(v));
                   }}
                 />
-                <span className="flex items-center justify-end gap-1.5 text-[13px] text-[#9A9DA1]">
+                <span className="flex items-center justify-end gap-1.5 text-[14px] text-[#6B6F68]">
                   {pending ? (
                     <button
                       type="button"
                       onClick={() => void recalcUnit(r.id, baseUnit, r.unit)}
                       disabled={recalcBusy.has(r.id)}
                       title={`Recalculate stock from documents (${baseUnit} → ${r.unit})`}
-                      className="rounded-md bg-[#E7EEF8] px-1.5 py-0.5 text-[11px] font-medium text-[#1F5FA8] transition-colors hover:bg-[#d9e6e0] disabled:opacity-50"
+                      className="rounded-md bg-[#EAF2FC] px-1.5 py-0.5 text-[11px] font-medium text-[#1F5FA8] transition-colors hover:bg-[#D9E6F5] disabled:opacity-50"
                     >
                       {recalcBusy.has(r.id) ? '…' : '↻ recalc'}
                     </button>
                   ) : null}
-                  <span>{r.on_hand}</span>
+                  <span className="of-num">{r.on_hand}</span>
                 </span>
                 <button
                   type="button"
                   onClick={() => deleteRow(r.id)}
                   aria-label={`Delete ${r.name || 'product'}`}
-                  className="flex h-9 w-9 items-center justify-center rounded-lg text-[#9A9DA1] transition-colors hover:bg-[#FCEBEB] hover:text-[#A32D2D]"
+                  className="flex h-9 w-9 items-center justify-center rounded-[10px] text-[#A0A49C] transition-colors hover:bg-[#FCEBEB] hover:text-[#A32D2D]"
                 >
                   ✕
                 </button>
@@ -428,28 +428,28 @@ export function ProductsManager({
       </div>
 
       {recalcMsg ? (
-        <p className="mt-3 rounded-xl bg-[#E7EEF8] px-3 py-2 text-center text-[12px] text-[#174C87]">{recalcMsg}</p>
+        <p className="mt-3 rounded-[12px] bg-[#EAF2FC] px-3 py-2 text-center text-[13px] text-[#174C87]">{recalcMsg}</p>
       ) : null}
 
       {/* Pagination */}
       {pageCount > 1 ? (
-        <div className="mt-3 flex items-center justify-center gap-3 text-[13px] text-[#5F6368]">
+        <div className="mt-3 flex items-center justify-center gap-3 text-[13px] text-[#6B6F68]">
           <button
             type="button"
             onClick={() => setPage((p) => Math.max(0, p - 1))}
             disabled={safePage === 0}
-            className="rounded-lg border border-[#E7E7E2] bg-white px-3 py-1.5 transition-colors hover:border-[#3E7BC4]/30 disabled:opacity-40"
+            className="rounded-[10px] border border-[#E2E6EC] bg-white px-3 py-1.5 font-medium transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87] disabled:opacity-40"
           >
             ‹ Prev
           </button>
-          <span>
+          <span className="of-num">
             Page {safePage + 1} of {pageCount}
           </span>
           <button
             type="button"
             onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
             disabled={safePage >= pageCount - 1}
-            className="rounded-lg border border-[#E7E7E2] bg-white px-3 py-1.5 transition-colors hover:border-[#3E7BC4]/30 disabled:opacity-40"
+            className="rounded-[10px] border border-[#E2E6EC] bg-white px-3 py-1.5 font-medium transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87] disabled:opacity-40"
           >
             Next ›
           </button>
@@ -457,7 +457,7 @@ export function ProductsManager({
       ) : null}
 
       {dirtyCount > 0 ? (
-        <p className="mt-3 text-center text-[12px] text-[#854F0B]">
+        <p className="of-num mt-3 text-center text-[12px] text-[#854F0B]">
           {diff.inserts.length} added · {diff.updates.length} edited · {diff.deletes.length} removed — unsaved
         </p>
       ) : null}

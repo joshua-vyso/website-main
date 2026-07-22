@@ -6,21 +6,21 @@ import { createPortal } from 'react-dom';
 // Portals mount on document.body, outside the platform subtree's --radius
 // override, so re-declare it here (else rounded-lg/xl collapse to square
 // corners) plus the app font. Rule 6.
-const PORTAL_STYLE = { fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties;
+const PORTAL_STYLE = { fontFamily: 'var(--font-instrument)', ['--radius' as string]: '0.625rem' } as React.CSSProperties;
 
 // ---------------------------------------------------------------------------
 // Inputs
 // ---------------------------------------------------------------------------
 
 export const inputClass =
-  'h-9 w-full rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/50 focus:outline-none';
+  'h-11 w-full rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]';
 
 export function Field({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
   return (
     <div>
-      <label className="mb-1 block text-[13px] font-medium text-[#1A1C1E]">
+      <label className="mb-1.5 block text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">
         {label}
-        {hint ? <span className="ml-1.5 font-normal text-[#9A9DA1]">{hint}</span> : null}
+        {hint ? <span className="ml-1.5 font-normal normal-case tracking-normal text-[#A0A49C]">{hint}</span> : null}
       </label>
       {children}
     </div>
@@ -36,7 +36,7 @@ export function PrimaryBtn({ className = '', ...props }: React.ButtonHTMLAttribu
     <button
       type="button"
       {...props}
-      className={`inline-flex h-9 items-center justify-center rounded-lg bg-[#1F5FA8] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+      className={`inline-flex h-[42px] items-center justify-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
     />
   );
 }
@@ -46,7 +46,7 @@ export function SecondaryBtn({ className = '', ...props }: React.ButtonHTMLAttri
     <button
       type="button"
       {...props}
-      className={`inline-flex h-9 items-center justify-center rounded-lg border border-[#D7DAD8] bg-white px-4 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:bg-[#F0F0EC] disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+      className={`inline-flex h-[42px] items-center justify-center rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87] disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
     />
   );
 }
@@ -56,7 +56,7 @@ export function DangerBtn({ className = '', ...props }: React.ButtonHTMLAttribut
     <button
       type="button"
       {...props}
-      className={`inline-flex h-9 items-center justify-center rounded-lg px-4 text-[13px] font-medium text-[#A32D2D] transition-colors hover:bg-[#F3E7E7] disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+      className={`inline-flex h-[42px] items-center justify-center rounded-[11px] px-[18px] text-[14px] font-medium text-[#A32D2D] transition-colors hover:bg-[#F3E7E7] disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
     />
   );
 }
@@ -101,29 +101,29 @@ export function Modal({
   if (!mounted || !open) return null;
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={PORTAL_STYLE}>
-      <div className="absolute inset-0 bg-[#1A1C1E]/25 backdrop-blur-[1px]" onClick={onClose} />
+      <div className="absolute inset-0 bg-[#171A17]/25 backdrop-blur-[1px]" onClick={onClose} />
       <div
         role="dialog"
         aria-modal="true"
-        className="relative flex max-h-[90vh] w-full flex-col rounded-2xl border border-[#E7E7E2] bg-white shadow-[0_24px_70px_-20px_rgba(26,28,30,0.45)]"
+        className="relative flex max-h-[90vh] w-full flex-col rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_24px_70px_-20px_rgba(26,28,30,0.45)]"
         style={{ maxWidth: width }}
       >
         <div className="flex items-start justify-between gap-3 px-5 pt-5">
           <div className="min-w-0">
-            <h2 className="text-[16px] font-semibold text-[#1A1C1E]">{title}</h2>
-            {subtitle ? <p className="mt-0.5 text-[13px] text-[#5F6368]">{subtitle}</p> : null}
+            <h2 className="of-display text-[16px] font-semibold text-[#171A17]">{title}</h2>
+            {subtitle ? <p className="mt-1 text-[13px] text-[#6B6F68]">{subtitle}</p> : null}
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[18px] text-[#9A9DA1] transition-colors hover:bg-[#F0F0EC] hover:text-[#1A1C1E]"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] text-[18px] text-[#A0A49C] transition-colors hover:bg-[#EEF1F5] hover:text-[#171A17]"
           >
             ✕
           </button>
         </div>
         <div className="flex-1 overflow-y-auto px-5 py-4">{children}</div>
-        {footer ? <div className="flex justify-end gap-2 border-t border-[#F0F0EC] px-5 py-3.5">{footer}</div> : null}
+        {footer ? <div className="flex justify-end gap-2 border-t border-[#EEF1F5] px-5 py-3.5">{footer}</div> : null}
       </div>
     </div>,
     document.body,
@@ -165,7 +165,7 @@ export function ConfirmDialog({
             <button
               type="button"
               onClick={onConfirm}
-              className="inline-flex h-9 items-center justify-center rounded-lg bg-[#A32D2D] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#8A2626]"
+              className="inline-flex h-[42px] items-center justify-center rounded-[11px] bg-[#A32D2D] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#8A2626]"
             >
               {confirmLabel}
             </button>
@@ -186,9 +186,9 @@ export function ConfirmDialog({
 
 export function EmptyState({ title, body, action }: { title: string; body?: string; action?: ReactNode }) {
   return (
-    <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
-      <p className="text-[15px] font-medium text-[#1A1C1E]">{title}</p>
-      {body ? <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">{body}</p> : null}
+    <div className="rounded-2xl border border-dashed border-[#E2E6EC] bg-[#FBFCFE] px-6 py-12 text-center">
+      <p className="of-display text-[16px] font-semibold text-[#171A17]">{title}</p>
+      {body ? <p className="mx-auto mt-1.5 max-w-md text-[13px] text-[#6B6F68]">{body}</p> : null}
       {action ? <div className="mt-4 flex justify-center">{action}</div> : null}
     </div>
   );
@@ -201,12 +201,12 @@ export function EmptyState({ title, body, action }: { title: string; body?: stri
 export function SearchInput({ value, onChange, placeholder }: { value: string; onChange: (v: string) => void; placeholder?: string }) {
   return (
     <div className="relative">
-      <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-[#9A9DA1]">⌕</span>
+      <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-[14px] text-[#A0A49C]">⌕</span>
       <input
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder ?? 'Search…'}
-        className="h-9 w-full rounded-lg border border-[#D7DAD8] bg-white pl-8 pr-3 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/50 focus:outline-none sm:w-64"
+        className="h-11 w-full rounded-[12px] border border-[#E4E9F0] bg-white pl-9 pr-4 text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4] sm:w-72"
       />
     </div>
   );

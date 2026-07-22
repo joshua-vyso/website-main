@@ -34,7 +34,7 @@ export interface ProfitSnapshotProps {
 function Meter({ pct, color = '#3E7BC4' }: { pct: number; color?: string }) {
   const w = Math.max(0, Math.min(100, pct));
   return (
-    <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-[#F0F0EC]">
+    <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-[#EEF1F5]">
       <div className="h-full rounded-full" style={{ width: `${w}%`, backgroundColor: color }} />
     </div>
   );
@@ -118,18 +118,18 @@ export function ProfitSnapshot(props: ProfitSnapshotProps) {
               type="button"
               onClick={() => setOpen(active ? null : t.key)}
               aria-expanded={active}
-              className={`rounded-2xl border bg-white p-4 text-left transition-all hover:border-[#3E7BC4]/40 hover:shadow-sm ${
-                active ? 'border-[#3E7BC4] ring-1 ring-[#3E7BC4]/20' : 'border-[#E7E7E2]'
+              className={`rounded-2xl border bg-white p-4 text-left shadow-[0_1px_2px_rgba(20,24,20,0.03)] transition-all hover:border-[#C9DEF7] ${
+                active ? 'border-[#3E7BC4] ring-1 ring-[#3E7BC4]/20' : 'border-[#EAEDF2]'
               }`}
             >
               <div className="flex items-center justify-between">
-                <span className="text-[13px] text-[#9A9DA1]">{t.label}</span>
+                <span className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">{t.label}</span>
                 <span className={`text-[#C7C9C5] transition-transform ${active ? 'rotate-180' : ''}`} aria-hidden>
                   ⌄
                 </span>
               </div>
-              <div className="mt-2 text-[24px] font-bold leading-none text-[#1A1C1E]">{t.value}</div>
-              <div className="mt-2 text-[12px]" style={{ color: t.subColor ?? '#9A9DA1' }}>
+              <div className="of-num mt-2 text-[30px] font-semibold leading-none tracking-[-0.02em] text-[#171A17]">{t.value}</div>
+              <div className="of-num mt-2 text-[12px]" style={{ color: t.subColor ?? '#A0A49C' }}>
                 {t.sub}
               </div>
             </button>
@@ -138,7 +138,7 @@ export function ProfitSnapshot(props: ProfitSnapshotProps) {
       </div>
 
       {open ? (
-        <div className="mt-4 overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
+        <div className="mt-4 overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
           <Breakdown metric={open} {...props} />
         </div>
       ) : null}
@@ -150,7 +150,7 @@ function Breakdown({ metric, ...p }: ProfitSnapshotProps & { metric: MetricKey }
   const { orders, grossProfit, netProfit, opex } = p;
 
   if (orders.length === 0) {
-    return <p className="py-10 text-center text-[13px] text-[#9A9DA1]">No invoiced sales this month yet.</p>;
+    return <p className="py-10 text-center text-[13px] text-[#8A8E86]">No invoiced sales this month yet.</p>;
   }
 
   const title: Record<MetricKey, string> = {
@@ -175,22 +175,22 @@ function Breakdown({ metric, ...p }: ProfitSnapshotProps & { metric: MetricKey }
 
   return (
     <div>
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#F0F0EC] px-5 py-3.5">
-        <h3 className="text-[14px] font-semibold text-[#1A1C1E]">{title[metric]}</h3>
-        <span className="text-[12px] text-[#9A9DA1]">{orders.length} orders</span>
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#EEF1F5] px-5 py-3.5">
+        <h3 className="of-display text-[16px] font-semibold text-[#171A17]">{title[metric]}</h3>
+        <span className="text-[12px] text-[#A0A49C]"><span className="of-num">{orders.length}</span> orders</span>
       </div>
 
       {/* Net profit gets a small ledger above the per-order table */}
       {metric === 'net' ? (
-        <div className="border-b border-[#F0F0EC] px-5 py-4">
-          <div className="mx-auto max-w-sm space-y-2 text-[13px]">
+        <div className="border-b border-[#EEF1F5] px-5 py-4">
+          <div className="mx-auto max-w-sm space-y-2 text-[14px]">
             <Row label="Gross profit (costed sales)" value={zar(grossProfit)} />
             <Row
               label="Operating costs"
               value={opex != null ? `− ${zar(opex)}` : 'not set'}
               muted={opex == null}
             />
-            <div className="border-t border-[#F0F0EC] pt-2">
+            <div className="border-t border-[#EEF1F5] pt-2">
               <Row
                 label="Net profit"
                 value={netProfit != null ? zar(netProfit) : '—'}
@@ -199,7 +199,7 @@ function Breakdown({ metric, ...p }: ProfitSnapshotProps & { metric: MetricKey }
               />
             </div>
             {opex == null ? (
-              <p className="pt-1 text-[12px] text-[#9A9DA1]">
+              <p className="pt-1 text-[12px] text-[#8A8E86]">
                 <Link href="/app/marginview/goals" className="font-medium text-[#1F5FA8] hover:underline">
                   Set your monthly operating costs
                 </Link>{' '}
@@ -211,9 +211,9 @@ function Breakdown({ metric, ...p }: ProfitSnapshotProps & { metric: MetricKey }
       ) : null}
 
       <div className="overflow-x-auto">
-        <table className="w-full text-[13px]">
+        <table className="w-full text-[14px]">
           <thead>
-            <tr className="border-b border-[#F0F0EC] text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+            <tr className="border-b border-[#EEF1F5] bg-[#FBFCFE] text-[11px] uppercase tracking-[0.06em] text-[#A0A49C]">
               <th className="px-5 py-2.5 text-left font-medium">Invoice</th>
               <th className="px-3 py-2.5 text-left font-medium">Customer</th>
               {metric === 'revenue' ? (
@@ -230,35 +230,35 @@ function Breakdown({ metric, ...p }: ProfitSnapshotProps & { metric: MetricKey }
           </thead>
           <tbody>
             {sorted.map((o) => (
-              <tr key={o.id} className="border-b border-[#F6F6F2] last:border-0">
-                <td className="px-5 py-2.5">
-                  <Link href={`/app/orderflow/orders/${o.id}`} className="font-medium text-[#1A1C1E] hover:text-[#174C87]">
+              <tr key={o.id} className="border-b border-[#F4F5F7] last:border-0 hover:bg-[#F5F9FE]">
+                <td className="px-5 py-3">
+                  <Link href={`/app/orderflow/orders/${o.id}`} className="of-num font-semibold text-[#171A17] hover:text-[#174C87]">
                     {o.invoice}
                   </Link>
                 </td>
-                <td className="px-3 py-2.5 text-[#5F6368]">{o.customer}</td>
+                <td className="px-3 py-3 text-[#2C333B]">{o.customer}</td>
                 {metric === 'revenue' ? (
-                  <td className="px-5 py-2.5 text-right font-medium tabular-nums text-[#1A1C1E]">{zar2(o.revenue)}</td>
+                  <td className="of-num px-5 py-3 text-right font-semibold text-[#171A17]">{zar2(o.revenue)}</td>
                 ) : (
                   <>
-                    <td className="px-3 py-2.5 text-right tabular-nums text-[#5F6368]">
+                    <td className="of-num px-3 py-3 text-right text-[#6B6F68]">
                       {o.costableRev > 0 ? zar2(o.costableRev) : '—'}
                       {o.uncosted ? (
-                        <span className="block text-[11px] text-[#B8BAB5]" title={`Full invoice ${zar2(o.revenue)}`}>
+                        <span className="block text-[11px] text-[#A0A49C]" title={`Full invoice ${zar2(o.revenue)}`}>
                           of {zar2(o.revenue)}
                         </span>
                       ) : null}
                     </td>
-                    <td className="px-3 py-2.5 text-right tabular-nums text-[#5F6368]">
+                    <td className="of-num px-3 py-3 text-right text-[#6B6F68]">
                       {o.costableRev > 0 ? zar2(o.cost) : '—'}
                     </td>
                     <td
-                      className="px-3 py-2.5 text-right font-medium tabular-nums"
-                      style={{ color: o.profit > 0 ? '#0F6E56' : o.profit < 0 ? '#A32D2D' : '#9A9DA1' }}
+                      className="of-num px-3 py-3 text-right font-semibold"
+                      style={{ color: o.profit > 0 ? '#0F6E56' : o.profit < 0 ? '#A32D2D' : '#8A8E86' }}
                     >
                       {o.costableRev > 0 ? zar2(o.profit) : '—'}
                     </td>
-                    <td className="px-5 py-2.5 text-right tabular-nums text-[#5F6368]">
+                    <td className="of-num px-5 py-3 text-right text-[#6B6F68]">
                       {o.margin != null ? `${Math.round(o.margin)}%` : '—'}
                     </td>
                   </>
@@ -267,23 +267,23 @@ function Breakdown({ metric, ...p }: ProfitSnapshotProps & { metric: MetricKey }
             ))}
           </tbody>
           <tfoot>
-            <tr className="border-t border-[#E7E7E2] bg-[#FBFBF9] font-semibold text-[#1A1C1E]">
+            <tr className="border-t border-[#EAEDF2] bg-[#FBFCFE] font-semibold text-[#171A17]">
               <td className="px-5 py-3" colSpan={2}>
                 Total
               </td>
               {metric === 'revenue' ? (
-                <td className="px-5 py-3 text-right tabular-nums">{zar(totalRevenue)}</td>
+                <td className="of-num px-5 py-3 text-right">{zar(totalRevenue)}</td>
               ) : (
                 <>
-                  <td className="px-3 py-3 text-right tabular-nums">
+                  <td className="of-num px-3 py-3 text-right">
                     {zar(totalCostableRev)}
                     {anyUncosted ? (
-                      <span className="block text-[11px] font-normal text-[#B8BAB5]">of {zar(totalRevenue)}</span>
+                      <span className="block text-[11px] font-normal text-[#A0A49C]">of {zar(totalRevenue)}</span>
                     ) : null}
                   </td>
-                  <td className="px-3 py-3 text-right tabular-nums">{zar(totalCost)}</td>
-                  <td className="px-3 py-3 text-right tabular-nums text-[#0F6E56]">{zar(totalProfit)}</td>
-                  <td className="px-5 py-3 text-right tabular-nums">
+                  <td className="of-num px-3 py-3 text-right">{zar(totalCost)}</td>
+                  <td className="of-num px-3 py-3 text-right text-[#0F6E56]">{zar(totalProfit)}</td>
+                  <td className="of-num px-5 py-3 text-right">
                     {totalCostableRev > 0 ? `${Math.round((totalProfit / totalCostableRev) * 100)}%` : '—'}
                   </td>
                 </>
@@ -294,7 +294,7 @@ function Breakdown({ metric, ...p }: ProfitSnapshotProps & { metric: MetricKey }
       </div>
 
       {anyUncosted && metric !== 'revenue' ? (
-        <p className="border-t border-[#F0F0EC] px-5 py-3 text-[12px] text-[#9A9DA1]">
+        <p className="border-t border-[#EEF1F5] px-5 py-3 text-[12px] text-[#8A8E86]">
           Some lines have no recorded cost yet, so profit and margin are based on the costed portion of each order.
         </p>
       ) : null}
@@ -317,8 +317,8 @@ function Row({
 }) {
   return (
     <div className="flex items-center justify-between">
-      <span className={muted ? 'text-[#9A9DA1]' : 'text-[#5F6368]'}>{label}</span>
-      <span className={`tabular-nums ${bold ? 'font-bold' : 'font-medium'}`} style={color ? { color } : undefined}>
+      <span className={muted ? 'text-[#8A8E86]' : 'text-[#6B6F68]'}>{label}</span>
+      <span className={`of-num ${bold ? 'font-semibold' : 'font-medium'}`} style={color ? { color } : undefined}>
         {value}
       </span>
     </div>

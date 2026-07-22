@@ -669,23 +669,23 @@ export function OrdersView({
 
   const drawerOrder = drawerId ? orders.find((o) => o.id === drawerId) ?? null : null;
 
-  const cell = 'h-9 rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:border-[#3E7BC4]/40 focus:outline-none';
-  const filterSel = 'h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#3E7BC4]';
+  const cell = 'h-9 rounded-lg border border-[#EAEDF2] bg-white px-2.5 text-[13px] text-[#171A17] focus:border-[#3E7BC4]/40 focus:outline-none';
+  const filterSel = 'h-9 rounded-lg border border-[#E2E6EC] bg-white px-2.5 text-[13px] text-[#6B6F68] outline-none focus:border-[#3E7BC4]';
 
   return (
     <div>
       {toastNode}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-[26px] font-bold text-[#1A1C1E]">Orders</h1>
-          <p className="mt-1 text-[14px] text-[#5F6368]">Manage customer orders from draft to delivery and invoicing</p>
+          <h1 className="text-[26px] font-bold text-[#171A17]">Orders</h1>
+          <p className="mt-1 text-[14px] text-[#6B6F68]">Manage customer orders from draft to delivery and invoicing</p>
         </div>
         <div className="flex items-center gap-2.5">
           <PublishOrderButton />
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="inline-flex h-10 items-center rounded-xl border border-[#D7DAD8] bg-white px-4 text-[14px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/40"
+            className="inline-flex h-10 items-center rounded-xl border border-[#E2E6EC] bg-white px-4 text-[14px] font-medium text-[#171A17] transition-colors hover:border-[#3E7BC4]/40"
           >
             Quick order
           </button>
@@ -714,7 +714,7 @@ export function OrdersView({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search customer, order #, invoice #, or product…"
-          className="h-9 min-w-[260px] flex-1 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] outline-none placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]"
+          className="h-9 min-w-[260px] flex-1 rounded-lg border border-[#E2E6EC] bg-white px-3 text-[13px] text-[#171A17] outline-none placeholder:text-[#8A8E86] focus:border-[#3E7BC4]"
         />
         <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as 'all' | OrderStatus)} className={filterSel}>
           <option value="all">All statuses</option>
@@ -740,23 +740,23 @@ export function OrdersView({
 
       <div className="mt-4 grid grid-cols-1 gap-5 lg:grid-cols-[1fr_300px]">
         {/* Orders table */}
-        <div className="overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
+        <div className="overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white">
           {selected.size > 0 ? (
-            <div className="flex flex-wrap items-center gap-2 border-b border-[#F0F0EC] bg-[#F5F9FE] px-4 py-2.5 text-[13px]">
-              <span className="font-medium text-[#1A1C1E]">{selected.size} selected</span>
+            <div className="flex flex-wrap items-center gap-2 border-b border-[#EEF1F5] bg-[#F5F9FE] px-4 py-2.5 text-[13px]">
+              <span className="font-medium text-[#171A17]">{selected.size} selected</span>
               <span className="flex-1" />
               <BulkBtn onClick={() => void invoiceSelected()} disabled={actionBusy}>Generate invoices</BulkBtn>
               <BulkBtn onClick={() => exportCsv(selectedRows)} disabled={actionBusy}>Export CSV</BulkBtn>
               <BulkBtn onClick={() => void markDeliveredSelected()} disabled={actionBusy}>Mark delivered</BulkBtn>
               <BulkBtn onClick={() => setCancelIds([...selected])} disabled={actionBusy} danger>Cancel orders</BulkBtn>
-              <button type="button" onClick={() => setSelected(new Set())} className="text-[12px] text-[#9A9DA1] hover:text-[#5F6368]">Clear</button>
+              <button type="button" onClick={() => setSelected(new Set())} className="text-[12px] text-[#8A8E86] hover:text-[#6B6F68]">Clear</button>
             </div>
           ) : null}
 
           <div className="overflow-x-auto">
             <table className="w-full text-[13px]">
               <thead>
-                <tr className="border-b border-[#F0F0EC] bg-[#FBFBF9] text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+                <tr className="border-b border-[#EEF1F5] bg-[#FBFCFE] text-[11px] uppercase tracking-wide text-[#8A8E86]">
                   <th className="w-9 px-3 py-2.5">
                     <input type="checkbox" checked={allFilteredSelected} onChange={toggleAll} aria-label="Select all" className="accent-[#3E7BC4]" />
                   </th>
@@ -774,7 +774,7 @@ export function OrdersView({
               <tbody>
                 {filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={10} className="px-5 py-12 text-center text-[14px] text-[#9A9DA1]">
+                    <td colSpan={10} className="px-5 py-12 text-center text-[14px] text-[#8A8E86]">
                       {orders.length === 0 ? 'No orders yet — create your first.' : 'No orders match your filters.'}
                     </td>
                   </tr>
@@ -783,19 +783,19 @@ export function OrdersView({
                     <tr
                       key={o.id}
                       onClick={() => setDrawerId(o.id)}
-                      className="cursor-pointer border-b border-[#F6F6F2] last:border-0 hover:bg-[#FAFAF8]"
+                      className="cursor-pointer border-b border-[#F5F9FE] last:border-0 hover:bg-[#F5F9FE]"
                     >
                       <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
                         <input type="checkbox" checked={selected.has(o.id)} onChange={() => toggleOne(o.id)} aria-label="Select" className="accent-[#3E7BC4]" />
                       </td>
-                      <td className="px-2 py-3 font-medium text-[#1A1C1E]">{orderRef(o)}</td>
-                      <td className="px-2 py-3 text-[#1A1C1E]">{o.customer_name}</td>
+                      <td className="px-2 py-3 font-medium text-[#171A17]">{orderRef(o)}</td>
+                      <td className="px-2 py-3 text-[#171A17]">{o.customer_name}</td>
                       <td className="px-2 py-3"><OrderStatusBadge status={o.status} /></td>
                       <td className="px-2 py-3"><PaymentStatusBadge status={paymentStatusOf(o.status)} /></td>
-                      <td className="px-2 py-3 text-right tabular-nums text-[#5F6368]">{o.item_count}</td>
-                      <td className="px-2 py-3 text-[#5F6368]">{fmtDate(o.delivery_date)}</td>
-                      <td className="px-2 py-3 text-right font-medium tabular-nums text-[#1A1C1E]">{zar(o.total)}</td>
-                      <td className="px-2 py-3 text-[#9A9DA1]">{fmtDate(o.created_at)}</td>
+                      <td className="px-2 py-3 text-right tabular-nums text-[#6B6F68]">{o.item_count}</td>
+                      <td className="px-2 py-3 text-[#6B6F68]">{fmtDate(o.delivery_date)}</td>
+                      <td className="px-2 py-3 text-right font-medium tabular-nums text-[#171A17]">{zar(o.total)}</td>
+                      <td className="px-2 py-3 text-[#8A8E86]">{fmtDate(o.created_at)}</td>
                       <td className="px-2 py-3" onClick={(e) => e.stopPropagation()}>
                         <RowActionsMenu
                           actions={[
@@ -819,19 +819,19 @@ export function OrdersView({
         </div>
 
         {/* Attention */}
-        <div className="rounded-2xl border border-[#E7E7E2] bg-white p-5">
-          <h2 className="text-[14px] font-semibold text-[#1A1C1E]">Orders needing attention</h2>
+        <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5">
+          <h2 className="text-[14px] font-semibold text-[#171A17]">Orders needing attention</h2>
           {attention.length === 0 ? (
-            <p className="mt-3 text-[13px] text-[#9A9DA1]">Nothing needs attention — orders and invoices are on track.</p>
+            <p className="mt-3 text-[13px] text-[#8A8E86]">Nothing needs attention — orders and invoices are on track.</p>
           ) : (
             <div className="mt-3 flex flex-col gap-2.5">
               {attention.map((a) => (
                 <Link key={a.id} href={a.href} className="flex items-start gap-2.5 text-[13px] transition-colors hover:opacity-80">
                   <span
                     className="mt-1.5 h-2 w-2 shrink-0 rounded-full"
-                    style={{ backgroundColor: a.severity === 'high' ? '#A32D2D' : a.severity === 'medium' ? '#854F0B' : '#9A9DA1' }}
+                    style={{ backgroundColor: a.severity === 'high' ? '#A32D2D' : a.severity === 'medium' ? '#854F0B' : '#8A8E86' }}
                   />
-                  <span className="text-[#5F6368]">{a.text}</span>
+                  <span className="text-[#6B6F68]">{a.text}</span>
                 </Link>
               ))}
             </div>
@@ -861,7 +861,7 @@ export function OrdersView({
         footer={
           drawerOrder ? (
             <div className="flex items-center justify-end gap-2">
-              <Link href={`/app/orderflow/orders/${drawerOrder.id}`} className="rounded-lg border border-[#D7DAD8] bg-white px-3.5 py-2 text-[13px] font-medium text-[#1A1C1E] hover:border-[#3E7BC4]/40">
+              <Link href={`/app/orderflow/orders/${drawerOrder.id}`} className="rounded-lg border border-[#E2E6EC] bg-white px-3.5 py-2 text-[13px] font-medium text-[#171A17] hover:border-[#3E7BC4]/40">
                 Open full page
               </Link>
               {canInvoice(drawerOrder) ? (
@@ -883,12 +883,12 @@ export function OrdersView({
 
       {/* Quick-order builder (modal) */}
       {open ? (
-        <div className="fixed inset-0 z-[80] flex items-start justify-center p-4 pt-[7vh]" style={{ fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties}>
+        <div className="fixed inset-0 z-[80] flex items-start justify-center p-4 pt-[7vh]" style={{ fontFamily: 'var(--font-instrument)', ['--radius' as string]: '0.625rem' } as React.CSSProperties}>
           <button type="button" aria-label="Close" onClick={resetBuilder} className="absolute inset-0 bg-black/20" />
-          <div className="relative z-10 w-full max-w-[640px] rounded-2xl border border-[#E7E7E2] bg-white p-5 shadow-[0_24px_70px_-20px_rgba(26,28,30,0.5)]">
+          <div className="relative z-10 w-full max-w-[640px] rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_24px_70px_-20px_rgba(26,28,30,0.5)]">
             <div className="mb-3 flex items-center justify-between">
-              <h3 className="text-[16px] font-semibold text-[#1A1C1E]">Quick order</h3>
-              <button type="button" onClick={resetBuilder} aria-label="Close" className="text-[#9A9DA1] hover:text-[#1A1C1E]">✕</button>
+              <h3 className="text-[16px] font-semibold text-[#171A17]">Quick order</h3>
+              <button type="button" onClick={resetBuilder} aria-label="Close" className="text-[#8A8E86] hover:text-[#171A17]">✕</button>
             </div>
 
             {/* Quick-start */}
@@ -898,7 +898,7 @@ export function OrdersView({
               <QuickStart onClick={() => toast('Use the Upload order button to import a document.')}>Upload order</QuickStart>
             </div>
 
-            <label className="mb-1 block text-[12px] text-[#5F6368]">Customer</label>
+            <label className="mb-1 block text-[12px] text-[#6B6F68]">Customer</label>
             <div className="relative mb-3">
               <input
                 className={`${cell} h-10 w-full`}
@@ -913,14 +913,14 @@ export function OrdersView({
                 placeholder="Search customers or type a new name…"
               />
               {customerOpen && (custMatches.length > 0 || (customerQuery.trim() && !custExact)) ? (
-                <div className="absolute left-0 right-0 top-full z-20 mt-1 max-h-[200px] overflow-y-auto rounded-xl border border-[#E7E7E2] bg-white py-1 shadow-[0_12px_40px_-12px_rgba(26,28,30,0.25)]">
+                <div className="absolute left-0 right-0 top-full z-20 mt-1 max-h-[200px] overflow-y-auto rounded-xl border border-[#EAEDF2] bg-white py-1 shadow-[0_12px_40px_-12px_rgba(26,28,30,0.25)]">
                   {custMatches.map((c) => (
-                    <button key={c.id} type="button" onMouseDown={(e) => { e.preventDefault(); pickCustomer(c); }} className="block w-full truncate px-3 py-2 text-left text-[13px] text-[#1A1C1E] transition-colors hover:bg-[#FAFAF8]">
+                    <button key={c.id} type="button" onMouseDown={(e) => { e.preventDefault(); pickCustomer(c); }} className="block w-full truncate px-3 py-2 text-left text-[13px] text-[#171A17] transition-colors hover:bg-[#F5F9FE]">
                       {c.name}
                     </button>
                   ))}
                   {customerQuery.trim() && !custExact ? (
-                    <button type="button" onMouseDown={(e) => { e.preventDefault(); void createCustomer(customerQuery); }} disabled={creatingCustomer} className="block w-full truncate border-t border-[#F0F0EC] px-3 py-2 text-left text-[13px] font-medium text-[#1F5FA8] transition-colors hover:bg-[#FAFAF8] disabled:opacity-50">
+                    <button type="button" onMouseDown={(e) => { e.preventDefault(); void createCustomer(customerQuery); }} disabled={creatingCustomer} className="block w-full truncate border-t border-[#EEF1F5] px-3 py-2 text-left text-[13px] font-medium text-[#1F5FA8] transition-colors hover:bg-[#F5F9FE] disabled:opacity-50">
                       {creatingCustomer ? 'Creating…' : `+ Create “${customerQuery.trim()}”`}
                     </button>
                   ) : null}
@@ -934,7 +934,7 @@ export function OrdersView({
               </div>
             ) : null}
 
-            <label className="mb-1 block text-[12px] text-[#5F6368]">Line items</label>
+            <label className="mb-1 block text-[12px] text-[#6B6F68]">Line items</label>
             <div className="relative mb-2">
               <input
                 className={`${cell} h-10 w-full`}
@@ -944,11 +944,11 @@ export function OrdersView({
                 placeholder="Search a product to add (or type a new name + Enter)…"
               />
               {matches.length > 0 ? (
-                <div className="absolute left-0 right-0 top-full z-10 mt-1 max-h-[180px] overflow-y-auto rounded-xl border border-[#E7E7E2] bg-white shadow-[0_12px_40px_-12px_rgba(26,28,30,0.25)]">
+                <div className="absolute left-0 right-0 top-full z-10 mt-1 max-h-[180px] overflow-y-auto rounded-xl border border-[#EAEDF2] bg-white shadow-[0_12px_40px_-12px_rgba(26,28,30,0.25)]">
                   {matches.map((p) => (
-                    <button key={p.id} type="button" onClick={() => addLine(p)} className="flex w-full items-center justify-between px-3 py-2 text-left text-[13px] text-[#1A1C1E] transition-colors hover:bg-[#FAFAF8]">
+                    <button key={p.id} type="button" onClick={() => addLine(p)} className="flex w-full items-center justify-between px-3 py-2 text-left text-[13px] text-[#171A17] transition-colors hover:bg-[#F5F9FE]">
                       <span className="truncate">{p.name}</span>
-                      <span className="text-[12px] text-[#9A9DA1]">{p.avg_unit_price != null ? zar(p.avg_unit_price) : ''}</span>
+                      <span className="text-[12px] text-[#8A8E86]">{p.avg_unit_price != null ? zar(p.avg_unit_price) : ''}</span>
                     </button>
                   ))}
                 </div>
@@ -966,30 +966,30 @@ export function OrdersView({
                       {unitOptions(l.unit).map((u) => (<option key={u} value={u}>{u}</option>))}
                     </select>
                     <input className={`${cell} text-right`} value={l.unit_price} inputMode="decimal" onChange={(e) => updateLine(l.key, { unit_price: e.target.value.replace(/[^0-9.]/g, '') })} placeholder="price" />
-                    <button type="button" onClick={() => removeLine(l.key)} aria-label="Remove line" className="flex h-9 w-7 items-center justify-center rounded-lg text-[#9A9DA1] hover:bg-[#FCEBEB] hover:text-[#A32D2D]">✕</button>
+                    <button type="button" onClick={() => removeLine(l.key)} aria-label="Remove line" className="flex h-9 w-7 items-center justify-center rounded-lg text-[#8A8E86] hover:bg-[#FCEBEB] hover:text-[#A32D2D]">✕</button>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="mb-3 text-[12px] text-[#9A9DA1]">No items yet — search above to add products.</p>
+              <p className="mb-3 text-[12px] text-[#8A8E86]">No items yet — search above to add products.</p>
             )}
 
             {/* Delivery + notes */}
             <div className="mb-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-[12px] text-[#5F6368]">Delivery date</label>
+                <label className="mb-1 block text-[12px] text-[#6B6F68]">Delivery date</label>
                 <input type="date" value={deliveryDate} onChange={(e) => setDeliveryDate(e.target.value)} className={`${cell} h-10 w-full`} />
               </div>
               <div>
-                <label className="mb-1 block text-[12px] text-[#5F6368]">Notes</label>
+                <label className="mb-1 block text-[12px] text-[#6B6F68]">Notes</label>
                 <input value={orderNotes} onChange={(e) => setOrderNotes(e.target.value)} placeholder="Delivery / order notes…" className={`${cell} h-10 w-full`} />
               </div>
             </div>
 
-            <div className="flex items-center justify-between border-t border-[#F0F0EC] pt-3">
-              <span className="text-[14px] font-semibold text-[#1A1C1E]">Total {zar(builderTotal)}</span>
+            <div className="flex items-center justify-between border-t border-[#EEF1F5] pt-3">
+              <span className="text-[14px] font-semibold text-[#171A17]">Total {zar(builderTotal)}</span>
               <div className="flex gap-2">
-                <button type="button" onClick={resetBuilder} className="rounded-lg px-3.5 py-2 text-[13px] text-[#5F6368] hover:bg-black/[0.03]">Cancel</button>
+                <button type="button" onClick={resetBuilder} className="rounded-lg px-3.5 py-2 text-[13px] text-[#6B6F68] hover:bg-black/[0.03]">Cancel</button>
                 <button type="button" onClick={() => void saveOrder()} disabled={!canSave || busy} className="rounded-lg bg-[#1F5FA8] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-40">
                   {busy ? 'Creating…' : 'Create order'}
                 </button>
@@ -1009,7 +1009,7 @@ function BulkBtn({ children, onClick, danger, disabled }: { children: React.Reac
       onClick={onClick}
       disabled={disabled}
       className={`rounded-lg border bg-white px-3 py-1.5 text-[12px] font-medium transition-colors disabled:opacity-50 ${
-        danger ? 'border-[#F0D9D9] text-[#A32D2D] hover:bg-[#FCEBEB]' : 'border-[#D7DAD8] text-[#1A1C1E] hover:border-[#3E7BC4]/40'
+        danger ? 'border-[#F0D9D9] text-[#A32D2D] hover:bg-[#FCEBEB]' : 'border-[#E2E6EC] text-[#171A17] hover:border-[#3E7BC4]/40'
       }`}
     >
       {children}
@@ -1019,7 +1019,7 @@ function BulkBtn({ children, onClick, danger, disabled }: { children: React.Reac
 
 function QuickStart({ children, onClick }: { children: React.ReactNode; onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} className="rounded-full border border-[#E7E7E2] bg-white px-3 py-1.5 text-[12px] font-medium text-[#5F6368] transition-colors hover:border-[#3E7BC4]/40 hover:text-[#1A1C1E]">
+    <button type="button" onClick={onClick} className="rounded-full border border-[#EAEDF2] bg-white px-3 py-1.5 text-[12px] font-medium text-[#6B6F68] transition-colors hover:border-[#3E7BC4]/40 hover:text-[#171A17]">
       {children}
     </button>
   );
@@ -1044,17 +1044,17 @@ function OrderDrawerBody({ order, items, allOrders, vatRate }: { order: OrderRow
       </div>
       {order.delivery_address ? (
         <Field label="Deliver to">
-          <span className="text-[13px] text-[#5F6368]">{order.delivery_address}</span>
+          <span className="text-[13px] text-[#6B6F68]">{order.delivery_address}</span>
         </Field>
       ) : null}
       {order.notes ? (
-        <div className="rounded-xl border border-[#F0F0EC] bg-[#FCFCFB] px-3.5 py-2.5 text-[13px] text-[#5F6368]">{order.notes}</div>
+        <div className="rounded-xl border border-[#EEF1F5] bg-[#FCFCFB] px-3.5 py-2.5 text-[13px] text-[#6B6F68]">{order.notes}</div>
       ) : null}
 
       <Section title="Items">
         <table className="w-full text-[13px]">
           <thead>
-            <tr className="border-b border-[#F0F0EC] text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+            <tr className="border-b border-[#EEF1F5] text-[11px] uppercase tracking-wide text-[#8A8E86]">
               <th className="py-1.5 pr-2 text-left font-medium">Item</th>
               <th className="px-2 py-1.5 text-right font-medium">Qty</th>
               <th className="px-2 py-1.5 text-right font-medium">Price</th>
@@ -1063,20 +1063,20 @@ function OrderDrawerBody({ order, items, allOrders, vatRate }: { order: OrderRow
           </thead>
           <tbody>
             {its.length === 0 ? (
-              <tr><td colSpan={4} className="py-4 text-center text-[#9A9DA1]">No items.</td></tr>
+              <tr><td colSpan={4} className="py-4 text-center text-[#8A8E86]">No items.</td></tr>
             ) : (
               its.map((i, idx) => (
-                <tr key={idx} className="border-b border-[#F6F6F2] last:border-0">
-                  <td className="py-2 pr-2 text-[#1A1C1E]">{i.name}</td>
-                  <td className="px-2 py-2 text-right tabular-nums text-[#5F6368]">{i.qty}{i.unit ? ` ${i.unit}` : ''}</td>
-                  <td className="px-2 py-2 text-right tabular-nums text-[#5F6368]">{zar(i.unit_price)}</td>
-                  <td className="py-2 pl-2 text-right tabular-nums font-medium text-[#1A1C1E]">{zar((Number(i.qty) || 0) * (Number(i.unit_price) || 0))}</td>
+                <tr key={idx} className="border-b border-[#F5F9FE] last:border-0">
+                  <td className="py-2 pr-2 text-[#171A17]">{i.name}</td>
+                  <td className="px-2 py-2 text-right tabular-nums text-[#6B6F68]">{i.qty}{i.unit ? ` ${i.unit}` : ''}</td>
+                  <td className="px-2 py-2 text-right tabular-nums text-[#6B6F68]">{zar(i.unit_price)}</td>
+                  <td className="py-2 pl-2 text-right tabular-nums font-medium text-[#171A17]">{zar((Number(i.qty) || 0) * (Number(i.unit_price) || 0))}</td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
-        <div className="mt-3 space-y-1 border-t border-[#F0F0EC] pt-3 text-[13px]">
+        <div className="mt-3 space-y-1 border-t border-[#EEF1F5] pt-3 text-[13px]">
           <Row label="Subtotal" value={zar2(totals.subtotal)} />
           <Row label={`VAT (${vatRate}%)`} value={zar2(totals.vat)} muted />
           <Row label="Total" value={zar2(totals.total)} bold />
@@ -1088,8 +1088,8 @@ function OrderDrawerBody({ order, items, allOrders, vatRate }: { order: OrderRow
           <div className="flex flex-col gap-1.5 text-[13px]">
             {comparison.slice(0, 8).map((c) => (
               <div key={c.name} className="flex items-center justify-between">
-                <span className="text-[#5F6368]">{c.name}</span>
-                <span className="tabular-nums text-[#1A1C1E]">
+                <span className="text-[#6B6F68]">{c.name}</span>
+                <span className="tabular-nums text-[#171A17]">
                   {c.from ?? 0}{c.unit ? ` ${c.unit}` : ''} → {c.to ?? 0}{c.unit ? ` ${c.unit}` : ''}{' '}
                   <span className="font-medium" style={{ color: c.delta > 0 ? '#0F6E56' : '#A32D2D' }}>
                     ({c.delta > 0 ? '+' : ''}{c.delta})
@@ -1107,15 +1107,15 @@ function OrderDrawerBody({ order, items, allOrders, vatRate }: { order: OrderRow
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">{label}</div>
-      <div className="mt-1 text-[#1A1C1E]">{children}</div>
+      <div className="text-[11px] uppercase tracking-wide text-[#8A8E86]">{label}</div>
+      <div className="mt-1 text-[#171A17]">{children}</div>
     </div>
   );
 }
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h3 className="mb-2 text-[13px] font-semibold text-[#1A1C1E]">{title}</h3>
+      <h3 className="mb-2 text-[13px] font-semibold text-[#171A17]">{title}</h3>
       {children}
     </div>
   );
@@ -1123,8 +1123,8 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 function Row({ label, value, bold, muted }: { label: string; value: string; bold?: boolean; muted?: boolean }) {
   return (
     <div className="flex items-center justify-between">
-      <span className={muted ? 'text-[#9A9DA1]' : 'text-[#5F6368]'}>{label}</span>
-      <span className={`tabular-nums ${bold ? 'font-bold text-[#1A1C1E]' : 'text-[#1A1C1E]'}`}>{value}</span>
+      <span className={muted ? 'text-[#8A8E86]' : 'text-[#6B6F68]'}>{label}</span>
+      <span className={`tabular-nums ${bold ? 'font-bold text-[#171A17]' : 'text-[#171A17]'}`}>{value}</span>
     </div>
   );
 }
@@ -1332,11 +1332,11 @@ export function NewOrderBuilder({ context, defaultCustomerId }: { context: Build
         <div className="flex items-center gap-3">
           <Link
             href="/app/orderflow/orders"
-            className="inline-flex h-8 items-center gap-1 rounded-full border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#5F6368] transition-colors hover:border-[#3E7BC4]/30 hover:text-[#1A1C1E]"
+            className="inline-flex h-8 items-center gap-1 rounded-full border border-[#EAEDF2] bg-white px-3 text-[13px] text-[#6B6F68] transition-colors hover:border-[#3E7BC4]/30 hover:text-[#171A17]"
           >
             <span aria-hidden>‹</span> Orders
           </Link>
-          <h1 className="text-[22px] font-bold text-[#1A1C1E]">New order</h1>
+          <h1 className="text-[22px] font-bold text-[#171A17]">New order</h1>
         </div>
         <div className="flex items-center gap-2">
           <SecondaryBtn onClick={() => void save('draft')} disabled={!canSave}>
@@ -1359,8 +1359,8 @@ export function NewOrderBuilder({ context, defaultCustomerId }: { context: Build
       <div className="mt-1 grid grid-cols-1 gap-5 lg:grid-cols-[340px_1fr]">
         {/* Customer + delivery */}
         <div className="space-y-4">
-          <div className="space-y-4 rounded-2xl border border-[#E7E7E2] bg-white p-5">
-            <h2 className="text-[14px] font-semibold text-[#1A1C1E]">Customer</h2>
+          <div className="space-y-4 rounded-2xl border border-[#EAEDF2] bg-white p-5">
+            <h2 className="text-[14px] font-semibold text-[#171A17]">Customer</h2>
             <FormField label="Customer">
               <CustomerSelect customers={context.customers} value={customerId} onChange={pickCustomer} allowCreate />
             </FormField>
@@ -1369,8 +1369,8 @@ export function NewOrderBuilder({ context, defaultCustomerId }: { context: Build
             </FormField>
           </div>
 
-          <div className="space-y-4 rounded-2xl border border-[#E7E7E2] bg-white p-5">
-            <h2 className="text-[14px] font-semibold text-[#1A1C1E]">Delivery</h2>
+          <div className="space-y-4 rounded-2xl border border-[#EAEDF2] bg-white p-5">
+            <h2 className="text-[14px] font-semibold text-[#171A17]">Delivery</h2>
             <FormField label="Deliver to">
               <select
                 value={addressChoice}
@@ -1398,11 +1398,11 @@ export function NewOrderBuilder({ context, defaultCustomerId }: { context: Build
                   onChange={(e) => setCustomAddress(e.target.value)}
                   rows={2}
                   placeholder="Street, suburb, city…"
-                  className="w-full rounded-lg border border-[#D7DAD8] bg-white px-3 py-2 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/50 focus:outline-none"
+                  className="w-full rounded-lg border border-[#E2E6EC] bg-white px-3 py-2 text-[13px] text-[#171A17] placeholder:text-[#8A8E86] focus:border-[#3E7BC4]/50 focus:outline-none"
                 />
               </FormField>
             ) : chosenAddress ? (
-              <p className="rounded-xl border border-[#F0F0EC] bg-[#FBFBF9] px-3 py-2 text-[12px] text-[#5F6368]">{formatAddress(chosenAddress) || '—'}</p>
+              <p className="rounded-xl border border-[#EEF1F5] bg-[#FBFCFE] px-3 py-2 text-[12px] text-[#6B6F68]">{formatAddress(chosenAddress) || '—'}</p>
             ) : null}
             <FormField label="Delivery date">
               <input type="date" value={deliveryDate} onChange={(e) => setDeliveryDate(e.target.value)} className={inputClass} />
@@ -1412,21 +1412,21 @@ export function NewOrderBuilder({ context, defaultCustomerId }: { context: Build
             </FormField>
           </div>
 
-          <div className="space-y-4 rounded-2xl border border-[#E7E7E2] bg-white p-5">
-            <h2 className="text-[14px] font-semibold text-[#1A1C1E]">Notes</h2>
+          <div className="space-y-4 rounded-2xl border border-[#EAEDF2] bg-white p-5">
+            <h2 className="text-[14px] font-semibold text-[#171A17]">Notes</h2>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
               placeholder="Internal order notes…"
-              className="w-full rounded-lg border border-[#D7DAD8] bg-white px-3 py-2 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/50 focus:outline-none"
+              className="w-full rounded-lg border border-[#E2E6EC] bg-white px-3 py-2 text-[13px] text-[#171A17] placeholder:text-[#8A8E86] focus:border-[#3E7BC4]/50 focus:outline-none"
             />
           </div>
         </div>
 
         {/* Line items + totals */}
-        <div className="rounded-2xl border border-[#E7E7E2] bg-white p-5">
-          <h2 className="text-[14px] font-semibold text-[#1A1C1E]">Line items</h2>
+        <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5">
+          <h2 className="text-[14px] font-semibold text-[#171A17]">Line items</h2>
           <div className="mt-3">
             <LineItemsEditor
               products={context.products}
@@ -1436,7 +1436,7 @@ export function NewOrderBuilder({ context, defaultCustomerId }: { context: Build
               onChange={setBlines}
             />
           </div>
-          <div className="mt-4 ml-auto w-full max-w-[280px] space-y-1.5 border-t border-[#F0F0EC] pt-3 text-[13px]">
+          <div className="mt-4 ml-auto w-full max-w-[280px] space-y-1.5 border-t border-[#EEF1F5] pt-3 text-[13px]">
             <Row label="Subtotal" value={zar2(totals.subtotal)} />
             <Row label={`VAT (${vatRate}%) if invoiced`} value={zar2(totals.vat)} muted />
             <Row label="Total" value={zar2(totals.total)} bold />

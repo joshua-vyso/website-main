@@ -1,5 +1,5 @@
 /** Vyso wordmark (shared SVG geometry) for platform surfaces. */
-export function VysoMark({ width = 96, color = '#1A1C1E' }: { width?: number; color?: string }) {
+export function VysoMark({ width = 96, color = '#171A17' }: { width?: number; color?: string }) {
   const height = width * (350 / 900);
   return (
     <svg viewBox="175 455 900 350" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ width, height, display: 'block' }}>

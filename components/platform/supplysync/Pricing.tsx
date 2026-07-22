@@ -136,7 +136,7 @@ export function PricingTab() {
       {/* ---------------------------------------------------------------- */}
       <SectionCard
         title="Price watch"
-        right={<span className="text-[12px] text-[#9A9DA1]">{pricing.length} tracked line{pricing.length === 1 ? '' : 's'}</span>}
+        right={<span className="text-[12px] text-[#A0A49C]"><span className="of-num">{pricing.length}</span> tracked line{pricing.length === 1 ? '' : 's'}</span>}
       >
         <DataTable
           columns={[
@@ -155,8 +155,8 @@ export function PricingTab() {
             const pos = POSITION_META[p.position];
             return [
               <div key="item">
-                <div className="font-medium text-[#1A1C1E]">{p.item}</div>
-                <div className="text-[11px] text-[#9A9DA1]">
+                <div className="font-semibold text-[#171A17]">{p.item}</div>
+                <div className="mt-0.5 text-[12px] text-[#A0A49C]">
                   {p.category}
                   {p.unit ? ` · per ${p.unit}` : ''}
                 </div>
@@ -166,13 +166,13 @@ export function PricingTab() {
               ) : (
                 <span key="sup">{p.supplierName || '—'}</span>
               ),
-              <span key="cur" className="font-medium text-[#1A1C1E] tabular-nums">{zar(p.currentPrice)}</span>,
-              <span key="prev" className="text-[#5F6368] tabular-nums">{zar(p.previousPrice)}</span>,
-              <span key="chg" className="font-medium tabular-nums" style={{ color: changeColor(p.changePct) }}>
+              <span key="cur" className="of-num font-medium text-[#171A17]">{zar(p.currentPrice)}</span>,
+              <span key="prev" className="of-num text-[#6B6F68]">{zar(p.previousPrice)}</span>,
+              <span key="chg" className="of-num font-medium" style={{ color: changeColor(p.changePct) }}>
                 {signed(p.changePct)}
               </span>,
-              <span key="mkt" className="text-[#5F6368] tabular-nums">{zar(p.marketAvg)}</span>,
-              <span key="vs" className="tabular-nums" style={{ color: marketDiffColor(p.diffVsMarketPct) }}>
+              <span key="mkt" className="of-num text-[#6B6F68]">{zar(p.marketAvg)}</span>,
+              <span key="vs" className="of-num" style={{ color: marketDiffColor(p.diffVsMarketPct) }}>
                 <span className="font-medium">{signed(p.diffVsMarketPct)}</span>
                 <span className="ml-1 text-[11px]" style={{ color: pos.color }}>{pos.label}</span>
               </span>,
@@ -189,12 +189,12 @@ export function PricingTab() {
         title="Supplier price comparison"
         right={
           categories.length > 0 ? (
-            <label className="flex items-center gap-2 text-[12px] text-[#5F6368]">
-              <span className="text-[#9A9DA1]">Category</span>
+            <label className="flex items-center gap-2 text-[12px] text-[#6B6F68]">
+              <span className="text-[#8A8E86]">Category</span>
               <select
                 value={activeCategory}
                 onChange={(e) => setCategory(e.target.value)}
-                className="rounded-lg border border-[#E7E7E2] bg-white px-2.5 py-1.5 text-[12px] font-medium text-[#1A1C1E] outline-none focus:border-[#B0466A]"
+                className="h-9 rounded-[10px] border border-[#E4E9F0] bg-white px-3 text-[13px] font-medium text-[#171A17] outline-none transition-colors focus:border-[#3E7BC4]"
               >
                 {categories.map((c) => (
                   <option key={c} value={c}>{c}</option>
@@ -204,9 +204,9 @@ export function PricingTab() {
           ) : undefined
         }
       >
-        <p className="mb-3 text-[12px] text-[#5F6368]">
+        <p className="mb-3 text-[12px] text-[#6B6F68]">
           Best value blends supplier score with price standing versus the market — a quick read on who to lean on for{' '}
-          <span className="font-medium text-[#1A1C1E]">{activeCategory || 'this category'}</span>. Purchasing stays in ProcurePulse.
+          <span className="font-medium text-[#171A17]">{activeCategory || 'this category'}</span>. Purchasing stays in ProcurePulse.
         </p>
         <DataTable
           columns={[
@@ -227,12 +227,12 @@ export function PricingTab() {
                 {p.supplierId ? (
                   <SupplierNameButton id={p.supplierId} name={p.supplierName || 'Supplier'} />
                 ) : (
-                  <span className="font-medium text-[#1A1C1E]">{p.supplierName || '—'}</span>
+                  <span className="font-medium text-[#171A17]">{p.supplierName || '—'}</span>
                 )}
                 {isTop ? <Badge label="Top pick" tone="positive" /> : null}
               </div>,
-              <span key="item" className="text-[#5F6368]">{p.item}</span>,
-              <span key="price" className="tabular-nums font-medium text-[#1A1C1E]">{zar(p.currentPrice)}</span>,
+              <span key="item" className="text-[#6B6F68]">{p.item}</span>,
+              <span key="price" className="of-num font-medium text-[#171A17]">{zar(p.currentPrice)}</span>,
               <ScorePill key="rel" value={row.reliability} />,
               <ScorePill key="qual" value={row.quality} />,
               <ScorePill key="del" value={row.delivery} />,
@@ -247,12 +247,12 @@ export function PricingTab() {
       {/* ---------------------------------------------------------------- */}
       <SectionCard
         title="Buying opportunities"
-        right={<span className="text-[12px] text-[#9A9DA1]">Recommendations · act in ProcurePulse</span>}
+        right={<span className="text-[12px] text-[#8A8E86]">Recommendations · act in ProcurePulse</span>}
       >
         {groupedOpps.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-10 text-center">
-            <p className="text-[14px] font-medium text-[#1A1C1E]">No standout opportunities right now</p>
-            <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">
+          <div className="rounded-2xl border border-dashed border-[#E2E6EC] bg-[#FBFCFE] px-6 py-10 text-center">
+            <p className="of-display text-[16px] font-semibold text-[#171A17]">No standout opportunities right now</p>
+            <p className="mx-auto mt-1 max-w-md text-[13px] text-[#6B6F68]">
               Supplier prices are tracking close to market. SupplySync will flag below-market buys and above-market lines to negotiate as new price lists arrive.
             </p>
           </div>
@@ -264,34 +264,34 @@ export function PricingTab() {
                 <div key={group.kind}>
                   <div className="mb-2.5 flex items-center gap-2">
                     <Badge label={meta.label} tone={meta.tone} />
-                    <span className="text-[12px] text-[#9A9DA1]">{group.items.length}</span>
+                    <span className="of-num text-[12px] text-[#A0A49C]">{group.items.length}</span>
                   </div>
                   <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
                     {group.items.map((o) => (
                       <article
                         key={o.id}
-                        className="rounded-2xl border border-[#E7E7E2] bg-white p-4"
+                        className="rounded-2xl border border-[#EAEDF2] bg-white p-4 shadow-[0_1px_2px_rgba(20,24,20,0.03)]"
                         style={{ borderLeft: `3px solid ${meta.accent}` }}
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div>
-                            <h3 className="text-[14px] font-semibold text-[#1A1C1E]">{o.title}</h3>
-                            <p className="mt-0.5 text-[12px] text-[#9A9DA1]">
+                            <h3 className="of-display text-[15px] font-semibold text-[#171A17]">{o.title}</h3>
+                            <p className="mt-1 text-[12px] text-[#A0A49C]">
                               {o.supplierName || 'Supplier'}
                               {o.category ? ` · ${o.category}` : ''}
                             </p>
                           </div>
                           <Badge label={meta.label} tone={meta.tone} />
                         </div>
-                        <p className="mt-2.5 text-[13px] leading-relaxed text-[#5F6368]">{o.body}</p>
-                        <div className="mt-3 rounded-xl bg-[#FBFBF9] px-3 py-2">
-                          <span className="text-[11px] font-medium uppercase tracking-wide text-[#9A9DA1]">Suggested action</span>
-                          <p className="mt-0.5 text-[13px] text-[#1A1C1E]">{o.suggestedAction}</p>
+                        <p className="mt-2.5 text-[13px] leading-relaxed text-[#6B6F68]">{o.body}</p>
+                        <div className="mt-3 rounded-[11px] border border-[#EEF1F5] bg-[#FBFCFE] px-3 py-2.5">
+                          <span className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">Suggested action</span>
+                          <p className="mt-0.5 text-[13px] text-[#171A17]">{o.suggestedAction}</p>
                         </div>
                         <div className="mt-3.5 flex flex-wrap items-center gap-2">
                           <Link
                             href="/app/procurepulse"
-                            className="inline-flex items-center rounded-lg px-3 py-1.5 text-[12px] font-semibold text-white transition-opacity hover:opacity-90"
+                            className="inline-flex h-[42px] items-center rounded-[11px] px-[18px] text-[14px] font-semibold text-white transition-opacity hover:opacity-90"
                             style={{ backgroundColor: INK }}
                           >
                             Prioritise in ProcurePulse →
@@ -300,7 +300,7 @@ export function PricingTab() {
                             <button
                               type="button"
                               onClick={() => o.supplierId && openProfile(o.supplierId)}
-                              className="inline-flex items-center rounded-lg border border-[#E7E7E2] bg-white px-3 py-1.5 text-[12px] font-medium text-[#1A1C1E] hover:bg-[#FAFAF8]"
+                              className="inline-flex h-[42px] items-center rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]"
                             >
                               View supplier
                             </button>
@@ -315,7 +315,7 @@ export function PricingTab() {
           </div>
         )}
         {!hasSuppliers ? (
-          <p className="mt-4 text-[11px] text-[#9A9DA1]">
+          <p className="mt-4 text-[11px] text-[#8A8E86]">
             Supplier scorecards aren&apos;t loaded yet — value scores use pricing only until suppliers sync.
           </p>
         ) : null}

@@ -59,7 +59,7 @@ const ACCENT: Record<VysoModuleKey, { bg: string; fg: string }> = {
   shiftboard: { bg: '#ECEAFB', fg: '#5B53C0' },
   supplysync: { bg: '#FBE9EE', fg: '#B0466A' },
   insightgen: { bg: '#EAECF8', fg: '#3A4DB0' },
-  orderflow: { bg: '#EDEFF1', fg: '#5F6368' },
+  orderflow: { bg: '#EDEFF1', fg: '#6B6F68' },
 };
 
 const DESCRIPTION: Record<VysoModuleKey, string> = {

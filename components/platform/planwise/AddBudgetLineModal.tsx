@@ -7,7 +7,7 @@ import { usePlatform } from '@/lib/platform/session';
 import { createClient } from '@/lib/platform/supabase-browser';
 import { usePlanWise } from './context';
 
-const MODAL_STYLE = { fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties;
+const MODAL_STYLE = { fontFamily: 'var(--font-instrument)', ['--radius' as string]: '0.625rem' } as React.CSSProperties;
 
 // Swatches for new expense categories (distinct from the seeded palette where possible).
 const PALETTE = ['#0C447C', '#854F0B', '#2E7D67', '#5B53C0', '#A0691A', '#7C5BC0', '#3E7C4F', '#B0552A'];
@@ -71,42 +71,42 @@ export function AddBudgetLineModal({ open, onClose, onSaved }: { open: boolean; 
   }
 
   if (!mounted || !open) return null;
-  const input = 'h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none';
+  const input = 'h-11 w-full rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]';
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={MODAL_STYLE}>
-      <div className="absolute inset-0 bg-[#1A1C1E]/25 backdrop-blur-[1px]" onClick={() => !busy && onClose()} />
-      <div role="dialog" aria-modal="true" className="relative w-full max-w-[420px] rounded-2xl border border-[#E7E7E2] bg-white p-5 shadow-[0_24px_70px_-20px_rgba(26,28,30,0.45)]">
+      <div className="absolute inset-0 bg-[#171A17]/25 backdrop-blur-[1px]" onClick={() => !busy && onClose()} />
+      <div role="dialog" aria-modal="true" className="relative w-full max-w-[420px] rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_24px_70px_-20px_rgba(26,28,30,0.45)]">
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-[16px] font-semibold text-[#1A1C1E]">Add budget category</h2>
-            <p className="mt-0.5 text-[13px] text-[#5F6368]">A new expense line in this month&rsquo;s budget.</p>
+            <h2 className="of-display text-[18px] font-semibold tracking-[-0.015em] text-[#171A17]">Add budget category</h2>
+            <p className="mt-1 text-[13px] text-[#8A8E86]">A new expense line in this month&rsquo;s budget.</p>
           </div>
-          <button type="button" onClick={onClose} aria-label="Close" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[18px] text-[#9A9DA1] transition-colors hover:bg-[#F0F0EC] hover:text-[#1A1C1E]">✕</button>
+          <button type="button" onClick={onClose} aria-label="Close" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-[10px] text-[18px] text-[#A0A49C] transition-colors hover:bg-[#EEF1F5] hover:text-[#171A17]">✕</button>
         </div>
         <div className="mt-4 space-y-3">
           <div>
-            <label className="mb-1 block text-[13px] font-medium text-[#1A1C1E]">Category</label>
+            <label className="mb-1 block text-[13px] font-medium text-[#171A17]">Category</label>
             <input autoFocus value={cat} onChange={(e) => { setCat(e.target.value); if (error) setError(null); }} placeholder="e.g. Cold chain, Insurance" className={input} />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="mb-1 block text-[13px] font-medium text-[#1A1C1E]">Budgeted (R)</label>
-              <input value={budgeted} onChange={(e) => { setBudgeted(e.target.value); if (error) setError(null); }} inputMode="decimal" placeholder="0" className={input} />
+              <label className="mb-1 block text-[13px] font-medium text-[#171A17]">Budgeted (R)</label>
+              <input value={budgeted} onChange={(e) => { setBudgeted(e.target.value); if (error) setError(null); }} inputMode="decimal" placeholder="0" className={`${input} of-num`} />
             </div>
             <div>
-              <label className="mb-1 block text-[13px] font-medium text-[#1A1C1E]">Actual (R)</label>
-              <input value={actual} onChange={(e) => setActual(e.target.value)} inputMode="decimal" placeholder="0" className={input} />
+              <label className="mb-1 block text-[13px] font-medium text-[#171A17]">Actual (R)</label>
+              <input value={actual} onChange={(e) => setActual(e.target.value)} inputMode="decimal" placeholder="0" className={`${input} of-num`} />
             </div>
           </div>
           <div>
-            <label className="mb-1 block text-[13px] font-medium text-[#1A1C1E]">Suggested action <span className="text-[#9A9DA1]">(optional)</span></label>
+            <label className="mb-1 block text-[13px] font-medium text-[#171A17]">Suggested action <span className="text-[#8A8E86]">(optional)</span></label>
             <input value={action} onChange={(e) => setAction(e.target.value)} placeholder="e.g. Lock an annual rate" className={input} />
           </div>
           {error ? <p className="text-[12px] text-[#A32D2D]">{error}</p> : null}
         </div>
         <div className="mt-5 flex justify-end gap-2">
-          <button type="button" onClick={onClose} disabled={busy} className="rounded-lg px-3.5 py-2 text-[13px] text-[#5F6368] hover:bg-black/[0.03] disabled:opacity-50">Cancel</button>
-          <button type="button" onClick={save} disabled={busy} className="rounded-lg bg-[#1F5FA8] px-4 py-2 text-[13px] font-medium text-white hover:bg-[#174C87] disabled:opacity-60">{busy ? 'Saving…' : 'Add category'}</button>
+          <button type="button" onClick={onClose} disabled={busy} className="inline-flex h-[42px] items-center rounded-[11px] px-[18px] text-[14px] font-medium text-[#6B6F68] transition-colors hover:bg-black/[0.03] disabled:opacity-50">Cancel</button>
+          <button type="button" onClick={save} disabled={busy} className="inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-60">{busy ? 'Saving…' : 'Add category'}</button>
         </div>
       </div>
     </div>,

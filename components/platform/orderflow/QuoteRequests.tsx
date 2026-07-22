@@ -82,16 +82,16 @@ export function QuoteRequests({ requests, total }: { requests: OfQuoteRequest[];
           <button
             type="button"
             onClick={() => setExpanded(isOpen ? null : r.id)}
-            className="min-w-0 flex-1 truncate text-left text-[13px] text-[#1A1C1E]"
+            className="min-w-0 flex-1 truncate text-left text-[13px] text-[#171A17]"
           >
             <span className="font-medium">{who}</span>
             {r.business_name && r.business_name !== who ? (
-              <span className="text-[#5F6368]"> · {r.business_name}</span>
+              <span className="text-[#6B6F68]"> · {r.business_name}</span>
             ) : null}
-            {r.message ? <span className="text-[#9A9DA1]"> — {r.message}</span> : null}
+            {r.message ? <span className="text-[#8A8E86]"> — {r.message}</span> : null}
           </button>
 
-          <span className="shrink-0 text-[12px] text-[#9A9DA1]">{fmtWhen(r.received_at)}</span>
+          <span className="shrink-0 text-[12px] text-[#8A8E86]">{fmtWhen(r.received_at)}</span>
 
           {/* A flagged row can be un-flagged in one click if the human disagrees — it
               then joins the real leads. Human decides, not the model. */}
@@ -100,7 +100,7 @@ export function QuoteRequests({ requests, total }: { requests: OfQuoteRequest[];
               type="button"
               disabled={busy === r.id}
               onClick={() => void act(r.id, { flagged_spam: false })}
-              className="shrink-0 rounded-lg border border-[#E7E7E2] bg-white px-2.5 py-1 text-[12px] text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/30 disabled:opacity-40"
+              className="shrink-0 rounded-lg border border-[#EAEDF2] bg-white px-2.5 py-1 text-[12px] text-[#171A17] transition-colors hover:border-[#3E7BC4]/30 disabled:opacity-40"
             >
               Not spam
             </button>
@@ -116,7 +116,7 @@ export function QuoteRequests({ requests, total }: { requests: OfQuoteRequest[];
             type="button"
             disabled={busy === r.id}
             onClick={() => void dismiss(r.id, who)}
-            className="shrink-0 rounded-lg px-2 py-1 text-[12px] text-[#5F6368] transition-colors hover:bg-black/[0.04] disabled:opacity-40"
+            className="shrink-0 rounded-lg px-2 py-1 text-[12px] text-[#6B6F68] transition-colors hover:bg-black/[0.04] disabled:opacity-40"
           >
             Dismiss
           </button>
@@ -124,20 +124,20 @@ export function QuoteRequests({ requests, total }: { requests: OfQuoteRequest[];
 
         {isOpen ? (
           <div className="mt-2 space-y-2 border-t border-[#F3F3EF] pt-2">
-            <div className="flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-[#5F6368]">
+            <div className="flex flex-wrap gap-x-4 gap-y-1 text-[12px] text-[#6B6F68]">
               {r.contact_email ? <span>{r.contact_email}</span> : null}
               {r.contact_phone ? <span>{r.contact_phone}</span> : null}
-              {r.from_email ? <span className="text-[#9A9DA1]">via {r.from_email}</span> : null}
+              {r.from_email ? <span className="text-[#8A8E86]">via {r.from_email}</span> : null}
             </div>
 
             {r.message ? (
-              <p className="whitespace-pre-wrap text-[13px] leading-snug text-[#1A1C1E]">{r.message}</p>
+              <p className="whitespace-pre-wrap text-[13px] leading-snug text-[#171A17]">{r.message}</p>
             ) : null}
 
             {items.length > 0 ? (
               <div className="flex flex-wrap gap-1.5">
                 {items.map((it, i) => (
-                  <span key={`${r.id}_${i}`} className="rounded-full bg-[#F0F0EC] px-2 py-0.5 text-[12px] text-[#1A1C1E]">
+                  <span key={`${r.id}_${i}`} className="rounded-full bg-[#EEF1F5] px-2 py-0.5 text-[12px] text-[#171A17]">
                     {[it.quantity, it.unit, it.description].filter(Boolean).join(' ')}
                   </span>
                 ))}
@@ -151,7 +151,7 @@ export function QuoteRequests({ requests, total }: { requests: OfQuoteRequest[];
               </Link>
             ) : null}
 
-            <p className="text-[11px] text-[#9A9DA1]">Typed into a public form — treat the name and company as unverified.</p>
+            <p className="text-[11px] text-[#8A8E86]">Typed into a public form — treat the name and company as unverified.</p>
           </div>
         ) : null}
       </div>
@@ -163,10 +163,10 @@ export function QuoteRequests({ requests, total }: { requests: OfQuoteRequest[];
       {toastNode}
 
       <div>
-        <div className="text-[15px] font-medium text-[#1A1C1E]">
+        <div className="text-[15px] font-medium text-[#171A17]">
           {leads.length} quote request{leads.length === 1 ? '' : 's'} to review
         </div>
-        <p className="mt-0.5 text-[13px] text-[#9A9DA1]">
+        <p className="mt-0.5 text-[13px] text-[#8A8E86]">
           From the website contact form. Nothing is priced or linked to a customer until you draft the quote.
           {hidden > 0 ? ` Showing the newest ${requests.length}; ${hidden} more are waiting.` : ''}
         </p>
@@ -179,7 +179,7 @@ export function QuoteRequests({ requests, total }: { requests: OfQuoteRequest[];
           ))}
         </div>
       ) : (
-        <p className="mt-3 text-[13px] text-[#9A9DA1]">
+        <p className="mt-3 text-[13px] text-[#8A8E86]">
           No un-flagged enquiries right now{spam.length > 0 ? ' — the rest are flagged as likely spam below.' : '.'}
         </p>
       )}
@@ -191,7 +191,7 @@ export function QuoteRequests({ requests, total }: { requests: OfQuoteRequest[];
           <button
             type="button"
             onClick={() => setShowSpam((s) => !s)}
-            className="text-[12px] font-medium text-[#9A9DA1] transition-colors hover:text-[#5F6368]"
+            className="text-[12px] font-medium text-[#8A8E86] transition-colors hover:text-[#6B6F68]"
           >
             {showSpam ? '▾' : '▸'} Likely spam ({spam.length})
           </button>

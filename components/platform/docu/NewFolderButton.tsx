@@ -54,7 +54,7 @@ export function NewFolderButton() {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-[#E7E7E2] bg-white px-4 text-[14px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/30"
+        className="inline-flex h-[42px] shrink-0 items-center gap-1.5 rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]"
       >
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden>
           <path d="M8 3.5v9M3.5 8h9" />
@@ -70,8 +70,8 @@ export function NewFolderButton() {
             onClick={() => setOpen(false)}
             className="fixed inset-0 z-40 cursor-default"
           />
-          <div className="absolute right-0 top-full z-50 mt-2 w-[280px] rounded-2xl border border-[#E7E7E2] bg-white p-3 shadow-[0_12px_40px_-12px_rgba(26,28,30,0.25)]">
-            <p className="px-1 pb-2 text-[11px] font-medium uppercase tracking-wide text-[#9A9DA1]">
+          <div className="absolute right-0 top-full z-50 mt-2 w-[280px] rounded-2xl border border-[#EAEDF2] bg-white p-3 shadow-[0_12px_40px_-12px_rgba(26,28,30,0.25)]">
+            <p className="px-1 pb-2 text-[11px] font-medium uppercase tracking-[0.06em] text-[#A0A49C]">
               New folder
             </p>
             <input
@@ -84,7 +84,7 @@ export function NewFolderButton() {
                 if (e.key === 'Escape') setOpen(false);
               }}
               placeholder="Folder name"
-              className="h-9 w-full rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
+              className="h-10 w-full rounded-[10px] border border-[#E4E9F0] bg-white px-3 text-[13px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]"
             />
             <div className="mt-2.5 grid grid-cols-8 gap-1.5">
               {FOLDER_COLORS.map((c) => (
@@ -94,21 +94,21 @@ export function NewFolderButton() {
                   onClick={() => setColor(c)}
                   aria-label={`Colour ${c}`}
                   className={`h-6 w-6 rounded-md transition-transform hover:scale-110 ${
-                    color === c ? 'ring-2 ring-offset-1 ring-[#1A1C1E]' : ''
+                    color === c ? 'ring-2 ring-offset-1 ring-[#1F5FA8]' : ''
                   }`}
                   style={{ backgroundColor: c }}
                 />
               ))}
             </div>
             <div className="mt-3 flex justify-end gap-1.5">
-              <button type="button" onClick={() => setOpen(false)} className="rounded-lg px-3 py-1.5 text-[13px] text-[#5F6368] hover:bg-[#FAFAF8]">
+              <button type="button" onClick={() => setOpen(false)} className="inline-flex h-9 items-center rounded-[10px] px-3.5 text-[13px] font-medium text-[#6B6F68] transition-colors hover:bg-[#EAF2FC] hover:text-[#174C87]">
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={() => void create()}
                 disabled={busy || !name.trim()}
-                className="rounded-lg bg-[#1F5FA8] px-3.5 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
+                className="inline-flex h-9 items-center rounded-[10px] bg-[#1F5FA8] px-3.5 text-[13px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
               >
                 {busy ? 'Creating…' : 'Create folder'}
               </button>

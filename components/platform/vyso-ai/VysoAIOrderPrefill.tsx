@@ -44,9 +44,9 @@ export function VysoAIOrderPrefill({ onLoad }: { onLoad: (order: ParsedOrder) =>
             </svg>
           </span>
           <div className="text-[13px] text-[#12324F]">
-            <span className="font-semibold">Vyso AI parsed an order</span>
+            <span className="of-display font-semibold">Vyso AI parsed an order</span>
             {' — '}
-            {count} item{count === 1 ? '' : 's'}
+            <span className="of-num">{count}</span> item{count === 1 ? '' : 's'}
             {order.customerName ? (
               <>
                 {' for '}
@@ -60,7 +60,7 @@ export function VysoAIOrderPrefill({ onLoad }: { onLoad: (order: ParsedOrder) =>
           <button
             type="button"
             onClick={dismiss}
-            className="rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-[#5F6368] transition-colors hover:bg-[#E4EFFA]"
+            className="rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-[#6B6F68] transition-colors hover:bg-[#E4EFFA]"
           >
             Dismiss
           </button>

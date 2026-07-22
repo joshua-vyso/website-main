@@ -16,9 +16,9 @@ function dotColor(event: string): string {
   if (event.includes('quote')) return '#4A6FA5'; // muted blue
   if (event.includes('order')) return '#3E7BC4';
   if (event.includes('delivery') || event.includes('pod')) return '#854F0B';
-  if (event.includes('document')) return '#5F6368';
+  if (event.includes('document')) return '#6B6F68';
   if (event.includes('customer') || event.includes('contact') || event.includes('address')) return '#4A6FA5';
-  return '#9A9DA1';
+  return '#8A8E86';
 }
 
 /**
@@ -40,7 +40,7 @@ function displayTime(iso: string): string {
 export function ActivityFeed({ events, emptyLabel }: { events: OfActivityEvent[]; emptyLabel?: string }) {
   if (!events || events.length === 0) {
     return (
-      <p className="text-[13px] text-[#9A9DA1]">{emptyLabel ?? 'No activity yet.'}</p>
+      <p className="text-[13px] text-[#8A8E86]">{emptyLabel ?? 'No activity yet.'}</p>
     );
   }
 
@@ -55,13 +55,13 @@ export function ActivityFeed({ events, emptyLabel }: { events: OfActivityEvent[]
           />
           <div className="min-w-0 flex-1">
             <div className="flex items-start justify-between gap-3">
-              <span className="text-[13px] font-medium text-[#1A1C1E]">
+              <span className="text-[13px] font-medium text-[#171A17]">
                 {ACTIVITY_EVENT_LABEL[e.event] ?? e.event}
               </span>
-              <span className="shrink-0 text-[11px] text-[#9A9DA1]">{displayTime(e.created_at)}</span>
+              <span className="shrink-0 text-[11px] text-[#8A8E86]">{displayTime(e.created_at)}</span>
             </div>
             {e.description ? (
-              <p className="mt-0.5 truncate text-[12px] text-[#5F6368]">{e.description}</p>
+              <p className="mt-0.5 truncate text-[12px] text-[#6B6F68]">{e.description}</p>
             ) : null}
           </div>
         </li>

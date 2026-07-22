@@ -44,19 +44,19 @@ export function AiSummaryCard({
   }
 
   return (
-    <div className="rounded-2xl border border-[#E7E7E2] bg-white px-5 py-4">
+    <div className="rounded-2xl border border-[#EAEDF2] bg-white px-5 py-4 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
       {/* Heading row */}
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="text-[15px] font-semibold text-[#1A1C1E]">AI summary</h3>
-          <p className="mt-0.5 text-[12px] text-[#9A9DA1]">Operational briefing</p>
+          <h3 className="of-display text-[16px] font-semibold text-[#171A17]">AI summary</h3>
+          <p className="mt-0.5 text-[12px] text-[#A0A49C]">Operational briefing</p>
         </div>
         {summary ? (
           <button
             type="button"
             onClick={() => generate(true)}
             disabled={loading}
-            className="shrink-0 text-[13px] text-[#5F6368] transition-colors hover:text-[#1A1C1E] disabled:opacity-50"
+            className="shrink-0 text-[13px] font-semibold text-[#1F5FA8] transition-colors hover:text-[#174C87] disabled:opacity-50"
           >
             Regenerate
           </button>
@@ -65,7 +65,7 @@ export function AiSummaryCard({
             type="button"
             onClick={() => generate(false)}
             disabled={loading}
-            className="shrink-0 rounded-lg bg-[#1F5FA8] px-3 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-50"
+            className="inline-flex h-9 shrink-0 items-center rounded-[10px] bg-[#1F5FA8] px-3.5 text-[13px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-50"
           >
             Generate AI summary
           </button>
@@ -74,7 +74,7 @@ export function AiSummaryCard({
 
       {/* Loading line */}
       {loading ? (
-        <div className="mt-4 flex items-center gap-2 text-[13px] text-[#5F6368]">
+        <div className="mt-4 flex items-center gap-2 text-[13px] text-[#6B6F68]">
           <span className="h-2 w-2 animate-pulse rounded-full bg-[#1F5FA8]" />
           <span className="animate-pulse">Generating operational summary…</span>
         </div>
@@ -87,7 +87,7 @@ export function AiSummaryCard({
 
       {/* Empty state */}
       {!summary && !loading && !error ? (
-        <p className="mt-4 text-[13px] text-[#9A9DA1]">
+        <p className="mt-4 text-[13px] text-[#8A8E86]">
           No summary yet — generate a briefing to read spend, price movements and discrepancies at a glance.
         </p>
       ) : null}
@@ -96,21 +96,21 @@ export function AiSummaryCard({
       {summary && !loading ? (
         <div className="mt-4 space-y-4">
           {/* Briefing (≤500 chars) */}
-          <p className="text-[14px] leading-relaxed text-[#1A1C1E]">{summary.text}</p>
+          <p className="text-[14px] leading-relaxed text-[#171A17]">{summary.text}</p>
 
           {/* Stat chips */}
           {summary.total_spend || summary.supplier ? (
             <div className="flex flex-wrap gap-2.5">
               {summary.total_spend ? (
-                <div className="rounded-xl border border-[#E7E7E2] bg-[#EAF2FC] px-3 py-2">
-                  <div className="text-[11px] text-[#5F6368]">Total spend</div>
-                  <div className="mt-0.5 text-[14px] font-semibold text-[#0F6E56]">{summary.total_spend}</div>
+                <div className="rounded-[14px] border border-[#EEF1F5] bg-[#E1F5EE] px-3.5 py-2.5">
+                  <div className="text-[11px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">Total spend</div>
+                  <div className="of-num mt-1 text-[15px] font-semibold text-[#0F6E56]">{summary.total_spend}</div>
                 </div>
               ) : null}
               {summary.supplier ? (
-                <div className="rounded-xl border border-[#E7E7E2] bg-white px-3 py-2">
-                  <div className="text-[11px] text-[#5F6368]">Supplier</div>
-                  <div className="mt-0.5 text-[14px] font-semibold text-[#1A1C1E]">{summary.supplier}</div>
+                <div className="rounded-[14px] border border-[#EEF1F5] bg-white px-3.5 py-2.5">
+                  <div className="text-[11px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">Supplier</div>
+                  <div className="mt-1 text-[15px] font-semibold text-[#171A17]">{summary.supplier}</div>
                 </div>
               ) : null}
             </div>

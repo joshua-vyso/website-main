@@ -6,14 +6,14 @@ import type { DocumentWithSupplier } from '@/lib/platform/types';
 
 /** Dot colour per activity kind. */
 const KIND_COLOR: Record<ActivityKind, string> = {
-  uploaded: '#9A9DA1',
+  uploaded: '#8A8E86',
   extracted: '#0C447C',
   supplier_matched: '#3E7BC4',
   flags_detected: '#854F0B',
   reviewed: '#0F6E56',
   approved: '#0F6E56',
   rejected: '#A32D2D',
-  archived: '#5F6368',
+  archived: '#6B6F68',
 };
 
 function formatAt(at: string | null): string {
@@ -34,11 +34,11 @@ export function ActivityTimeline({ doc }: { doc: DocumentWithSupplier }) {
   const events = deriveActivity(doc);
 
   return (
-    <div className="rounded-2xl border border-[#E7E7E2] bg-white px-5 py-4">
-      <h3 className="text-[15px] font-semibold text-[#1A1C1E]">Activity</h3>
+    <div className="rounded-2xl border border-[#EAEDF2] bg-white px-5 py-4 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+      <h3 className="of-display text-[16px] font-semibold text-[#171A17]">Activity</h3>
 
       {events.length === 0 ? (
-        <p className="mt-3 text-[13px] text-[#9A9DA1]">No activity yet.</p>
+        <p className="mt-3 text-[13px] text-[#8A8E86]">No activity yet.</p>
       ) : (
         <ol className="mt-3">
           {events.map((event, i) => {
@@ -49,7 +49,7 @@ export function ActivityTimeline({ doc }: { doc: DocumentWithSupplier }) {
                 {!last ? (
                   <span
                     aria-hidden
-                    className="absolute left-[3.5px] top-3 bottom-0 w-px bg-[#E7E7E2]"
+                    className="absolute left-[3.5px] top-3 bottom-0 w-px bg-[#EAEDF2]"
                   />
                 ) : null}
                 {/* Dot */}
@@ -60,14 +60,14 @@ export function ActivityTimeline({ doc }: { doc: DocumentWithSupplier }) {
                 {/* Content */}
                 <div className="min-w-0 -mt-0.5">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[13px] text-[#1A1C1E]">{event.label}</span>
+                    <span className="text-[13px] text-[#171A17]">{event.label}</span>
                     {event.source === 'mock' ? (
-                      <span className="rounded-full bg-[#F0F0EC] px-1.5 py-0.5 text-[10px] text-[#9A9DA1]">
+                      <span className="rounded-full bg-[#EEF1F5] px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.05em] text-[#A0A49C]">
                         demo
                       </span>
                     ) : null}
                   </div>
-                  <span className="mt-0.5 block text-[12px] text-[#9A9DA1]">{formatAt(event.at)}</span>
+                  <span className="of-num mt-0.5 block text-[12px] text-[#A0A49C]">{formatAt(event.at)}</span>
                 </div>
               </li>
             );

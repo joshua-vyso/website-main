@@ -5,7 +5,7 @@ import type { UserRole } from '@/lib/platform/types';
 const ROLE_STYLE: Record<UserRole, { bg: string; fg: string; label: string }> = {
   owner: { bg: '#EAF2FC', fg: '#1F5FA8', label: 'Owner' },
   admin: { bg: '#E6F1FB', fg: '#0C447C', label: 'Admin' },
-  member: { bg: '#F0F0EC', fg: '#5F6368', label: 'Member' },
+  member: { bg: '#EEF1F5', fg: '#6B6F68', label: 'Member' },
 };
 
 function initials(name: string | null): string {
@@ -92,24 +92,24 @@ export default async function OrganisationPage() {
   return (
     <div className="px-8 py-7">
       <div>
-        <h1 className="text-[26px] font-bold text-[#1A1C1E]">My Organisation</h1>
-        <p className="mt-1 text-[14px] text-[#5F6368]">
+        <h1 className="of-display text-[28px] font-semibold leading-tight tracking-[-0.015em] text-[#171A17]">My Organisation</h1>
+        <p className="mt-1.5 text-[14px] text-[#8A8E86]">
           {session.org?.name ?? 'Your organisation'} — team members and recent activity
         </p>
       </div>
 
       <div className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-2">
         {/* Team members */}
-        <div className="rounded-2xl border border-[#E7E7E2] bg-white">
-          <div className="flex items-center justify-between border-b border-[#F0F0EC] px-5 py-4">
-            <h2 className="text-[15px] font-semibold text-[#1A1C1E]">Team members</h2>
-            <span className="text-[12px] text-[#9A9DA1]">
-              {members.length} {members.length === 1 ? 'person' : 'people'}
+        <div className="rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <div className="flex items-center justify-between border-b border-[#EEF1F5] px-5 py-4">
+            <h2 className="of-display text-[16px] font-semibold text-[#171A17]">Team members</h2>
+            <span className="text-[12px] text-[#A0A49C]">
+              <span className="of-num">{members.length}</span> {members.length === 1 ? 'person' : 'people'}
             </span>
           </div>
           <div className="px-5">
             {members.length === 0 ? (
-              <p className="py-8 text-center text-[13px] text-[#9A9DA1]">No team members yet.</p>
+              <p className="py-10 text-center text-[14px] text-[#8A8E86]">No team members yet.</p>
             ) : (
               members.map((m, i) => {
                 const r = ROLE_STYLE[m.role] ?? ROLE_STYLE.member;
@@ -117,26 +117,28 @@ export default async function OrganisationPage() {
                 return (
                   <div
                     key={m.id}
-                    className={`flex items-center gap-3 py-3.5 ${i > 0 ? 'border-t border-[#F0F0EC]' : ''}`}
+                    className={`flex items-center gap-3 py-3.5 ${i > 0 ? 'border-t border-[#F4F5F7]' : ''}`}
                   >
                     <div
-                      className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[12px] font-semibold"
+                      className="of-display flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[12px] font-semibold"
                       style={{ backgroundColor: r.bg, color: r.fg }}
                     >
                       {initials(m.full_name)}
                     </div>
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
-                        <span className="truncate text-[14px] font-medium text-[#1A1C1E]">
+                        <span className="truncate text-[14px] font-medium text-[#171A17]">
                           {m.full_name || 'Teammate'}
                         </span>
                         {isYou ? (
-                          <span className="rounded-full bg-[#1A1C1E] px-1.5 py-0.5 text-[10px] font-medium text-white">
+                          <span className="rounded-full bg-[#171A17] px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.05em] text-white">
                             You
                           </span>
                         ) : null}
                       </div>
-                      <div className="text-[12px] text-[#9A9DA1]">Joined {fmtDate(m.created_at)}</div>
+                      <div className="mt-0.5 text-[12px] text-[#A0A49C]">
+                        Joined <span className="of-num">{fmtDate(m.created_at)}</span>
+                      </div>
                     </div>
                     <span
                       className="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-medium"
@@ -152,25 +154,25 @@ export default async function OrganisationPage() {
         </div>
 
         {/* Activity / edits */}
-        <div className="rounded-2xl border border-[#E7E7E2] bg-white">
-          <div className="flex items-center justify-between border-b border-[#F0F0EC] px-5 py-4">
-            <h2 className="text-[15px] font-semibold text-[#1A1C1E]">Recent activity</h2>
-            <span className="text-[12px] text-[#9A9DA1]">Who changed what</span>
+        <div className="rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <div className="flex items-center justify-between border-b border-[#EEF1F5] px-5 py-4">
+            <h2 className="of-display text-[16px] font-semibold text-[#171A17]">Recent activity</h2>
+            <span className="text-[12px] text-[#A0A49C]">Who changed what</span>
           </div>
           <div className="px-5">
             {activity.length === 0 ? (
-              <p className="py-8 text-center text-[13px] text-[#9A9DA1]">No activity yet.</p>
+              <p className="py-10 text-center text-[14px] text-[#8A8E86]">No activity yet.</p>
             ) : (
               activity.map((a, i) => (
-                <div key={a.id} className={`flex items-start gap-3 py-3 ${i > 0 ? 'border-t border-[#F0F0EC]' : ''}`}>
-                  <div className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1F5FA8]" aria-hidden />
+                <div key={a.id} className={`flex items-start gap-3 py-3.5 ${i > 0 ? 'border-t border-[#F4F5F7]' : ''}`}>
+                  <div className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#3E7BC4]" aria-hidden />
                   <div className="min-w-0 flex-1">
-                    <p className="text-[13px] text-[#1A1C1E]">
-                      <span className="font-medium">{a.who}</span> {a.action}{' '}
-                      <span className="text-[#5F6368]">{a.target}</span>
+                    <p className="text-[14px] text-[#2C333B]">
+                      <span className="font-semibold text-[#171A17]">{a.who}</span> {a.action}{' '}
+                      <span className="text-[#6B6F68]">{a.target}</span>
                     </p>
                   </div>
-                  <span className="shrink-0 text-[12px] text-[#9A9DA1]">{timeAgo(a.at)}</span>
+                  <span className="of-num shrink-0 pt-0.5 text-[12px] text-[#A0A49C]">{timeAgo(a.at)}</span>
                 </div>
               ))
             )}

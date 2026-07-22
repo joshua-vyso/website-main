@@ -117,10 +117,10 @@ export function DocumentFilters({
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
-          className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition-colors ${
+          className={`inline-flex h-[38px] items-center gap-1.5 rounded-full border px-4 text-[13px] font-medium transition-all ${
             hasFilter
-              ? 'border-[#1A1C1E] bg-[#1A1C1E] text-white'
-              : 'border-[#E7E7E2] bg-white text-[#1A1C1E] hover:border-[#3E7BC4]/30'
+              ? 'border-[#1F5FA8] bg-[#1F5FA8] text-white hover:bg-[#174C87]'
+              : 'border-[#E2E6EC] bg-white text-[#3E4A57] hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]'
           }`}
           aria-expanded={open}
         >
@@ -128,14 +128,14 @@ export function DocumentFilters({
             <path d="M2 4h12M4.5 8h7M6.5 12h3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
           <span>{buttonLabel}</span>
-          <span className={hasFilter ? 'text-white/60' : 'text-[#9A9DA1]'}>▾</span>
+          <span className={hasFilter ? 'text-white/60' : 'text-[#8A8E86]'}>▾</span>
         </button>
 
         {hasFilter ? (
           <button
             type="button"
             onClick={clearAll}
-            className="inline-flex items-center gap-1 rounded-full border border-[#E7E7E2] bg-white px-3 py-1.5 text-[13px] text-[#5F6368] transition-colors hover:border-[#A32D2D]/30 hover:text-[#A32D2D]"
+            className="inline-flex h-[38px] items-center gap-1 rounded-full border border-[#E2E6EC] bg-white px-3.5 text-[13px] font-medium text-[#6B6F68] transition-colors hover:border-[#A32D2D]/30 hover:text-[#A32D2D]"
           >
             Clear ✕
           </button>
@@ -150,9 +150,9 @@ export function DocumentFilters({
               onClick={() => setOpen(false)}
               className="fixed inset-0 z-40 cursor-default"
             />
-            <div className="absolute left-0 top-full z-50 mt-2 w-[300px] rounded-2xl border border-[#E7E7E2] bg-white p-3 shadow-[0_12px_40px_-12px_rgba(26,28,30,0.25)]">
+            <div className="absolute left-0 top-full z-50 mt-2 w-[300px] rounded-2xl border border-[#EAEDF2] bg-white p-3 shadow-[0_12px_40px_-12px_rgba(26,28,30,0.25)]">
               {/* Types */}
-              <div className="px-1 pb-1.5 text-[11px] font-medium uppercase tracking-wide text-[#9A9DA1]">
+              <div className="px-1 pb-1.5 text-[11px] font-medium uppercase tracking-[0.06em] text-[#A0A49C]">
                 Document type
               </div>
               <div className="space-y-0.5">
@@ -164,23 +164,23 @@ export function DocumentFilters({
                       type="button"
                       onClick={() => pickType(t.key)}
                       className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-left text-[13px] transition-colors ${
-                        isActive ? 'bg-[#E7EEF8] text-[#174C87]' : 'text-[#1A1C1E] hover:bg-[#FAFAF8]'
+                        isActive ? 'bg-[#E7EEF8] text-[#174C87]' : 'text-[#171A17] hover:bg-[#F5F9FE]'
                       }`}
                     >
                       <span>{t.label}</span>
-                      <span className="text-[12px] text-[#9A9DA1]">{countByType(docs, t.key)}</span>
+                      <span className="of-num text-[12px] text-[#A0A49C]">{countByType(docs, t.key)}</span>
                     </button>
                   );
                 })}
               </div>
 
               {/* Folders */}
-              <div className="mt-3 px-1 pb-1.5 text-[11px] font-medium uppercase tracking-wide text-[#9A9DA1]">
+              <div className="mt-3 px-1 pb-1.5 text-[11px] font-medium uppercase tracking-[0.06em] text-[#A0A49C]">
                 Folders
               </div>
               <div className="space-y-0.5">
                 {allFolders.length === 0 ? (
-                  <p className="px-2.5 py-1 text-[12px] text-[#9A9DA1]">No folders yet.</p>
+                  <p className="px-2.5 py-1 text-[12px] text-[#8A8E86]">No folders yet.</p>
                 ) : (
                   allFolders.map((f) => {
                     const isActive = f.id === activeFolderId;
@@ -191,17 +191,17 @@ export function DocumentFilters({
                         type="button"
                         onClick={() => pickFolder(f.id)}
                         className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-left text-[13px] transition-colors ${
-                          isActive ? 'bg-[#E7EEF8] text-[#174C87]' : 'text-[#1A1C1E] hover:bg-[#FAFAF8]'
+                          isActive ? 'bg-[#E7EEF8] text-[#174C87]' : 'text-[#171A17] hover:bg-[#F5F9FE]'
                         }`}
                       >
                         <span className="flex min-w-0 items-center gap-2">
                           <span
                             className="h-2.5 w-2.5 shrink-0 rounded-full"
-                            style={{ backgroundColor: f.color ?? '#C9CCC8' }}
+                            style={{ backgroundColor: f.color ?? '#BFC5CC' }}
                           />
                           <span className="truncate">{f.name}</span>
                         </span>
-                        <span className="text-[12px] text-[#9A9DA1]">{count}</span>
+                        <span className="of-num text-[12px] text-[#A0A49C]">{count}</span>
                       </button>
                     );
                   })
@@ -209,7 +209,7 @@ export function DocumentFilters({
               </div>
 
               {/* New folder */}
-              <div className="mt-2 flex items-center gap-2 border-t border-[#F0F0EC] pt-2.5">
+              <div className="mt-2 flex items-center gap-2 border-t border-[#EEF1F5] pt-2.5">
                 <input
                   type="text"
                   value={newName}
@@ -218,13 +218,13 @@ export function DocumentFilters({
                     if (e.key === 'Enter') void createFolder();
                   }}
                   placeholder="New folder name"
-                  className="h-8 flex-1 rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
+                  className="h-9 flex-1 rounded-[10px] border border-[#E4E9F0] bg-white px-3 text-[13px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]"
                 />
                 <button
                   type="button"
                   onClick={() => void createFolder()}
                   disabled={creating || !newName.trim()}
-                  className="h-8 shrink-0 rounded-lg bg-[#1F5FA8] px-3 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
+                  className="h-9 shrink-0 rounded-[10px] bg-[#1F5FA8] px-3.5 text-[13px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
                 >
                   {creating ? '…' : 'Add'}
                 </button>
@@ -239,10 +239,10 @@ export function DocumentFilters({
       <button
         type="button"
         onClick={onSortToggle}
-        className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#E7E7E2] bg-white px-3.5 py-1.5 text-[13px] text-[#5F6368] transition-colors hover:border-[#3E7BC4]/30"
+        className="inline-flex h-[38px] shrink-0 items-center gap-1.5 rounded-full border border-[#E2E6EC] bg-white px-4 text-[13px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]"
       >
         Sort: {sortDir === 'desc' ? 'Newest first' : 'Oldest first'}
-        <span className="text-[#9A9DA1]">⇅</span>
+        <span className="text-[#8A8E86]">⇅</span>
       </button>
     </div>
   );

@@ -30,11 +30,16 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         // Globals set --radius: 0 (sharp shadcn default), which zeroes the
         // rounded-sm/md/lg/xl scale and leaves buttons/inputs square. Give the
         // platform subtree a real radius so all corners round consistently.
-        style={{ fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties}
-        className="flex h-screen flex-col overflow-hidden bg-[#F6F6F4] text-[#1A1C1E] antialiased"
+        style={{ fontFamily: 'var(--font-instrument)', ['--radius' as string]: '0.625rem' } as React.CSSProperties}
+        className="flex h-screen flex-col overflow-hidden bg-white text-[#171A17] antialiased"
       >
         <TopBar />
-        <main className="min-h-0 min-w-0 flex-1 overflow-y-auto">
+        {/* The cool wash every module sits on. It lives here rather than in each
+            module layout so the nine of them can't drift apart. */}
+        <main
+          className="min-h-0 min-w-0 flex-1 overflow-y-auto"
+          style={{ background: 'linear-gradient(180deg, #F3F8FF 0%, #FFFFFF 340px)' }}
+        >
           <ModuleLockGuard>{children}</ModuleLockGuard>
         </main>
       </div>

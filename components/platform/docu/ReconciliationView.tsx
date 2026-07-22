@@ -94,23 +94,23 @@ export function ReconciliationView({ statements }: { statements: DocumentWithSup
       <DocuNav />
 
       <div className="mt-6">
-        <h1 className="text-[26px] font-bold leading-tight text-[#1A1C1E]">Reconciliation</h1>
-        <p className="mt-1 text-[14px] text-[#5F6368]">
+        <h1 className="of-display text-[28px] font-semibold leading-tight tracking-[-0.015em] text-[#171A17]">Reconciliation</h1>
+        <p className="mt-1.5 text-[14px] text-[#8A8E86]">
           Statement totals by month — grouped by the date on each statement. Export any month as CSV.
         </p>
       </div>
 
       {missing > 0 ? (
-        <p className="mt-4 rounded-xl bg-[#FBEEDA] px-3 py-2 text-[13px] text-[#854F0B]">
-          {missing} statement{missing === 1 ? '' : 's'} {missing === 1 ? 'has' : 'have'} no parsed totals yet — newly
+        <p className="mt-4 rounded-[14px] bg-[#FBEEDA] px-3.5 py-2.5 text-[13px] text-[#854F0B]">
+          <span className="of-num font-semibold">{missing}</span> statement{missing === 1 ? '' : 's'} {missing === 1 ? 'has' : 'have'} no parsed totals yet — newly
           uploaded statements are parsed automatically.
         </p>
       ) : null}
 
       {parsedCount === 0 ? (
-        <div className="mt-6 rounded-2xl border border-dashed border-[#E7E7E2] bg-white px-8 py-14 text-center">
-          <h2 className="text-[18px] font-semibold text-[#1A1C1E]">No statement totals yet</h2>
-          <p className="mx-auto mt-1 max-w-md text-[14px] text-[#5F6368]">
+        <div className="mt-6 rounded-2xl border border-dashed border-[#E2E6EC] bg-[#FBFCFE] px-8 py-14 text-center">
+          <h2 className="of-display text-[18px] font-semibold text-[#171A17]">No statement totals yet</h2>
+          <p className="mx-auto mt-1.5 max-w-md text-[14px] text-[#6B6F68]">
             Upload supplier statements and Doc-U parses their transaction summaries here, ready to
             export.
           </p>
@@ -120,7 +120,7 @@ export function ReconciliationView({ statements }: { statements: DocumentWithSup
           {groups.map((g) => {
             const open = isOpen(g.key);
             return (
-              <div key={g.key} className="overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
+              <div key={g.key} className="overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
                 <div className="flex items-center justify-between gap-3 px-5 py-3.5">
                   <button
                     type="button"
@@ -128,18 +128,18 @@ export function ReconciliationView({ statements }: { statements: DocumentWithSup
                     className="flex items-center gap-2 text-left"
                     aria-expanded={open}
                   >
-                    <span className={`text-[#9A9DA1] transition-transform ${open ? 'rotate-180' : ''}`} aria-hidden>
+                    <span className={`text-[#8A8E86] transition-transform ${open ? 'rotate-180' : ''}`} aria-hidden>
                       ▾
                     </span>
-                    <span className="text-[15px] font-semibold text-[#1A1C1E]">{g.label}</span>
-                    <span className="text-[12px] text-[#9A9DA1]">
-                      {g.rows.length} statement{g.rows.length === 1 ? '' : 's'}
+                    <span className="of-display text-[16px] font-semibold text-[#171A17]">{g.label}</span>
+                    <span className="text-[12px] text-[#A0A49C]">
+                      <span className="of-num">{g.rows.length}</span> statement{g.rows.length === 1 ? '' : 's'}
                     </span>
                   </button>
                   <button
                     type="button"
                     onClick={() => downloadMonth(g.label, g.rows)}
-                    className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg bg-[#1F5FA8] px-3 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87]"
+                    className="inline-flex h-[38px] shrink-0 items-center gap-1.5 rounded-[11px] bg-[#1F5FA8] px-4 text-[13px] font-semibold text-white transition-colors hover:bg-[#174C87]"
                   >
                     <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden>
                       <path d="M8 2v8m0 0l-3-3m3 3l3-3M3 13h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -149,8 +149,8 @@ export function ReconciliationView({ statements }: { statements: DocumentWithSup
                 </div>
 
                 {open ? (
-                  <div className="overflow-x-auto border-t border-[#E7E7E2]">
-                    <div className={`grid ${COLS} items-center border-b border-[#F0F0EC] bg-[#FBFBF9] px-5 py-2.5 text-[12px] text-[#5F6368]`}>
+                  <div className="overflow-x-auto border-t border-[#EAEDF2]">
+                    <div className={`grid ${COLS} items-center border-b border-[#EEF1F5] bg-[#FBFCFE] px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.06em] text-[#A0A49C]`}>
                       <span>Date</span>
                       <span>Supplier</span>
                       <span className="text-right">Opening</span>
@@ -167,18 +167,18 @@ export function ReconciliationView({ statements }: { statements: DocumentWithSup
                       return (
                         <div
                           key={r.id}
-                          className={`grid ${COLS} items-center border-b border-[#F0F0EC] px-5 py-2.5 text-[13px] last:border-b-0`}
+                          className={`grid ${COLS} items-center border-b border-[#F4F5F7] px-5 py-3 text-[14px] last:border-b-0 hover:bg-[#F5F9FE]`}
                         >
-                          <span className="text-[#1A1C1E]">{r.date}</span>
-                          <span className="truncate text-[#5F6368]">{r.supplier}</span>
-                          <span className="text-right text-[#1A1C1E]">{fmtZar(r.opening)}</span>
-                          <span className="text-right text-[#1A1C1E]">{fmtZar(r.payments)}</span>
-                          <span className="text-right text-[#1A1C1E]">{fmtZar(r.purchases)}</span>
-                          <span className="text-right text-[#5F6368]">{fmtZar(r.palletRefunds)}</span>
-                          <span className="text-right text-[#5F6368]">{fmtZar(r.palletUsage)}</span>
-                          <span className="text-right text-[#5F6368]">{fmtZar(r.vat)}</span>
-                          <span className="text-right font-medium text-[#1A1C1E]">{fmtZar(r.closing)}</span>
-                          <span className={`text-right font-medium ${r.check == null ? 'text-[#9A9DA1]' : balanced ? 'text-[#0F6E56]' : 'text-[#A32D2D]'}`}>
+                          <span className="of-num text-[#171A17]">{r.date}</span>
+                          <span className="truncate text-[#6B6F68]">{r.supplier}</span>
+                          <span className="of-num text-right text-[#171A17]">{fmtZar(r.opening)}</span>
+                          <span className="of-num text-right text-[#171A17]">{fmtZar(r.payments)}</span>
+                          <span className="of-num text-right text-[#171A17]">{fmtZar(r.purchases)}</span>
+                          <span className="of-num text-right text-[#6B6F68]">{fmtZar(r.palletRefunds)}</span>
+                          <span className="of-num text-right text-[#6B6F68]">{fmtZar(r.palletUsage)}</span>
+                          <span className="of-num text-right text-[#6B6F68]">{fmtZar(r.vat)}</span>
+                          <span className="of-num text-right font-semibold text-[#171A17]">{fmtZar(r.closing)}</span>
+                          <span className={`of-num text-right font-semibold ${r.check == null ? 'text-[#A0A49C]' : balanced ? 'text-[#0F6E56]' : 'text-[#A32D2D]'}`}>
                             {r.check == null ? '—' : balanced ? '✓' : r.check.toFixed(2)}
                           </span>
                         </div>

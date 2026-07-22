@@ -94,7 +94,7 @@ export function HeroAuthCta() {
         fontFamily: 'var(--font-body, var(--font-sans))',
         fontWeight: 500,
         fontSize: '0.92rem',
-        color: '#5F6368',
+        color: '#6B6F68',
         textDecoration: 'none',
       }}
     >

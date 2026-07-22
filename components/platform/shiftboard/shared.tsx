@@ -19,7 +19,7 @@ import { useShiftBoard } from './context';
 export function DeptBadge({ department }: { department: DepartmentName }) {
   const { deptColor } = useShiftBoard();
   return (
-    <span className="inline-flex items-center gap-1.5 text-[13px] text-[#5F6368]">
+    <span className="inline-flex items-center gap-1.5 text-[13px] text-[#6B6F68]">
       <span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: deptColor(department) }} />
       {department}
     </span>
@@ -60,7 +60,7 @@ export function SkillStars({ rating, color = '#3E7BC4' }: { rating: number; colo
   return (
     <span className="inline-flex items-center gap-0.5">
       {[0, 1, 2, 3, 4].map((i) => (
-        <span key={i} className="h-2 w-2 rounded-full" style={{ backgroundColor: i < rating ? color : '#E7E7E2' }} />
+        <span key={i} className="h-2 w-2 rounded-full" style={{ backgroundColor: i < rating ? color : '#EAEDF2' }} />
       ))}
     </span>
   );
@@ -86,7 +86,7 @@ export function MobileSnapshotCards({ onAction }: { onAction?: (label: string) =
   };
   return (
     <div>
-      <h2 className="mb-2 text-[13px] font-semibold text-[#9A9DA1]">Mobile snapshot — widgets the companion app will surface</h2>
+      <h2 className="of-display mb-2.5 text-[16px] font-semibold text-[#171A17]">Mobile snapshot — widgets the companion app will surface</h2>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {widgetsFor('shiftboard').map((w) => (
           <ModuleWidgetCard key={w.id} widget={{ ...w, ...override[w.id] }} onAction={(widget) => onAction?.(widget.actionLabel ?? widget.title)} />

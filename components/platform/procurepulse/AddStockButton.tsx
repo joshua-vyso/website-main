@@ -166,7 +166,7 @@ export function AddStockButton() {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="inline-flex items-center gap-1.5 rounded-lg bg-[#1F5FA8] px-3.5 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87]"
+        className="inline-flex h-[42px] items-center gap-1.5 rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87]"
       >
         + Add stock
       </button>
@@ -174,22 +174,22 @@ export function AddStockButton() {
       {open ? (
         <div className="fixed inset-0 z-[80] flex items-start justify-center p-4 pt-[12vh]">
           <button type="button" aria-label="Close" onClick={close} className="absolute inset-0 bg-black/20" />
-          <div className="relative z-10 w-full max-w-[480px] rounded-2xl border border-[#E7E7E2] bg-white p-5 shadow-[0_24px_70px_-20px_rgba(26,28,30,0.5)]">
+          <div className="relative z-10 w-full max-w-[480px] rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_24px_70px_-20px_rgba(26,28,30,0.5)]">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-[16px] font-semibold text-[#1A1C1E]">Add stock</h3>
-              <button type="button" onClick={close} aria-label="Close" className="text-[#9A9DA1] hover:text-[#1A1C1E]">
+              <h3 className="of-display text-[18px] font-semibold text-[#171A17]">Add stock</h3>
+              <button type="button" onClick={close} aria-label="Close" className="text-[#A0A49C] transition-colors hover:text-[#171A17]">
                 ✕
               </button>
             </div>
 
-            <div className="mb-4 inline-flex rounded-lg bg-[#ECECE8] p-[3px]">
+            <div className="mb-4 inline-flex rounded-[11px] bg-[#ECECE8] p-[3px]">
               {(['document', 'custom'] as Tab[]).map((t) => (
                 <button
                   key={t}
                   type="button"
                   onClick={() => setTab(t)}
-                  className={`rounded-md px-3.5 py-1.5 text-[13px] font-medium transition-colors ${
-                    tab === t ? 'bg-white text-[#1A1C1E]' : 'text-[#5F6368]'
+                  className={`rounded-[9px] px-3.5 py-1.5 text-[13px] transition-colors ${
+                    tab === t ? 'bg-white font-semibold text-[#171A17] shadow-[0_1px_2px_rgba(20,24,20,0.06)]' : 'font-medium text-[#6B6F68] hover:text-[#171A17]'
                   }`}
                 >
                   {t === 'document' ? 'Choose a document' : 'Custom'}
@@ -199,10 +199,10 @@ export function AddStockButton() {
 
             {tab === 'document' ? (
               <div>
-                <p className="mb-2 text-[12px] text-[#9A9DA1]">Recent Doc-U files — pick one to feed its items into stock.</p>
-                <div className="max-h-[320px] overflow-y-auto rounded-xl border border-[#E7E7E2]">
+                <p className="mb-2 text-[13px] text-[#6B6F68]">Recent Doc-U files — pick one to feed its items into stock.</p>
+                <div className="max-h-[320px] overflow-y-auto rounded-[12px] border border-[#EAEDF2]">
                   {docs.length === 0 ? (
-                    <div className="px-3 py-8 text-center text-[13px] text-[#9A9DA1]">No documents yet.</div>
+                    <div className="px-3 py-10 text-center text-[14px] text-[#8A8E86]">No documents yet.</div>
                   ) : (
                     shownDocs.map((d, i) => (
                       <button
@@ -210,15 +210,15 @@ export function AddStockButton() {
                         type="button"
                         onClick={() => void feedDoc(d.id)}
                         disabled={busy}
-                        className={`flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left transition-colors hover:bg-[#FAFAF8] disabled:opacity-50 ${
-                          i > 0 ? 'border-t border-[#F0F0EC]' : ''
+                        className={`flex w-full items-center justify-between gap-3 px-3 py-2.5 text-left transition-colors hover:bg-[#F5F9FE] disabled:opacity-50 ${
+                          i > 0 ? 'border-t border-[#F4F5F7]' : ''
                         }`}
                       >
                         <span className="min-w-0">
-                          <span className="block truncate text-[13px] font-medium text-[#1A1C1E]">{d.filename}</span>
-                          <span className="block text-[11px] text-[#9A9DA1]">{d.status}</span>
+                          <span className="block truncate text-[14px] font-semibold text-[#171A17]">{d.filename}</span>
+                          <span className="block text-[11px] text-[#A0A49C]">{d.status}</span>
                         </span>
-                        <span className="shrink-0 text-[12px] text-[#1F5FA8]">Add →</span>
+                        <span className="shrink-0 text-[13px] font-semibold text-[#1F5FA8]">Add →</span>
                       </button>
                     ))
                   )}
@@ -235,7 +235,7 @@ export function AddStockButton() {
               </div>
             ) : (
               <div>
-                <p className="mb-2 text-[12px] text-[#9A9DA1]">Type a product — pick from your catalogue or add a new one.</p>
+                <p className="mb-2 text-[13px] text-[#6B6F68]">Type a product — pick from your catalogue or add a new one.</p>
                 <div className="relative">
                   <input
                     type="text"
@@ -245,10 +245,10 @@ export function AddStockButton() {
                       setQuery(e.target.value);
                     }}
                     placeholder="Product name…"
-                    className="h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
+                    className="h-11 w-full rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]"
                   />
                   {!picked && matches.length > 0 ? (
-                    <div className="absolute left-0 right-0 top-full z-10 mt-1 max-h-[200px] overflow-y-auto rounded-xl border border-[#E7E7E2] bg-white shadow-[0_12px_40px_-12px_rgba(26,28,30,0.25)]">
+                    <div className="absolute left-0 right-0 top-full z-10 mt-1 max-h-[200px] overflow-y-auto rounded-[12px] border border-[#EAEDF2] bg-white shadow-[0_12px_40px_-12px_rgba(26,28,30,0.25)]">
                       {matches.map((p) => (
                         <button
                           key={p.id}
@@ -257,10 +257,10 @@ export function AddStockButton() {
                             setPicked(p);
                             setQuery('');
                           }}
-                          className="flex w-full items-center justify-between px-3 py-2 text-left text-[13px] text-[#1A1C1E] transition-colors hover:bg-[#FAFAF8]"
+                          className="flex w-full items-center justify-between px-4 py-2 text-left text-[14px] text-[#171A17] transition-colors hover:bg-[#F5F9FE]"
                         >
                           <span className="truncate">{p.name}</span>
-                          <span className="text-[12px] text-[#9A9DA1]">{p.unit}</span>
+                          <span className="text-[12px] text-[#A0A49C]">{p.unit}</span>
                         </button>
                       ))}
                     </div>
@@ -273,13 +273,13 @@ export function AddStockButton() {
                     value={qty}
                     onChange={(e) => setQty(e.target.value.replace(/[^0-9.]/g, ''))}
                     placeholder={`Quantity${picked ? ` (${picked.unit})` : ''}`}
-                    className="h-10 w-40 rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
+                    className="of-num h-11 w-40 rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]"
                   />
                   <button
                     type="button"
                     onClick={() => void addCustom()}
                     disabled={busy || (!picked && !query.trim()) || !qty.trim()}
-                    className="h-10 rounded-lg bg-[#1F5FA8] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
+                    className="inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
                   >
                     {busy ? 'Adding…' : 'Add to stock'}
                   </button>
@@ -287,7 +287,7 @@ export function AddStockButton() {
               </div>
             )}
 
-            {msg ? <p className="mt-3 text-center text-[12px] text-[#174C87]">{msg}</p> : null}
+            {msg ? <p className="mt-3 text-center text-[13px] text-[#174C87]">{msg}</p> : null}
           </div>
         </div>
       ) : null}

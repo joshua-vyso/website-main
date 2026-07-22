@@ -26,7 +26,7 @@ const TABS = [
 export function PpSubnav() {
   const pathname = usePathname();
   return (
-    <nav className="flex flex-wrap items-center gap-x-5 gap-y-1 border-b border-[#E7E7E2]">
+    <nav className="flex flex-wrap items-center gap-x-5 gap-y-1 border-b border-[#EAEDF2]">
       {TABS.map((t) => {
         const active =
           t.href === '/app/procurepulse'
@@ -38,8 +38,8 @@ export function PpSubnav() {
             href={t.href}
             className={`-mb-px shrink-0 border-b-2 pb-2.5 pt-1 text-[14px] transition-colors ${
               active
-                ? 'border-[#3E7BC4] font-medium text-[#1A1C1E]'
-                : 'border-transparent text-[#5F6368] hover:text-[#1A1C1E]'
+                ? 'border-[#3E7BC4] font-medium text-[#171A17]'
+                : 'border-transparent text-[#6B6F68] hover:text-[#171A17]'
             }`}
           >
             {t.label}
@@ -71,8 +71,8 @@ export function PageHead({
   return (
     <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
       <div className="min-w-0">
-        <h1 className="text-[26px] font-bold text-[#1A1C1E]">{title}</h1>
-        {subtitle ? <p className="mt-1 text-[14px] text-[#5F6368]">{subtitle}</p> : null}
+        <h1 className="of-display text-[28px] font-semibold leading-tight tracking-[-0.015em] text-[#171A17]">{title}</h1>
+        {subtitle ? <p className="mt-1.5 text-[14px] text-[#8A8E86]">{subtitle}</p> : null}
       </div>
       {right ? <div className="flex shrink-0 items-center gap-2.5">{right}</div> : null}
     </div>
@@ -83,7 +83,7 @@ export function StockStatusPill({ status }: { status: StockStatus }) {
   const c = STOCK_STATUS_COLORS[status];
   return (
     <span
-      className="inline-flex items-center rounded-full px-2.5 py-1 text-[12px] font-medium"
+      className="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium"
       style={{ backgroundColor: c.bg, color: c.fg }}
     >
       {c.label}
@@ -93,7 +93,7 @@ export function StockStatusPill({ status }: { status: StockStatus }) {
 
 export function TrendText({ pct }: { pct: number | null }) {
   return (
-    <span className="text-[13px] font-medium" style={{ color: trendColor(pct) }}>
+    <span className="of-num text-[13px] font-medium" style={{ color: trendColor(pct) }}>
       {trendLabel(pct)}
     </span>
   );
@@ -117,11 +117,11 @@ export function KpiCard({
   accent?: string;
 }) {
   return (
-    <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
-      <div className="text-[13px] text-[#9A9DA1]">{label}</div>
+    <div className="rounded-2xl border border-[#EAEDF2] bg-white px-5 py-4 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+      <div className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">{label}</div>
       <div
-        className="mt-2 text-[26px] font-bold leading-none"
-        style={accent ? { color: accent } : undefined}
+        className="of-num mt-2 text-[22px] font-semibold leading-none tracking-[-0.02em]"
+        style={accent ? { color: accent } : { color: '#171A17' }}
       >
         {value}
       </div>
@@ -141,9 +141,9 @@ export function PpButton({
 }) {
   const cls =
     variant === 'solid'
-      ? 'bg-[#1F5FA8] text-white'
-      : 'border border-[#D7DAD8] bg-white text-[#5F6368]';
-  const base = `inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-[14px] font-medium ${cls}`;
+      ? 'bg-[#1F5FA8] font-semibold text-white transition-colors hover:bg-[#174C87]'
+      : 'border border-[#E2E6EC] bg-white font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]';
+  const base = `inline-flex h-[42px] items-center justify-center rounded-[11px] px-[18px] text-[14px] ${cls}`;
   return href ? (
     <Link href={href} className={base}>
       {children}
@@ -168,7 +168,7 @@ export function LevelBar({
   const pct = Math.min(100, Math.max(3, (value / max) * 100));
   const fill = status === 'out' ? '#A32D2D' : status === 'low' ? '#EF9F27' : '#1D9E75';
   return (
-    <div className="h-2.5 w-full overflow-hidden rounded-full bg-[#EFEFEC]">
+    <div className="h-2.5 w-full overflow-hidden rounded-full bg-[#EEF1F5]">
       <div className="h-full rounded-full" style={{ width: `${pct}%`, backgroundColor: fill }} />
     </div>
   );
@@ -262,7 +262,7 @@ export function DonutChart({
     <div className="relative" style={{ width: size, height: size }}>
       <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
         <g transform={`rotate(-90 ${size / 2} ${size / 2})`}>
-          <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#F0F0EC" strokeWidth={thickness} />
+          <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#EEF1F5" strokeWidth={thickness} />
           {total > 0 &&
             segments.map((s, i) => {
               const frac = s.value / total;
@@ -287,8 +287,8 @@ export function DonutChart({
       </svg>
       {centerLabel ? (
         <div className="absolute inset-0 flex flex-col items-center justify-center">
-          <span className="text-[22px] font-bold leading-none text-[#1A1C1E]">{centerLabel}</span>
-          {centerSub ? <span className="mt-1 text-[11px] text-[#9A9DA1]">{centerSub}</span> : null}
+          <span className="of-num text-[22px] font-semibold leading-none tracking-[-0.02em] text-[#171A17]">{centerLabel}</span>
+          {centerSub ? <span className="mt-1 text-[11px] text-[#A0A49C]">{centerSub}</span> : null}
         </div>
       ) : null}
     </div>
@@ -303,7 +303,7 @@ export function Toggle({ on }: { on: boolean }) {
   return (
     <span
       className={`inline-flex h-[26px] w-[46px] items-center rounded-full px-[3px] ${
-        on ? 'justify-end bg-[#1F5FA8]' : 'justify-start bg-[#D7DAD8]'
+        on ? 'justify-end bg-[#1F5FA8]' : 'justify-start bg-[#E2E6EC]'
       }`}
     >
       <span className="h-5 w-5 rounded-full bg-white" />
@@ -313,9 +313,9 @@ export function Toggle({ on }: { on: boolean }) {
 
 export function Stepper({ value }: { value: number | string }) {
   return (
-    <span className="inline-flex items-center rounded-lg bg-[#F2F2EF] text-[14px]">
-      <span className="px-3 py-1.5 font-medium text-[#5F6368]">−</span>
-      <span className="min-w-[28px] px-1 text-center font-medium text-[#1A1C1E]">{value}</span>
+    <span className="inline-flex items-center rounded-[10px] bg-[#F2F2EF] text-[14px]">
+      <span className="px-3 py-1.5 font-medium text-[#6B6F68]">−</span>
+      <span className="of-num min-w-[28px] px-1 text-center font-medium text-[#171A17]">{value}</span>
       <span className="px-3 py-1.5 font-medium text-[#1F5FA8]">+</span>
     </span>
   );

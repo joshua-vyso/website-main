@@ -43,27 +43,27 @@ export function People() {
   }, [sb.employees, dept, search]);
 
   const open = openId ? sb.employees.find((e) => e.id === openId) ?? null : null;
-  const sel = 'h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#3E7BC4]';
+  const sel = 'h-11 rounded-[12px] border border-[#E4E9F0] bg-white px-3.5 text-[14px] text-[#3E4A57] outline-none focus:border-[#3E7BC4]';
 
   return (
     <div className="space-y-5">
       {node}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-[24px] font-bold leading-tight text-[#1A1C1E]">People</h1>
-          <p className="mt-0.5 text-[14px] text-[#5F6368]">Profiles, skills, availability and device history</p>
+          <h1 className="of-display text-[28px] font-semibold leading-tight tracking-[-0.015em] text-[#171A17]">People</h1>
+          <p className="mt-1.5 text-[14px] text-[#8A8E86]">Profiles, skills, availability and device history</p>
         </div>
         <div className="flex items-center gap-2">
           <select value={dept} onChange={(e) => setDept(e.target.value)} className={sel}><option value="all">All departments</option>{sb.departments.map((d) => <option key={d.name} value={d.name}>{d.name}</option>)}</select>
-          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search people…" className="h-9 min-w-[180px] rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] outline-none placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]" />
+          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search people…" className="h-11 min-w-[180px] rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]" />
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
+      <div className="overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
         <div className="overflow-x-auto">
-          <table className="w-full text-[13px]">
+          <table className="w-full text-[14px]">
             <thead>
-              <tr className="border-b border-[#F0F0EC] bg-[#FBFBF9] text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+              <tr className="border-b border-[#EEF1F5] bg-[#FBFCFE] text-[11px] uppercase tracking-[0.06em] text-[#A0A49C]">
                 {['Name', 'Department', 'Status', 'Next shift', 'Hours / wk', 'Attendance', 'Device', ''].map((h) => (
                   <th key={h} className={`px-3 py-2.5 font-medium ${h === 'Hours / wk' || h === 'Attendance' ? 'text-right' : 'text-left'}`}>{h}</th>
                 ))}
@@ -71,14 +71,14 @@ export function People() {
             </thead>
             <tbody>
               {rows.map((e) => (
-                <tr key={e.id} onClick={() => setOpenId(e.id)} className="cursor-pointer border-b border-[#F6F6F2] last:border-0 hover:bg-[#FAFAF8]">
-                  <td className="px-3 py-3"><span className="font-medium text-[#1A1C1E]">{e.name}</span><span className="ml-1.5 text-[12px] text-[#9A9DA1]">{e.role}</span></td>
+                <tr key={e.id} onClick={() => setOpenId(e.id)} className="cursor-pointer border-b border-[#F5F9FE] last:border-0 hover:bg-[#F5F9FE]">
+                  <td className="px-3 py-3"><span className="font-semibold text-[#171A17]">{e.name}</span><span className="ml-1.5 text-[12px] text-[#A0A49C]">{e.role}</span></td>
                   <td className="px-3 py-3"><DeptBadge department={e.department} /></td>
                   <td className="px-3 py-3"><StatusBadge status={e.status} /></td>
-                  <td className="px-3 py-3 text-[#5F6368]">{e.nextShift}</td>
-                  <td className="px-3 py-3 text-right tabular-nums text-[#5F6368]">{e.hoursThisWeek}</td>
-                  <td className="px-3 py-3 text-right tabular-nums font-medium" style={{ color: scoreColor(e.attendanceScore) }}>{e.attendanceScore}</td>
-                  <td className="px-3 py-3">{e.assignedDevice ? <span className="rounded-full bg-[#E6F1FB] px-2 py-0.5 text-[11px] font-medium text-[#2C5E8A]">{e.assignedDevice}</span> : <span className="text-[12px] text-[#9A9DA1]">—</span>}</td>
+                  <td className="of-num px-3 py-3 text-[#6B6F68]">{e.nextShift}</td>
+                  <td className="of-num px-3 py-3 text-right text-[#6B6F68]">{e.hoursThisWeek}</td>
+                  <td className="of-num px-3 py-3 text-right font-semibold" style={{ color: scoreColor(e.attendanceScore) }}>{e.attendanceScore}</td>
+                  <td className="px-3 py-3">{e.assignedDevice ? <span className="inline-flex items-center rounded-full bg-[#E6F1FB] px-2.5 py-1 text-[11px] font-medium text-[#0C447C]">{e.assignedDevice}</span> : <span className="text-[12px] text-[#A0A49C]">—</span>}</td>
                   <td className="px-3 py-3 text-right" onClick={(ev) => ev.stopPropagation()}>
                     <RowActionsMenu actions={[
                       { label: 'View profile', onClick: () => setOpenId(e.id) },
@@ -121,8 +121,8 @@ function EmployeeDetail({ e, onAction }: { e: Employee; onAction: (m: string) =>
       <Section title="Skills matrix">
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
           {SKILL_NAMES.map((skill, i) => (
-            <div key={skill} className="flex items-center justify-between rounded-lg bg-[#FAFAF8] px-3 py-1.5">
-              <span className="text-[13px] text-[#5F6368]">{skill}</span>
+            <div key={skill} className="flex items-center justify-between rounded-[10px] bg-[#F5F9FE] px-3 py-2">
+              <span className="text-[13px] text-[#6B6F68]">{skill}</span>
               <SkillStars rating={e.skills[i] ?? 0} />
             </div>
           ))}
@@ -131,9 +131,9 @@ function EmployeeDetail({ e, onAction }: { e: Employee; onAction: (m: string) =>
 
       <Section title="Availability">
         <div className="space-y-2 text-[13px]">
-          <div className="flex flex-wrap items-center gap-1.5"><span className="w-20 text-[#9A9DA1]">Available</span>{e.availableDays.map((d) => <span key={d} className="rounded-full bg-[#E1F5EE] px-2 py-0.5 text-[12px] text-[#0F6E56]">{d}</span>)}</div>
-          <div className="flex flex-wrap items-center gap-1.5"><span className="w-20 text-[#9A9DA1]">Unavailable</span>{e.unavailableDays.length ? e.unavailableDays.map((d) => <span key={d} className="rounded-full bg-[#F0F0EC] px-2 py-0.5 text-[12px] text-[#9A9DA1]">{d}</span>) : <span className="text-[12px] text-[#9A9DA1]">—</span>}</div>
-          <div className="flex items-center gap-1.5"><span className="w-20 text-[#9A9DA1]">Prefers</span><span className="text-[#1A1C1E]">{e.preferredShifts}</span></div>
+          <div className="flex flex-wrap items-center gap-1.5"><span className="w-20 text-[#8A8E86]">Available</span>{e.availableDays.map((d) => <span key={d} className="rounded-full bg-[#E1F5EE] px-2 py-0.5 text-[12px] text-[#0F6E56]">{d}</span>)}</div>
+          <div className="flex flex-wrap items-center gap-1.5"><span className="w-20 text-[#8A8E86]">Unavailable</span>{e.unavailableDays.length ? e.unavailableDays.map((d) => <span key={d} className="rounded-full bg-[#EEF1F5] px-2 py-0.5 text-[12px] text-[#8A8E86]">{d}</span>) : <span className="text-[12px] text-[#8A8E86]">—</span>}</div>
+          <div className="flex items-center gap-1.5"><span className="w-20 text-[#A0A49C]">Prefers</span><span className="text-[#171A17]">{e.preferredShifts}</span></div>
         </div>
       </Section>
 
@@ -141,16 +141,16 @@ function EmployeeDetail({ e, onAction }: { e: Employee; onAction: (m: string) =>
         {e.devices.length ? (
           <div className="flex flex-wrap gap-1.5">{e.devices.map((d) => <span key={d} className="rounded-full bg-[#E6F1FB] px-2.5 py-0.5 text-[12px] font-medium text-[#2C5E8A]">{d}</span>)}{e.assignedDevice ? <span className="rounded-full bg-[#E1F5EE] px-2.5 py-0.5 text-[12px] font-medium text-[#0F6E56]">In use · {e.assignedDevice}</span> : null}</div>
         ) : (
-          <p className="text-[13px] text-[#9A9DA1]">No device assignments yet.</p>
+          <p className="text-[13px] text-[#8A8E86]">No device assignments yet.</p>
         )}
       </Section>
 
       <Section title="Documents">
         <div className="flex flex-col gap-1.5">
           {DOCS.map((d) => (
-            <div key={d} className="flex items-center justify-between rounded-lg border border-[#F0F0EC] px-3 py-2 text-[13px]">
-              <span className="text-[#1A1C1E]">{d}</span>
-              <button type="button" onClick={() => onAction('Documents coming soon (demo)')} className="text-[12px] font-medium text-[#1F5FA8] hover:underline">Upload</button>
+            <div key={d} className="flex items-center justify-between rounded-[10px] border border-[#EEF1F5] px-3 py-2.5 text-[13px]">
+              <span className="text-[#171A17]">{d}</span>
+              <button type="button" onClick={() => onAction('Documents coming soon (demo)')} className="text-[12px] font-semibold text-[#1F5FA8] hover:underline">Upload</button>
             </div>
           ))}
         </div>
@@ -162,8 +162,8 @@ function EmployeeDetail({ e, onAction }: { e: Employee; onAction: (m: string) =>
             <div key={i} className="flex gap-3 text-[13px]">
               <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1F5FA8]" />
               <div className="min-w-0">
-                <div className="text-[#1A1C1E]">{a.label}</div>
-                <div className="text-[11px] text-[#9A9DA1]">{a.time}</div>
+                <div className="text-[#171A17]">{a.label}</div>
+                <div className="of-num text-[11px] text-[#A0A49C]">{a.time}</div>
               </div>
             </div>
           ))}
@@ -176,15 +176,15 @@ function EmployeeDetail({ e, onAction }: { e: Employee; onAction: (m: string) =>
 function Field({ label, value, color }: { label: string; value: string; color?: string }) {
   return (
     <div>
-      <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">{label}</div>
-      <div className="mt-1 text-[14px] font-medium" style={{ color: color ?? '#1A1C1E' }}>{value}</div>
+      <div className="text-[11px] font-medium uppercase tracking-[0.06em] text-[#A0A49C]">{label}</div>
+      <div className="mt-1 text-[14px] font-semibold" style={{ color: color ?? '#171A17' }}>{value}</div>
     </div>
   );
 }
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h3 className="mb-2 text-[13px] font-semibold text-[#1A1C1E]">{title}</h3>
+      <h3 className="of-display mb-2 text-[14px] font-semibold text-[#171A17]">{title}</h3>
       {children}
     </div>
   );

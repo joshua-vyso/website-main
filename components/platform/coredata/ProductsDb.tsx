@@ -286,7 +286,7 @@ export function ProductsDb({ data }: { data: CoreData }) {
         <div className="ml-auto flex flex-wrap items-center gap-2">
           <Link
             href="/app/docu/databases/import?entity=products"
-            className="inline-flex h-9 items-center justify-center rounded-lg border border-[#D7DAD8] bg-white px-4 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:bg-[#F0F0EC]"
+            className="inline-flex h-[42px] items-center justify-center rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]"
           >
             Import Excel/CSV
           </Link>
@@ -305,17 +305,17 @@ export function ProductsDb({ data }: { data: CoreData }) {
       ) : filtered.length === 0 ? (
         <EmptyState title="No matches" body="No products match your search and filters." />
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-[#E7E7E2] bg-white">
-          <table className="w-full text-[13px]">
+        <div className="overflow-x-auto rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <table className="w-full text-[14px]">
             <thead>
-              <tr className="border-b border-[#E7E7E2] text-left text-[11px] uppercase tracking-wide text-[#9A9DA1]">
-                <th className="px-4 py-3 font-semibold">Name</th>
-                <th className="px-4 py-3 font-semibold">SKU</th>
-                <th className="px-4 py-3 font-semibold">Category</th>
-                <th className="px-4 py-3 font-semibold">Unit</th>
-                <th className="px-4 py-3 text-right font-semibold">Default price</th>
-                <th className="px-4 py-3 font-semibold">VAT</th>
-                <th className="px-4 py-3 font-semibold">Status</th>
+              <tr className="border-b border-[#EEF1F5] bg-[#FBFCFE] text-left text-[11px] uppercase tracking-[0.06em] text-[#A0A49C]">
+                <th className="px-4 py-3 font-medium">Name</th>
+                <th className="px-4 py-3 font-medium">SKU</th>
+                <th className="px-4 py-3 font-medium">Category</th>
+                <th className="px-4 py-3 font-medium">Unit</th>
+                <th className="px-4 py-3 text-right font-medium">Default price</th>
+                <th className="px-4 py-3 font-medium">VAT</th>
+                <th className="px-4 py-3 font-medium">Status</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
@@ -323,23 +323,23 @@ export function ProductsDb({ data }: { data: CoreData }) {
               {filtered.map((p) => {
                 const active = p.active !== false;
                 return (
-                  <tr key={p.id} className="border-b border-[#F0F0EC] last:border-0 hover:bg-[#FBFBF9]">
-                    <td className="px-4 py-3">
-                      <div className="font-medium text-[#1A1C1E]">{p.name}</div>
-                      {p.kind === 'service' ? <div className="text-[11px] text-[#9A9DA1]">Service</div> : null}
+                  <tr key={p.id} className="border-b border-[#F4F5F7] last:border-0 hover:bg-[#F5F9FE]">
+                    <td className="px-4 py-3.5">
+                      <div className="font-semibold text-[#171A17]">{p.name}</div>
+                      {p.kind === 'service' ? <div className="mt-0.5 text-[12px] text-[#A0A49C]">Service</div> : null}
                     </td>
-                    <td className="px-4 py-3 text-[#5F6368]">{p.sku || '—'}</td>
-                    <td className="px-4 py-3 text-[#5F6368]">
+                    <td className="of-num px-4 py-3.5 text-[#6B6F68]">{p.sku || '—'}</td>
+                    <td className="px-4 py-3.5 text-[#6B6F68]">
                       {p.category || '—'}
-                      {p.subcategory ? <span className="text-[#9A9DA1]"> · {p.subcategory}</span> : null}
+                      {p.subcategory ? <span className="text-[#A0A49C]"> · {p.subcategory}</span> : null}
                     </td>
-                    <td className="px-4 py-3 text-[#5F6368]">{p.unit || '—'}</td>
-                    <td className="px-4 py-3 text-right tabular-nums text-[#1A1C1E]">{p.avg_unit_price != null ? zar2(p.avg_unit_price) : '—'}</td>
-                    <td className="px-4 py-3 text-[#5F6368]">{p.vat_rate != null ? `${p.vat_rate}%` : 'Default'}</td>
-                    <td className="px-4 py-3">
-                      {active ? <Pill label="Active" bg="#E1F5EE" fg="#0F6E56" /> : <Pill label="Archived" bg="#F0F0EC" fg="#5F6368" />}
+                    <td className="px-4 py-3.5 text-[#6B6F68]">{p.unit || '—'}</td>
+                    <td className="of-num px-4 py-3.5 text-right text-[#171A17]">{p.avg_unit_price != null ? zar2(p.avg_unit_price) : '—'}</td>
+                    <td className="of-num px-4 py-3.5 text-[#6B6F68]">{p.vat_rate != null ? `${p.vat_rate}%` : 'Default'}</td>
+                    <td className="px-4 py-3.5">
+                      {active ? <Pill label="Active" bg="#E1F5EE" fg="#0F6E56" /> : <Pill label="Archived" bg="#EEF1F5" fg="#6B6F68" />}
                     </td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3.5 text-right">
                       <RowActionsMenu
                         actions={[
                           { label: 'Edit', onClick: () => startEdit(p) },
@@ -368,11 +368,11 @@ export function ProductsDb({ data }: { data: CoreData }) {
           </>
         }
       >
-        <div className="space-y-3">
+        <div className="space-y-4">
           <Field label="Name">
             <input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} placeholder="e.g. Tomatoes — Roma" className={inputClass} />
           </Field>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="SKU" hint="(optional)">
               <input value={draft.sku} onChange={(e) => setDraft({ ...draft, sku: e.target.value })} placeholder="TOM-ROM" className={inputClass} />
             </Field>
@@ -407,7 +407,7 @@ export function ProductsDb({ data }: { data: CoreData }) {
           <Field label="Notes" hint="(optional)">
             <textarea value={draft.notes} onChange={(e) => setDraft({ ...draft, notes: e.target.value })} placeholder="Internal notes" className={`${inputClass} h-16 py-2`} />
           </Field>
-          {error ? <p className="text-[12px] text-[#A32D2D]">{error}</p> : null}
+          {error ? <p className="text-[13px] text-[#A32D2D]">{error}</p> : null}
         </div>
       </Modal>
 

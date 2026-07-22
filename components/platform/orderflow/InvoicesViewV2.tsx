@@ -282,8 +282,8 @@ export function InvoicesViewV2({ data }: { data: InvoicesData }) {
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-[18px] font-bold text-[#1A1C1E]">Invoices</h1>
-          <p className="mt-0.5 text-[13px] text-[#5F6368]">Everything you&apos;ve billed — who owes what, and when it&apos;s due.</p>
+          <h1 className="text-[18px] font-bold text-[#171A17]">Invoices</h1>
+          <p className="mt-0.5 text-[13px] text-[#6B6F68]">Everything you&apos;ve billed — who owes what, and when it&apos;s due.</p>
         </div>
         <Link
           href="/app/orderflow/invoices/new"
@@ -324,11 +324,11 @@ export function InvoicesViewV2({ data }: { data: InvoicesData }) {
                 className={`h-8 rounded-lg border px-3 text-[12px] font-medium transition-colors ${
                   tab === t.key
                     ? 'border-[#3E7BC4] bg-[#1F5FA8] text-white'
-                    : 'border-[#D7DAD8] bg-white text-[#5F6368] hover:border-[#3E7BC4]/40'
+                    : 'border-[#E2E6EC] bg-white text-[#6B6F68] hover:border-[#3E7BC4]/40'
                 }`}
               >
                 {t.label}
-                {count > 0 ? <span className={`ml-1.5 tabular-nums ${tab === t.key ? 'text-white/70' : 'text-[#9A9DA1]'}`}>{count}</span> : null}
+                {count > 0 ? <span className={`ml-1.5 tabular-nums ${tab === t.key ? 'text-white/70' : 'text-[#8A8E86]'}`}>{count}</span> : null}
               </button>
             );
           })}
@@ -359,10 +359,10 @@ export function InvoicesViewV2({ data }: { data: InvoicesData }) {
         ) : filtered.length === 0 ? (
           <EmptyState title="No matching invoices" body="Try a different search or status tab." />
         ) : (
-          <div className="overflow-x-auto rounded-2xl border border-[#E7E7E2] bg-white">
+          <div className="overflow-x-auto rounded-2xl border border-[#EAEDF2] bg-white">
             <table className="w-full min-w-[880px] text-[13px]">
               <thead>
-                <tr className="border-b border-[#E7E7E2] text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+                <tr className="border-b border-[#EAEDF2] text-[11px] uppercase tracking-wide text-[#8A8E86]">
                   <th className="px-4 py-3 text-left font-medium">Number</th>
                   <th className="px-4 py-3 text-left font-medium">Customer</th>
                   <th className="px-4 py-3 text-left font-medium">Date</th>
@@ -381,30 +381,30 @@ export function InvoicesViewV2({ data }: { data: InvoicesData }) {
                     <tr
                       key={r.inv.id}
                       onClick={() => router.push(`/app/orderflow/invoices/${r.inv.id}`)}
-                      className={`cursor-pointer border-b border-[#F0F0EC] transition-colors last:border-0 hover:bg-[#FAFAF8] ${
+                      className={`cursor-pointer border-b border-[#EEF1F5] transition-colors last:border-0 hover:bg-[#F5F9FE] ${
                         busyId === r.inv.id ? 'opacity-50' : ''
                       }`}
                     >
                       <td className="px-4 py-3">
                         <span className="font-medium text-[#1F5FA8]">{r.inv.invoice_number}</span>
-                        {r.inv.customer_po ? <span className="mt-0.5 block text-[11px] text-[#9A9DA1]">PO {r.inv.customer_po}</span> : null}
+                        {r.inv.customer_po ? <span className="mt-0.5 block text-[11px] text-[#8A8E86]">PO {r.inv.customer_po}</span> : null}
                       </td>
-                      <td className="max-w-[220px] truncate px-4 py-3 text-[#1A1C1E]">{r.customerName}</td>
-                      <td className="whitespace-nowrap px-4 py-3 text-[#5F6368]">{fmtDate(r.inv.issue_date)}</td>
-                      <td className="whitespace-nowrap px-4 py-3 text-[#5F6368]">{fmtDate(r.inv.due_date)}</td>
-                      <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums text-[#1A1C1E]">{zar2(r.total)}</td>
+                      <td className="max-w-[220px] truncate px-4 py-3 text-[#171A17]">{r.customerName}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-[#6B6F68]">{fmtDate(r.inv.issue_date)}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-[#6B6F68]">{fmtDate(r.inv.due_date)}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums text-[#171A17]">{zar2(r.total)}</td>
                       <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums">
-                        <span className={r.balance > 0 && r.eff === 'overdue' ? 'font-medium text-[#A32D2D]' : r.balance > 0 ? 'font-medium text-[#1A1C1E]' : 'text-[#9A9DA1]'}>
+                        <span className={r.balance > 0 && r.eff === 'overdue' ? 'font-medium text-[#A32D2D]' : r.balance > 0 ? 'font-medium text-[#171A17]' : 'text-[#8A8E86]'}>
                           {zar2(r.balance)}
                         </span>
-                        {r.credited > 0 ? <span className="mt-0.5 block text-[11px] text-[#9A9DA1]">−{zar2(r.credited)} credited</span> : null}
+                        {r.credited > 0 ? <span className="mt-0.5 block text-[11px] text-[#8A8E86]">−{zar2(r.credited)} credited</span> : null}
                       </td>
                       <td className="px-4 py-3">
                         <span className="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium" style={{ backgroundColor: s.bg, color: s.fg }}>
                           {s.label}
                         </span>
                       </td>
-                      <td className="whitespace-nowrap px-4 py-3 text-[#5F6368]">{r.inv.sent_at ? fmtDate(r.inv.sent_at) : '—'}</td>
+                      <td className="whitespace-nowrap px-4 py-3 text-[#6B6F68]">{r.inv.sent_at ? fmtDate(r.inv.sent_at) : '—'}</td>
                       <td className="px-2 py-3 text-right" onClick={(e) => e.stopPropagation()}>
                         <RowActionsMenu actions={rowActions(r)} />
                       </td>

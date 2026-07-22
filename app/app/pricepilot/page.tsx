@@ -234,8 +234,8 @@ export default async function PricePilotDashboardPage() {
     <div>
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <div className="min-w-0">
-          <h1 className="text-[26px] font-bold text-[#1A1C1E]">PricePilot</h1>
-          <p className="mt-1 text-[14px] text-[#5F6368]">Your pricing intelligence — margins, profitability and opportunities</p>
+          <h1 className="of-display text-[28px] font-semibold tracking-[-0.015em] text-[#171A17]">PricePilot</h1>
+          <p className="mt-1 text-[14px] text-[#8A8E86]">Your pricing intelligence — margins, profitability and opportunities</p>
         </div>
         <LiveChip label="Live pricing" />
       </div>
@@ -256,9 +256,9 @@ export default async function PricePilotDashboardPage() {
       {notifications.length > 0 ? (
         <div className="mt-5">
           <div className="mb-2 flex items-center justify-between">
-            <h2 className="text-[15px] font-semibold text-[#1A1C1E]">Alerts</h2>
-            <Link href="/app/pricepilot/notifications" className="text-[12px] font-medium text-[#1F5FA8] hover:underline">
-              View all ({notifications.length}) →
+            <h2 className="of-display text-[16px] font-semibold text-[#171A17]">Alerts</h2>
+            <Link href="/app/pricepilot/notifications" className="text-[13px] font-semibold text-[#1F5FA8] hover:underline">
+              View all (<span className="of-num">{notifications.length}</span>) →
             </Link>
           </div>
           <NotificationList items={notifications.slice(0, 3)} compact />
@@ -267,16 +267,16 @@ export default async function PricePilotDashboardPage() {
 
       {/* Hero — pricing health + AI insight */}
       <div className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-3">
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-[#E7E7E2] bg-white p-6 text-center">
-          <span className="text-[13px] font-medium text-[#9A9DA1]">Pricing health</span>
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-[#EAEDF2] bg-white p-6 text-center shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <span className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">Pricing health</span>
           <div className="mt-3">
             <ScoreRing score={health} color={band.color} label={band.label} />
           </div>
-          <p className="mt-4 text-[13px] text-[#5F6368]">
+          <p className="mt-4 text-[13px] text-[#6B6F68]">
             {pms.length > 0 ? (
               <>
-                <span className="font-semibold text-[#1A1C1E]">{atOrAbove}</span> of {pms.length} products at or above your{' '}
-                {Math.round(target)}% target
+                <span className="of-num font-semibold text-[#171A17]">{atOrAbove}</span> of <span className="of-num">{pms.length}</span> products at or above your{' '}
+                <span className="of-num">{Math.round(target)}%</span> target
               </>
             ) : (
               'No catalogue pricing yet'
@@ -284,21 +284,21 @@ export default async function PricePilotDashboardPage() {
           </p>
         </div>
 
-        <div className="lg:col-span-2 flex flex-col rounded-2xl border border-[#E7E7E2] bg-gradient-to-br from-white to-[#F5F9FE] p-6">
+        <div className="lg:col-span-2 flex flex-col rounded-2xl border border-[#EAEDF2] bg-gradient-to-br from-white to-[#F5F9FE] p-6 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
           <div className="flex items-center gap-2">
             <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#EAF2FC] text-[14px] text-[#1F5FA8]">
               ✦
             </span>
-            <span className="text-[13px] font-semibold text-[#1F5FA8]">AI insight</span>
+            <span className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#1F5FA8]">AI insight</span>
           </div>
-          <p className="mt-3 text-[18px] font-medium leading-relaxed text-[#1A1C1E]">{insight}</p>
+          <p className="of-display mt-3 text-[18px] font-medium leading-relaxed text-[#171A17]">{insight}</p>
           <div className="mt-auto flex flex-wrap items-center gap-2.5 pt-5">
             <InsightChip label="Avg margin" value={`${Math.round(avgMargin)}%`} />
             <InsightChip label="Below target" value={String(belowTarget.length)} />
             <InsightChip label="Opportunity" value={`${zar(marginOpportunity)}/mo`} />
             <Link
               href="/app/pricepilot/recommendations"
-              className="ml-auto inline-flex items-center gap-1.5 rounded-lg bg-[#1F5FA8] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87]"
+              className="ml-auto inline-flex h-[42px] items-center gap-1.5 rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87]"
             >
               Review pricing →
             </Link>
@@ -308,8 +308,8 @@ export default async function PricePilotDashboardPage() {
 
       {/* Revenue & profit snapshot — tiles expand to the per-order breakdown */}
       <div className="mt-8 flex items-center gap-2">
-        <h2 className="text-[15px] font-semibold text-[#1A1C1E]">Revenue &amp; profit · this month</h2>
-        <span className="text-[12px] text-[#9A9DA1]">— tap a tile for the breakdown</span>
+        <h2 className="of-display text-[16px] font-semibold text-[#171A17]">Revenue &amp; profit · this month</h2>
+        <span className="text-[12px] text-[#A0A49C]">— tap a tile for the breakdown</span>
       </div>
       <div className="mt-3">
         <ProfitSnapshot
@@ -329,12 +329,12 @@ export default async function PricePilotDashboardPage() {
       <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-2">
         <Panel
           title="Margin distribution"
-          right={<span className="text-[12px] text-[#9A9DA1]">{pms.length} products · avg {Math.round(avgMargin)}%</span>}
+          right={<span className="text-[12px] text-[#A0A49C]"><span className="of-num">{pms.length}</span> products · avg <span className="of-num">{Math.round(avgMargin)}%</span></span>}
         >
           {pms.length > 0 ? (
             <MarginBars bands={bands} />
           ) : (
-            <p className="py-6 text-center text-[13px] text-[#9A9DA1]">
+            <p className="py-6 text-center text-[13px] text-[#8A8E86]">
               Build a price list to see how your margins are distributed.
             </p>
           )}
@@ -347,7 +347,7 @@ export default async function PricePilotDashboardPage() {
         <Panel
           title="Opportunity centre"
           right={
-            <Link href="/app/pricepilot/recommendations" className="text-[12px] font-medium text-[#1F5FA8] hover:underline">
+            <Link href="/app/pricepilot/recommendations" className="text-[13px] font-semibold text-[#1F5FA8] hover:underline">
               Review all →
             </Link>
           }
@@ -358,14 +358,14 @@ export default async function PricePilotDashboardPage() {
           </div>
           <div className="mt-4">
             {opportunities.length === 0 ? (
-              <p className="py-6 text-center text-[13px] text-[#9A9DA1]">
+              <p className="py-6 text-center text-[13px] text-[#8A8E86]">
                 {pms.length === 0
                   ? 'No catalogue pricing yet — create a price list to surface opportunities.'
                   : 'Every product is at or above target. Nothing to reprice right now. 🎉'}
               </p>
             ) : (
-              <div className="overflow-hidden rounded-xl border border-[#F0F0EC]">
-                <div className="grid grid-cols-[1.6fr_1fr_1fr_auto] gap-2 bg-[#FBFBF9] px-4 py-2.5 text-[11px] font-medium uppercase tracking-wide text-[#9A9DA1]">
+              <div className="overflow-hidden rounded-[14px] border border-[#EEF1F5]">
+                <div className="grid grid-cols-[1.6fr_1fr_1fr_auto] gap-2 bg-[#FBFCFE] px-4 py-2.5 text-[11px] font-medium uppercase tracking-[0.06em] text-[#A0A49C]">
                   <span>Product</span>
                   <span className="text-right">Margin</span>
                   <span className="text-right">Impact / mo</span>
@@ -376,15 +376,15 @@ export default async function PricePilotDashboardPage() {
                   return (
                     <div
                       key={o.item.id}
-                      className="grid grid-cols-[1.6fr_1fr_1fr_auto] items-center gap-2 border-t border-[#F0F0EC] px-4 py-3 text-[13px]"
+                      className="grid grid-cols-[1.6fr_1fr_1fr_auto] items-center gap-2 border-t border-[#F4F5F7] px-4 py-3 text-[14px] transition-colors hover:bg-[#F5F9FE]"
                     >
-                      <span className="min-w-0 truncate font-medium text-[#1A1C1E]">{o.item.name}</span>
-                      <span className="text-right tabular-nums text-[#5F6368]">
-                        {Math.round(o.currentMargin)}% <span className="text-[#9A9DA1]">→</span>{' '}
-                        <span className="font-medium text-[#0F6E56]">{Math.round(o.suggestedMargin)}%</span>
+                      <span className="min-w-0 truncate font-semibold text-[#171A17]">{o.item.name}</span>
+                      <span className="of-num text-right text-[#6B6F68]">
+                        {Math.round(o.currentMargin)}% <span className="text-[#A0A49C]">→</span>{' '}
+                        <span className="font-semibold text-[#0F6E56]">{Math.round(o.suggestedMargin)}%</span>
                       </span>
-                      <span className="text-right font-semibold tabular-nums text-[#1A1C1E]">
-                        {o.monthlyImpact > 0 ? `+${zar(o.monthlyImpact)}` : <span className="text-[#9A9DA1]">—</span>}
+                      <span className="of-num text-right font-semibold text-[#171A17]">
+                        {o.monthlyImpact > 0 ? `+${zar(o.monthlyImpact)}` : <span className="text-[#A0A49C]">—</span>}
                       </span>
                       <span className="flex justify-end">
                         <span
@@ -408,28 +408,28 @@ export default async function PricePilotDashboardPage() {
         <Panel
           title="Recent sales"
           right={
-            <Link href="/app/pricepilot/recent-sales" className="text-[12px] font-medium text-[#1F5FA8] hover:underline">
+            <Link href="/app/pricepilot/recent-sales" className="text-[13px] font-semibold text-[#1F5FA8] hover:underline">
               View all →
             </Link>
           }
         >
           {recent.length === 0 ? (
-            <p className="py-6 text-center text-[13px] text-[#9A9DA1]">No sales yet.</p>
+            <p className="py-6 text-center text-[13px] text-[#8A8E86]">No sales yet.</p>
           ) : (
             <div className="-my-1">
               {recent.map((o, i) => (
                 <Link
                   key={o.id}
                   href={`/app/orderflow/orders/${o.id}`}
-                  className={`flex items-center justify-between py-3 text-[13px] transition-colors hover:bg-[#FAFAF8] ${
-                    i > 0 ? 'border-t border-[#F0F0EC]' : ''
+                  className={`flex items-center justify-between py-3 text-[14px] transition-colors hover:bg-[#F5F9FE] ${
+                    i > 0 ? 'border-t border-[#F4F5F7]' : ''
                   }`}
                 >
-                  <span className="min-w-0 truncate text-[#1A1C1E]">
-                    <span className="font-medium">{o.invoice_number ?? 'Invoice'}</span>{' '}
-                    <span className="text-[#9A9DA1]">{(o.customer_id && custName.get(o.customer_id)) || ''}</span>
+                  <span className="min-w-0 truncate text-[#171A17]">
+                    <span className="of-num font-semibold">{o.invoice_number ?? 'Invoice'}</span>{' '}
+                    <span className="text-[#8A8E86]">{(o.customer_id && custName.get(o.customer_id)) || ''}</span>
                   </span>
-                  <span className="shrink-0 font-medium text-[#1A1C1E]">{zar(orderAgg.get(o.id)?.rev ?? 0)}</span>
+                  <span className="of-num shrink-0 font-semibold text-[#171A17]">{zar(orderAgg.get(o.id)?.rev ?? 0)}</span>
                 </Link>
               ))}
             </div>
@@ -442,9 +442,9 @@ export default async function PricePilotDashboardPage() {
 
 function InsightChip({ label, value }: { label: string; value: string }) {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-[#E7E7E2] bg-white px-3 py-1.5 text-[12px]">
-      <span className="text-[#9A9DA1]">{label}</span>
-      <span className="font-semibold text-[#1A1C1E]">{value}</span>
+    <span className="inline-flex items-center gap-1.5 rounded-full border border-[#EEF1F5] bg-white px-3 py-1.5 text-[12px]">
+      <span className="font-medium uppercase tracking-[0.05em] text-[#8A8E86]">{label}</span>
+      <span className="of-num font-semibold text-[#171A17]">{value}</span>
     </span>
   );
 }

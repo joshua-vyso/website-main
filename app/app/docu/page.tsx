@@ -10,7 +10,7 @@ function DatabasesTile() {
     <div className="px-8 pt-7">
       <Link
         href="/app/docu/databases"
-        className="group flex items-center gap-4 rounded-2xl border border-[#E7E7E2] bg-white p-5 transition-colors hover:border-[#3E7BC4]/40 hover:bg-[#FAFAF8]"
+        className="group flex items-center gap-4 rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)] transition-colors hover:border-[#3E7BC4]/40 hover:bg-[#F5F9FE]"
       >
         <span
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
@@ -25,18 +25,18 @@ function DatabasesTile() {
         </span>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className="text-[15px] font-semibold text-[#1A1C1E] transition-colors group-hover:text-[#174C87]">
+            <span className="of-display text-[16px] font-semibold text-[#171A17] transition-colors group-hover:text-[#174C87]">
               Databases
             </span>
-            <span className="rounded-full bg-[#F0F0EC] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#5F6368]">
+            <span className="rounded-full bg-[#EEF1F5] px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.05em] text-[#6B6F68]">
               Core Data
             </span>
           </div>
-          <p className="mt-0.5 text-[13px] text-[#5F6368]">
+          <p className="mt-1 text-[13px] text-[#6B6F68]">
             Customers, products, price lists, company profile and more — the shared source of truth behind every document.
           </p>
         </div>
-        <span className="shrink-0 text-[18px] text-[#C9CCC8] transition-colors group-hover:text-[#174C87]" aria-hidden>
+        <span className="shrink-0 text-[18px] text-[#BFC5CC] transition-colors group-hover:text-[#174C87]" aria-hidden>
           &rsaquo;
         </span>
       </Link>
@@ -51,9 +51,9 @@ export default async function DocuInboxPage() {
   if (!session.features.docu) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center px-8 py-7">
-        <div className="max-w-sm rounded-2xl border border-[#E7E7E2] bg-white px-8 py-10 text-center">
-          <h1 className="text-[18px] font-bold text-[#1A1C1E]">Doc-U is not enabled for your plan</h1>
-          <p className="mt-2 text-[14px] text-[#5F6368]">
+        <div className="max-w-sm rounded-2xl border border-[#EAEDF2] bg-white px-8 py-10 text-center shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <h1 className="of-display text-[18px] font-semibold text-[#171A17]">Doc-U is not enabled for your plan</h1>
+          <p className="mt-2 text-[14px] text-[#6B6F68]">
             Contact your administrator to add Doc-U to your subscription.
           </p>
         </div>

@@ -112,13 +112,13 @@ export function ProductThresholds({
   }
 
   const cell =
-    'h-9 w-full rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:border-[#3E7BC4]/40 focus:outline-none';
+    'h-10 w-full rounded-[10px] border border-[#E4E9F0] bg-white px-3 text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]';
   const COLS = 'grid grid-cols-[minmax(150px,1fr)_88px_88px_92px_120px_64px_minmax(120px,1fr)] gap-2 items-center';
 
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="max-w-xl text-[13px] text-[#5F6368]">
+        <p className="max-w-xl text-[13px] text-[#6B6F68]">
           Low stock, target (par), reorder lead time and freshness thresholds. These feed Alerts and
           Intelligence. Freshness is per product — e.g. lettuce 2 days, broccoli 3 days.
         </p>
@@ -131,21 +131,21 @@ export function ProductThresholds({
               setPage(0);
             }}
             placeholder="Search products…"
-            className="h-10 w-60 rounded-xl border border-[#E7E7E2] bg-white px-4 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
+            className="h-11 w-60 rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]"
           />
           <button
             type="button"
             onClick={() => void save()}
             disabled={busy || dirty.size === 0}
-            className="inline-flex h-10 items-center rounded-xl bg-[#1F5FA8] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:cursor-not-allowed disabled:opacity-40"
           >
             {busy ? 'Saving…' : dirty.size > 0 ? `Save changes (${dirty.size})` : 'Saved'}
           </button>
         </div>
       </div>
 
-      <div className="mt-4 overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
-        <div className={`${COLS} border-b border-[#F0F0EC] bg-[#FBFBF9] px-4 py-2.5 text-[12px] text-[#5F6368]`}>
+      <div className="mt-4 overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+        <div className={`${COLS} border-b border-[#EEF1F5] bg-[#FBFCFE] px-4 py-2.5 text-[11px] font-medium uppercase tracking-[0.06em] text-[#A0A49C]`}>
           <span>Product</span>
           <span>Low</span>
           <span>Par</span>
@@ -155,25 +155,25 @@ export function ProductThresholds({
           <span>Notes</span>
         </div>
         {pageRows.length === 0 ? (
-          <div className="px-4 py-12 text-center text-[14px] text-[#9A9DA1]">
+          <div className="px-4 py-12 text-center text-[14px] text-[#8A8E86]">
             {items.length === 0 ? 'No products yet.' : 'No products match your search.'}
           </div>
         ) : (
           pageRows.map((r) => (
-            <div key={r.stock_item_id} className={`${COLS} border-b border-[#F0F0EC] px-4 py-2 last:border-b-0`}>
+            <div key={r.stock_item_id} className={`${COLS} border-b border-[#F4F5F7] px-4 py-2 last:border-b-0`}>
               <div className="min-w-0">
-                <div className="truncate text-[13px] font-medium text-[#1A1C1E]">{r.name}</div>
-                <div className="text-[11px] text-[#9A9DA1]">{r.unit}</div>
+                <div className="truncate text-[14px] font-semibold text-[#171A17]">{r.name}</div>
+                <div className="text-[11px] text-[#A0A49C]">{r.unit}</div>
               </div>
-              <input className={`${cell} text-right`} inputMode="numeric" value={r.low_threshold} onChange={(e) => edit(r.stock_item_id, 'low_threshold', e.target.value.replace(/[^0-9.]/g, ''))} />
-              <input className={`${cell} text-right`} inputMode="numeric" value={r.par_level} onChange={(e) => edit(r.stock_item_id, 'par_level', e.target.value.replace(/[^0-9.]/g, ''))} />
-              <input className={`${cell} text-right`} inputMode="numeric" value={r.lead_time_days} onChange={(e) => edit(r.stock_item_id, 'lead_time_days', e.target.value.replace(/[^0-9.]/g, ''))} />
+              <input className={`${cell} of-num text-right`} inputMode="numeric" value={r.low_threshold} onChange={(e) => edit(r.stock_item_id, 'low_threshold', e.target.value.replace(/[^0-9.]/g, ''))} />
+              <input className={`${cell} of-num text-right`} inputMode="numeric" value={r.par_level} onChange={(e) => edit(r.stock_item_id, 'par_level', e.target.value.replace(/[^0-9.]/g, ''))} />
+              <input className={`${cell} of-num text-right`} inputMode="numeric" value={r.lead_time_days} onChange={(e) => edit(r.stock_item_id, 'lead_time_days', e.target.value.replace(/[^0-9.]/g, ''))} />
               <div className="flex items-center gap-1">
-                <input className={`${cell} text-right`} inputMode="numeric" value={r.freshness_value} onChange={(e) => edit(r.stock_item_id, 'freshness_value', e.target.value.replace(/[^0-9.]/g, ''))} />
+                <input className={`${cell} of-num text-right`} inputMode="numeric" value={r.freshness_value} onChange={(e) => edit(r.stock_item_id, 'freshness_value', e.target.value.replace(/[^0-9.]/g, ''))} />
                 <select
                   value={r.freshness_unit}
                   onChange={(e) => edit(r.stock_item_id, 'freshness_unit', e.target.value)}
-                  className="h-9 rounded-lg border border-[#E7E7E2] bg-white px-1 text-[12px] text-[#1A1C1E] focus:outline-none"
+                  className="h-10 rounded-[10px] border border-[#E4E9F0] bg-white px-1 text-[12px] text-[#171A17] outline-none focus:border-[#3E7BC4]"
                 >
                   <option value="days">d</option>
                   <option value="hours">h</option>
@@ -189,14 +189,14 @@ export function ProductThresholds({
       </div>
 
       {pageCount > 1 ? (
-        <div className="mt-3 flex items-center justify-center gap-3 text-[13px] text-[#5F6368]">
-          <button type="button" onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={safePage === 0} className="rounded-lg border border-[#E7E7E2] bg-white px-3 py-1.5 disabled:opacity-40">‹ Prev</button>
-          <span>Page {safePage + 1} of {pageCount}</span>
-          <button type="button" onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))} disabled={safePage >= pageCount - 1} className="rounded-lg border border-[#E7E7E2] bg-white px-3 py-1.5 disabled:opacity-40">Next ›</button>
+        <div className="mt-3 flex items-center justify-center gap-3 text-[13px] text-[#6B6F68]">
+          <button type="button" onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={safePage === 0} className="rounded-[10px] border border-[#E2E6EC] bg-white px-3 py-1.5 font-medium transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87] disabled:opacity-40">‹ Prev</button>
+          <span className="of-num">Page {safePage + 1} of {pageCount}</span>
+          <button type="button" onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))} disabled={safePage >= pageCount - 1} className="rounded-[10px] border border-[#E2E6EC] bg-white px-3 py-1.5 font-medium transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87] disabled:opacity-40">Next ›</button>
         </div>
       ) : null}
 
-      {msg ? <p className="mt-3 text-[12px] text-[#174C87]">{msg}</p> : null}
+      {msg ? <p className="mt-3 text-[13px] text-[#174C87]">{msg}</p> : null}
     </div>
   );
 }

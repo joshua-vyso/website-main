@@ -53,8 +53,8 @@ export default async function WorkspaceSettings() {
   return (
     <div className="px-8 py-7">
       <div className="min-w-0">
-        <h1 className="text-[26px] font-bold text-[#1A1C1E]">Workspace settings</h1>
-        <p className="mt-1 text-[14px] text-[#5F6368]">
+        <h1 className="of-display text-[28px] font-semibold leading-tight tracking-[-0.015em] text-[#171A17]">Workspace settings</h1>
+        <p className="mt-1.5 text-[14px] text-[#8A8E86]">
           Settings for {session.org?.name ?? 'your organisation'}
         </p>
       </div>
@@ -73,13 +73,13 @@ export default async function WorkspaceSettings() {
 
         <Link
           href="/app/organisation"
-          className="flex items-center justify-between gap-4 rounded-2xl border border-[#E7E7E2] bg-white p-4 transition-colors hover:border-[#3E7BC4]/30"
+          className="flex items-center justify-between gap-4 rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)] transition-colors hover:border-[#C9DEF7] hover:bg-[#FBFCFE]"
         >
           <div className="min-w-0">
-            <div className="text-[15px] font-medium text-[#1A1C1E]">My Organisation</div>
-            <p className="mt-0.5 text-[13px] text-[#9A9DA1]">Team members and recent workspace activity</p>
+            <div className="of-display text-[16px] font-semibold text-[#171A17]">My Organisation</div>
+            <p className="mt-1 text-[13px] text-[#6B6F68]">Team members and recent workspace activity</p>
           </div>
-          <span className="shrink-0 text-[18px] text-[#9A9DA1]" aria-hidden>
+          <span className="shrink-0 text-[18px] text-[#A0A49C]" aria-hidden>
             ›
           </span>
         </Link>

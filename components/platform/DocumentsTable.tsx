@@ -46,14 +46,14 @@ export function DocumentsTable({ docs }: { docs: DocumentWithSupplier[] }) {
                 key={t.key ?? 'all'}
                 type="button"
                 onClick={() => setActiveType(t.key)}
-                className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors ${
+                className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-all ${
                   isActive
-                    ? 'bg-[#1A1C1E] text-white'
-                    : 'border border-[#E7E7E2] bg-white text-[#1A1C1E] hover:border-[#3E7BC4]/30'
+                    ? 'bg-[#1F5FA8] text-white'
+                    : 'border border-[#E2E6EC] bg-white text-[#3E4A57] hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]'
                 }`}
               >
                 <span>{t.label}</span>
-                <span className={isActive ? 'text-white/60' : 'text-[#9A9DA1]'}>{count}</span>
+                <span className={`of-num ${isActive ? 'text-white/70' : 'text-[#A0A49C]'}`}>{count}</span>
               </button>
             );
           })}
@@ -62,25 +62,25 @@ export function DocumentsTable({ docs }: { docs: DocumentWithSupplier[] }) {
         <button
           type="button"
           onClick={toggleSort}
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#E7E7E2] bg-white px-3.5 py-1.5 text-[13px] text-[#5F6368] transition-colors hover:border-[#3E7BC4]/30"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#E2E6EC] bg-white px-3.5 py-1.5 text-[13px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]"
         >
           Sort: {sortDir === 'desc' ? 'Newest first' : 'Oldest first'}
-          <span className="text-[#9A9DA1]">⇅</span>
+          <span className="text-[#A0A49C]">⇅</span>
         </button>
       </div>
 
       {/* Card table */}
-      <div className="mt-4 overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
+      <div className="mt-4 overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
         {/* Header */}
-        <div className="grid grid-cols-[1fr_180px_110px_140px_140px_110px] items-center border-b border-[#E7E7E2] px-6 py-3 text-[12px] text-[#5F6368]">
+        <div className="grid grid-cols-[1fr_180px_110px_140px_140px_110px] items-center border-b border-[#EEF1F5] bg-[#FBFCFE] px-6 py-3 text-[11px] font-medium uppercase tracking-[0.06em] text-[#A0A49C]">
           <span>Document</span>
           <span>Supplier</span>
           <button
             type="button"
             onClick={toggleSort}
-            className="flex items-center gap-1 text-left text-[#5F6368] hover:text-[#1A1C1E]"
+            className="flex items-center gap-1 text-left uppercase tracking-[0.06em] text-[#A0A49C] transition-colors hover:text-[#171A17]"
           >
-            Date <span className="text-[10px] text-[#9A9DA1]">{sortDir === 'desc' ? '▾' : '▴'}</span>
+            Date <span className="text-[10px] text-[#A0A49C]">{sortDir === 'desc' ? '▾' : '▴'}</span>
           </button>
           <span>Type</span>
           <span>Status</span>
@@ -89,21 +89,21 @@ export function DocumentsTable({ docs }: { docs: DocumentWithSupplier[] }) {
 
         {/* Rows */}
         {rows.length === 0 ? (
-          <div className="px-6 py-10 text-center text-[14px] text-[#9A9DA1]">No documents.</div>
+          <div className="px-6 py-12 text-center text-[14px] text-[#8A8E86]">No documents.</div>
         ) : (
           rows.map((doc) => (
             <Link
               key={doc.id}
               href={`/app/docu/${doc.id}`}
-              className="grid grid-cols-[1fr_180px_110px_140px_140px_110px] items-center border-b border-[#F0F0EC] px-6 py-3.5 text-[14px] transition-colors last:border-b-0 hover:bg-[#FAFAF8]"
+              className="grid grid-cols-[1fr_180px_110px_140px_140px_110px] items-center border-b border-[#F4F5F7] px-6 py-3.5 text-[14px] transition-colors last:border-b-0 hover:bg-[#F5F9FE]"
             >
               <div className="flex min-w-0 items-center gap-3">
-                <span className="h-7 w-7 shrink-0 rounded-md bg-[#F0F0EC]" aria-hidden />
-                <span className="truncate text-[#1A1C1E]">{doc.filename}</span>
+                <span className="h-7 w-7 shrink-0 rounded-[8px] bg-[#EEF1F5]" aria-hidden />
+                <span className="truncate font-semibold text-[#171A17]">{doc.filename}</span>
               </div>
-              <span className="truncate text-[#5F6368]">{doc.supplier?.name ?? '—'}</span>
-              <span className="text-[#5F6368]">{formatDate(doc.created_at)}</span>
-              <span className="text-[#5F6368]">
+              <span className="truncate text-[#2C333B]">{doc.supplier?.name ?? '—'}</span>
+              <span className="of-num text-[#6B6F68]">{formatDate(doc.created_at)}</span>
+              <span className="text-[#6B6F68]">
                 {doc.document_type ? DOC_TYPE_LABEL[doc.document_type] : '—'}
               </span>
               <span>

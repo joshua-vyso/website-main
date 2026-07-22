@@ -28,7 +28,7 @@ export function CompareBar() {
 
   return (
     <div className="fixed bottom-4 left-1/2 z-[80] -translate-x-1/2">
-      <div className="flex max-w-[92vw] items-center gap-3 rounded-2xl border border-[#E7E7E2] bg-white px-4 py-2.5 shadow-[0_16px_50px_-18px_rgba(26,28,30,0.45)]">
+      <div className="flex max-w-[92vw] items-center gap-3 rounded-2xl border border-[#EAEDF2] bg-white px-4 py-2.5 shadow-[0_16px_50px_-18px_rgba(26,28,30,0.45)]">
         {/* Selected supplier chips */}
         <div className="flex min-w-0 items-center gap-1.5 overflow-x-auto">
           {ss.compareIds.map((id) => {
@@ -37,15 +37,15 @@ export function CompareBar() {
             return (
               <span
                 key={id}
-                className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#FBFBF9] py-1 pl-2.5 pr-1 text-[12px] font-medium text-[#1A1C1E]"
-                style={{ border: '1px solid #E7E7E2' }}
+                className="inline-flex shrink-0 items-center gap-1 rounded-full bg-[#FBFCFE] py-1 pl-2.5 pr-1 text-[12px] font-medium text-[#171A17]"
+                style={{ border: '1px solid #EAEDF2' }}
               >
                 <span className="max-w-[140px] truncate">{s.name}</span>
                 <button
                   type="button"
                   onClick={() => ss.toggleCompare(id)}
                   aria-label={`Remove ${s.name} from comparison`}
-                  className="flex h-4 w-4 items-center justify-center rounded-full text-[11px] leading-none text-[#9A9DA1] transition-colors hover:bg-[#F0F0EC] hover:text-[#1A1C1E]"
+                  className="flex h-4 w-4 items-center justify-center rounded-full text-[11px] leading-none text-[#8A8E86] transition-colors hover:bg-[#EEF1F5] hover:text-[#171A17]"
                 >
                   ✕
                 </button>
@@ -54,16 +54,16 @@ export function CompareBar() {
           })}
         </div>
 
-        <span className="hidden shrink-0 whitespace-nowrap text-[11px] text-[#9A9DA1] sm:inline">
-          Select up to {MAX_COMPARE}
+        <span className="hidden shrink-0 whitespace-nowrap text-[12px] text-[#A0A49C] sm:inline">
+          Select up to <span className="of-num">{MAX_COMPARE}</span>
         </span>
 
-        <span className="h-5 w-px shrink-0 bg-[#F0F0EC]" aria-hidden />
+        <span className="h-5 w-px shrink-0 bg-[#EEF1F5]" aria-hidden />
 
         <button
           type="button"
           onClick={ss.clearCompare}
-          className="shrink-0 rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-[#5F6368] transition-colors hover:bg-[#F0F0EC] hover:text-[#1A1C1E]"
+          className="inline-flex h-9 shrink-0 items-center rounded-[10px] px-3 text-[13px] font-medium text-[#6B6F68] transition-colors hover:bg-[#EEF1F5] hover:text-[#171A17]"
         >
           Clear
         </button>
@@ -71,10 +71,9 @@ export function CompareBar() {
           type="button"
           onClick={ss.openCompare}
           disabled={!canCompare}
-          className="shrink-0 rounded-lg px-3 py-1.5 text-[12px] font-semibold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-45"
-          style={{ backgroundColor: '#1A1C1E' }}
+          className="inline-flex h-9 shrink-0 items-center rounded-[10px] bg-[#1F5FA8] px-3.5 text-[13px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:cursor-not-allowed disabled:opacity-45"
         >
-          Compare ({ss.compareIds.length})
+          Compare (<span className="of-num">{ss.compareIds.length}</span>)
         </button>
       </div>
     </div>
@@ -98,7 +97,7 @@ const SCORE_ROWS: { key: ScoreKey; label: string }[] = [
 
 function RowLabel({ children }: { children: ReactNode }) {
   return (
-    <td className="sticky left-0 z-[1] whitespace-nowrap border-b border-[#F0F0EC] bg-white py-3 pr-4 text-[12px] font-medium text-[#5F6368]">
+    <td className="sticky left-0 z-[1] whitespace-nowrap border-b border-[#EEF1F5] bg-white py-3 pl-4 pr-4 text-[13px] font-medium text-[#6B6F68]">
       {children}
     </td>
   );
@@ -107,7 +106,7 @@ function RowLabel({ children }: { children: ReactNode }) {
 function PositionCell({ position }: { position: MarketPosition }) {
   const m = POSITION_META[position];
   return (
-    <span className="text-[12px] font-semibold" style={{ color: m.color }}>
+    <span className="text-[13px] font-semibold" style={{ color: m.color }}>
       {m.label}
     </span>
   );
@@ -140,9 +139,9 @@ export function CompareDrawer() {
   return (
     <Drawer open={ss.compareOpen} onClose={ss.closeCompare} width={720} title="Compare suppliers">
       {rows.length < 2 ? (
-        <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
-          <p className="text-[15px] font-medium text-[#1A1C1E]">Pick at least two suppliers</p>
-          <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">
+        <div className="rounded-2xl border border-dashed border-[#E2E6EC] bg-[#FBFCFE] px-6 py-12 text-center">
+          <p className="of-display text-[16px] font-semibold text-[#171A17]">Pick at least two suppliers</p>
+          <p className="mx-auto mt-1 max-w-md text-[13px] text-[#6B6F68]">
             Select two or three suppliers from the table to see their scorecards, pricing position and
             recommendation side by side.
           </p>
@@ -150,11 +149,11 @@ export function CompareDrawer() {
       ) : (
         <div className="space-y-4">
           {/* Comparison matrix — metrics down the left, one column per supplier */}
-          <div className="overflow-x-auto rounded-2xl border border-[#E7E7E2]">
+          <div className="overflow-x-auto rounded-2xl border border-[#EAEDF2]">
             <table className="w-full border-collapse text-left">
               <thead>
                 <tr>
-                  <th className="sticky left-0 z-[2] bg-[#FBFBF9] px-4 py-3 text-[11px] font-medium uppercase tracking-wide text-[#9A9DA1]">
+                  <th className="sticky left-0 z-[2] bg-[#FBFCFE] px-4 py-3 text-[11px] font-medium uppercase tracking-[0.06em] text-[#A0A49C]">
                     Metric
                   </th>
                   {rows.map((r) => {
@@ -162,18 +161,18 @@ export function CompareDrawer() {
                     return (
                       <th
                         key={r.supplierId}
-                        className="border-l border-[#F0F0EC] px-4 py-3 align-bottom"
-                        style={isBest ? { backgroundColor: '#0F6E560D' } : { backgroundColor: '#FBFBF9' }}
+                        className="border-l border-[#EEF1F5] px-4 py-3 align-bottom"
+                        style={isBest ? { backgroundColor: '#0F6E560D' } : { backgroundColor: '#FBFCFE' }}
                       >
                         <button
                           type="button"
                           onClick={() => ss.openProfile(r.supplierId)}
-                          className="text-left text-[13px] font-semibold text-[#1A1C1E] transition-colors hover:text-[#B0466A]"
+                          className="of-display text-left text-[14px] font-semibold text-[#171A17] transition-colors hover:text-[#1F5FA8]"
                         >
                           {r.name}
                         </button>
                         {isBest ? (
-                          <div className="mt-1 text-[10px] font-semibold uppercase tracking-wide" style={{ color: '#0F6E56' }}>
+                          <div className="mt-1 text-[11px] font-semibold uppercase tracking-[0.06em]" style={{ color: '#0F6E56' }}>
                             Top overall
                           </div>
                         ) : null}
@@ -193,7 +192,7 @@ export function CompareDrawer() {
                       return (
                         <td
                           key={r.supplierId}
-                          className="border-b border-l border-[#F0F0EC] px-4 py-3"
+                          className="border-b border-l border-[#EEF1F5] px-4 py-3"
                           style={r.supplierId === bestOverallId ? { backgroundColor: '#0F6E5608' } : undefined}
                         >
                           <span className="inline-flex items-center gap-1.5">
@@ -216,7 +215,7 @@ export function CompareDrawer() {
                   {rows.map((r) => (
                     <td
                       key={r.supplierId}
-                      className="border-b border-l border-[#F0F0EC] px-4 py-3"
+                      className="border-b border-l border-[#EEF1F5] px-4 py-3"
                       style={r.supplierId === bestOverallId ? { backgroundColor: '#0F6E5608' } : undefined}
                     >
                       <PositionCell position={r.pricePosition} />
@@ -230,7 +229,7 @@ export function CompareDrawer() {
                   {rows.map((r) => (
                     <td
                       key={r.supplierId}
-                      className="border-b border-l border-[#F0F0EC] px-4 py-3 text-[12px]"
+                      className="border-b border-l border-[#EEF1F5] px-4 py-3 text-[12px]"
                       style={{
                         color: r.lastIssue ? MUTE : FAINT,
                         ...(r.supplierId === bestOverallId ? { backgroundColor: '#0F6E5608' } : {}),
@@ -247,7 +246,7 @@ export function CompareDrawer() {
                   {rows.map((r) => (
                     <td
                       key={r.supplierId}
-                      className="border-l border-[#F0F0EC] px-4 py-3"
+                      className="border-l border-[#EEF1F5] px-4 py-3"
                       style={r.supplierId === bestOverallId ? { backgroundColor: '#0F6E5608' } : undefined}
                     >
                       <Badge label={r.recommendation} tone={recommendationTone(r.recommendation)} />
@@ -262,15 +261,15 @@ export function CompareDrawer() {
           <p className="text-[12px] leading-relaxed" style={{ color: FAINT }}>
             Recommendations are guidance based on scorecards, compliance and pricing position. Actual purchasing
             happens in{' '}
-            <Link href="/app/procurepulse" className="font-medium underline decoration-[#E7E7E2] underline-offset-2 transition-colors hover:text-[#B0466A]" style={{ color: MUTE }}>
+            <Link href="/app/procurepulse" className="font-medium underline decoration-[#EAEDF2] underline-offset-2 transition-colors hover:text-[#1F5FA8]" style={{ color: MUTE }}>
               ProcurePulse
             </Link>
             .
           </p>
 
           <div className="flex items-center justify-between gap-3 pt-1">
-            <span className="text-[12px]" style={{ color: INK }}>
-              Comparing {rows.length} of up to {MAX_COMPARE} suppliers
+            <span className="text-[13px]" style={{ color: INK }}>
+              Comparing <span className="of-num">{rows.length}</span> of up to <span className="of-num">{MAX_COMPARE}</span> suppliers
             </span>
             <button
               type="button"
@@ -278,7 +277,7 @@ export function CompareDrawer() {
                 ss.clearCompare();
                 ss.closeCompare();
               }}
-              className="rounded-lg border border-[#E7E7E2] px-3 py-1.5 text-[12px] font-medium text-[#5F6368] transition-colors hover:bg-[#F0F0EC] hover:text-[#1A1C1E]"
+              className="inline-flex h-[42px] items-center rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]"
             >
               Clear selection
             </button>

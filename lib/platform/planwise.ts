@@ -90,7 +90,7 @@ export const REC_STATUS_LABEL: Record<RecStatus, string> = { open: 'Open', in_pr
 export const PRIORITY_STYLE: Record<Priority, { bg: string; fg: string; label: string }> = {
   high: { bg: '#FCEBEB', fg: '#A32D2D', label: 'High' },
   medium: { bg: '#FBEEDA', fg: '#854F0B', label: 'Medium' },
-  low: { bg: '#F0F0EC', fg: '#5F6368', label: 'Low' },
+  low: { bg: '#EEF1F5', fg: '#6B6F68', label: 'Low' },
 };
 
 // ---------------------------------------------------------------------------

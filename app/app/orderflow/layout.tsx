@@ -40,15 +40,9 @@ export default async function OrderFlowLayout({ children }: { children: React.Re
   const needsSetup = session.org ? await needsOrderFlowSetup() : false;
 
   return (
-    <div
-      // OrderFlow runs its own palette: Instrument Sans over a cool wash that
-      // fades to white just below the sub-nav, so the cards read as floating.
-      className="min-h-full px-8 py-7"
-      style={{
-        fontFamily: 'var(--font-instrument)',
-        background: 'linear-gradient(180deg, #F3F8FF 0%, #FFFFFF 340px)',
-      }}
-    >
+    // Font and the cool wash now come from the platform shell (app/app/layout.tsx),
+    // which every module shares. OrderFlow only keeps its orange sub-nav accent.
+    <div className="min-h-full px-8 py-7">
       {needsSetup ? <OrderFlowSetupBanner /> : null}
       <SubNav
         tabs={TABS}

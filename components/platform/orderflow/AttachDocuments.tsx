@@ -134,12 +134,12 @@ export function AttachDocuments({
   return (
     <div>
       <div className="flex items-center justify-between gap-3">
-        <h3 className="text-[13px] font-semibold text-[#1A1C1E]">{title ?? 'Documents'}</h3>
+        <h3 className="text-[13px] font-semibold text-[#171A17]">{title ?? 'Documents'}</h3>
         <button
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={busy}
-          className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/40 disabled:opacity-60"
+          className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#E2E6EC] bg-white px-3 text-[12px] font-medium text-[#171A17] transition-colors hover:border-[#3E7BC4]/40 disabled:opacity-60"
         >
           {busy ? 'Uploading…' : '↑ Attach'}
         </button>
@@ -158,9 +158,9 @@ export function AttachDocuments({
       </div>
 
       {documents.length === 0 ? (
-        <p className="mt-3 text-[13px] text-[#9A9DA1]">No documents attached yet.</p>
+        <p className="mt-3 text-[13px] text-[#8A8E86]">No documents attached yet.</p>
       ) : (
-        <ul className="mt-3 divide-y divide-[#F0F0EC] overflow-hidden rounded-xl border border-[#E7E7E2]">
+        <ul className="mt-3 divide-y divide-[#EEF1F5] overflow-hidden rounded-xl border border-[#EAEDF2]">
           {documents.map((doc) => (
             <li key={doc.id} className="flex items-center justify-between gap-3 px-3.5 py-2.5">
               <div className="min-w-0">
@@ -168,12 +168,12 @@ export function AttachDocuments({
                   type="button"
                   onClick={() => void open(doc)}
                   disabled={!doc.storage_path || opening === doc.id}
-                  className="block max-w-full truncate text-left text-[13px] font-medium text-[#1F5FA8] transition-colors hover:text-[#174C87] disabled:text-[#9A9DA1]"
+                  className="block max-w-full truncate text-left text-[13px] font-medium text-[#1F5FA8] transition-colors hover:text-[#174C87] disabled:text-[#8A8E86]"
                   title={doc.filename}
                 >
                   {opening === doc.id ? 'Opening…' : doc.filename}
                 </button>
-                <div className="mt-0.5 text-[11px] text-[#9A9DA1]">
+                <div className="mt-0.5 text-[11px] text-[#8A8E86]">
                   {doc.document_type ? <span className="capitalize">{doc.document_type}</span> : null}
                   {doc.document_type && doc.created_at ? ' · ' : null}
                   {docDate(doc.created_at)}

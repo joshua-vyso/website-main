@@ -57,12 +57,12 @@ export function ApprovalActions({
   }
 
   return (
-    <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
+    <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
       <div className="flex items-center justify-between">
-        <span className="text-[14px] font-medium text-[#1A1C1E]">Workflow</span>
+        <span className="of-display text-[16px] font-semibold text-[#171A17]">Workflow</span>
         <StatusPill status={status} />
       </div>
-      <div className="mt-1 text-[12px] text-[#9A9DA1]">Current — {workflowLabel(status)}</div>
+      <div className="mt-1 text-[12px] text-[#A0A49C]">Current — {workflowLabel(status)}</div>
 
       <div className="mt-3 flex flex-wrap gap-2">
         {transitions.map((t) => (
@@ -71,10 +71,10 @@ export function ApprovalActions({
             type="button"
             disabled={!t.available || busy !== null}
             onClick={() => run(t.action, t.toStatus)}
-            className={`rounded-lg px-3.5 py-2 text-[13px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+            className={`inline-flex h-[38px] items-center rounded-[11px] px-4 text-[13px] transition-all disabled:cursor-not-allowed disabled:opacity-40 ${
               t.primary
-                ? 'bg-[#1F5FA8] text-white hover:bg-[#184c44]'
-                : 'border border-[#D7DAD8] text-[#5F6368] hover:bg-[#FAFAF8]'
+                ? 'bg-[#1F5FA8] font-semibold text-white hover:bg-[#174C87]'
+                : 'border border-[#E2E6EC] bg-white font-medium text-[#3E4A57] hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]'
             }`}
           >
             {busy === t.action ? '…' : t.label}

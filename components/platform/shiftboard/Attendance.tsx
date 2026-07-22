@@ -43,8 +43,8 @@ export function Attendance() {
 
   const header = (
     <div>
-      <h1 className="text-[24px] font-bold leading-tight text-[#1A1C1E]">Attendance</h1>
-      <p className="mt-0.5 text-[14px] text-[#5F6368]">Clock-ins, hours worked and timesheet approvals</p>
+      <h1 className="of-display text-[28px] font-semibold leading-tight tracking-[-0.015em] text-[#171A17]">Attendance</h1>
+      <p className="mt-1.5 text-[14px] text-[#8A8E86]">Clock-ins, hours worked and timesheet approvals</p>
     </div>
   );
 
@@ -53,9 +53,9 @@ export function Attendance() {
       <div className="space-y-5">
         {node}
         {header}
-        <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
-          <p className="text-[15px] font-medium text-[#1A1C1E]">No attendance yet</p>
-          <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">Clock-ins, hours worked and timesheet approvals will appear here once staff start their shifts.</p>
+        <div className="rounded-2xl border border-dashed border-[#E2E6EC] bg-[#FBFCFE] px-6 py-12 text-center">
+          <p className="of-display text-[16px] font-semibold text-[#171A17]">No attendance yet</p>
+          <p className="mx-auto mt-1.5 max-w-md text-[13px] text-[#6B6F68]">Clock-ins, hours worked and timesheet approvals will appear here once staff start their shifts.</p>
         </div>
       </div>
     );
@@ -74,11 +74,11 @@ export function Attendance() {
         <Kpi label="Pending timesheets" value={String(pending)} accent={pending > 0 ? '#854F0B' : undefined} />
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
+      <div className="overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
         <div className="overflow-x-auto">
-          <table className="w-full text-[13px]">
+          <table className="w-full text-[14px]">
             <thead>
-              <tr className="border-b border-[#F0F0EC] bg-[#FBFBF9] text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+              <tr className="border-b border-[#EEF1F5] bg-[#FBFCFE] text-[11px] uppercase tracking-[0.06em] text-[#A0A49C]">
                 {['Employee', 'Department', 'Scheduled', 'Clock in', 'Clock out', 'Hours', 'Overtime', 'Status', ''].map((h) => (
                   <th key={h} className={`px-3 py-2.5 font-medium ${h === 'Hours' || h === 'Overtime' ? 'text-right' : 'text-left'}`}>{h}</th>
                 ))}
@@ -86,14 +86,14 @@ export function Attendance() {
             </thead>
             <tbody>
               {attendance.map((a) => (
-                <tr key={a.id} className="border-b border-[#F6F6F2] last:border-0 hover:bg-[#FAFAF8]">
-                  <td className="px-3 py-3 font-medium text-[#1A1C1E]">{a.name}</td>
+                <tr key={a.id} className="border-b border-[#F5F9FE] last:border-0 hover:bg-[#F5F9FE]">
+                  <td className="px-3 py-3 font-semibold text-[#171A17]">{a.name}</td>
                   <td className="px-3 py-3"><DeptBadge department={a.department} /></td>
-                  <td className="px-3 py-3 tabular-nums text-[#5F6368]">{a.scheduled}</td>
-                  <td className="px-3 py-3 tabular-nums" style={{ color: a.status === 'Late' ? '#854F0B' : '#5F6368' }}>{a.clockIn ?? '—'}</td>
-                  <td className="px-3 py-3 tabular-nums text-[#9A9DA1]">{a.clockOut ?? 'On shift'}</td>
-                  <td className="px-3 py-3 text-right tabular-nums text-[#5F6368]">{a.hoursWorked.toFixed(1)}</td>
-                  <td className="px-3 py-3 text-right tabular-nums" style={{ color: a.overtime > 0 ? '#5B53C0' : '#9A9DA1' }}>{a.overtime > 0 ? `+${a.overtime.toFixed(1)}` : '—'}</td>
+                  <td className="of-num px-3 py-3 text-[#6B6F68]">{a.scheduled}</td>
+                  <td className="of-num px-3 py-3" style={{ color: a.status === 'Late' ? '#854F0B' : '#6B6F68' }}>{a.clockIn ?? '—'}</td>
+                  <td className="of-num px-3 py-3 text-[#A0A49C]">{a.clockOut ?? 'On shift'}</td>
+                  <td className="of-num px-3 py-3 text-right text-[#6B6F68]">{a.hoursWorked.toFixed(1)}</td>
+                  <td className="of-num px-3 py-3 text-right" style={{ color: a.overtime > 0 ? '#5B53C0' : '#A0A49C' }}>{a.overtime > 0 ? `+${a.overtime.toFixed(1)}` : '—'}</td>
                   <td className="px-3 py-3"><AttendanceBadge status={a.status} /></td>
                   <td className="px-3 py-3 text-right">
                     <RowActionsMenu actions={[

@@ -84,8 +84,8 @@ export function DeliveryNotesView({ data }: { data: DeliveryNotesData }) {
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-[18px] font-bold text-[#1A1C1E]">Delivery notes</h1>
-          <p className="mt-0.5 text-[13px] text-[#5F6368]">
+          <h1 className="text-[18px] font-bold text-[#171A17]">Delivery notes</h1>
+          <p className="mt-0.5 text-[13px] text-[#6B6F68]">
             Picking slips and proof-of-delivery for orders and invoices.
           </p>
         </div>
@@ -103,7 +103,7 @@ export function DeliveryNotesView({ data }: { data: DeliveryNotesData }) {
               className={`h-8 rounded-lg border px-3 text-[12px] font-medium transition-colors ${
                 status === f.value
                   ? 'border-[#3E7BC4] bg-[#1F5FA8] text-white'
-                  : 'border-[#D7DAD8] bg-white text-[#5F6368] hover:border-[#3E7BC4]/40'
+                  : 'border-[#E2E6EC] bg-white text-[#6B6F68] hover:border-[#3E7BC4]/40'
               }`}
             >
               {f.label}
@@ -122,10 +122,10 @@ export function DeliveryNotesView({ data }: { data: DeliveryNotesData }) {
         ) : filtered.length === 0 ? (
           <EmptyState title="No matching delivery notes" body="Try a different search or status filter." />
         ) : (
-          <div className="overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
+          <div className="overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white">
             <table className="w-full text-[13px]">
               <thead>
-                <tr className="border-b border-[#E7E7E2] text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+                <tr className="border-b border-[#EAEDF2] text-[11px] uppercase tracking-wide text-[#8A8E86]">
                   <th className="px-4 py-3 text-left font-medium">Number</th>
                   <th className="px-4 py-3 text-left font-medium">Customer</th>
                   <th className="px-4 py-3 text-left font-medium">Source</th>
@@ -147,13 +147,13 @@ export function DeliveryNotesView({ data }: { data: DeliveryNotesData }) {
                       ? `/app/orderflow/invoices/${dn.invoice_id}`
                       : null;
                   return (
-                    <tr key={dn.id} className="border-b border-[#F0F0EC] transition-colors last:border-0 hover:bg-[#FAFAF8]">
+                    <tr key={dn.id} className="border-b border-[#EEF1F5] transition-colors last:border-0 hover:bg-[#F5F9FE]">
                       <td className="px-4 py-3">
                         <Link href={`/app/orderflow/delivery-notes/${dn.id}`} className="font-medium text-[#1F5FA8] hover:text-[#174C87]">
                           {dn.dn_number}
                         </Link>
                       </td>
-                      <td className="px-4 py-3 text-[#1A1C1E]">
+                      <td className="px-4 py-3 text-[#171A17]">
                         {(dn.customer_id && custName.get(dn.customer_id)) || 'No customer'}
                       </td>
                       <td className="px-4 py-3">
@@ -162,18 +162,18 @@ export function DeliveryNotesView({ data }: { data: DeliveryNotesData }) {
                             {src}
                           </Link>
                         ) : (
-                          <span className="text-[#9A9DA1]">—</span>
+                          <span className="text-[#8A8E86]">—</span>
                         )}
                       </td>
                       <td className="px-4 py-3">
                         <Pill label={s.label} bg={s.bg} fg={s.fg} />
                       </td>
-                      <td className="px-4 py-3 text-[#5F6368]">{fmtDate(dn.delivered_at)}</td>
+                      <td className="px-4 py-3 text-[#6B6F68]">{fmtDate(dn.delivered_at)}</td>
                       <td className="px-4 py-3">
                         {dn.pod_document_id ? (
                           <span className="inline-flex items-center gap-1 text-[12px] font-medium text-[#0F6E56]">✓ Uploaded</span>
                         ) : (
-                          <span className="text-[12px] text-[#9A9DA1]">—</span>
+                          <span className="text-[12px] text-[#8A8E86]">—</span>
                         )}
                       </td>
                     </tr>
@@ -390,7 +390,7 @@ function NewDeliveryNoteModal({
               className={`h-8 rounded-lg border px-3 text-[12px] font-medium capitalize transition-colors ${
                 kind === k
                   ? 'border-[#3E7BC4] bg-[#1F5FA8] text-white'
-                  : 'border-[#D7DAD8] bg-white text-[#5F6368] hover:border-[#3E7BC4]/40'
+                  : 'border-[#E2E6EC] bg-white text-[#6B6F68] hover:border-[#3E7BC4]/40'
               }`}
             >
               From {k}
@@ -406,25 +406,25 @@ function NewDeliveryNoteModal({
           />
         </div>
 
-        <div className="mt-3 max-h-[280px] overflow-y-auto rounded-xl border border-[#E7E7E2]">
+        <div className="mt-3 max-h-[280px] overflow-y-auto rounded-xl border border-[#EAEDF2]">
           {results.length === 0 ? (
-            <p className="px-3.5 py-6 text-center text-[13px] text-[#9A9DA1]">
+            <p className="px-3.5 py-6 text-center text-[13px] text-[#8A8E86]">
               No {kind === 'order' ? 'orders' : 'invoices'} found.
             </p>
           ) : (
-            <ul className="divide-y divide-[#F0F0EC]">
+            <ul className="divide-y divide-[#EEF1F5]">
               {results.map((r) => (
                 <li key={r.id}>
                   <button
                     type="button"
                     onClick={() => setSelected(r.id)}
-                    className={`flex w-full items-center justify-between gap-3 px-3.5 py-2.5 text-left transition-colors hover:bg-[#FAFAF8] ${
+                    className={`flex w-full items-center justify-between gap-3 px-3.5 py-2.5 text-left transition-colors hover:bg-[#F5F9FE] ${
                       selected === r.id ? 'bg-[#EAF4F0]' : ''
                     }`}
                   >
                     <div className="min-w-0">
-                      <div className="truncate text-[13px] font-medium text-[#1A1C1E]">{r.number}</div>
-                      <div className="truncate text-[12px] text-[#5F6368]">{r.customerName}</div>
+                      <div className="truncate text-[13px] font-medium text-[#171A17]">{r.number}</div>
+                      <div className="truncate text-[12px] text-[#6B6F68]">{r.customerName}</div>
                     </div>
                     {selected === r.id ? <span className="shrink-0 text-[13px] text-[#1F5FA8]">✓</span> : null}
                   </button>

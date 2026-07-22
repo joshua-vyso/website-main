@@ -283,7 +283,7 @@ export function AddressesDb({ data }: { data: CoreData }) {
         <select
           value={customerFilter}
           onChange={(e) => setCustomerFilter(e.target.value)}
-          className="h-9 max-w-[220px] rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] focus:border-[#3E7BC4]/50 focus:outline-none"
+          className="h-11 max-w-[220px] rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] outline-none focus:border-[#3E7BC4]"
         >
           <option value="all">All customers</option>
           {customers.map((c) => (
@@ -319,46 +319,46 @@ export function AddressesDb({ data }: { data: CoreData }) {
       ) : filtered.length === 0 ? (
         <EmptyState title="No matching addresses" body="Try a different search or clear the filters." />
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-[#E7E7E2] bg-white">
-          <table className="w-full text-[13px]">
+        <div className="overflow-x-auto rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <table className="w-full text-[14px]">
             <thead>
-              <tr className="border-b border-[#E7E7E2] text-left text-[11px] uppercase tracking-wide text-[#9A9DA1]">
-                <th className="px-4 py-3 font-semibold">Nickname</th>
-                <th className="px-4 py-3 font-semibold">Customer</th>
-                <th className="px-4 py-3 font-semibold">Address</th>
-                <th className="px-4 py-3 font-semibold">Instructions</th>
+              <tr className="border-b border-[#EEF1F5] bg-[#FBFCFE] text-left text-[11px] uppercase tracking-[0.06em] text-[#A0A49C]">
+                <th className="px-4 py-3 font-medium">Nickname</th>
+                <th className="px-4 py-3 font-medium">Customer</th>
+                <th className="px-4 py-3 font-medium">Address</th>
+                <th className="px-4 py-3 font-medium">Instructions</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
             <tbody>
               {filtered.map((a) => (
-                <tr key={a.id} className="border-b border-[#F0F0EC] last:border-0 hover:bg-[#FBFBF9]">
-                  <td className="px-4 py-3">
+                <tr key={a.id} className="border-b border-[#F4F5F7] last:border-0 hover:bg-[#F5F9FE]">
+                  <td className="px-4 py-3.5">
                     <button
                       type="button"
                       onClick={() => openEdit(a)}
-                      className="inline-flex items-center gap-2 text-left font-medium text-[#1A1C1E] transition-colors hover:text-[#174C87] hover:underline"
+                      className="inline-flex items-center gap-2 text-left font-semibold text-[#171A17] transition-colors hover:text-[#174C87] hover:underline"
                     >
                       {a.nickname || 'Address'}
                       {a.is_default ? <Pill label="Default" bg="#E1F5EE" fg="#0F6E56" /> : null}
                     </button>
                   </td>
-                  <td className="px-4 py-3 text-[#5F6368]">{customerName.get(a.customer_id) ?? '—'}</td>
-                  <td className="px-4 py-3 text-[#5F6368]">{formatAddress(a) || '—'}</td>
-                  <td className="max-w-[240px] truncate px-4 py-3 text-[#9A9DA1]">{a.instructions || '—'}</td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-4 py-3.5 text-[#6B6F68]">{customerName.get(a.customer_id) ?? '—'}</td>
+                  <td className="px-4 py-3.5 text-[#6B6F68]">{formatAddress(a) || '—'}</td>
+                  <td className="max-w-[240px] truncate px-4 py-3.5 text-[#A0A49C]">{a.instructions || '—'}</td>
+                  <td className="px-4 py-3.5 text-right">
                     <div className="flex items-center justify-end gap-1">
                       <button
                         type="button"
                         onClick={() => openEdit(a)}
-                        className="rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-[#1F5FA8] transition-colors hover:bg-[#EAF3F0]"
+                        className="rounded-[9px] px-2.5 py-1.5 text-[13px] font-semibold text-[#1F5FA8] transition-colors hover:bg-[#EAF2FC]"
                       >
                         Edit
                       </button>
                       <button
                         type="button"
                         onClick={() => setDeleting(a)}
-                        className="rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-[#A32D2D] transition-colors hover:bg-[#F3E7E7]"
+                        className="rounded-[9px] px-2.5 py-1.5 text-[13px] font-semibold text-[#A32D2D] transition-colors hover:bg-[#F3E7E7]"
                       >
                         Delete
                       </button>
@@ -388,7 +388,7 @@ export function AddressesDb({ data }: { data: CoreData }) {
           </>
         }
       >
-        <div className="space-y-3">
+        <div className="space-y-4">
           <Field label="Customer">
             <select
               value={form.customer_id}
@@ -428,7 +428,7 @@ export function AddressesDb({ data }: { data: CoreData }) {
             />
           </Field>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Suburb" hint="(optional)">
               <input
                 value={form.suburb}
@@ -447,7 +447,7 @@ export function AddressesDb({ data }: { data: CoreData }) {
             </Field>
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Province" hint="(optional)">
               <input
                 value={form.province}
@@ -475,20 +475,20 @@ export function AddressesDb({ data }: { data: CoreData }) {
             />
           </Field>
 
-          <label className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-[#E7E7E2] bg-[#FBFBF9] px-3 py-2.5">
+          <label className="flex cursor-pointer items-center gap-2.5 rounded-lg border border-[#EAEDF2] bg-[#FBFCFE] px-3 py-2.5">
             <input
               type="checkbox"
               checked={form.is_default}
               onChange={(e) => setForm({ ...form, is_default: e.target.checked })}
-              className="h-4 w-4 accent-[#3E7BC4]"
+              className="h-4 w-4 accent-[#1F5FA8]"
             />
-            <span className="text-[13px] text-[#1A1C1E]">
+            <span className="text-[13px] text-[#171A17]">
               Default delivery address
-              <span className="ml-1.5 text-[12px] text-[#9A9DA1]">— pre-filled on new orders</span>
+              <span className="ml-1.5 text-[12px] text-[#8A8E86]">— pre-filled on new orders</span>
             </span>
           </label>
 
-          {error ? <p className="text-[12px] text-[#A32D2D]">{error}</p> : null}
+          {error ? <p className="text-[13px] text-[#A32D2D]">{error}</p> : null}
         </div>
       </Modal>
 

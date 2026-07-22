@@ -330,7 +330,7 @@ export function CustomersDb({ data }: { data: CoreData }) {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-          className="h-9 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] focus:border-[#3E7BC4]/50 focus:outline-none"
+          className="h-11 rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] outline-none focus:border-[#3E7BC4]"
         >
           {STATUS_FILTERS.map((s) => (
             <option key={s.value} value={s.value}>
@@ -341,7 +341,7 @@ export function CustomersDb({ data }: { data: CoreData }) {
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value as TypeFilter)}
-          className="h-9 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] focus:border-[#3E7BC4]/50 focus:outline-none"
+          className="h-11 rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] outline-none focus:border-[#3E7BC4]"
         >
           <option value="all">All types</option>
           {CUSTOMER_TYPES.map((t) => (
@@ -353,7 +353,7 @@ export function CustomersDb({ data }: { data: CoreData }) {
         <div className="ml-auto flex items-center gap-2">
           <Link
             href="/app/docu/databases/import?entity=customers"
-            className="inline-flex h-9 items-center justify-center rounded-lg border border-[#D7DAD8] bg-white px-4 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:bg-[#F0F0EC]"
+            className="inline-flex h-[42px] items-center justify-center rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]"
           >
             Import Excel/CSV
           </Link>
@@ -375,17 +375,17 @@ export function CustomersDb({ data }: { data: CoreData }) {
       ) : filtered.length === 0 ? (
         <EmptyState title="No matching customers" body="Try a different search or clear the filters." />
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-[#E7E7E2] bg-white">
-          <table className="w-full text-[13px]">
+        <div className="overflow-x-auto rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <table className="w-full text-[14px]">
             <thead>
-              <tr className="border-b border-[#E7E7E2] text-left text-[11px] uppercase tracking-wide text-[#9A9DA1]">
-                <th className="px-4 py-3 font-semibold">Name</th>
-                <th className="px-4 py-3 font-semibold">Trading name</th>
-                <th className="px-4 py-3 font-semibold">Type</th>
-                <th className="px-4 py-3 font-semibold">Status</th>
-                <th className="px-4 py-3 font-semibold">Terms</th>
-                <th className="px-4 py-3 font-semibold">VAT no.</th>
-                <th className="px-4 py-3 font-semibold">Updated</th>
+              <tr className="border-b border-[#EEF1F5] bg-[#FBFCFE] text-left text-[11px] uppercase tracking-[0.06em] text-[#A0A49C]">
+                <th className="px-4 py-3 font-medium">Name</th>
+                <th className="px-4 py-3 font-medium">Trading name</th>
+                <th className="px-4 py-3 font-medium">Type</th>
+                <th className="px-4 py-3 font-medium">Status</th>
+                <th className="px-4 py-3 font-medium">Terms</th>
+                <th className="px-4 py-3 font-medium">VAT no.</th>
+                <th className="px-4 py-3 font-medium">Updated</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
@@ -395,34 +395,34 @@ export function CustomersDb({ data }: { data: CoreData }) {
                 const s = ACCOUNT_STATUS_STYLE[status];
                 const typeLabel = CUSTOMER_TYPES.find((t) => t.value === (c.customer_type ?? 'other'))?.label ?? '—';
                 return (
-                  <tr key={c.id} className="border-b border-[#F0F0EC] last:border-0 hover:bg-[#FBFBF9]">
-                    <td className="px-4 py-3">
+                  <tr key={c.id} className="border-b border-[#F4F5F7] last:border-0 hover:bg-[#F5F9FE]">
+                    <td className="px-4 py-3.5">
                       <button
                         type="button"
                         onClick={() => openEdit(c)}
-                        className="text-left font-medium text-[#1A1C1E] transition-colors hover:text-[#174C87] hover:underline"
+                        className="text-left font-semibold text-[#171A17] transition-colors hover:text-[#174C87] hover:underline"
                       >
                         {c.name}
                       </button>
                     </td>
-                    <td className="px-4 py-3 text-[#5F6368]">{c.trading_name || '—'}</td>
-                    <td className="px-4 py-3 text-[#5F6368]">{typeLabel}</td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3.5 text-[#6B6F68]">{c.trading_name || '—'}</td>
+                    <td className="px-4 py-3.5 text-[#6B6F68]">{typeLabel}</td>
+                    <td className="px-4 py-3.5">
                       <Pill label={s.label} bg={s.bg} fg={s.fg} />
                     </td>
-                    <td className="px-4 py-3 text-[#5F6368]">
+                    <td className="of-num px-4 py-3.5 text-[#6B6F68]">
                       {c.payment_terms_days != null ? `${c.payment_terms_days} days` : '—'}
                     </td>
-                    <td className="px-4 py-3 text-[#5F6368]">{c.vat_number || '—'}</td>
-                    <td className="px-4 py-3 text-[#9A9DA1]">
+                    <td className="of-num px-4 py-3.5 text-[#6B6F68]">{c.vat_number || '—'}</td>
+                    <td className="of-num px-4 py-3.5 text-[#A0A49C]">
                       {c.updated_at ? new Date(c.updated_at).toLocaleDateString('en-ZA') : '—'}
                     </td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3.5 text-right">
                       <div className="flex items-center justify-end gap-1">
                         <button
                           type="button"
                           onClick={() => openEdit(c)}
-                          className="rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-[#1F5FA8] transition-colors hover:bg-[#EAF3F0]"
+                          className="rounded-[9px] px-2.5 py-1.5 text-[13px] font-semibold text-[#1F5FA8] transition-colors hover:bg-[#EAF2FC]"
                         >
                           Edit
                         </button>
@@ -430,7 +430,7 @@ export function CustomersDb({ data }: { data: CoreData }) {
                           <button
                             type="button"
                             onClick={() => setArchiving(c)}
-                            className="rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-[#A32D2D] transition-colors hover:bg-[#F3E7E7]"
+                            className="rounded-[9px] px-2.5 py-1.5 text-[13px] font-semibold text-[#A32D2D] transition-colors hover:bg-[#F3E7E7]"
                           >
                             Archive
                           </button>
@@ -463,8 +463,8 @@ export function CustomersDb({ data }: { data: CoreData }) {
           </>
         }
       >
-        <div className="space-y-3">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Company name">
               <input
                 autoFocus
@@ -487,7 +487,7 @@ export function CustomersDb({ data }: { data: CoreData }) {
             </Field>
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Email">
               <input
                 value={form.email}
@@ -506,7 +506,7 @@ export function CustomersDb({ data }: { data: CoreData }) {
             </Field>
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="VAT number" hint="(optional)">
               <input
                 value={form.vat_number}
@@ -525,7 +525,7 @@ export function CustomersDb({ data }: { data: CoreData }) {
             </Field>
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Customer type">
               <select
                 value={form.customer_type}
@@ -552,7 +552,7 @@ export function CustomersDb({ data }: { data: CoreData }) {
             </Field>
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Payment terms (days)" hint="(optional)">
               <input
                 type="number"
@@ -601,7 +601,7 @@ export function CustomersDb({ data }: { data: CoreData }) {
             />
           </Field>
 
-          {error ? <p className="text-[12px] text-[#A32D2D]">{error}</p> : null}
+          {error ? <p className="text-[13px] text-[#A32D2D]">{error}</p> : null}
         </div>
       </Modal>
 

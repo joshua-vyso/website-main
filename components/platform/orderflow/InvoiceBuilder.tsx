@@ -74,7 +74,7 @@ export interface InvoiceBuilderInitial {
 }
 
 const textareaClass =
-  'w-full rounded-lg border border-[#D7DAD8] bg-white px-3 py-2 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/50 focus:outline-none';
+  'w-full rounded-lg border border-[#E2E6EC] bg-white px-3 py-2 text-[13px] text-[#171A17] placeholder:text-[#8A8E86] focus:border-[#3E7BC4]/50 focus:outline-none';
 
 let lineSeq = 0;
 
@@ -360,23 +360,23 @@ export function InvoiceBuilder({
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <Link href="/app/orderflow/invoices" className="text-[13px] font-medium text-[#5F6368] transition-colors hover:text-[#1A1C1E]">
+          <Link href="/app/orderflow/invoices" className="text-[13px] font-medium text-[#6B6F68] transition-colors hover:text-[#171A17]">
             ← Invoices
           </Link>
-          <h1 className="mt-1 text-[26px] font-bold text-[#1A1C1E]">{heading}</h1>
+          <h1 className="mt-1 text-[26px] font-bold text-[#171A17]">{heading}</h1>
           {initial.sourceLabel ? (
-            <p className="mt-0.5 text-[13px] text-[#5F6368]">Prefilled from {initial.sourceLabel}.</p>
+            <p className="mt-0.5 text-[13px] text-[#6B6F68]">Prefilled from {initial.sourceLabel}.</p>
           ) : null}
         </div>
       </div>
 
-      <div className="mt-6 space-y-5 rounded-2xl border border-[#E7E7E2] bg-white p-6">
+      <div className="mt-6 space-y-5 rounded-2xl border border-[#EAEDF2] bg-white p-6">
         {/* Customer + PO */}
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Customer">
             <CustomerSelect customers={customers} value={customerId} onChange={handleCustomerChange} allowCreate />
             {customer ? (
-              <p className="mt-1.5 text-[12px] text-[#9A9DA1]">
+              <p className="mt-1.5 text-[12px] text-[#8A8E86]">
                 {customer.vat_number ? `VAT ${customer.vat_number}` : 'No VAT number on file'}
                 {' · '}
                 {termsDaysFor(customer)}-day terms
@@ -439,7 +439,7 @@ export function InvoiceBuilder({
 
         {/* Line items */}
         <div>
-          <div className="mb-2 text-[13px] font-medium text-[#1A1C1E]">Line items</div>
+          <div className="mb-2 text-[13px] font-medium text-[#171A17]">Line items</div>
           <LineItemsEditor products={products} priceList={priceList} overrides={overrides} lines={lines} onChange={setLines} />
         </div>
 
@@ -466,14 +466,14 @@ export function InvoiceBuilder({
         </div>
 
         {/* Totals */}
-        <div className="flex justify-end border-t border-[#F0F0EC] pt-4">
+        <div className="flex justify-end border-t border-[#EEF1F5] pt-4">
           <div className="w-full max-w-[300px] space-y-2 text-[13px]">
             <div className="flex justify-between">
-              <span className="text-[#5F6368]">Subtotal</span>
-              <span className="tabular-nums text-[#1A1C1E]">{zar2(totals.subtotal)}</span>
+              <span className="text-[#6B6F68]">Subtotal</span>
+              <span className="tabular-nums text-[#171A17]">{zar2(totals.subtotal)}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="flex items-center text-[#5F6368]">
+              <span className="flex items-center text-[#6B6F68]">
                 Discount R
                 <input
                   value={discount}
@@ -481,13 +481,13 @@ export function InvoiceBuilder({
                   inputMode="decimal"
                   placeholder="0.00"
                   aria-label="Discount in rands"
-                  className="ml-1.5 h-6 w-20 rounded-md border border-[#E7E7E2] px-1 text-right text-[12px] tabular-nums text-[#1A1C1E] focus:border-[#3E7BC4]/50 focus:outline-none"
+                  className="ml-1.5 h-6 w-20 rounded-md border border-[#EAEDF2] px-1 text-right text-[12px] tabular-nums text-[#171A17] focus:border-[#3E7BC4]/50 focus:outline-none"
                 />
               </span>
-              <span className="tabular-nums text-[#1A1C1E]">{totals.discount > 0 ? `−${zar2(totals.discount)}` : zar2(0)}</span>
+              <span className="tabular-nums text-[#171A17]">{totals.discount > 0 ? `−${zar2(totals.discount)}` : zar2(0)}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="flex items-center text-[#5F6368]">
+              <span className="flex items-center text-[#6B6F68]">
                 Rebate
                 <input
                   value={rebate}
@@ -495,29 +495,29 @@ export function InvoiceBuilder({
                   inputMode="decimal"
                   placeholder="0"
                   aria-label="Rebate percentage"
-                  className="mx-1.5 h-6 w-12 rounded-md border border-[#E7E7E2] px-1 text-right text-[12px] tabular-nums text-[#1A1C1E] focus:border-[#3E7BC4]/50 focus:outline-none"
+                  className="mx-1.5 h-6 w-12 rounded-md border border-[#EAEDF2] px-1 text-right text-[12px] tabular-nums text-[#171A17] focus:border-[#3E7BC4]/50 focus:outline-none"
                 />
                 %
               </span>
-              <span className="tabular-nums text-[#1A1C1E]">{totals.rebate > 0 ? `−${zar2(totals.rebate)}` : zar2(0)}</span>
+              <span className="tabular-nums text-[#171A17]">{totals.rebate > 0 ? `−${zar2(totals.rebate)}` : zar2(0)}</span>
             </div>
             <div className="flex items-center justify-between">
-              <span className="text-[#5F6368]">
+              <span className="text-[#6B6F68]">
                 VAT
                 <input
                   value={String(vatRate)}
                   onChange={(e) => setVatRate(Number(e.target.value) || 0)}
                   inputMode="decimal"
                   aria-label="VAT rate"
-                  className="mx-1.5 h-6 w-12 rounded-md border border-[#E7E7E2] px-1 text-right text-[12px] tabular-nums text-[#1A1C1E] focus:border-[#3E7BC4]/50 focus:outline-none"
+                  className="mx-1.5 h-6 w-12 rounded-md border border-[#EAEDF2] px-1 text-right text-[12px] tabular-nums text-[#171A17] focus:border-[#3E7BC4]/50 focus:outline-none"
                 />
                 %
               </span>
-              <span className="tabular-nums text-[#1A1C1E]">{zar2(totals.vat)}</span>
+              <span className="tabular-nums text-[#171A17]">{zar2(totals.vat)}</span>
             </div>
-            <div className="flex justify-between border-t border-[#E7E7E2] pt-2 text-[16px] font-bold">
-              <span className="text-[#1A1C1E]">Total</span>
-              <span className="tabular-nums text-[#1A1C1E]">{zar2(totals.total)}</span>
+            <div className="flex justify-between border-t border-[#EAEDF2] pt-2 text-[16px] font-bold">
+              <span className="text-[#171A17]">Total</span>
+              <span className="tabular-nums text-[#171A17]">{zar2(totals.total)}</span>
             </div>
           </div>
         </div>
@@ -527,7 +527,7 @@ export function InvoiceBuilder({
       <div className="mt-4 flex flex-wrap items-center justify-end gap-2.5">
         <Link
           href={isEdit && initial.editInvoice ? `/app/orderflow/invoices/${initial.editInvoice.id}` : '/app/orderflow/invoices'}
-          className="inline-flex h-9 items-center justify-center rounded-lg border border-[#D7DAD8] bg-white px-4 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:bg-[#F0F0EC]"
+          className="inline-flex h-9 items-center justify-center rounded-lg border border-[#E2E6EC] bg-white px-4 text-[13px] font-medium text-[#171A17] transition-colors hover:bg-[#EEF1F5]"
         >
           Cancel
         </Link>
@@ -535,7 +535,7 @@ export function InvoiceBuilder({
           type="button"
           onClick={() => void save('draft')}
           disabled={!!busy || !canSave}
-          className="inline-flex h-9 items-center justify-center rounded-lg border border-[#D7DAD8] bg-white px-4 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:bg-[#F0F0EC] disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex h-9 items-center justify-center rounded-lg border border-[#E2E6EC] bg-white px-4 text-[13px] font-medium text-[#171A17] transition-colors hover:bg-[#EEF1F5] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {busy === 'draft' ? 'Saving…' : isEdit ? 'Save changes' : 'Save draft'}
         </button>
