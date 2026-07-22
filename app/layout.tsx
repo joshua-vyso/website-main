@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Barlow_Condensed, DM_Sans, Inter } from "next/font/google";
+import { Barlow_Condensed, DM_Sans, Inter, Instrument_Sans, Space_Grotesk } from "next/font/google";
 import { LiquidGlassFilter }  from "@/components/ui/liquid-button";
 import { GlobalPixelTrail }   from "@/components/GlobalPixelTrail";
 import "./globals.css";
@@ -23,6 +23,21 @@ const dmSans = DM_Sans({
 /* ── Platform font: Inter (scoped to /login and /app via --font-inter) ─────── */
 const inter = Inter({
   variable: "--font-inter",
+  subsets:  ["latin"],
+  weight:   ["400", "500", "600", "700"],
+  display:  "swap",
+});
+
+/* ── OrderFlow font pair: Instrument Sans (UI) + Space Grotesk (numerals) ──── */
+const instrumentSans = Instrument_Sans({
+  variable: "--font-instrument",
+  subsets:  ["latin"],
+  weight:   ["400", "500", "600", "700"],
+  display:  "swap",
+});
+
+const spaceGrotesk = Space_Grotesk({
+  variable: "--font-grotesk",
   subsets:  ["latin"],
   weight:   ["400", "500", "600", "700"],
   display:  "swap",
@@ -107,7 +122,7 @@ export default function RootLayout({
     <html
       lang="en-ZA"
       data-scroll-behavior="smooth"
-      className={`${barlowCondensed.variable} ${dmSans.variable} ${inter.variable} h-full antialiased`}
+      className={`${barlowCondensed.variable} ${dmSans.variable} ${inter.variable} ${instrumentSans.variable} ${spaceGrotesk.variable} h-full antialiased`}
     >
       <body className="min-h-full">
         <script

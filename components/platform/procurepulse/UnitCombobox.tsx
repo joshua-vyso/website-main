@@ -90,7 +90,7 @@ export function UnitCombobox({
                 setOpen(false);
               }}
               className={`flex w-full items-center rounded-lg px-2.5 py-1.5 text-left text-[13px] transition-colors hover:bg-[#FAFAF8] ${
-                u.toLowerCase() === q ? 'bg-[#E9EFEC] font-medium text-[#0F4C44]' : 'text-[#1A1C1E]'
+                u.toLowerCase() === q ? 'bg-[#E7EEF8] font-medium text-[#174C87]' : 'text-[#1A1C1E]'
               }`}
             >
               {u}

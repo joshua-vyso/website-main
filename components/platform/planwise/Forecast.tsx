@@ -9,7 +9,7 @@ import { FORECAST_DRIVERS, FORECAST_COMMENTARY, type ForecastLine } from '@/lib/
 import { usePlanWise } from './context';
 
 function toneColor(t: ForecastLine['tone']) {
-  return t === 'positive' ? '#0F6E56' : t === 'critical' ? '#A32D2D' : t === 'warning' ? '#854F0B' : '#1E5E54';
+  return t === 'positive' ? '#0F6E56' : t === 'critical' ? '#A32D2D' : t === 'warning' ? '#854F0B' : '#3E7BC4';
 }
 const TREND = { up: '▲', down: '▼', flat: '→' } as const;
 
@@ -68,12 +68,12 @@ export function ForecastDrivers() {
 
 export function ForecastInsight() {
   return (
-    <SectionCard title="Forecast commentary" right={<span className="inline-flex items-center gap-1 text-[11px] font-medium text-[#1E5E54]">✦ AI insight</span>}>
-      <div className="rounded-xl bg-gradient-to-br from-white to-[#F6FAF8] p-4">
+    <SectionCard title="Forecast commentary" right={<span className="inline-flex items-center gap-1 text-[11px] font-medium text-[#1F5FA8]">✦ AI insight</span>}>
+      <div className="rounded-xl bg-gradient-to-br from-white to-[#F5F9FE] p-4">
         <div className="flex flex-col gap-3">
           {FORECAST_COMMENTARY.map((t, i) => (
             <div key={i} className="flex items-start gap-2.5 text-[14px] leading-relaxed">
-              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1E5E54]" />
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1F5FA8]" />
               <span className="text-[#1A1C1E]">{t}</span>
             </div>
           ))}

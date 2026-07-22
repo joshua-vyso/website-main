@@ -14,7 +14,7 @@ const M = MODULE_META.shiftboard;
 function cellTone(s: Shift) {
   if (s.status === 'off') return { bg: '#F0F0EC', fg: '#9A9DA1' };
   if (s.status === 'leave') return { bg: '#FBEEDA', fg: '#854F0B' };
-  return { bg: '#E3F0ED', fg: '#1E5E54' };
+  return { bg: '#EAF2FC', fg: '#1F5FA8' };
 }
 
 export function ShiftBoardOverview() {

@@ -40,9 +40,22 @@ export default async function OrderFlowLayout({ children }: { children: React.Re
   const needsSetup = session.org ? await needsOrderFlowSetup() : false;
 
   return (
-    <div className="px-8 py-7">
+    <div
+      // OrderFlow runs its own palette: Instrument Sans over a cool wash that
+      // fades to white just below the sub-nav, so the cards read as floating.
+      className="min-h-full px-8 py-7"
+      style={{
+        fontFamily: 'var(--font-instrument)',
+        background: 'linear-gradient(180deg, #F3F8FF 0%, #FFFFFF 340px)',
+      }}
+    >
       {needsSetup ? <OrderFlowSetupBanner /> : null}
-      <SubNav tabs={TABS} rootHref="/app/orderflow" right={<VysoAILauncher module="orderflow" />} />
+      <SubNav
+        tabs={TABS}
+        rootHref="/app/orderflow"
+        accent="#E5651F"
+        right={<VysoAILauncher module="orderflow" />}
+      />
       <div className="mt-6">{children}</div>
     </div>
   );

@@ -167,7 +167,7 @@ export function CustomerProfile({ data, orgName }: { data: CustomerProfileData |
         <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">
           It may have been deleted, or the Core Data migration has not been run yet.
         </p>
-        <Link href="/app/orderflow/customers" className="mt-3 inline-block text-[13px] font-medium text-[#1E5E54] hover:underline">
+        <Link href="/app/orderflow/customers" className="mt-3 inline-block text-[13px] font-medium text-[#1F5FA8] hover:underline">
           ← Back to customers
         </Link>
       </div>
@@ -407,7 +407,7 @@ export function CustomerProfile({ data, orgName }: { data: CustomerProfileData |
           </Link>
           <Link
             href={`/app/orderflow/invoices/new?customer=${customer.id}`}
-            className="inline-flex h-9 items-center justify-center rounded-lg bg-[#1E5E54] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174A42]"
+            className="inline-flex h-9 items-center justify-center rounded-lg bg-[#1F5FA8] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87]"
           >
             New invoice
           </Link>
@@ -464,7 +464,7 @@ export function CustomerProfile({ data, orgName }: { data: CustomerProfileData |
                       </td>
                       <td className="px-2 py-2 text-right tabular-nums text-[#1A1C1E]">—</td>
                       <td className="py-2 pl-2 text-right">
-                        <Link href={`/app/orderflow/quotes/${q.id}`} className="text-[12px] font-medium text-[#1E5E54] hover:underline">
+                        <Link href={`/app/orderflow/quotes/${q.id}`} className="text-[12px] font-medium text-[#1F5FA8] hover:underline">
                           Open
                         </Link>
                       </td>
@@ -492,7 +492,7 @@ export function CustomerProfile({ data, orgName }: { data: CustomerProfileData |
                       </td>
                       <td className="px-2 py-2 text-right tabular-nums text-[#1A1C1E]">—</td>
                       <td className="py-2 pl-2 text-right">
-                        <Link href={`/app/orderflow/orders/${o.id}`} className="text-[12px] font-medium text-[#1E5E54] hover:underline">
+                        <Link href={`/app/orderflow/orders/${o.id}`} className="text-[12px] font-medium text-[#1F5FA8] hover:underline">
                           Open
                         </Link>
                       </td>
@@ -528,7 +528,7 @@ export function CustomerProfile({ data, orgName }: { data: CustomerProfileData |
                         {zar2(bal)}
                       </td>
                       <td className="py-2 pl-2 text-right">
-                        <Link href={`/app/orderflow/invoices/${inv.id}`} className="text-[12px] font-medium text-[#1E5E54] hover:underline">
+                        <Link href={`/app/orderflow/invoices/${inv.id}`} className="text-[12px] font-medium text-[#1F5FA8] hover:underline">
                           Open
                         </Link>
                       </td>
@@ -553,7 +553,7 @@ export function CustomerProfile({ data, orgName }: { data: CustomerProfileData |
                       <td className="py-2 pr-2 text-[#5F6368]">{fmtDate(p.paid_on)}</td>
                       <td className="px-2 py-2">
                         {inv ? (
-                          <Link href={`/app/orderflow/invoices/${inv.id}`} className="font-medium text-[#1E5E54] hover:underline">
+                          <Link href={`/app/orderflow/invoices/${inv.id}`} className="font-medium text-[#1F5FA8] hover:underline">
                             {inv.invoice_number}
                           </Link>
                         ) : (
@@ -920,7 +920,7 @@ function ContactsEditor({ customerId, contacts }: { customerId: string; contacts
     <div>
       {toastNode}
       <div className="mb-2 flex justify-end">
-        <button type="button" onClick={startNew} className="text-[12px] font-medium text-[#1E5E54] hover:underline">
+        <button type="button" onClick={startNew} className="text-[12px] font-medium text-[#1F5FA8] hover:underline">
           + Add contact
         </button>
       </div>
@@ -986,7 +986,7 @@ function ContactsEditor({ customerId, contacts }: { customerId: string; contacts
             <input className={inputClass} value={draft.whatsapp} onChange={(e) => setDraft({ ...draft, whatsapp: e.target.value })} />
           </Field>
           <label className="flex items-center gap-2 pt-6 text-[13px] text-[#5F6368]">
-            <input type="checkbox" checked={draft.is_primary} onChange={(e) => setDraft({ ...draft, is_primary: e.target.checked })} className="accent-[#1E5E54]" />
+            <input type="checkbox" checked={draft.is_primary} onChange={(e) => setDraft({ ...draft, is_primary: e.target.checked })} className="accent-[#3E7BC4]" />
             Primary contact
           </label>
         </div>
@@ -1061,7 +1061,7 @@ function BillingAddressEditor({ customerId, value }: { customerId: string; value
             setText(value);
             setEditing(true);
           }}
-          className="mt-2 text-[12px] font-medium text-[#1E5E54] hover:underline"
+          className="mt-2 text-[12px] font-medium text-[#1F5FA8] hover:underline"
         >
           {value.trim() ? 'Edit' : '+ Add billing address'}
         </button>
@@ -1224,7 +1224,7 @@ function DeliveryAddressesEditor({ customerId, addresses }: { customerId: string
     <div>
       {toastNode}
       <div className="mb-2 flex justify-end">
-        <button type="button" onClick={startNew} className="text-[12px] font-medium text-[#1E5E54] hover:underline">
+        <button type="button" onClick={startNew} className="text-[12px] font-medium text-[#1F5FA8] hover:underline">
           + Add address
         </button>
       </div>
@@ -1253,7 +1253,7 @@ function DeliveryAddressesEditor({ customerId, addresses }: { customerId: string
                     </button>
                   </div>
                   {!a.is_default ? (
-                    <button type="button" onClick={() => void makeDefault(a.id)} className="text-[12px] text-[#1E5E54] hover:underline">
+                    <button type="button" onClick={() => void makeDefault(a.id)} className="text-[12px] text-[#1F5FA8] hover:underline">
                       Set default
                     </button>
                   ) : null}
@@ -1307,7 +1307,7 @@ function DeliveryAddressesEditor({ customerId, addresses }: { customerId: string
             </Field>
           </div>
           <label className="flex items-center gap-2 text-[13px] text-[#5F6368] sm:col-span-2">
-            <input type="checkbox" checked={draft.is_default} onChange={(e) => setDraft({ ...draft, is_default: e.target.checked })} className="accent-[#1E5E54]" />
+            <input type="checkbox" checked={draft.is_default} onChange={(e) => setDraft({ ...draft, is_default: e.target.checked })} className="accent-[#3E7BC4]" />
             Default delivery address
           </label>
         </div>

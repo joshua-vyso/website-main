@@ -10,7 +10,7 @@ import styles from "./faq.module.css";
 
 const PAGE_TITLE = "Frequently Asked Questions | Vyso Operations Platform";
 const PAGE_DESCRIPTION =
-  "Clear answers about Vyso's configurable operations platform, hands-on implementation, pricing, modules and how it compares with other software options.";
+  "Clear answers about Vyso's South African operations platform, OrderFlow, VAT-aware documents, payments, implementation, pricing and software fit.";
 
 export const metadata: Metadata = {
   title: PAGE_TITLE,
@@ -138,6 +138,45 @@ const FAQ_GROUPS: readonly FaqGroup[] = [
         question: "Which plan should we choose?",
         answer:
           "You do not need to choose a plan before speaking to us. The one-week audit establishes the operational need and gives both sides enough context to recommend Start, Create or Scale based on the work required.",
+      },
+    ],
+  },
+  {
+    id: "south-africa",
+    eyebrow: "South African operations",
+    title: "Rands, VAT and local workflows",
+    description:
+      "Specific answers about how OrderFlow fits the commercial details South African SMEs and SMMEs handle every day.",
+    questions: [
+      {
+        question: "Can OrderFlow create VAT-aware South African tax invoices?",
+        answer:
+          "Yes. OrderFlow supports seller and customer details, VAT numbers, document numbering, line items, VAT values and standard, zero-rated or exempt VAT treatment. Your accountant or tax practitioner remains responsible for confirming the correct tax treatment and statutory requirements for your business.",
+      },
+      {
+        question: "Can OrderFlow create quotes and invoices in South African rand?",
+        answer:
+          "Yes. OrderFlow keeps customer pricing, document totals, payments and balances in ZAR, including customer-specific price lists and commercial terms.",
+      },
+      {
+        question: "Can OrderFlow handle EFT, cash and card payments?",
+        answer:
+          "Yes. Teams can record EFT, cash, card and other payments, add a reference, and see what has been paid, what remains outstanding and what is overdue. This records payments and account status; it does not imply that Vyso processes every payment method directly.",
+      },
+      {
+        question: "Can customers keep sending orders through WhatsApp or email?",
+        answer:
+          "OrderFlow can accept uploaded WhatsApp screenshots, email captures, PDFs and photographed orders for extraction and review. A direct WhatsApp or email integration is a separate requirement and is confirmed during scoping.",
+      },
+      {
+        question: "Does OrderFlow replace Sage, Pastel, Xero or QuickBooks?",
+        answer:
+          "OrderFlow can replace parts of the operating workflow, such as customer pricing, order capture and invoicing, but it is not presented as a full accounting ledger or tax-submission product. Any required accounting connection or migration boundary is agreed during implementation.",
+      },
+      {
+        question: "Does using Vyso make a business POPIA compliant?",
+        answer:
+          "No software makes a business POPIA compliant by itself. Vyso can support more consistent records, organisation-scoped access and role-aware permissions, while compliance still depends on how your business collects, uses, retains, shares and protects personal information.",
       },
     ],
   },

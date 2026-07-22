@@ -38,7 +38,11 @@ yarn-error.log*
 
 # local tooling (Claude Code)
 .claude/
+.firecrawl/
 
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# nested clone of this repo (do not commit)
+website-main/

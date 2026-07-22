@@ -175,7 +175,7 @@ export function CustomerSelect({
                 }
               }}
               placeholder="Search customers…"
-              className="h-8 w-full rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] focus:border-[#1E5E54]/50 focus:outline-none"
+              className="h-8 w-full rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] focus:border-[#3E7BC4]/50 focus:outline-none"
             />
           </div>
           <div className="max-h-60 overflow-y-auto py-1">
@@ -223,7 +223,7 @@ export function CustomerSelect({
                 type="button"
                 onClick={() => void quickCreate()}
                 disabled={creating}
-                className="block w-full px-3 py-2 text-left text-[13px] font-medium text-[#1E5E54] transition-colors hover:bg-[#F2F7F5] disabled:opacity-50"
+                className="block w-full px-3 py-2 text-left text-[13px] font-medium text-[#1F5FA8] transition-colors hover:bg-[#F2F7F5] disabled:opacity-50"
               >
                 {creating ? 'Adding…' : `+ Add “${query.trim()}”`}
               </button>
@@ -249,7 +249,7 @@ const SOURCE_HINT: Record<PriceSource, string> = {
 };
 
 const numCell =
-  'h-8 w-full rounded-md border border-[#E7E7E2] px-1.5 text-right text-[13px] tabular-nums text-[#1A1C1E] focus:border-[#1E5E54]/50 focus:outline-none';
+  'h-8 w-full rounded-md border border-[#E7E7E2] px-1.5 text-right text-[13px] tabular-nums text-[#1A1C1E] focus:border-[#3E7BC4]/50 focus:outline-none';
 
 export function LineItemsEditor({
   products,
@@ -407,7 +407,7 @@ export function LineItemsEditor({
         <button
           type="button"
           onClick={addCustom}
-          className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-dashed border-[#D7DAD8] bg-white px-3 text-[13px] text-[#5F6368] transition-colors hover:border-[#1E5E54]/50 hover:text-[#1A1C1E]"
+          className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-dashed border-[#D7DAD8] bg-white px-3 text-[13px] text-[#5F6368] transition-colors hover:border-[#3E7BC4]/50 hover:text-[#1A1C1E]"
         >
           + Custom line
         </button>
@@ -510,7 +510,7 @@ function FragmentRow({
               value={l.unit ?? ''}
               onChange={(e) => onUpdate({ unit: e.target.value || null })}
               placeholder="unit"
-              className="h-8 w-full rounded-md border border-[#E7E7E2] px-1.5 text-[13px] text-[#1A1C1E] focus:border-[#1E5E54]/50 focus:outline-none"
+              className="h-8 w-full rounded-md border border-[#E7E7E2] px-1.5 text-[13px] text-[#1A1C1E] focus:border-[#3E7BC4]/50 focus:outline-none"
             />
           ) : (
             <span className="text-[#5F6368]">{l.unit ?? '—'}</span>
@@ -550,7 +550,7 @@ function FragmentRow({
                 onChange={(e) => onUpdate({ override_note: e.target.value ? e.target.value : null })}
                 placeholder="Why is this price different?"
                 className={`h-7 min-w-[220px] flex-1 rounded-md border px-2 text-[12px] text-[#1A1C1E] focus:outline-none ${
-                  reasonMissing ? 'border-[#D9A441] bg-white' : 'border-[#E7E7E2] bg-white focus:border-[#1E5E54]/50'
+                  reasonMissing ? 'border-[#D9A441] bg-white' : 'border-[#E7E7E2] bg-white focus:border-[#3E7BC4]/50'
                 }`}
               />
             </div>

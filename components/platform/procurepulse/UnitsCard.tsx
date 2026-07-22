@@ -74,7 +74,7 @@ export function UnitsCard({ initialCustom }: { initialCustom: string[] }) {
         {units.map((u) => (
           <span
             key={u}
-            className="inline-flex items-center gap-1 rounded-full bg-[#E9EFEC] px-2.5 py-1 text-[12px] font-medium text-[#0F4C44]"
+            className="inline-flex items-center gap-1 rounded-full bg-[#E7EEF8] px-2.5 py-1 text-[12px] font-medium text-[#174C87]"
           >
             {u}
             <button
@@ -82,7 +82,7 @@ export function UnitsCard({ initialCustom }: { initialCustom: string[] }) {
               onClick={() => remove(u)}
               disabled={busy}
               aria-label={`Remove ${u}`}
-              className="text-[#1E5E54] transition-colors hover:text-[#A32D2D] disabled:opacity-40"
+              className="text-[#1F5FA8] transition-colors hover:text-[#A32D2D] disabled:opacity-40"
             >
               ✕
             </button>
@@ -99,13 +99,13 @@ export function UnitsCard({ initialCustom }: { initialCustom: string[] }) {
             if (e.key === 'Enter') add();
           }}
           placeholder="Add a custom unit (e.g. sack, dozen)"
-          className="h-9 flex-1 rounded-lg border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none"
+          className="h-9 flex-1 rounded-lg border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
         />
         <button
           type="button"
           onClick={add}
           disabled={busy || !value.trim()}
-          className="h-9 shrink-0 rounded-lg bg-[#1E5E54] px-3.5 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:opacity-40"
+          className="h-9 shrink-0 rounded-lg bg-[#1F5FA8] px-3.5 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
         >
           {busy ? '…' : 'Add'}
         </button>

@@ -12,9 +12,9 @@ function dotColor(event: string): string {
   if (event.includes('payment')) return '#0F6E56'; // money in — green
   if (event.includes('cancelled') || event.includes('rejected') || event.includes('void')) return '#A32D2D'; // red
   if (event.includes('credit_note')) return '#854F0B'; // amber
-  if (event.includes('invoice')) return '#1E5E54'; // teal — primary flow
+  if (event.includes('invoice')) return '#3E7BC4'; // blue — primary flow
   if (event.includes('quote')) return '#4A6FA5'; // muted blue
-  if (event.includes('order')) return '#1E5E54';
+  if (event.includes('order')) return '#3E7BC4';
   if (event.includes('delivery') || event.includes('pod')) return '#854F0B';
   if (event.includes('document')) return '#5F6368';
   if (event.includes('customer') || event.includes('contact') || event.includes('address')) return '#4A6FA5';

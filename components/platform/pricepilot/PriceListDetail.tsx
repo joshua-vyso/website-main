@@ -135,13 +135,13 @@ export function PriceListDetail({
   const rows = filtered.slice(safePage * PAGE, safePage * PAGE + PAGE);
 
   const COLS = 'grid grid-cols-[minmax(180px,1fr)_110px_96px_120px_40px] gap-2 items-center';
-  const cell = 'h-9 rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:border-[#1E5E54]/40 focus:outline-none';
+  const cell = 'h-9 rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:border-[#3E7BC4]/40 focus:outline-none';
 
   return (
     <div>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex items-center gap-3">
-          <Link href="/app/pricepilot/price-lists" className="inline-flex h-8 items-center gap-1 rounded-full border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#5F6368] transition-colors hover:border-[#1E5E54]/30 hover:text-[#1A1C1E]">
+          <Link href="/app/pricepilot/price-lists" className="inline-flex h-8 items-center gap-1 rounded-full border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#5F6368] transition-colors hover:border-[#3E7BC4]/30 hover:text-[#1A1C1E]">
             <span aria-hidden>‹</span> Price lists
           </Link>
           <div>
@@ -152,13 +152,13 @@ export function PriceListDetail({
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button type="button" onClick={exportCsv} className="rounded-lg border border-[#E7E7E2] bg-white px-3.5 py-2 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/30">
+          <button type="button" onClick={exportCsv} className="rounded-lg border border-[#E7E7E2] bg-white px-3.5 py-2 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/30">
             Export CSV
           </button>
-          <button type="button" onClick={() => setMsg('Price list queued to send (email delivery is a later step).')} className="rounded-lg border border-[#D7DAD8] bg-white px-3.5 py-2 text-[13px] font-medium text-[#5F6368] transition-colors hover:border-[#1E5E54]/30">
+          <button type="button" onClick={() => setMsg('Price list queued to send (email delivery is a later step).')} className="rounded-lg border border-[#D7DAD8] bg-white px-3.5 py-2 text-[13px] font-medium text-[#5F6368] transition-colors hover:border-[#3E7BC4]/30">
             Send
           </button>
-          <button type="button" onClick={() => void save()} disabled={busy || !dirty} className="rounded-lg bg-[#1E5E54] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:opacity-40">
+          <button type="button" onClick={() => void save()} disabled={busy || !dirty} className="rounded-lg bg-[#1F5FA8] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-40">
             {busy ? 'Saving…' : dirty ? 'Save changes' : 'Saved'}
           </button>
         </div>
@@ -176,7 +176,7 @@ export function PriceListDetail({
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(0); }}
           placeholder="Search products…"
-          className="h-10 w-64 rounded-xl border border-[#E7E7E2] bg-white px-4 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none"
+          className="h-10 w-64 rounded-xl border border-[#E7E7E2] bg-white px-4 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
         />
       </div>
 
@@ -223,7 +223,7 @@ export function PriceListDetail({
         </div>
       ) : null}
 
-      {msg ? <p className="mt-3 text-center text-[12px] text-[#0F4C44]">{msg}</p> : null}
+      {msg ? <p className="mt-3 text-center text-[12px] text-[#174C87]">{msg}</p> : null}
     </div>
   );
 }

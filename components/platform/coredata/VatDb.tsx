@@ -209,7 +209,7 @@ export function VatDb({ data }: { data: CoreData }) {
             <input value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} placeholder="Standard-rated supplies" className={inputClass} />
           </Field>
           <label className="flex items-center gap-2.5 text-[13px] text-[#1A1C1E]">
-            <input type="checkbox" checked={draft.active} onChange={(e) => setDraft({ ...draft, active: e.target.checked })} className="h-4 w-4 accent-[#1E5E54]" />
+            <input type="checkbox" checked={draft.active} onChange={(e) => setDraft({ ...draft, active: e.target.checked })} className="h-4 w-4 accent-[#3E7BC4]" />
             Active (available to select on documents)
           </label>
           {error ? <p className="text-[12px] text-[#A32D2D]">{error}</p> : null}

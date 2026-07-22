@@ -129,7 +129,7 @@ export function PublishOrderButton() {
         type="button"
         onClick={() => inputRef.current?.click()}
         disabled={busy}
-        className="inline-flex h-10 items-center gap-2 rounded-xl border border-[#D7DAD8] bg-white px-4 text-[14px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/40 disabled:opacity-60"
+        className="inline-flex h-[42px] items-center gap-2 rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87] disabled:opacity-60"
       >
         {status === 'uploading' ? 'Uploading…' : status === 'reading' ? 'Reading order…' : '↑ Upload order'}
       </button>

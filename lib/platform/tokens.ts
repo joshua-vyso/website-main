@@ -18,10 +18,10 @@ export const VYSO = {
   textSecondary: '#5F6368',
   /** Muted / placeholder text. */
   muted: '#9A9DA1',
-  /** Brand accent (teal). */
-  teal: '#1E5E54',
-  /** Weak teal tint (selected nav, avatars, accent wells). */
-  tealWeak: '#E3F0ED',
+  /** Brand accent (blue). */
+  accent: '#3E7BC4',
+  /** Weak blue tint (selected nav, avatars, accent wells). */
+  accentWeak: '#EAF2FC',
   /** Primary CTA / Upload — burnt orange (btn/Upload fill). */
   orange: '#D9730D',
 } as const;

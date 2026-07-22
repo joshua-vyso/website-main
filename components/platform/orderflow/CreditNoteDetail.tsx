@@ -60,7 +60,7 @@ export function CreditNoteDetail({
       <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
         <p className="text-[15px] font-medium text-[#1A1C1E]">Credit note not found</p>
         <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">It may have been deleted.</p>
-        <Link href="/app/orderflow/credit-notes" className="mt-3 inline-block text-[13px] font-medium text-[#1E5E54] hover:underline">
+        <Link href="/app/orderflow/credit-notes" className="mt-3 inline-block text-[13px] font-medium text-[#1F5FA8] hover:underline">
           ← Back to credit notes
         </Link>
       </div>
@@ -98,7 +98,7 @@ export function CreditNoteDetail({
           {invoice ? (
             <Link
               href={`/app/orderflow/invoices/${invoice.id}`}
-              className="inline-flex h-9 items-center rounded-lg border border-[#D7DAD8] bg-white px-3.5 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/50"
+              className="inline-flex h-9 items-center rounded-lg border border-[#D7DAD8] bg-white px-3.5 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/50"
             >
               View invoice {invoice.invoice_number}
             </Link>
@@ -113,7 +113,7 @@ export function CreditNoteDetail({
           <span className="text-[#5F6368]">
             This credit note was raised against invoice <span className="font-medium text-[#1A1C1E]">{invoice.invoice_number}</span>.
           </span>
-          <Link href={`/app/orderflow/invoices/${invoice.id}`} className="font-medium text-[#1E5E54] hover:underline">
+          <Link href={`/app/orderflow/invoices/${invoice.id}`} className="font-medium text-[#1F5FA8] hover:underline">
             View invoice →
           </Link>
         </div>

@@ -942,7 +942,7 @@ function IngestResultCard({
       </div>
 
       {invoiced ? (
-        <div className="mt-1.5 text-[12px] font-medium text-[#1E5E54]">Invoice {result.invoiceNumber} created.</div>
+        <div className="mt-1.5 text-[12px] font-medium text-[#1F5FA8]">Invoice {result.invoiceNumber} created.</div>
       ) : draftHeld ? (
         <div className="mt-1.5 text-[12px] text-[#9A6A00]">Saved as a draft order — confirm the customer to invoice it.</div>
       ) : orderNotBuilt ? (

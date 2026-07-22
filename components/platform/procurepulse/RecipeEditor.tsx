@@ -188,7 +188,7 @@ export function RecipeEditor({
   }
 
   const field =
-    'h-10 rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none';
+    'h-10 rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none';
 
   return (
     <div>
@@ -220,7 +220,7 @@ export function RecipeEditor({
           value={outputProduct}
           onChange={(e) => setOutputProduct(e.target.value)}
           placeholder="output product (e.g. Mixed Veg)"
-          className="h-9 w-[220px] rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none"
+          className="h-9 w-[220px] rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
         />
         <span>· makes</span>
         <input
@@ -228,13 +228,13 @@ export function RecipeEditor({
           onChange={(e) => setOutputQty(sanitizeDecimal(e.target.value))}
           inputMode="decimal"
           placeholder="qty"
-          className="h-9 w-[72px] rounded-lg border border-[#E7E7E2] bg-white px-3 text-right text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none"
+          className="h-9 w-[72px] rounded-lg border border-[#E7E7E2] bg-white px-3 text-right text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
         />
         <input
           value={outputUnit}
           onChange={(e) => setOutputUnit(e.target.value)}
           placeholder="unit"
-          className="h-9 w-[110px] rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none"
+          className="h-9 w-[110px] rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
         />
         <span className="text-[#9A9DA1]">per batch</span>
       </div>
@@ -250,7 +250,7 @@ export function RecipeEditor({
               <button
                 type="button"
                 onClick={addRow}
-                className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[13px] font-medium text-[#1E5E54] transition-colors hover:border-[#1E5E54]/40"
+                className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[13px] font-medium text-[#1F5FA8] transition-colors hover:border-[#3E7BC4]/40"
               >
                 + Add ingredient
               </button>
@@ -364,7 +364,7 @@ export function RecipeEditor({
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Method, yield notes, anything the team should know."
               rows={3}
-              className="mt-2 w-full resize-y rounded-lg border border-[#E7E7E2] bg-white px-3 py-2 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none"
+              className="mt-2 w-full resize-y rounded-lg border border-[#E7E7E2] bg-white px-3 py-2 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
             />
           </div>
 
@@ -379,7 +379,7 @@ export function RecipeEditor({
               type="button"
               onClick={() => void save()}
               disabled={busy}
-              className="inline-flex h-10 items-center rounded-lg bg-[#1E5E54] px-5 text-[14px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:opacity-50"
+              className="inline-flex h-10 items-center rounded-lg bg-[#1F5FA8] px-5 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-50"
             >
               {busy ? 'Saving…' : 'Save recipe'}
             </button>
@@ -429,7 +429,7 @@ export function RecipeEditor({
                 onChange={(e) => setPlanN(sanitizeInt(e.target.value))}
                 inputMode="numeric"
                 placeholder={plan.batches != null ? String(plan.batches) : '0'}
-                className="h-9 w-[72px] rounded-lg border border-[#E7E7E2] bg-white px-3 text-right text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none"
+                className="h-9 w-[72px] rounded-lg border border-[#E7E7E2] bg-white px-3 text-right text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
               />
               <span>batches</span>
             </div>
@@ -475,7 +475,7 @@ export function RecipeEditor({
                 {plan.availabilities.some((a) => a.linked && a.perBatch * planCount - a.onHand > 0) ? (
                   <Link
                     href="/app/procurepulse/reorder"
-                    className="mt-3 inline-flex w-full items-center justify-center rounded-lg border border-[#D7DAD8] bg-white px-4 py-2.5 text-[13px] font-medium text-[#1E5E54] transition-colors hover:border-[#1E5E54]/40"
+                    className="mt-3 inline-flex w-full items-center justify-center rounded-lg border border-[#D7DAD8] bg-white px-4 py-2.5 text-[13px] font-medium text-[#1F5FA8] transition-colors hover:border-[#3E7BC4]/40"
                   >
                     Reorder what&apos;s short
                   </Link>

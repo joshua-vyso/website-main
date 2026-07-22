@@ -150,7 +150,7 @@ export function AnalyticsView({ windows, target }: AnalyticsViewProps) {
                       <div className="flex items-center gap-2">
                         <div className="h-2 flex-1 overflow-hidden rounded-full bg-[#F0F0EC]">
                           <div
-                            className="h-full rounded-full bg-[#1E5E54]"
+                            className="h-full rounded-full bg-[#1F5FA8]"
                             style={{ width: `${r.contributionPct <= 0 ? 0 : Math.max(3, (r.contributionPct / maxContribution) * 100)}%` }}
                           />
                         </div>

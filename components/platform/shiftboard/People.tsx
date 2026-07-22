@@ -43,7 +43,7 @@ export function People() {
   }, [sb.employees, dept, search]);
 
   const open = openId ? sb.employees.find((e) => e.id === openId) ?? null : null;
-  const sel = 'h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#1E5E54]';
+  const sel = 'h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#3E7BC4]';
 
   return (
     <div className="space-y-5">
@@ -55,7 +55,7 @@ export function People() {
         </div>
         <div className="flex items-center gap-2">
           <select value={dept} onChange={(e) => setDept(e.target.value)} className={sel}><option value="all">All departments</option>{sb.departments.map((d) => <option key={d.name} value={d.name}>{d.name}</option>)}</select>
-          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search people…" className="h-9 min-w-[180px] rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] outline-none placeholder:text-[#9A9DA1] focus:border-[#1E5E54]" />
+          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search people…" className="h-9 min-w-[180px] rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] outline-none placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]" />
         </div>
       </div>
 
@@ -150,7 +150,7 @@ function EmployeeDetail({ e, onAction }: { e: Employee; onAction: (m: string) =>
           {DOCS.map((d) => (
             <div key={d} className="flex items-center justify-between rounded-lg border border-[#F0F0EC] px-3 py-2 text-[13px]">
               <span className="text-[#1A1C1E]">{d}</span>
-              <button type="button" onClick={() => onAction('Documents coming soon (demo)')} className="text-[12px] font-medium text-[#1E5E54] hover:underline">Upload</button>
+              <button type="button" onClick={() => onAction('Documents coming soon (demo)')} className="text-[12px] font-medium text-[#1F5FA8] hover:underline">Upload</button>
             </div>
           ))}
         </div>
@@ -160,7 +160,7 @@ function EmployeeDetail({ e, onAction }: { e: Employee; onAction: (m: string) =>
         <div className="flex flex-col gap-3">
           {activityFor(e).map((a, i) => (
             <div key={i} className="flex gap-3 text-[13px]">
-              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1E5E54]" />
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1F5FA8]" />
               <div className="min-w-0">
                 <div className="text-[#1A1C1E]">{a.label}</div>
                 <div className="text-[11px] text-[#9A9DA1]">{a.time}</div>

@@ -45,7 +45,7 @@ export function DocumentRename({ documentId, filename }: { documentId: string; f
           }
         }}
         aria-label="Rename document"
-        className="w-full max-w-[420px] rounded-lg border border-[#1E5E54]/40 bg-white px-2 py-0.5 text-[20px] font-bold leading-tight text-[#1A1C1E] focus:outline-none"
+        className="w-full max-w-[420px] rounded-lg border border-[#3E7BC4]/40 bg-white px-2 py-0.5 text-[20px] font-bold leading-tight text-[#1A1C1E] focus:outline-none"
       />
     );
   }

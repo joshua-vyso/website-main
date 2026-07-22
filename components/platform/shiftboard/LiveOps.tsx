@@ -30,7 +30,7 @@ export function LiveOps() {
       {/* Quick actions */}
       <div className="flex flex-wrap gap-2">
         {QUICK_ACTIONS.map((a) => (
-          <button key={a} type="button" onClick={() => show(`${a} (demo)`)} className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/40">{a}</button>
+          <button key={a} type="button" onClick={() => show(`${a} (demo)`)} className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/40">{a}</button>
         ))}
       </div>
 

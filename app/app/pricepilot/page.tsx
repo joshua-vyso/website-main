@@ -257,7 +257,7 @@ export default async function PricePilotDashboardPage() {
         <div className="mt-5">
           <div className="mb-2 flex items-center justify-between">
             <h2 className="text-[15px] font-semibold text-[#1A1C1E]">Alerts</h2>
-            <Link href="/app/pricepilot/notifications" className="text-[12px] font-medium text-[#1E5E54] hover:underline">
+            <Link href="/app/pricepilot/notifications" className="text-[12px] font-medium text-[#1F5FA8] hover:underline">
               View all ({notifications.length}) →
             </Link>
           </div>
@@ -284,12 +284,12 @@ export default async function PricePilotDashboardPage() {
           </p>
         </div>
 
-        <div className="lg:col-span-2 flex flex-col rounded-2xl border border-[#E7E7E2] bg-gradient-to-br from-white to-[#F6FAF8] p-6">
+        <div className="lg:col-span-2 flex flex-col rounded-2xl border border-[#E7E7E2] bg-gradient-to-br from-white to-[#F5F9FE] p-6">
           <div className="flex items-center gap-2">
-            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#E3F0ED] text-[14px] text-[#1E5E54]">
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#EAF2FC] text-[14px] text-[#1F5FA8]">
               ✦
             </span>
-            <span className="text-[13px] font-semibold text-[#1E5E54]">AI insight</span>
+            <span className="text-[13px] font-semibold text-[#1F5FA8]">AI insight</span>
           </div>
           <p className="mt-3 text-[18px] font-medium leading-relaxed text-[#1A1C1E]">{insight}</p>
           <div className="mt-auto flex flex-wrap items-center gap-2.5 pt-5">
@@ -298,7 +298,7 @@ export default async function PricePilotDashboardPage() {
             <InsightChip label="Opportunity" value={`${zar(marginOpportunity)}/mo`} />
             <Link
               href="/app/pricepilot/recommendations"
-              className="ml-auto inline-flex items-center gap-1.5 rounded-lg bg-[#1E5E54] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45]"
+              className="ml-auto inline-flex items-center gap-1.5 rounded-lg bg-[#1F5FA8] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87]"
             >
               Review pricing →
             </Link>
@@ -347,13 +347,13 @@ export default async function PricePilotDashboardPage() {
         <Panel
           title="Opportunity centre"
           right={
-            <Link href="/app/pricepilot/recommendations" className="text-[12px] font-medium text-[#1E5E54] hover:underline">
+            <Link href="/app/pricepilot/recommendations" className="text-[12px] font-medium text-[#1F5FA8] hover:underline">
               Review all →
             </Link>
           }
         >
           <div className="grid grid-cols-2 gap-4">
-            <KpiCard label="Margin opportunity / month" value={zar(marginOpportunity)} accent="#1E5E54" />
+            <KpiCard label="Margin opportunity / month" value={zar(marginOpportunity)} accent="#3E7BC4" />
             <KpiCard label="Revenue at risk / month" value={zar(revenueAtRisk)} accent={revenueAtRisk > 0 ? '#A32D2D' : undefined} />
           </div>
           <div className="mt-4">
@@ -408,7 +408,7 @@ export default async function PricePilotDashboardPage() {
         <Panel
           title="Recent sales"
           right={
-            <Link href="/app/pricepilot/recent-sales" className="text-[12px] font-medium text-[#1E5E54] hover:underline">
+            <Link href="/app/pricepilot/recent-sales" className="text-[12px] font-medium text-[#1F5FA8] hover:underline">
               View all →
             </Link>
           }

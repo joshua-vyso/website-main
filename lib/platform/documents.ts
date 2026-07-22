@@ -17,7 +17,7 @@ export interface DocTypeMeta {
 }
 
 export const DOC_TYPES: readonly DocTypeMeta[] = [
-  { key: null, label: 'All', tint: '#E9EFEC', iconBg: '#1E5E54' },
+  { key: null, label: 'All', tint: '#E7EEF8', iconBg: '#3E7BC4' },
   { key: 'invoice', label: 'Invoices', tint: '#E6F1FB', iconBg: '#0C447C' },
   { key: 'statement', label: 'Statements', tint: '#E1F5EE', iconBg: '#0F6E56' },
   { key: 'delivery_note', label: 'Delivery notes', tint: '#FBEEDA', iconBg: '#854F0B' },

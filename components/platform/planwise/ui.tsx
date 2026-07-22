@@ -111,7 +111,7 @@ export function BudgetTable({ filter }: { filter?: string | null }) {
           <span key="p" style={{ color: b.profitImpact < 0 ? '#A32D2D' : '#0F6E56' }}>{b.profitImpact >= 0 ? '+' : '−'}{zar(Math.abs(b.profitImpact))}</span>,
           b.suggestedAction,
           <Badge key="s" label={st.label} tone={st.tone} />,
-          b.module ? <Link key="a" href={MODULE_META[b.module].route} className="text-[12px] font-medium text-[#1E5E54] hover:underline">Review →</Link> : <span key="a" className="text-[#C7C9C5]">—</span>,
+          b.module ? <Link key="a" href={MODULE_META[b.module].route} className="text-[12px] font-medium text-[#1F5FA8] hover:underline">Review →</Link> : <span key="a" className="text-[#C7C9C5]">—</span>,
         ];
       })}
       empty="No budget set yet."

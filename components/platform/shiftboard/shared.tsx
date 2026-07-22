@@ -56,7 +56,7 @@ export function ConflictBadge({ conflict }: { conflict: ShiftConflict }) {
 }
 
 /** Simple 0–5 skill rating as filled dots. */
-export function SkillStars({ rating, color = '#1E5E54' }: { rating: number; color?: string }) {
+export function SkillStars({ rating, color = '#3E7BC4' }: { rating: number; color?: string }) {
   return (
     <span className="inline-flex items-center gap-0.5">
       {[0, 1, 2, 3, 4].map((i) => (

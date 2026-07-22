@@ -137,7 +137,7 @@ export function CategoryModal({ open, mode, category, onClose, onSaved }: { open
         <div className="mt-4 space-y-4">
           <div>
             <label className="mb-1 block text-[13px] font-medium text-[#1A1C1E]">Name</label>
-            <input autoFocus value={name} onChange={(e) => { setName(e.target.value); if (error) setError(null); }} onKeyDown={(e) => { if (e.key === 'Enter') submit(); }} placeholder="e.g. Leafy Greens" className="h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none" />
+            <input autoFocus value={name} onChange={(e) => { setName(e.target.value); if (error) setError(null); }} onKeyDown={(e) => { if (e.key === 'Enter') submit(); }} placeholder="e.g. Leafy Greens" className="h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none" />
           </div>
           <div>
             <label className="mb-1.5 block text-[13px] font-medium text-[#1A1C1E]">Colour</label>
@@ -156,7 +156,7 @@ export function CategoryModal({ open, mode, category, onClose, onSaved }: { open
 
         <div className="mt-5 flex justify-end gap-2">
           <button type="button" onClick={onClose} disabled={busy} className="rounded-lg px-3.5 py-2 text-[13px] text-[#5F6368] hover:bg-black/[0.03] disabled:opacity-50">Cancel</button>
-          <button type="button" onClick={submit} disabled={busy} className="rounded-lg bg-[#1E5E54] px-4 py-2 text-[13px] font-medium text-white hover:bg-[#184D45] disabled:opacity-60">{busy ? 'Saving…' : mode === 'edit' ? 'Save changes' : 'Create category'}</button>
+          <button type="button" onClick={submit} disabled={busy} className="rounded-lg bg-[#1F5FA8] px-4 py-2 text-[13px] font-medium text-white hover:bg-[#174C87] disabled:opacity-60">{busy ? 'Saving…' : mode === 'edit' ? 'Save changes' : 'Create category'}</button>
         </div>
       </div>
     </div>,

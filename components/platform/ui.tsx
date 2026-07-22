@@ -43,7 +43,7 @@ export function KpiTile({
   return (
     <Link
       href={href}
-      className="block rounded-2xl border border-[#E7E7E2] bg-white p-4 transition-colors hover:border-[#1E5E54]/30"
+      className="block rounded-2xl border border-[#E7E7E2] bg-white p-4 transition-colors hover:border-[#3E7BC4]/30"
     >
       <div className="flex items-center justify-between">
         <span className="text-[13px] text-[#5F6368]">{label}</span>

@@ -8,7 +8,7 @@ import type { DocumentWithSupplier } from '@/lib/platform/types';
 const KIND_COLOR: Record<ActivityKind, string> = {
   uploaded: '#9A9DA1',
   extracted: '#0C447C',
-  supplier_matched: '#1E5E54',
+  supplier_matched: '#3E7BC4',
   flags_detected: '#854F0B',
   reviewed: '#0F6E56',
   approved: '#0F6E56',

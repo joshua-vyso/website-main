@@ -10,14 +10,14 @@ function DatabasesTile() {
     <div className="px-8 pt-7">
       <Link
         href="/app/docu/databases"
-        className="group flex items-center gap-4 rounded-2xl border border-[#E7E7E2] bg-white p-5 transition-colors hover:border-[#1E5E54]/40 hover:bg-[#FAFAF8]"
+        className="group flex items-center gap-4 rounded-2xl border border-[#E7E7E2] bg-white p-5 transition-colors hover:border-[#3E7BC4]/40 hover:bg-[#FAFAF8]"
       >
         <span
           className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
-          style={{ backgroundColor: '#1E5E541A' }}
+          style={{ backgroundColor: '#3E7BC41A' }}
           aria-hidden
         >
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1E5E54" strokeWidth="1.8">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3E7BC4" strokeWidth="1.8">
             <ellipse cx="12" cy="5" rx="8" ry="3" />
             <path d="M4 5v6c0 1.66 3.58 3 8 3s8-1.34 8-3V5" />
             <path d="M4 11v6c0 1.66 3.58 3 8 3s8-1.34 8-3v-6" />
@@ -25,7 +25,7 @@ function DatabasesTile() {
         </span>
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
-            <span className="text-[15px] font-semibold text-[#1A1C1E] transition-colors group-hover:text-[#1E5E54]">
+            <span className="text-[15px] font-semibold text-[#1A1C1E] transition-colors group-hover:text-[#174C87]">
               Databases
             </span>
             <span className="rounded-full bg-[#F0F0EC] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#5F6368]">
@@ -36,7 +36,7 @@ function DatabasesTile() {
             Customers, products, price lists, company profile and more — the shared source of truth behind every document.
           </p>
         </div>
-        <span className="shrink-0 text-[18px] text-[#C9CCC8] transition-colors group-hover:text-[#1E5E54]" aria-hidden>
+        <span className="shrink-0 text-[18px] text-[#C9CCC8] transition-colors group-hover:text-[#174C87]" aria-hidden>
           &rsaquo;
         </span>
       </Link>

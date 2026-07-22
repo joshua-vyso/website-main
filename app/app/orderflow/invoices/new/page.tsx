@@ -25,7 +25,7 @@ function noticeCard(title: string, body: string, backLabel: string, backHref: st
     <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
       <p className="text-[15px] font-medium text-[#1A1C1E]">{title}</p>
       <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">{body}</p>
-      <Link href={backHref} className="mt-3 inline-block text-[13px] font-medium text-[#1E5E54] hover:underline">
+      <Link href={backHref} className="mt-3 inline-block text-[13px] font-medium text-[#1F5FA8] hover:underline">
         ← {backLabel}
       </Link>
     </div>

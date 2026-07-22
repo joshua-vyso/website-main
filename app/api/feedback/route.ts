@@ -125,7 +125,7 @@ export async function POST(req: Request) {
           <p><strong>Org id:</strong> ${escapeHtml(orgId ?? '(none)')}</p>
           <p><strong>Page:</strong> ${pageUrl ? `<a href="${escapeHtml(pageUrl)}">${escapeHtml(pageUrl)}</a>` : '(none)'}</p>
           <p style="margin-top: 16px;"><strong>Message:</strong></p>
-          <blockquote style="border-left: 3px solid #1E5E54; padding-left: 12px; color: #374151; margin: 8px 0;">
+          <blockquote style="border-left: 3px solid #3E7BC4; padding-left: 12px; color: #374151; margin: 8px 0;">
             ${escapeHtml(message).replace(/\n/g, '<br>')}
           </blockquote>
           <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;">

@@ -86,7 +86,7 @@ export function InsightGenView({ data }: { data: InsightGenData }) {
           {/* Areas */}
           <div className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-1 border-b border-[#E7E7E2]">
             {AREAS.map((a) => (
-              <button key={a} type="button" onClick={() => setArea(a)} className={`-mb-px border-b-2 pb-2.5 pt-1 text-[14px] transition-colors ${area === a ? 'border-[#1E5E54] font-medium text-[#1A1C1E]' : 'border-transparent text-[#5F6368] hover:text-[#1A1C1E]'}`}>{a}</button>
+              <button key={a} type="button" onClick={() => setArea(a)} className={`-mb-px border-b-2 pb-2.5 pt-1 text-[14px] transition-colors ${area === a ? 'border-[#3E7BC4] font-medium text-[#1A1C1E]' : 'border-transparent text-[#5F6368] hover:text-[#1A1C1E]'}`}>{a}</button>
             ))}
           </div>
 
@@ -170,7 +170,7 @@ export function InsightGenView({ data }: { data: InsightGenData }) {
                           <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#A32D2D]" />
                           <span className="text-[#5F6368]"><span className="font-medium text-[#1A1C1E]">{moduleName(a.sourceModule)}:</span> {a.text}</span>
                         </div>
-                        <button type="button" onClick={() => toast('Investigate (demo)')} className="shrink-0 text-[12px] font-medium text-[#1E5E54] hover:underline">Investigate</button>
+                        <button type="button" onClick={() => toast('Investigate (demo)')} className="shrink-0 text-[12px] font-medium text-[#1F5FA8] hover:underline">Investigate</button>
                       </div>
                     ))}
                   </div>
@@ -186,7 +186,7 @@ export function InsightGenView({ data }: { data: InsightGenData }) {
 
 function Chip({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
   return (
-    <button type="button" onClick={onClick} className={`rounded-full px-3 py-1.5 text-[12px] font-medium transition-colors ${active ? 'bg-[#1A1C1E] text-white' : 'border border-[#E7E7E2] bg-white text-[#5F6368] hover:border-[#1E5E54]/30'}`}>
+    <button type="button" onClick={onClick} className={`rounded-full px-3 py-1.5 text-[12px] font-medium transition-colors ${active ? 'bg-[#1A1C1E] text-white' : 'border border-[#E7E7E2] bg-white text-[#5F6368] hover:border-[#3E7BC4]/30'}`}>
       {children}
     </button>
   );
@@ -245,7 +245,7 @@ function CreateReportModal({ open, onClose, onSaved }: { open: boolean; onClose:
   }
 
   if (!mounted || !open) return null;
-  const input = 'h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none';
+  const input = 'h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none';
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={MODAL_STYLE}>
       <div className="absolute inset-0 bg-[#1A1C1E]/25 backdrop-blur-[1px]" onClick={() => !busy && onClose()} />
@@ -270,7 +270,7 @@ function CreateReportModal({ open, onClose, onSaved }: { open: boolean; onClose:
             <div className="mb-1.5 text-[13px] font-medium text-[#1A1C1E]">Modules <span className="font-normal text-[#9A9DA1]">(none = all)</span></div>
             <div className="flex flex-wrap gap-1.5">
               {REPORT_MODULES.map((m) => (
-                <button key={m} type="button" onClick={() => toggleModule(m)} className={`rounded-full px-2.5 py-1 text-[12px] font-medium transition-colors ${modules.includes(m) ? 'bg-[#1A1C1E] text-white' : 'border border-[#E7E7E2] bg-white text-[#5F6368] hover:border-[#1E5E54]/30'}`}>{MODULE_META[m].name}</button>
+                <button key={m} type="button" onClick={() => toggleModule(m)} className={`rounded-full px-2.5 py-1 text-[12px] font-medium transition-colors ${modules.includes(m) ? 'bg-[#1A1C1E] text-white' : 'border border-[#E7E7E2] bg-white text-[#5F6368] hover:border-[#3E7BC4]/30'}`}>{MODULE_META[m].name}</button>
               ))}
             </div>
           </div>
@@ -278,7 +278,7 @@ function CreateReportModal({ open, onClose, onSaved }: { open: boolean; onClose:
         </div>
         <div className="mt-5 flex justify-end gap-2">
           <button type="button" onClick={onClose} disabled={busy} className="rounded-lg px-3.5 py-2 text-[13px] text-[#5F6368] hover:bg-black/[0.03] disabled:opacity-50">Cancel</button>
-          <button type="button" onClick={save} disabled={busy} className="rounded-lg bg-[#1E5E54] px-4 py-2 text-[13px] font-medium text-white hover:bg-[#184D45] disabled:opacity-60">{busy ? 'Saving…' : 'Create report'}</button>
+          <button type="button" onClick={save} disabled={busy} className="rounded-lg bg-[#1F5FA8] px-4 py-2 text-[13px] font-medium text-white hover:bg-[#174C87] disabled:opacity-60">{busy ? 'Saving…' : 'Create report'}</button>
         </div>
       </div>
     </div>,

@@ -305,7 +305,7 @@ export function QuoteBuilder({
               onChange={(e) => setDeliveryAddress(e.target.value)}
               rows={3}
               placeholder="Where the goods go"
-              className="w-full rounded-lg border border-[#D7DAD8] bg-white px-3 py-2 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/50 focus:outline-none"
+              className="w-full rounded-lg border border-[#D7DAD8] bg-white px-3 py-2 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/50 focus:outline-none"
             />
           </Field>
           <Field label="Notes" hint="shown on the quote">
@@ -314,7 +314,7 @@ export function QuoteBuilder({
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
               placeholder="Anything the customer should see"
-              className="w-full rounded-lg border border-[#D7DAD8] bg-white px-3 py-2 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/50 focus:outline-none"
+              className="w-full rounded-lg border border-[#D7DAD8] bg-white px-3 py-2 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/50 focus:outline-none"
             />
           </Field>
         </div>
@@ -334,7 +334,7 @@ export function QuoteBuilder({
                   onChange={(e) => setVatRate(Number(e.target.value) || 0)}
                   inputMode="decimal"
                   aria-label="VAT rate"
-                  className="mx-1.5 h-6 w-12 rounded-md border border-[#E7E7E2] px-1 text-right text-[12px] tabular-nums text-[#1A1C1E] focus:border-[#1E5E54]/50 focus:outline-none"
+                  className="mx-1.5 h-6 w-12 rounded-md border border-[#E7E7E2] px-1 text-right text-[12px] tabular-nums text-[#1A1C1E] focus:border-[#3E7BC4]/50 focus:outline-none"
                 />
                 %
               </span>
@@ -368,7 +368,7 @@ export function QuoteBuilder({
           type="button"
           onClick={() => void save('sent')}
           disabled={!!busy || !canSave}
-          className="inline-flex h-9 items-center justify-center rounded-lg bg-[#1E5E54] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174A42] disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex h-9 items-center justify-center rounded-lg bg-[#1F5FA8] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {busy === 'sent' ? 'Saving…' : 'Save & mark sent'}
         </button>

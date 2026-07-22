@@ -120,7 +120,7 @@ export function LogWasteModal({ open, onClose, onSaved }: { open: boolean; onClo
 
   if (!mounted || !open) return null;
 
-  const input = 'h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none';
+  const input = 'h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none';
   const title = step === 'manual' ? 'Enter waste manually' : step === 'choose' ? 'Log waste' : 'Connect to a device';
   const subtitle = step === 'choose' ? 'How would you like to record this?' : step === 'manual' ? 'Type the details yourself' : 'Start a measuring session';
 
@@ -197,11 +197,11 @@ export function LogWasteModal({ open, onClose, onSaved }: { open: boolean; onClo
                 <label className="mb-1 block text-[13px] font-medium text-[#1A1C1E]">Your name</label>
                 <input autoFocus value={name} onChange={(e) => setName(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter' && name.trim()) setStep('device-done'); }} placeholder="e.g. Thandi Mokoena" className={input} />
               </div>
-              <p className="rounded-lg bg-[#F6FAF8] px-3 py-2 text-[12px] text-[#5F6368]">Once a scale is linked to your account, your waste is weighed and logged automatically — no typing. We’ll wire up the hardware connection here soon.</p>
+              <p className="rounded-lg bg-[#F5F9FE] px-3 py-2 text-[12px] text-[#5F6368]">Once a scale is linked to your account, your waste is weighed and logged automatically — no typing. We’ll wire up the hardware connection here soon.</p>
             </div>
             <div className="mt-5 flex justify-between gap-2">
               <button type="button" onClick={() => setStep('choose')} className="rounded-lg px-3.5 py-2 text-[13px] text-[#5F6368] hover:bg-black/[0.03]">Back</button>
-              <button type="button" disabled={!name.trim()} onClick={() => setStep('device-done')} className="rounded-lg bg-[#1E5E54] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:cursor-not-allowed disabled:opacity-40">Continue</button>
+              <button type="button" disabled={!name.trim()} onClick={() => setStep('device-done')} className="rounded-lg bg-[#1F5FA8] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:cursor-not-allowed disabled:opacity-40">Continue</button>
             </div>
           </>
         ) : null}
@@ -218,8 +218,8 @@ export function LogWasteModal({ open, onClose, onSaved }: { open: boolean; onClo
               </div>
             </div>
             <div className="mt-2 flex justify-between gap-2">
-              <button type="button" onClick={() => setStep('manual')} className="rounded-lg px-3.5 py-2 text-[13px] font-medium text-[#1E5E54] hover:bg-black/[0.03]">Log manually instead</button>
-              <button type="button" onClick={onClose} className="rounded-lg bg-[#1E5E54] px-4 py-2 text-[13px] font-medium text-white hover:bg-[#184D45]">Done</button>
+              <button type="button" onClick={() => setStep('manual')} className="rounded-lg px-3.5 py-2 text-[13px] font-medium text-[#1F5FA8] hover:bg-black/[0.03]">Log manually instead</button>
+              <button type="button" onClick={onClose} className="rounded-lg bg-[#1F5FA8] px-4 py-2 text-[13px] font-medium text-white hover:bg-[#174C87]">Done</button>
             </div>
           </>
         ) : null}
@@ -243,7 +243,7 @@ export function LogWasteModal({ open, onClose, onSaved }: { open: boolean; onClo
             </div>
             <div className="mt-5 flex justify-between gap-2">
               <button type="button" onClick={() => setStep('choose')} className="rounded-lg px-3.5 py-2 text-[13px] text-[#5F6368] hover:bg-black/[0.03]">Back</button>
-              <button type="button" disabled={!canSave} onClick={submitManual} className="rounded-lg bg-[#1E5E54] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:cursor-not-allowed disabled:opacity-40">{saving ? 'Logging…' : 'Log waste'}</button>
+              <button type="button" disabled={!canSave} onClick={submitManual} className="rounded-lg bg-[#1F5FA8] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:cursor-not-allowed disabled:opacity-40">{saving ? 'Logging…' : 'Log waste'}</button>
             </div>
           </>
         ) : null}
@@ -255,8 +255,8 @@ export function LogWasteModal({ open, onClose, onSaved }: { open: boolean; onClo
 
 function ChoiceTile({ icon, title, desc, onClick }: { icon: React.ReactNode; title: string; desc: string; onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} className="flex w-full items-center gap-3.5 rounded-xl border border-[#E7E7E2] bg-white p-4 text-left transition-all hover:-translate-y-0.5 hover:border-[#1E5E54]/40 hover:shadow-sm">
-      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#E3F0ED] text-[#1E5E54]">{icon}</span>
+    <button type="button" onClick={onClick} className="flex w-full items-center gap-3.5 rounded-xl border border-[#E7E7E2] bg-white p-4 text-left transition-all hover:-translate-y-0.5 hover:border-[#3E7BC4]/40 hover:shadow-sm">
+      <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#EAF2FC] text-[#1F5FA8]">{icon}</span>
       <span className="min-w-0 flex-1">
         <span className="block text-[14px] font-semibold text-[#1A1C1E]">{title}</span>
         <span className="block text-[12px] text-[#5F6368]">{desc}</span>

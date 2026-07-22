@@ -86,7 +86,7 @@ export default async function ProcurePulseIntelligence() {
               key={row.item.id}
               className="rounded-2xl border border-[#E7E7E2] bg-white p-4"
             >
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#1E5E54]">
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#1F5FA8]">
                 <span className="h-[13px] w-[13px] bg-white" />
               </div>
               <div className="mt-3 text-[16px] font-medium text-[#0F6E56]">
@@ -98,7 +98,7 @@ export default async function ProcurePulseIntelligence() {
               </p>
               <button
                 type="button"
-                className="mt-3 w-full rounded-lg bg-[#E3F0ED] py-2 text-[13px] font-medium text-[#1E5E54]"
+                className="mt-3 w-full rounded-lg bg-[#EAF2FC] py-2 text-[13px] font-medium text-[#1F5FA8]"
               >
                 Add to order
               </button>

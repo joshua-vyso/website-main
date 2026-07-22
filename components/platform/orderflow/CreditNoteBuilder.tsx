@@ -321,7 +321,7 @@ export function CreditNoteBuilder({
               action={
                 <Link
                   href="/app/orderflow/invoices"
-                  className="inline-flex h-9 items-center rounded-lg bg-[#1E5E54] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174A42]"
+                  className="inline-flex h-9 items-center rounded-lg bg-[#1F5FA8] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87]"
                 >
                   View invoices
                 </Link>
@@ -366,7 +366,7 @@ export function CreditNoteBuilder({
                           <td className="px-2 py-3 text-right tabular-nums text-[#5F6368]">{zar2(r.total)}</td>
                           <td className="px-2 py-3 text-right tabular-nums font-medium text-[#854F0B]">{zar2(r.balance)}</td>
                           <td className="px-2 py-3 text-right">
-                            <span className="text-[13px] font-medium text-[#1E5E54]">Credit →</span>
+                            <span className="text-[13px] font-medium text-[#1F5FA8]">Credit →</span>
                           </td>
                         </tr>
                       ))
@@ -385,7 +385,7 @@ export function CreditNoteBuilder({
   // Credit builder (an invoice is selected)
   // ---------------------------------------------------------------------------
   const numCell =
-    'h-8 w-full rounded-md border border-[#E7E7E2] px-1.5 text-right text-[13px] tabular-nums text-[#1A1C1E] focus:border-[#1E5E54]/50 focus:outline-none disabled:bg-[#FBFBF9] disabled:text-[#9A9DA1]';
+    'h-8 w-full rounded-md border border-[#E7E7E2] px-1.5 text-right text-[13px] tabular-nums text-[#1A1C1E] focus:border-[#3E7BC4]/50 focus:outline-none disabled:bg-[#FBFBF9] disabled:text-[#9A9DA1]';
 
   return (
     <div className="mx-auto max-w-[880px]">
@@ -403,7 +403,7 @@ export function CreditNoteBuilder({
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#E7E7E2] bg-[#FBFBF9] px-4 py-3">
           <div className="text-[13px]">
             <span className="text-[#9A9DA1]">Crediting invoice</span>{' '}
-            <Link href={`/app/orderflow/invoices/${invoice!.id}`} className="font-medium text-[#1E5E54] hover:underline">
+            <Link href={`/app/orderflow/invoices/${invoice!.id}`} className="font-medium text-[#1F5FA8] hover:underline">
               {invoice!.invoice_number}
             </Link>
             {customer ? <span className="text-[#5F6368]"> · {customer.name}</span> : null}
@@ -428,7 +428,7 @@ export function CreditNoteBuilder({
             type="checkbox"
             checked={creditEverything}
             onChange={(e) => toggleEverything(e.target.checked)}
-            className="h-4 w-4 rounded border-[#D7DAD8] text-[#1E5E54] focus:ring-[#1E5E54]/40"
+            className="h-4 w-4 rounded border-[#D7DAD8] text-[#1F5FA8] focus:ring-[#3E7BC4]/40"
           />
           <span className="font-medium">Credit everything on this invoice</span>
           <span className="text-[#9A9DA1]">— check to credit every line in full</span>
@@ -467,7 +467,7 @@ export function CreditNoteBuilder({
                           type="checkbox"
                           checked={l.checked}
                           onChange={(e) => updateLine(l.invoice_item_id, { checked: e.target.checked })}
-                          className="h-4 w-4 rounded border-[#D7DAD8] text-[#1E5E54] focus:ring-[#1E5E54]/40"
+                          className="h-4 w-4 rounded border-[#D7DAD8] text-[#1F5FA8] focus:ring-[#3E7BC4]/40"
                           aria-label={`Credit ${l.name}`}
                         />
                       </td>
@@ -505,7 +505,7 @@ export function CreditNoteBuilder({
               onChange={(e) => setReason(e.target.value)}
               placeholder="e.g. Damaged goods returned"
               className={`h-9 w-full rounded-lg border bg-white px-3 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:outline-none ${
-                reason.trim() ? 'border-[#D7DAD8] focus:border-[#1E5E54]/50' : 'border-[#D9A441]'
+                reason.trim() ? 'border-[#D7DAD8] focus:border-[#3E7BC4]/50' : 'border-[#D9A441]'
               }`}
             />
           </Field>
@@ -515,7 +515,7 @@ export function CreditNoteBuilder({
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
               placeholder="Anything the customer should see"
-              className="w-full rounded-lg border border-[#D7DAD8] bg-white px-3 py-2 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/50 focus:outline-none"
+              className="w-full rounded-lg border border-[#D7DAD8] bg-white px-3 py-2 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/50 focus:outline-none"
             />
           </Field>
         </div>
@@ -551,7 +551,7 @@ export function CreditNoteBuilder({
           type="button"
           onClick={() => void issue()}
           disabled={!canIssue}
-          className="inline-flex h-9 items-center justify-center rounded-lg bg-[#1E5E54] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174A42] disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex h-9 items-center justify-center rounded-lg bg-[#1F5FA8] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {busy ? 'Issuing…' : 'Issue credit note'}
         </button>

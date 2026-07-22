@@ -65,8 +65,8 @@ export default async function ProcurePulseDashboard() {
   if (items.length === 0) {
     return (
       <div className="flex min-h-[55vh] flex-col items-center justify-center text-center">
-        <div className="flex h-[76px] w-[76px] items-center justify-center rounded-[20px] bg-[#E3F0ED]">
-          <span className="h-[30px] w-[30px] rounded-[7px] bg-[#1E5E54]" />
+        <div className="flex h-[76px] w-[76px] items-center justify-center rounded-[20px] bg-[#EAF2FC]">
+          <span className="h-[30px] w-[30px] rounded-[7px] bg-[#1F5FA8]" />
         </div>
         <h1 className="mt-4 text-[24px] font-bold text-[#1A1C1E]">Connect ProcurePulse to Doc-U</h1>
         <p className="mt-2 max-w-md text-[14px] text-[#5F6368]">
@@ -75,7 +75,7 @@ export default async function ProcurePulseDashboard() {
         </p>
         <Link
           href="/app/docu"
-          className="mt-5 inline-flex items-center rounded-lg bg-[#1E5E54] px-5 py-3 text-[15px] font-medium text-white"
+          className="mt-5 inline-flex items-center rounded-lg bg-[#1F5FA8] px-5 py-3 text-[15px] font-medium text-white"
         >
           Use my Doc-U documents
         </Link>
@@ -189,7 +189,7 @@ export default async function ProcurePulseDashboard() {
                   </div>
                   <Link
                     href="/app/procurepulse/reorder"
-                    className="shrink-0 rounded-lg bg-[#1E5E54] px-3.5 py-2 text-[13px] font-medium text-white"
+                    className="shrink-0 rounded-lg bg-[#1F5FA8] px-3.5 py-2 text-[13px] font-medium text-white"
                   >
                     Order
                   </Link>
@@ -243,7 +243,7 @@ export default async function ProcurePulseDashboard() {
             <div className="text-[14px] font-medium text-[#1A1C1E]">Notifications</div>
             <Link
               href="/app/procurepulse/notifications"
-              className="text-[12px] font-medium text-[#1E5E54] hover:underline"
+              className="text-[12px] font-medium text-[#1F5FA8] hover:underline"
             >
               Show all
             </Link>

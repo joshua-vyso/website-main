@@ -296,7 +296,7 @@ export function OrderDetail({
           <div className="flex flex-wrap items-center gap-3">
             <Link
               href="/app/orderflow/orders"
-              className="inline-flex h-8 items-center gap-1 rounded-full border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#5F6368] transition-colors hover:border-[#1E5E54]/30 hover:text-[#1A1C1E]"
+              className="inline-flex h-8 items-center gap-1 rounded-full border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#5F6368] transition-colors hover:border-[#3E7BC4]/30 hover:text-[#1A1C1E]"
             >
               <span aria-hidden>‹</span> Orders
             </Link>
@@ -310,7 +310,7 @@ export function OrderDetail({
           </div>
           <p className="mt-1.5 text-[13px] text-[#5F6368]">
             {customer ? (
-              <Link href={`/app/orderflow/customers/${customer.id}`} className="font-medium text-[#1E5E54] hover:text-[#174A42]">
+              <Link href={`/app/orderflow/customers/${customer.id}`} className="font-medium text-[#1F5FA8] hover:text-[#174C87]">
                 {customer.name}
               </Link>
             ) : (
@@ -326,7 +326,7 @@ export function OrderDetail({
               type="button"
               onClick={() => void generateInvoice()}
               disabled={busy || items.length === 0}
-              className="inline-flex h-9 items-center rounded-lg bg-[#1E5E54] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174A42] disabled:opacity-40"
+              className="inline-flex h-9 items-center rounded-lg bg-[#1F5FA8] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
             >
               Generate invoice
             </button>
@@ -336,7 +336,7 @@ export function OrderDetail({
               type="button"
               onClick={() => void makeDeliveryNote()}
               disabled={busy || items.length === 0}
-              className="inline-flex h-9 items-center rounded-lg border border-[#D7DAD8] bg-white px-4 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/40 disabled:opacity-40"
+              className="inline-flex h-9 items-center rounded-lg border border-[#D7DAD8] bg-white px-4 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/40 disabled:opacity-40"
             >
               Create delivery note
             </button>
@@ -368,7 +368,7 @@ export function OrderDetail({
               const clickable = isPipeline && !busy && st !== order.status;
               return (
                 <div key={st} className="flex items-center">
-                  {i > 0 ? <span className={`mx-2 h-px w-6 sm:w-10 ${i <= stepIdx ? 'bg-[#1E5E54]' : 'bg-[#E7E7E2]'}`} aria-hidden /> : null}
+                  {i > 0 ? <span className={`mx-2 h-px w-6 sm:w-10 ${i <= stepIdx ? 'bg-[#1F5FA8]' : 'bg-[#E7E7E2]'}`} aria-hidden /> : null}
                   <button
                     type="button"
                     onClick={() => clickable && void setStatus(st)}
@@ -378,12 +378,12 @@ export function OrderDetail({
                   >
                     <span
                       className={`flex h-5 w-5 items-center justify-center rounded-full border text-[10px] font-semibold ${
-                        done ? 'border-[#1E5E54] bg-[#1E5E54] text-white' : 'border-[#D7DAD8] bg-white text-[#9A9DA1]'
-                      } ${current ? 'ring-2 ring-[#1E5E54]/25' : ''}`}
+                        done ? 'border-[#3E7BC4] bg-[#1F5FA8] text-white' : 'border-[#D7DAD8] bg-white text-[#9A9DA1]'
+                      } ${current ? 'ring-2 ring-[#3E7BC4]/25' : ''}`}
                     >
                       {done ? '✓' : i + 1}
                     </span>
-                    <span className={`text-[12px] font-medium ${current ? 'text-[#1E5E54]' : done ? 'text-[#1A1C1E]' : 'text-[#9A9DA1]'}`}>
+                    <span className={`text-[12px] font-medium ${current ? 'text-[#1F5FA8]' : done ? 'text-[#1A1C1E]' : 'text-[#9A9DA1]'}`}>
                       {ORDER_STATUS_STYLE[st].label}
                     </span>
                   </button>
@@ -469,7 +469,7 @@ export function OrderDetail({
                     type="button"
                     onClick={() => void saveDelivery()}
                     disabled={busy}
-                    className="inline-flex h-8 items-center rounded-lg bg-[#1E5E54] px-3 text-[12px] font-medium text-white hover:bg-[#174A42] disabled:opacity-40"
+                    className="inline-flex h-8 items-center rounded-lg bg-[#1F5FA8] px-3 text-[12px] font-medium text-white hover:bg-[#174C87] disabled:opacity-40"
                   >
                     {busy ? 'Saving…' : 'Save'}
                   </button>
@@ -478,7 +478,7 @@ export function OrderDetail({
                 <button
                   type="button"
                   onClick={() => setEditDelivery(true)}
-                  className="inline-flex h-8 items-center rounded-lg border border-[#D7DAD8] bg-white px-3 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/40"
+                  className="inline-flex h-8 items-center rounded-lg border border-[#D7DAD8] bg-white px-3 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/40"
                 >
                   Edit
                 </button>
@@ -493,7 +493,7 @@ export function OrderDetail({
                     onChange={(e) => setDAddress(e.target.value)}
                     rows={2}
                     placeholder="Street, suburb, city…"
-                    className="w-full rounded-lg border border-[#D7DAD8] bg-white px-3 py-2 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/50 focus:outline-none"
+                    className="w-full rounded-lg border border-[#D7DAD8] bg-white px-3 py-2 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/50 focus:outline-none"
                   />
                 </div>
                 <div>
@@ -545,10 +545,10 @@ export function OrderDetail({
             {invoice ? (
               <Link
                 href={`/app/orderflow/invoices/${invoice.id}`}
-                className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-[#F0F0EC] bg-[#FBFBF9] px-3.5 py-3 transition-colors hover:border-[#1E5E54]/30"
+                className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-[#F0F0EC] bg-[#FBFBF9] px-3.5 py-3 transition-colors hover:border-[#3E7BC4]/30"
               >
                 <div className="min-w-0">
-                  <div className="truncate text-[13px] font-medium text-[#1E5E54]">{invoice.invoice_number}</div>
+                  <div className="truncate text-[13px] font-medium text-[#1F5FA8]">{invoice.invoice_number}</div>
                   <div className="mt-0.5 text-[11px] text-[#9A9DA1]">Issued {fmtDate(invoice.issue_date)}</div>
                 </div>
                 {invoiceStyle ? <Pill label={invoiceStyle.label} bg={invoiceStyle.bg} fg={invoiceStyle.fg} /> : null}
@@ -576,7 +576,7 @@ export function OrderDetail({
                     <li key={dn.id}>
                       <Link href={`/app/orderflow/delivery-notes/${dn.id}`} className="flex items-center justify-between gap-3 px-3.5 py-2.5 transition-colors hover:bg-[#FAFAF8]">
                         <div className="min-w-0">
-                          <div className="truncate text-[13px] font-medium text-[#1E5E54]">{dn.dn_number}</div>
+                          <div className="truncate text-[13px] font-medium text-[#1F5FA8]">{dn.dn_number}</div>
                           <div className="mt-0.5 text-[11px] text-[#9A9DA1]">{fmtDate(dn.created_at)}</div>
                         </div>
                         <Pill label={ds.label} bg={ds.bg} fg={ds.fg} />

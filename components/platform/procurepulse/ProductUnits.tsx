@@ -108,7 +108,7 @@ export function ProductUnits({
   }
 
   const cell =
-    'h-9 w-full rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:border-[#1E5E54]/40 focus:outline-none';
+    'h-9 w-full rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:border-[#3E7BC4]/40 focus:outline-none';
   const COLS = 'grid grid-cols-[minmax(150px,1fr)_120px_120px_120px_96px_minmax(120px,1fr)] gap-2 items-center';
 
   return (
@@ -128,13 +128,13 @@ export function ProductUnits({
               setPage(0);
             }}
             placeholder="Search products…"
-            className="h-10 w-60 rounded-xl border border-[#E7E7E2] bg-white px-4 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none"
+            className="h-10 w-60 rounded-xl border border-[#E7E7E2] bg-white px-4 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
           />
           <button
             type="button"
             onClick={() => void save()}
             disabled={busy || dirty.size === 0}
-            className="inline-flex h-10 items-center rounded-xl bg-[#1E5E54] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex h-10 items-center rounded-xl bg-[#1F5FA8] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:cursor-not-allowed disabled:opacity-40"
           >
             {busy ? 'Saving…' : dirty.size > 0 ? `Save changes (${dirty.size})` : 'Saved'}
           </button>
@@ -182,7 +182,7 @@ export function ProductUnits({
         </div>
       ) : null}
 
-      {msg ? <p className="mt-3 text-[12px] text-[#0F4C44]">{msg}</p> : null}
+      {msg ? <p className="mt-3 text-[12px] text-[#174C87]">{msg}</p> : null}
     </div>
   );
 }

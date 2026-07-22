@@ -38,7 +38,7 @@ export function LabourInsights() {
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         <SectionCard title="Labour cost trend" right={<span className="text-[12px] text-[#9A9DA1]">{zar(LABOUR_COST_TREND[LABOUR_COST_TREND.length - 1])}/day</span>}>
-          <AreaChart data={LABOUR_COST_TREND} color="#1E5E54" fill="#E3F0ED" height={120} />
+          <AreaChart data={LABOUR_COST_TREND} color="#3E7BC4" fill="#EAF2FC" height={120} />
           <p className="mt-2 text-[12px] text-[#9A9DA1]">Daily labour cost this week — tracking ~7% above plan.</p>
         </SectionCard>
 
@@ -76,11 +76,11 @@ export function LabourInsights() {
           <div className="mt-2 flex justify-between text-[10px] text-[#9A9DA1]">{DAYS.map((d) => <span key={d}>{d}</span>)}</div>
         </SectionCard>
 
-        <SectionCard title="Cross-module insights" right={<span className="inline-flex items-center gap-1 text-[11px] font-medium text-[#1E5E54]">✦ auto-generated soon</span>}>
+        <SectionCard title="Cross-module insights" right={<span className="inline-flex items-center gap-1 text-[11px] font-medium text-[#1F5FA8]">✦ auto-generated soon</span>}>
           <div className="flex flex-col gap-2.5">
             {LABOUR_INSIGHTS.map((i) => (
               <div key={i.id} className="flex flex-wrap items-center gap-2.5 text-[13px]">
-                <span className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1E5E54]" />
+                <span className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1F5FA8]" />
                 <span className="min-w-0 flex-1 text-[#1A1C1E]">{i.text}</span>
                 {i.module ? (
                   <Link href={MODULE_META[i.module].route} className="shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium" style={{ backgroundColor: MODULE_META[i.module].accent.bg, color: MODULE_META[i.module].accent.fg }}>{MODULE_META[i.module].name} →</Link>

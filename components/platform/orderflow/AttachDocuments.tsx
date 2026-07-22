@@ -139,7 +139,7 @@ export function AttachDocuments({
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={busy}
-          className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/40 disabled:opacity-60"
+          className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/40 disabled:opacity-60"
         >
           {busy ? 'Uploading…' : '↑ Attach'}
         </button>
@@ -168,7 +168,7 @@ export function AttachDocuments({
                   type="button"
                   onClick={() => void open(doc)}
                   disabled={!doc.storage_path || opening === doc.id}
-                  className="block max-w-full truncate text-left text-[13px] font-medium text-[#1E5E54] transition-colors hover:text-[#174A42] disabled:text-[#9A9DA1]"
+                  className="block max-w-full truncate text-left text-[13px] font-medium text-[#1F5FA8] transition-colors hover:text-[#174C87] disabled:text-[#9A9DA1]"
                   title={doc.filename}
                 >
                   {opening === doc.id ? 'Opening…' : doc.filename}

@@ -111,7 +111,7 @@ export function LiveStockView({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search products"
-          className="h-[34px] w-[240px] rounded-lg border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none"
+          className="h-[34px] w-[240px] rounded-lg border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
         />
         <button type="button" onClick={() => setStatus('all')} className={pill(status === 'all')}>
           All
@@ -146,14 +146,14 @@ export function LiveStockView({
           type="button"
           onClick={() => void autoCategorise()}
           disabled={categorising}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-[#D7DAD8] bg-white px-3.5 py-2 text-[13px] font-medium text-[#1E5E54] transition-colors hover:border-[#1E5E54]/40 disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 rounded-lg border border-[#D7DAD8] bg-white px-3.5 py-2 text-[13px] font-medium text-[#1F5FA8] transition-colors hover:border-[#3E7BC4]/40 disabled:opacity-50"
         >
           {categorising ? 'Categorising…' : uncategorised > 0 ? `✦ Categorise ${uncategorised}` : '✦ Re-categorise'}
         </button>
         <PpButton href="/app/procurepulse/reorder">Reorder low · {lowCount}</PpButton>
       </div>
 
-      {msg ? <p className="mb-3 text-[12px] text-[#0F4C44]">{msg}</p> : null}
+      {msg ? <p className="mb-3 text-[12px] text-[#174C87]">{msg}</p> : null}
 
       <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
         <div className="flex items-center border-b border-[#E7E7E2] pb-2.5 text-[12px] font-medium text-[#9A9DA1]">

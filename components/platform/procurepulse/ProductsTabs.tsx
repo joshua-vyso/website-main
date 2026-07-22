@@ -43,7 +43,7 @@ export function ProductsTabs({
         right={
           <Link
             href="/app/orderflow/orders"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-[#D7DAD8] bg-white px-3.5 py-2.5 text-[14px] font-medium text-[#5F6368] transition-colors hover:border-[#1E5E54]/30"
+            className="inline-flex items-center gap-1.5 rounded-lg border border-[#D7DAD8] bg-white px-3.5 py-2.5 text-[14px] font-medium text-[#5F6368] transition-colors hover:border-[#3E7BC4]/30"
           >
             Create order in OrderFlow
             <span aria-hidden>→</span>

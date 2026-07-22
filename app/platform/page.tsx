@@ -169,6 +169,9 @@ const structuredData = {
         "Delivery notes",
         "Payment tracking",
         "Customer price lists",
+        "ZAR invoices and payment records",
+        "Standard, zero-rated and exempt VAT treatment",
+        "EFT, cash and card payment tracking",
         "Operational search and reporting",
       ],
     },
@@ -279,6 +282,61 @@ export default function PlatformPage() {
               </li>
             ))}
           </ol>
+        </div>
+      </section>
+
+      <section className={styles.section} aria-labelledby="south-africa-proof-heading">
+        <div className={styles.shell}>
+          <div className={styles.sectionIntro}>
+            <div>
+              <p className={styles.sectionKicker}>South African commercial reality</p>
+              <h2 id="south-africa-proof-heading" className={`${styles.sectionTitle} ${styles.blendPlain}`}>
+                Local where the workflow actually matters.
+              </h2>
+            </div>
+            <div>
+              <p className={styles.sectionCopy}>
+                OrderFlow is shaped around the details South African B2B teams deal
+                with every day—not just a global product with rand added at the end.
+              </p>
+              <Link className={styles.textLink} href="/south-africa">
+                See Vyso for South Africa <span aria-hidden="true">→</span>
+              </Link>
+            </div>
+          </div>
+
+          <div className={styles.answerGrid}>
+            {[
+              {
+                icon: ReceiptText,
+                title: "VAT-aware documents",
+                copy: "Use seller and customer VAT details, standard, zero-rated or exempt treatment, tax invoices and connected credit notes.",
+              },
+              {
+                icon: CircleDollarSign,
+                title: "Rand and local payment records",
+                copy: "Keep ZAR totals, EFT references, cash and card payments, account terms, outstanding balances and overdue invoices visible.",
+              },
+              {
+                icon: Users,
+                title: "Customer-specific trade",
+                copy: "Apply price lists, rebates, purchase orders, credit limits, payment terms and delivery details at customer level.",
+              },
+              {
+                icon: MessageSquareText,
+                title: "Real-world order intake",
+                copy: "Upload WhatsApp screenshots, email captures, PDFs or photographed orders for extraction and review before they move forward.",
+              },
+            ].map(({ icon: Icon, title: localTitle, copy }) => (
+              <article key={localTitle} className={styles.answerCard}>
+                <span className={styles.cardIcon} style={{ marginBottom: "1rem" }}>
+                  <Icon aria-hidden="true" size={19} strokeWidth={1.8} />
+                </span>
+                <h3>{localTitle}</h3>
+                <p>{copy}</p>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 

@@ -74,7 +74,7 @@ export interface InvoiceBuilderInitial {
 }
 
 const textareaClass =
-  'w-full rounded-lg border border-[#D7DAD8] bg-white px-3 py-2 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/50 focus:outline-none';
+  'w-full rounded-lg border border-[#D7DAD8] bg-white px-3 py-2 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/50 focus:outline-none';
 
 let lineSeq = 0;
 
@@ -481,7 +481,7 @@ export function InvoiceBuilder({
                   inputMode="decimal"
                   placeholder="0.00"
                   aria-label="Discount in rands"
-                  className="ml-1.5 h-6 w-20 rounded-md border border-[#E7E7E2] px-1 text-right text-[12px] tabular-nums text-[#1A1C1E] focus:border-[#1E5E54]/50 focus:outline-none"
+                  className="ml-1.5 h-6 w-20 rounded-md border border-[#E7E7E2] px-1 text-right text-[12px] tabular-nums text-[#1A1C1E] focus:border-[#3E7BC4]/50 focus:outline-none"
                 />
               </span>
               <span className="tabular-nums text-[#1A1C1E]">{totals.discount > 0 ? `−${zar2(totals.discount)}` : zar2(0)}</span>
@@ -495,7 +495,7 @@ export function InvoiceBuilder({
                   inputMode="decimal"
                   placeholder="0"
                   aria-label="Rebate percentage"
-                  className="mx-1.5 h-6 w-12 rounded-md border border-[#E7E7E2] px-1 text-right text-[12px] tabular-nums text-[#1A1C1E] focus:border-[#1E5E54]/50 focus:outline-none"
+                  className="mx-1.5 h-6 w-12 rounded-md border border-[#E7E7E2] px-1 text-right text-[12px] tabular-nums text-[#1A1C1E] focus:border-[#3E7BC4]/50 focus:outline-none"
                 />
                 %
               </span>
@@ -509,7 +509,7 @@ export function InvoiceBuilder({
                   onChange={(e) => setVatRate(Number(e.target.value) || 0)}
                   inputMode="decimal"
                   aria-label="VAT rate"
-                  className="mx-1.5 h-6 w-12 rounded-md border border-[#E7E7E2] px-1 text-right text-[12px] tabular-nums text-[#1A1C1E] focus:border-[#1E5E54]/50 focus:outline-none"
+                  className="mx-1.5 h-6 w-12 rounded-md border border-[#E7E7E2] px-1 text-right text-[12px] tabular-nums text-[#1A1C1E] focus:border-[#3E7BC4]/50 focus:outline-none"
                 />
                 %
               </span>
@@ -543,7 +543,7 @@ export function InvoiceBuilder({
           type="button"
           onClick={() => void save('sent')}
           disabled={!!busy || !canSave}
-          className="inline-flex h-9 items-center justify-center rounded-lg bg-[#1E5E54] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174A42] disabled:cursor-not-allowed disabled:opacity-50"
+          className="inline-flex h-9 items-center justify-center rounded-lg bg-[#1F5FA8] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:cursor-not-allowed disabled:opacity-50"
         >
           {busy === 'sent' ? 'Saving…' : 'Save & mark sent'}
         </button>

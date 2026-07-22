@@ -9,7 +9,7 @@ import type { DocumentFolder, DocumentType, DocumentWithSupplier } from '@/lib/p
 
 /** Palette offered when creating or recolouring a custom folder. */
 export const FOLDER_COLORS: readonly string[] = [
-  '#1E5E54', // teal
+  '#3E7BC4', // blue
   '#0C447C', // blue
   '#0F6E56', // green
   '#854F0B', // amber
@@ -36,7 +36,7 @@ export function buildFolderTiles(
   folders: DocumentFolder[],
 ): FolderTile[] {
   const tiles: FolderTile[] = [
-    { key: 'all', name: 'All documents', color: '#1E5E54', count: docs.length, kind: 'all' },
+    { key: 'all', name: 'All documents', color: '#3E7BC4', count: docs.length, kind: 'all' },
   ];
 
   for (const t of DOC_TYPES) {

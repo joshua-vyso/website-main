@@ -34,7 +34,7 @@ import {
   INK,
   MUTE,
   FAINT,
-  TEAL,
+  ACCENT,
   GREEN,
   AMBER,
   RED,
@@ -232,10 +232,10 @@ function OverviewTab({ supplier }: { supplier: Supplier }) {
 
   const chain = [
     { label: 'Supplier', color: PURPLE },
-    { label: `Contacts ${supplier.contacts.length}`, color: TEAL },
+    { label: `Contacts ${supplier.contacts.length}`, color: ACCENT },
     { label: `Documents ${supplier.docs.length}`, color: GREEN },
     { label: 'Performance', color: AMBER },
-    { label: 'Pricing', color: TEAL },
+    { label: 'Pricing', color: ACCENT },
     { label: `Risk ${supplier.openRisks}`, color: supplier.openRisks ? RED : FAINT },
   ];
 
@@ -586,7 +586,7 @@ function DocRow({ doc, show }: { doc: SupplierDocument; show: (m: string) => voi
 function PerformanceTab({ supplier }: { supplier: Supplier }) {
   const p = supplier.performance;
   const trends: { label: string; data: number[]; color: string }[] = [
-    { label: 'Reliability trend', data: p.reliabilityTrend, color: TEAL },
+    { label: 'Reliability trend', data: p.reliabilityTrend, color: ACCENT },
     { label: 'Delivery trend', data: p.deliveryTrend, color: GREEN },
     { label: 'Score trend', data: p.scoreTrend, color: PURPLE },
   ];
@@ -668,7 +668,7 @@ function PricingTab({ supplier }: { supplier: Supplier }) {
       </span>,
       <span key="upd" className="text-[12px] text-[#9A9DA1]">{fmtDate(p.lastUpdated)}</span>,
       p.trend.length > 1 ? (
-        <Sparkline key="spark" data={p.trend} color={p.changePct > 0 ? RED : TEAL} width={72} height={26} />
+        <Sparkline key="spark" data={p.trend} color={p.changePct > 0 ? RED : ACCENT} width={72} height={26} />
       ) : (
         <span key="spark" className="text-[12px] text-[#C4C4BE]">—</span>
       ),

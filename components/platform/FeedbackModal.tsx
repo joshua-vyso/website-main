@@ -215,7 +215,7 @@ export function FeedbackModal({ open, onClose }: { open: boolean; onClose: () =>
                 <button
                   type="button"
                   onClick={() => fileRef.current?.click()}
-                  className="flex h-16 w-16 flex-col items-center justify-center gap-0.5 rounded-lg border border-dashed border-[#D7DAD8] bg-white text-[11px] text-[#5F6368] transition-colors hover:border-[#1E5E54]/50 hover:text-[#1A1C1E]"
+                  className="flex h-16 w-16 flex-col items-center justify-center gap-0.5 rounded-lg border border-dashed border-[#D7DAD8] bg-white text-[11px] text-[#5F6368] transition-colors hover:border-[#3E7BC4]/50 hover:text-[#1A1C1E]"
                 >
                   <span className="text-[16px] leading-none">+</span>
                   Add

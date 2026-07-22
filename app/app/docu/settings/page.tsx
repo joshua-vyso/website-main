@@ -38,7 +38,7 @@ export default async function DocuSettings() {
               </div>
               <Link
                 href="/app/settings"
-                className="shrink-0 rounded-lg border border-[#D7DAD8] bg-white px-3.5 py-2 text-[13px] font-medium text-[#1E5E54] transition-colors hover:border-[#1E5E54]/40"
+                className="shrink-0 rounded-lg border border-[#D7DAD8] bg-white px-3.5 py-2 text-[13px] font-medium text-[#1F5FA8] transition-colors hover:border-[#3E7BC4]/40"
               >
                 Manage units
               </Link>

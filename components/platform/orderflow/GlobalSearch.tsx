@@ -76,6 +76,18 @@ export function GlobalSearch({ items, placeholder }: { items: SearchIndexItem[];
 
   useEffect(() => setActive(0), [query]);
 
+  // ⌘K / Ctrl-K focuses the bar — the shortcut the hint badge advertises.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key.toLowerCase() !== 'k' || !(e.metaKey || e.ctrlKey)) return;
+      e.preventDefault();
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
   function reposition() {
     const r = wrapRef.current?.getBoundingClientRect();
     if (r) setPos({ top: r.bottom + 6, left: r.left, width: r.width });
@@ -124,12 +136,18 @@ export function GlobalSearch({ items, placeholder }: { items: SearchIndexItem[];
 
   return (
     <div ref={wrapRef} className="relative w-full">
-      <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[#9A9DA1]" aria-hidden>
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <div className="pointer-events-none absolute left-5 top-1/2 -translate-y-1/2 text-[#AEB4BC]" aria-hidden>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round">
           <circle cx="11" cy="11" r="7" />
           <path d="m21 21-4.3-4.3" />
         </svg>
       </div>
+      <span
+        className="pointer-events-none absolute right-5 top-1/2 -translate-y-1/2 rounded-md border border-[#E6E6DE] px-1.5 py-0.5 text-[12px] text-[#B0B4AC]"
+        aria-hidden
+      >
+        ⌘K
+      </span>
       <input
         ref={inputRef}
         type="text"
@@ -142,7 +160,7 @@ export function GlobalSearch({ items, placeholder }: { items: SearchIndexItem[];
         onBlur={() => setTimeout(() => setOpen(false), 120)}
         onKeyDown={onKeyDown}
         placeholder={placeholder ?? 'Search customers, quotes, orders, invoices…'}
-        className="h-11 w-full rounded-xl border border-[#D7DAD8] bg-white pl-9 pr-3 text-[14px] text-[#1A1C1E] outline-none transition-colors placeholder:text-[#9A9DA1] focus:border-[#1E5E54]"
+        className="h-[54px] w-full rounded-[14px] border border-[#E4E9F0] bg-white pl-[52px] pr-16 text-[15px] text-[#171A17] shadow-[0_1px_2px_rgba(20,24,20,0.03)] outline-none transition-colors placeholder:text-[#A0A49C] focus:border-[#3E7BC4]"
         aria-label="Search OrderFlow"
         autoComplete="off"
       />

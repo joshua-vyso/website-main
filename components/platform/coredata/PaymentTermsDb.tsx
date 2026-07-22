@@ -195,7 +195,7 @@ export function PaymentTermsDb({ data }: { data: CoreData }) {
             <input value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} placeholder="Payment due within 30 days of invoice" className={inputClass} />
           </Field>
           <label className="flex items-center gap-2.5 text-[13px] text-[#1A1C1E]">
-            <input type="checkbox" checked={draft.is_default} onChange={(e) => setDraft({ ...draft, is_default: e.target.checked })} className="h-4 w-4 accent-[#1E5E54]" />
+            <input type="checkbox" checked={draft.is_default} onChange={(e) => setDraft({ ...draft, is_default: e.target.checked })} className="h-4 w-4 accent-[#3E7BC4]" />
             Use as the default term for new invoices
           </label>
           {error ? <p className="text-[12px] text-[#A32D2D]">{error}</p> : null}

@@ -89,7 +89,7 @@ export default async function ProcurePulseNotifications() {
     <div className="space-y-5">
       <Link
         href="/app/procurepulse"
-        className="inline-flex h-8 items-center gap-1 rounded-full border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#5F6368] transition-colors hover:border-[#1E5E54]/30 hover:text-[#1A1C1E]"
+        className="inline-flex h-8 items-center gap-1 rounded-full border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#5F6368] transition-colors hover:border-[#3E7BC4]/30 hover:text-[#1A1C1E]"
       >
         <span aria-hidden>‹</span> Dashboard
       </Link>

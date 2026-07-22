@@ -180,7 +180,7 @@ const CADENCES: { value: PriceCadence; label: string }[] = [
 ];
 
 const filterSel =
-  'h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#1E5E54]';
+  'h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#3E7BC4]';
 
 interface ListDraft {
   name: string;
@@ -462,7 +462,7 @@ export function PriceListsView({
           <button
             type="button"
             onClick={startNew}
-            className="inline-flex h-10 items-center rounded-xl bg-[#1E5E54] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#184D45]"
+            className="inline-flex h-10 items-center rounded-xl bg-[#1F5FA8] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87]"
           >
             + New price list
           </button>
@@ -1116,7 +1116,7 @@ function PriceListEditor({
             type="button"
             onClick={() => (missingProducts.length > 40 ? setConfirmFill(true) : void fillFromCatalogue())}
             disabled={fillBusy || missingProducts.length === 0}
-            className="inline-flex h-8 items-center rounded-lg bg-[#1E5E54] px-3 text-[12px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:opacity-50"
+            className="inline-flex h-8 items-center rounded-lg bg-[#1F5FA8] px-3 text-[12px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-50"
           >
             {fillBusy ? 'Adding…' : `Fill from catalogue · ${missingProducts.length}`}
           </button>
@@ -1182,7 +1182,7 @@ function PriceListEditor({
                         {p.category ? `${p.category} · ` : ''}base {cost != null ? zar2(cost) : '—'} → {sell != null ? zar2(sell) : '—'}
                       </div>
                     </div>
-                    <span className="shrink-0 text-[12px] font-medium text-[#1E5E54]">Add</span>
+                    <span className="shrink-0 text-[12px] font-medium text-[#1F5FA8]">Add</span>
                   </button>
                 );
               })
@@ -1309,7 +1309,7 @@ function PriceListEditor({
                       }}
                       disabled={busyId === row.id}
                       inputMode="decimal"
-                      className="h-8 w-[68px] rounded-lg border border-[#D7DAD8] bg-white px-2 text-right text-[13px] text-[#1A1C1E] tabular-nums focus:border-[#1E5E54]/50 focus:outline-none disabled:opacity-50"
+                      className="h-8 w-[68px] rounded-lg border border-[#D7DAD8] bg-white px-2 text-right text-[13px] text-[#1A1C1E] tabular-nums focus:border-[#3E7BC4]/50 focus:outline-none disabled:opacity-50"
                     />
                   </td>
                   <td className="px-2 py-2.5 text-right">
@@ -1326,7 +1326,7 @@ function PriceListEditor({
                       }}
                       disabled={busyId === row.id}
                       inputMode="decimal"
-                      className="h-8 w-[90px] rounded-lg border border-[#D7DAD8] bg-white px-2 text-right text-[13px] text-[#1A1C1E] tabular-nums placeholder:text-[#C9CCCA] focus:border-[#1E5E54]/50 focus:outline-none disabled:opacity-50"
+                      className="h-8 w-[90px] rounded-lg border border-[#D7DAD8] bg-white px-2 text-right text-[13px] text-[#1A1C1E] tabular-nums placeholder:text-[#C9CCCA] focus:border-[#3E7BC4]/50 focus:outline-none disabled:opacity-50"
                     />
                   </td>
                   <td className="px-2 py-2.5 text-right tabular-nums font-medium text-[#1A1C1E]">

@@ -139,7 +139,7 @@ export function ReconciliationView({ statements }: { statements: DocumentWithSup
                   <button
                     type="button"
                     onClick={() => downloadMonth(g.label, g.rows)}
-                    className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg bg-[#1E5E54] px-3 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45]"
+                    className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-lg bg-[#1F5FA8] px-3 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87]"
                   >
                     <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden>
                       <path d="M8 2v8m0 0l-3-3m3 3l3-3M3 13h10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />

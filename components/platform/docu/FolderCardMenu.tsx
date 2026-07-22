@@ -149,13 +149,13 @@ export function FolderCardMenu({
                     if (e.key === 'Escape') close();
                   }}
                   aria-label="New folder name"
-                  className="h-8 w-full rounded-lg border border-[#1E5E54]/40 bg-white px-2 text-[13px] text-[#1A1C1E] focus:outline-none"
+                  className="h-8 w-full rounded-lg border border-[#3E7BC4]/40 bg-white px-2 text-[13px] text-[#1A1C1E] focus:outline-none"
                 />
                 <div className="mt-1.5 flex justify-end gap-1.5">
                   <button type="button" onClick={close} className="rounded-lg px-2.5 py-1 text-[12px] text-[#5F6368] hover:bg-[#FAFAF8]">
                     Cancel
                   </button>
-                  <button type="button" onClick={() => void rename()} disabled={busy || !value.trim()} className="rounded-lg bg-[#1E5E54] px-2.5 py-1 text-[12px] font-medium text-white hover:bg-[#184D45] disabled:opacity-40">
+                  <button type="button" onClick={() => void rename()} disabled={busy || !value.trim()} className="rounded-lg bg-[#1F5FA8] px-2.5 py-1 text-[12px] font-medium text-white hover:bg-[#174C87] disabled:opacity-40">
                     {busy ? '…' : 'Save'}
                   </button>
                 </div>

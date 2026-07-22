@@ -57,7 +57,7 @@ const SORT_OPTIONS: { value: SortKey; label: string }[] = [
 const RISK_RANK: Record<SupplierRisk, number> = { high: 3, medium: 2, low: 1 };
 
 const SELECT_CLASS =
-  'h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#1E5E54]';
+  'h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#3E7BC4]';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -202,7 +202,7 @@ export function SuppliersTab() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search suppliers, category or contact…"
-          className="h-9 min-w-[220px] flex-1 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] outline-none placeholder:text-[#9A9DA1] focus:border-[#1E5E54]"
+          className="h-9 min-w-[220px] flex-1 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] outline-none placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]"
         />
 
         <select

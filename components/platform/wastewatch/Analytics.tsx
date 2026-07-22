@@ -42,7 +42,7 @@ export function WasteAnalytics() {
           <p className="mt-0.5 text-[14px] text-[#5F6368]">Patterns by category, employee, recipe and time</p>
         </div>
         {selectedCat ? (
-          <button type="button" onClick={() => setSelected(null)} className="text-[12px] font-medium text-[#1E5E54] hover:underline">Focus: {selectedCat.name} · clear</button>
+          <button type="button" onClick={() => setSelected(null)} className="text-[12px] font-medium text-[#1F5FA8] hover:underline">Focus: {selectedCat.name} · clear</button>
         ) : null}
       </div>
 
@@ -50,7 +50,7 @@ export function WasteAnalytics() {
       <SectionCard
         title="Waste by category"
         right={
-          <button type="button" onClick={() => setModal({ open: true, mode: 'create', category: null })} className="inline-flex h-8 items-center rounded-lg border border-[#D7DAD8] bg-white px-3 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/40">+ New category</button>
+          <button type="button" onClick={() => setModal({ open: true, mode: 'create', category: null })} className="inline-flex h-8 items-center rounded-lg border border-[#D7DAD8] bg-white px-3 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/40">+ New category</button>
         }
       >
         <div className="grid grid-cols-1 gap-5 lg:grid-cols-[auto_1fr]">

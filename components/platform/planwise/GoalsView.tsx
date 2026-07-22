@@ -92,7 +92,7 @@ export function GoalsView({ initial, needsSetup }: { initial: PlTargets | null; 
     router.refresh();
   }
 
-  const inputBox = 'mt-1.5 flex items-center rounded-lg border border-[#D7DAD8] bg-white px-3 transition-colors focus-within:border-[#1E5E54]';
+  const inputBox = 'mt-1.5 flex items-center rounded-lg border border-[#D7DAD8] bg-white px-3 transition-colors focus-within:border-[#3E7BC4]';
   const inputEl = 'w-full bg-transparent py-2.5 text-[14px] text-[#1A1C1E] outline-none placeholder:text-[#C7C9C5]';
 
   return (
@@ -142,7 +142,7 @@ export function GoalsView({ initial, needsSetup }: { initial: PlTargets | null; 
           ))}
         </div>
         <div className="flex items-center gap-3 border-t border-[#F0F0EC] px-5 py-4">
-          <button type="button" onClick={save} disabled={busy} className="inline-flex items-center justify-center rounded-lg bg-[#1E5E54] px-4 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:opacity-50">
+          <button type="button" onClick={save} disabled={busy} className="inline-flex items-center justify-center rounded-lg bg-[#1F5FA8] px-4 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-50">
             {busy ? 'Saving…' : 'Save goals'}
           </button>
           {saved ? <span className="text-[13px] font-medium text-[#0F6E56]">✓ Saved</span> : null}

@@ -2,7 +2,7 @@ import type { AppIconKey } from '@/lib/platform/types';
 
 /** Per-key tints (tile background + glyph foreground) mirroring the mobile look. */
 const TINTS: Record<AppIconKey, { bg: string; fg: string }> = {
-  docu: { bg: '#E3F0ED', fg: '#1E5E54' },
+  docu: { bg: '#EAF2FC', fg: '#3E7BC4' },
   proc: { bg: '#E6F1FB', fg: '#2C5E8A' },
   margin: { bg: '#E1F5EE', fg: '#2E7D67' },
   waste: { bg: '#FBEFDD', fg: '#9A6314' },

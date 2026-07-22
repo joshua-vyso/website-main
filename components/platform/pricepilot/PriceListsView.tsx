@@ -65,7 +65,7 @@ export function PriceListsView({ lists, customers }: { lists: PriceListRow[]; cu
     else router.refresh();
   }
 
-  const field = 'h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] focus:border-[#1E5E54]/40 focus:outline-none';
+  const field = 'h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] focus:border-[#3E7BC4]/40 focus:outline-none';
 
   return (
     <div>
@@ -74,7 +74,7 @@ export function PriceListsView({ lists, customers }: { lists: PriceListRow[]; cu
           <h1 className="text-[26px] font-bold text-[#1A1C1E]">Price lists</h1>
           <p className="mt-1 text-[14px] text-[#5F6368]">Sell prices built from ProcurePulse base prices with your margins</p>
         </div>
-        <button type="button" onClick={() => setOpen(true)} className="inline-flex h-10 items-center rounded-xl bg-[#1E5E54] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#184D45]">
+        <button type="button" onClick={() => setOpen(true)} className="inline-flex h-10 items-center rounded-xl bg-[#1F5FA8] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87]">
           + New price list
         </button>
       </div>
@@ -135,7 +135,7 @@ export function PriceListsView({ lists, customers }: { lists: PriceListRow[]; cu
             </div>
             <div className="mt-4 flex justify-end gap-2">
               <button type="button" onClick={reset} className="rounded-lg px-3.5 py-2 text-[13px] text-[#5F6368] hover:bg-black/[0.03]">Cancel</button>
-              <button type="button" onClick={() => void create()} disabled={busy || !name.trim()} className="rounded-lg bg-[#1E5E54] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:opacity-40">
+              <button type="button" onClick={() => void create()} disabled={busy || !name.trim()} className="rounded-lg bg-[#1F5FA8] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-40">
                 {busy ? 'Creating…' : 'Create & edit'}
               </button>
             </div>

@@ -120,7 +120,7 @@ export function DocumentFilters({
           className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-[13px] font-medium transition-colors ${
             hasFilter
               ? 'border-[#1A1C1E] bg-[#1A1C1E] text-white'
-              : 'border-[#E7E7E2] bg-white text-[#1A1C1E] hover:border-[#1E5E54]/30'
+              : 'border-[#E7E7E2] bg-white text-[#1A1C1E] hover:border-[#3E7BC4]/30'
           }`}
           aria-expanded={open}
         >
@@ -164,7 +164,7 @@ export function DocumentFilters({
                       type="button"
                       onClick={() => pickType(t.key)}
                       className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-left text-[13px] transition-colors ${
-                        isActive ? 'bg-[#E9EFEC] text-[#0F4C44]' : 'text-[#1A1C1E] hover:bg-[#FAFAF8]'
+                        isActive ? 'bg-[#E7EEF8] text-[#174C87]' : 'text-[#1A1C1E] hover:bg-[#FAFAF8]'
                       }`}
                     >
                       <span>{t.label}</span>
@@ -191,7 +191,7 @@ export function DocumentFilters({
                         type="button"
                         onClick={() => pickFolder(f.id)}
                         className={`flex w-full items-center justify-between rounded-lg px-2.5 py-1.5 text-left text-[13px] transition-colors ${
-                          isActive ? 'bg-[#E9EFEC] text-[#0F4C44]' : 'text-[#1A1C1E] hover:bg-[#FAFAF8]'
+                          isActive ? 'bg-[#E7EEF8] text-[#174C87]' : 'text-[#1A1C1E] hover:bg-[#FAFAF8]'
                         }`}
                       >
                         <span className="flex min-w-0 items-center gap-2">
@@ -218,13 +218,13 @@ export function DocumentFilters({
                     if (e.key === 'Enter') void createFolder();
                   }}
                   placeholder="New folder name"
-                  className="h-8 flex-1 rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none"
+                  className="h-8 flex-1 rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
                 />
                 <button
                   type="button"
                   onClick={() => void createFolder()}
                   disabled={creating || !newName.trim()}
-                  className="h-8 shrink-0 rounded-lg bg-[#1E5E54] px-3 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:opacity-40"
+                  className="h-8 shrink-0 rounded-lg bg-[#1F5FA8] px-3 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
                 >
                   {creating ? '…' : 'Add'}
                 </button>
@@ -239,7 +239,7 @@ export function DocumentFilters({
       <button
         type="button"
         onClick={onSortToggle}
-        className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#E7E7E2] bg-white px-3.5 py-1.5 text-[13px] text-[#5F6368] transition-colors hover:border-[#1E5E54]/30"
+        className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#E7E7E2] bg-white px-3.5 py-1.5 text-[13px] text-[#5F6368] transition-colors hover:border-[#3E7BC4]/30"
       >
         Sort: {sortDir === 'desc' ? 'Newest first' : 'Oldest first'}
         <span className="text-[#9A9DA1]">⇅</span>

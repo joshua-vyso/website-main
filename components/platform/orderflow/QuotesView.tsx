@@ -246,7 +246,7 @@ export function QuotesView({
   }
 
   const filterSel =
-    'h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#1E5E54]';
+    'h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#3E7BC4]';
 
   return (
     <div>
@@ -259,7 +259,7 @@ export function QuotesView({
         </div>
         <Link
           href="/app/orderflow/quotes/new"
-          className="inline-flex h-10 items-center rounded-xl bg-[#1E5E54] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#184D45]"
+          className="inline-flex h-10 items-center rounded-xl bg-[#1F5FA8] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87]"
         >
           + New quote
         </Link>
@@ -267,7 +267,7 @@ export function QuotesView({
 
       {/* KPI strip */}
       <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <Kpi label="Open quote value" value={zar(kpi.openValue)} accent={kpi.openValue > 0 ? '#1E5E54' : undefined} sub="Draft + sent" />
+        <Kpi label="Open quote value" value={zar(kpi.openValue)} accent={kpi.openValue > 0 ? '#3E7BC4' : undefined} sub="Draft + sent" />
         <Kpi label="Awaiting decision" value={String(kpi.awaiting)} accent={kpi.awaiting > 0 ? '#854F0B' : undefined} />
         <Kpi label="Accepted this month" value={zar(kpi.acceptedThisMonth)} accent={kpi.acceptedThisMonth > 0 ? '#0F6E56' : undefined} />
       </div>
@@ -311,7 +311,7 @@ export function QuotesView({
                         action={
                           <Link
                             href="/app/orderflow/quotes/new"
-                            className="inline-flex h-9 items-center rounded-lg bg-[#1E5E54] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174A42]"
+                            className="inline-flex h-9 items-center rounded-lg bg-[#1F5FA8] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87]"
                           >
                             + New quote
                           </Link>

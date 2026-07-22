@@ -96,8 +96,8 @@ export function LeaveWorkspace() {
             <div className="mt-3 flex items-center justify-between">
               {r.status === 'Pending' ? (
                 <div className="flex gap-2">
-                  <button type="button" onClick={() => approve(r)} className="rounded-lg bg-[#1E5E54] px-3 py-1.5 text-[12px] font-medium text-white hover:bg-[#184D45]">Approve</button>
-                  <button type="button" onClick={() => decline(r)} className="rounded-lg border border-[#D7DAD8] px-3 py-1.5 text-[12px] font-medium text-[#5F6368] hover:border-[#1E5E54]/40">Decline</button>
+                  <button type="button" onClick={() => approve(r)} className="rounded-lg bg-[#1F5FA8] px-3 py-1.5 text-[12px] font-medium text-white hover:bg-[#174C87]">Approve</button>
+                  <button type="button" onClick={() => decline(r)} className="rounded-lg border border-[#D7DAD8] px-3 py-1.5 text-[12px] font-medium text-[#5F6368] hover:border-[#3E7BC4]/40">Decline</button>
                 </div>
               ) : (
                 <span className="text-[12px] text-[#9A9DA1]">No actions</span>

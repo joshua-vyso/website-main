@@ -210,13 +210,13 @@ export function InboxView({
             onChange={(e) => setSearch(e.target.value)}
             placeholder={`Try: ${SEARCH_EXAMPLES[0]}`}
             aria-label="Search documents"
-            className="h-10 w-72 rounded-xl border border-[#E7E7E2] bg-white px-4 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none"
+            className="h-10 w-72 rounded-xl border border-[#E7E7E2] bg-white px-4 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
           />
           {localDocs.length > 0 ? (
             <button
               type="button"
               onClick={() => (selectMode ? exitSelect() : setSelectMode(true))}
-              className="inline-flex h-10 shrink-0 items-center rounded-xl border border-[#E7E7E2] bg-white px-4 text-[14px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/30"
+              className="inline-flex h-10 shrink-0 items-center rounded-xl border border-[#E7E7E2] bg-white px-4 text-[14px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/30"
             >
               {selectMode ? 'Cancel' : 'Select'}
             </button>
@@ -277,13 +277,13 @@ export function InboxView({
             />
           </div>
           {selectMode ? (
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#1E5E54]/30 bg-[#E9EFEC] px-4 py-2.5">
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#3E7BC4]/30 bg-[#E7EEF8] px-4 py-2.5">
               <div className="flex items-center gap-4 text-[13px]">
-                <span className="font-medium text-[#0F4C44]">{selected.size} selected</span>
+                <span className="font-medium text-[#174C87]">{selected.size} selected</span>
                 <button
                   type="button"
                   onClick={() => setSelected(allSelected ? new Set() : new Set(selectableIds))}
-                  className="text-[#1E5E54] hover:underline"
+                  className="text-[#1F5FA8] hover:underline"
                 >
                   {allSelected ? 'Clear all' : 'Select all'}
                 </button>
@@ -315,7 +315,7 @@ export function InboxView({
                     type="button"
                     onClick={() => void bulkReview()}
                     disabled={selected.size === 0 || bulkBusy}
-                    className="inline-flex items-center rounded-lg bg-[#1E5E54] px-3 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:cursor-not-allowed disabled:opacity-40"
+                    className="inline-flex items-center rounded-lg bg-[#1F5FA8] px-3 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     {bulkBusy ? '…' : `Mark reviewed${selected.size ? ` (${selected.size})` : ''}`}
                   </button>

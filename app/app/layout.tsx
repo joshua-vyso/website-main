@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { getPlatformSession } from '@/lib/platform/supabase-server';
 import { PlatformProvider } from '@/lib/platform/session';
-import { Sidebar } from '@/components/platform/Sidebar';
+import { TopBar } from '@/components/platform/TopBar';
 import { ModuleLockGuard } from '@/components/platform/ModuleLockGuard';
 
 export const metadata: Metadata = {
@@ -31,10 +31,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         // rounded-sm/md/lg/xl scale and leaves buttons/inputs square. Give the
         // platform subtree a real radius so all corners round consistently.
         style={{ fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties}
-        className="flex h-screen overflow-hidden bg-[#F6F6F4] text-[#1A1C1E] antialiased"
+        className="flex h-screen flex-col overflow-hidden bg-[#F6F6F4] text-[#1A1C1E] antialiased"
       >
-        <Sidebar />
-        <main className="min-w-0 flex-1 overflow-y-auto">
+        <TopBar />
+        <main className="min-h-0 min-w-0 flex-1 overflow-y-auto">
           <ModuleLockGuard>{children}</ModuleLockGuard>
         </main>
       </div>

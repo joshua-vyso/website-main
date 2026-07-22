@@ -49,7 +49,7 @@ export function DocumentsTable({ docs }: { docs: DocumentWithSupplier[] }) {
                 className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-[13px] font-medium transition-colors ${
                   isActive
                     ? 'bg-[#1A1C1E] text-white'
-                    : 'border border-[#E7E7E2] bg-white text-[#1A1C1E] hover:border-[#1E5E54]/30'
+                    : 'border border-[#E7E7E2] bg-white text-[#1A1C1E] hover:border-[#3E7BC4]/30'
                 }`}
               >
                 <span>{t.label}</span>
@@ -62,7 +62,7 @@ export function DocumentsTable({ docs }: { docs: DocumentWithSupplier[] }) {
         <button
           type="button"
           onClick={toggleSort}
-          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#E7E7E2] bg-white px-3.5 py-1.5 text-[13px] text-[#5F6368] transition-colors hover:border-[#1E5E54]/30"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#E7E7E2] bg-white px-3.5 py-1.5 text-[13px] text-[#5F6368] transition-colors hover:border-[#3E7BC4]/30"
         >
           Sort: {sortDir === 'desc' ? 'Newest first' : 'Oldest first'}
           <span className="text-[#9A9DA1]">⇅</span>

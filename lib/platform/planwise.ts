@@ -116,7 +116,7 @@ export interface ForecastDriver {
   color: string;
 }
 export const FORECAST_DRIVERS: ForecastDriver[] = [
-  { label: 'Orders', pct: 68, module: 'orderflow', color: '#1E5E54' },
+  { label: 'Orders', pct: 68, module: 'orderflow', color: '#3E7BC4' },
   { label: 'Margins', pct: 16, module: 'pricepilot', color: '#2E7D67' },
   { label: 'Expenses', pct: 10, module: 'procurepulse', color: '#854F0B' },
   { label: 'Waste', pct: 6, module: 'wastewatch', color: '#A32D2D' },

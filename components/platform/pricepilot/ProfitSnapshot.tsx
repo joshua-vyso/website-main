@@ -31,7 +31,7 @@ export interface ProfitSnapshotProps {
   orders: BreakdownOrder[];
 }
 
-function Meter({ pct, color = '#1E5E54' }: { pct: number; color?: string }) {
+function Meter({ pct, color = '#3E7BC4' }: { pct: number; color?: string }) {
   const w = Math.max(0, Math.min(100, pct));
   return (
     <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-[#F0F0EC]">
@@ -118,8 +118,8 @@ export function ProfitSnapshot(props: ProfitSnapshotProps) {
               type="button"
               onClick={() => setOpen(active ? null : t.key)}
               aria-expanded={active}
-              className={`rounded-2xl border bg-white p-4 text-left transition-all hover:border-[#1E5E54]/40 hover:shadow-sm ${
-                active ? 'border-[#1E5E54] ring-1 ring-[#1E5E54]/20' : 'border-[#E7E7E2]'
+              className={`rounded-2xl border bg-white p-4 text-left transition-all hover:border-[#3E7BC4]/40 hover:shadow-sm ${
+                active ? 'border-[#3E7BC4] ring-1 ring-[#3E7BC4]/20' : 'border-[#E7E7E2]'
               }`}
             >
               <div className="flex items-center justify-between">
@@ -200,7 +200,7 @@ function Breakdown({ metric, ...p }: ProfitSnapshotProps & { metric: MetricKey }
             </div>
             {opex == null ? (
               <p className="pt-1 text-[12px] text-[#9A9DA1]">
-                <Link href="/app/marginview/goals" className="font-medium text-[#1E5E54] hover:underline">
+                <Link href="/app/marginview/goals" className="font-medium text-[#1F5FA8] hover:underline">
                   Set your monthly operating costs
                 </Link>{' '}
                 to see net profit.
@@ -232,7 +232,7 @@ function Breakdown({ metric, ...p }: ProfitSnapshotProps & { metric: MetricKey }
             {sorted.map((o) => (
               <tr key={o.id} className="border-b border-[#F6F6F2] last:border-0">
                 <td className="px-5 py-2.5">
-                  <Link href={`/app/orderflow/orders/${o.id}`} className="font-medium text-[#1A1C1E] hover:text-[#1E5E54]">
+                  <Link href={`/app/orderflow/orders/${o.id}`} className="font-medium text-[#1A1C1E] hover:text-[#174C87]">
                     {o.invoice}
                   </Link>
                 </td>

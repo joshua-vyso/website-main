@@ -141,7 +141,7 @@ export function FolderGridView({
 
 function FolderCard({ tile }: { tile: FolderTile }) {
   return (
-    <div className="group relative flex flex-col gap-4 rounded-2xl border border-[#E7E7E2] bg-white p-5 transition-colors hover:border-[#1E5E54]/30 hover:bg-[#FAFAF8]">
+    <div className="group relative flex flex-col gap-4 rounded-2xl border border-[#E7E7E2] bg-white p-5 transition-colors hover:border-[#3E7BC4]/30 hover:bg-[#FAFAF8]">
       <Link
         href={`/app/docu/folder/${tile.key}`}
         aria-label={`Open ${tile.name}`}
