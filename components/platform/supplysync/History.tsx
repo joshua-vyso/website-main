@@ -15,7 +15,7 @@ import { AMBER, EmptyState, INK, MUTE, RED, FAINT, ACCENT, channelColor, Supplie
 // Constants
 // ---------------------------------------------------------------------------
 
-const MODAL_STYLE = { fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties;
+const MODAL_STYLE = { fontFamily: 'var(--font-instrument)', ['--radius' as string]: '0.625rem' } as React.CSSProperties;
 
 /** Channels a user can log a communication against (with their event_type key). */
 const LOG_CHANNELS = [
@@ -174,27 +174,27 @@ function LogCommunicationModal({
   if (!mounted || !open) return null;
 
   const input =
-    'h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none';
+    'h-11 w-full rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] transition-colors placeholder:text-[#A0A49C] focus:border-[#3E7BC4] focus:outline-none';
   const select = `${input} appearance-none`;
 
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={MODAL_STYLE}>
-      <div className="absolute inset-0 bg-[#1A1C1E]/25 backdrop-blur-[1px]" onClick={() => !busy && onClose()} />
+      <div className="absolute inset-0 bg-[#171A17]/25 backdrop-blur-[1px]" onClick={() => !busy && onClose()} />
       <div
         role="dialog"
         aria-modal="true"
-        className="relative w-full max-w-[460px] rounded-2xl border border-[#E7E7E2] bg-white p-5 shadow-[0_24px_70px_-20px_rgba(26,28,30,0.45)]"
+        className="relative w-full max-w-[460px] rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_24px_70px_-20px_rgba(26,28,30,0.45)]"
       >
         <div className="flex items-start justify-between gap-3">
           <div>
-            <h2 className="text-[16px] font-semibold text-[#1A1C1E]">Log communication</h2>
-            <p className="mt-0.5 text-[13px] text-[#5F6368]">Record a touchpoint on the supplier timeline.</p>
+            <h2 className="of-display text-[18px] font-semibold tracking-[-0.015em] text-[#171A17]">Log communication</h2>
+            <p className="mt-1 text-[13px] text-[#6B6F68]">Record a touchpoint on the supplier timeline.</p>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[18px] text-[#9A9DA1] transition-colors hover:bg-[#F0F0EC] hover:text-[#1A1C1E]"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[18px] text-[#8A8E86] transition-colors hover:bg-[#EEF1F5] hover:text-[#171A17]"
           >
             ✕
           </button>
@@ -203,7 +203,7 @@ function LogCommunicationModal({
         <div className="mt-4 space-y-3">
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-[13px] font-medium text-[#1A1C1E]">Supplier</label>
+              <label className="mb-1 block text-[13px] font-medium text-[#171A17]">Supplier</label>
               <select
                 autoFocus
                 value={supplierId}
@@ -222,7 +222,7 @@ function LogCommunicationModal({
               </select>
             </div>
             <div>
-              <label className="mb-1 block text-[13px] font-medium text-[#1A1C1E]">Channel</label>
+              <label className="mb-1 block text-[13px] font-medium text-[#171A17]">Channel</label>
               <select value={channel} onChange={(e) => setChannel(e.target.value as LogChannel)} className={select}>
                 {LOG_CHANNELS.map((c) => (
                   <option key={c} value={c}>
@@ -234,7 +234,7 @@ function LogCommunicationModal({
           </div>
 
           <div>
-            <label className="mb-1 block text-[13px] font-medium text-[#1A1C1E]">Summary</label>
+            <label className="mb-1 block text-[13px] font-medium text-[#171A17]">Summary</label>
             <textarea
               value={summary}
               onChange={(e) => {
@@ -243,13 +243,13 @@ function LogCommunicationModal({
               }}
               rows={3}
               placeholder="What was discussed or agreed?"
-              className="w-full resize-none rounded-lg border border-[#E7E7E2] bg-white px-3 py-2 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
+              className="w-full resize-none rounded-[12px] border border-[#E4E9F0] bg-white px-4 py-2.5 text-[14px] text-[#171A17] transition-colors placeholder:text-[#A0A49C] focus:border-[#3E7BC4] focus:outline-none"
             />
           </div>
 
           <div>
-            <label className="mb-1 block text-[13px] font-medium text-[#1A1C1E]">
-              Contact name <span className="text-[#9A9DA1]">(optional)</span>
+            <label className="mb-1 block text-[13px] font-medium text-[#171A17]">
+              Contact name <span className="text-[#8A8E86]">(optional)</span>
             </label>
             <input
               value={contactName}
@@ -261,8 +261,8 @@ function LogCommunicationModal({
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-[13px] font-medium text-[#1A1C1E]">
-                Follow-up <span className="text-[#9A9DA1]">(optional)</span>
+              <label className="mb-1 block text-[13px] font-medium text-[#171A17]">
+                Follow-up <span className="text-[#8A8E86]">(optional)</span>
               </label>
               <input
                 value={followUp}
@@ -272,8 +272,8 @@ function LogCommunicationModal({
               />
             </div>
             <div>
-              <label className="mb-1 block text-[13px] font-medium text-[#1A1C1E]">
-                Follow-up date <span className="text-[#9A9DA1]">(optional)</span>
+              <label className="mb-1 block text-[13px] font-medium text-[#171A17]">
+                Follow-up date <span className="text-[#8A8E86]">(optional)</span>
               </label>
               <input
                 type="date"
@@ -292,7 +292,7 @@ function LogCommunicationModal({
             type="button"
             onClick={onClose}
             disabled={busy}
-            className="rounded-lg px-3.5 py-2 text-[13px] text-[#5F6368] hover:bg-black/[0.03] disabled:opacity-50"
+            className="inline-flex h-[42px] items-center rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87] disabled:opacity-50"
           >
             Cancel
           </button>
@@ -300,7 +300,7 @@ function LogCommunicationModal({
             type="button"
             onClick={save}
             disabled={busy}
-            className="rounded-lg bg-[#1F5FA8] px-4 py-2 text-[13px] font-medium text-white hover:bg-[#174C87] disabled:opacity-60"
+            className="inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-60"
           >
             {busy ? 'Logging…' : 'Log communication'}
           </button>
@@ -375,27 +375,27 @@ export function HistoryTab() {
                 ? `${ev.followUp} · done`
                 : '—';
           return [
-            <span key="date" className="whitespace-nowrap text-[#5F6368]">
+            <span key="date" className="of-num whitespace-nowrap text-[#6B6F68]">
               {fmtDate(ev.date)}
             </span>,
             ev.supplierId ? (
               <SupplierNameButton key="sup" id={ev.supplierId} name={ev.supplierName || 'Supplier'} />
             ) : (
-              <span key="sup" className="text-[#5F6368]">
+              <span key="sup" className="text-[#6B6F68]">
                 {ev.supplierName || '—'}
               </span>
             ),
-            <span key="contact" className="text-[#5F6368]">
+            <span key="contact" className="text-[#6B6F68]">
               {ev.contactName || '—'}
             </span>,
             <ChannelPill key="channel" channel={ev.channel} />,
-            <span key="summary" className="text-[#1A1C1E]">
+            <span key="summary" className="text-[#171A17]">
               {ev.summary || '—'}
             </span>,
-            <span key="fu" className="text-[#5F6368]">
+            <span key="fu" className="text-[#6B6F68]">
               {followUpCell}
             </span>,
-            <span key="owner" className="text-[#5F6368]">
+            <span key="owner" className="text-[#6B6F68]">
               {ev.owner || '—'}
             </span>,
           ];
@@ -453,7 +453,7 @@ export function HistoryTab() {
       {/* 1) Communication log */}
       <SectionCard
         title="Communication log"
-        right={<span className="text-[12px] text-[#9A9DA1]">{history.length} touchpoints</span>}
+        right={<span className="text-[12px] text-[#A0A49C]"><span className="of-num">{history.length}</span> touchpoints</span>}
       >
         <DataTable
           columns={[
@@ -473,23 +473,23 @@ export function HistoryTab() {
       {/* 2) Notes board */}
       <SectionCard
         title="Notes board"
-        right={<span className="text-[12px] text-[#9A9DA1]">{noteCards.length} suppliers</span>}
+        right={<span className="text-[12px] text-[#A0A49C]"><span className="of-num">{noteCards.length}</span> suppliers</span>}
       >
         {noteCards.length === 0 ? (
-          <p className="py-6 text-center text-[13px] text-[#9A9DA1]">No supplier notes captured yet.</p>
+          <p className="py-6 text-center text-[13px] text-[#8A8E86]">No supplier notes captured yet.</p>
         ) : (
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             {noteCards.map(({ supplier, notes }) => (
-              <div key={supplier.id} className="rounded-2xl border border-[#E7E7E2] bg-[#FBFBF9] p-4">
+              <div key={supplier.id} className="rounded-2xl border border-[#EAEDF2] bg-[#FBFCFE] p-4">
                 <div className="flex items-center justify-between gap-2">
                   <button
                     type="button"
                     onClick={() => openProfile(supplier.id)}
-                    className="text-left text-[14px] font-semibold text-[#1A1C1E] transition-colors hover:text-[#B0466A]"
+                    className="of-display text-left text-[15px] font-semibold text-[#171A17] transition-colors hover:text-[#1F5FA8]"
                   >
                     {supplier.name}
                   </button>
-                  <span className="text-[11px] text-[#9A9DA1]">{supplier.category}</span>
+                  <span className="text-[12px] text-[#A0A49C]">{supplier.category}</span>
                 </div>
                 <ul className="mt-3 space-y-2.5">
                   {notes.map((n, i) => (
@@ -497,7 +497,7 @@ export function HistoryTab() {
                       <p className="text-[13px] leading-snug" style={{ color: INK }}>
                         {n.body}
                       </p>
-                      <p className="mt-1 text-[11px]" style={{ color: FAINT }}>
+                      <p className="of-num mt-1 text-[12px]" style={{ color: FAINT }}>
                         {fmtDate(n.date)}
                         {n.author ? ` · ${n.author}` : ''}
                       </p>
@@ -513,14 +513,14 @@ export function HistoryTab() {
       {/* 3) Follow-ups */}
       <SectionCard
         title="Follow-ups"
-        right={<span className="text-[12px] text-[#9A9DA1]">{followUps.length} outstanding</span>}
+        right={<span className="text-[12px] text-[#A0A49C]"><span className="of-num">{followUps.length}</span> outstanding</span>}
       >
         {followUps.length === 0 ? (
           <p className="py-6 text-center text-[13px]" style={{ color: MUTE }}>
             No follow-ups outstanding.
           </p>
         ) : (
-          <ul className="divide-y divide-[#F0F0EC]">
+          <ul className="divide-y divide-[#EEF1F5]">
             {followUps.map((ev) => {
               const days = daysUntil(ev.followUpDate);
               const soon = days !== null && days <= 2; // due within 2 days or overdue
@@ -545,14 +545,14 @@ export function HistoryTab() {
                           className="text-[14px] font-semibold"
                         />
                       ) : (
-                        <span className="text-[14px] font-semibold text-[#1A1C1E]">
+                        <span className="text-[14px] font-semibold text-[#171A17]">
                           {ev.supplierName || 'Supplier'}
                         </span>
                       )}
                       <ChannelPill channel={ev.channel} />
                     </div>
-                    <p className="mt-0.5 text-[13px] text-[#5F6368]">{ev.followUp}</p>
-                    <p className="mt-0.5 text-[11px] font-medium" style={{ color: dueColor }}>
+                    <p className="mt-0.5 text-[13px] text-[#6B6F68]">{ev.followUp}</p>
+                    <p className="of-num mt-1 text-[12px] font-medium" style={{ color: dueColor }}>
                       {dueLabel}
                     </p>
                   </div>
@@ -560,7 +560,7 @@ export function HistoryTab() {
                     type="button"
                     onClick={() => markFollowUpDone(ev)}
                     disabled={savingId === ev.id}
-                    className="shrink-0 rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/40 hover:text-[#174C87] disabled:opacity-60"
+                    className="inline-flex h-[42px] shrink-0 items-center rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87] disabled:opacity-60"
                   >
                     {savingId === ev.id ? 'Saving…' : 'Mark done'}
                   </button>

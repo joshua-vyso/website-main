@@ -19,7 +19,7 @@ export const SKILL_NAMES: SkillName[] = ['Receiving', 'Dispatch', 'Prep Kitchen'
 export const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 /** Fallback colours for departments not carrying their own colour. */
-const FALLBACK_PALETTE = ['#0F6E56', '#0C447C', '#D9730D', '#5B53C0', '#2C7A8A', '#854F0B', '#5F6368', '#A32D2D', '#2E7D67', '#3A4DB0'];
+const FALLBACK_PALETTE = ['#0F6E56', '#0C447C', '#D9730D', '#5B53C0', '#2C7A8A', '#854F0B', '#6B6F68', '#A32D2D', '#2E7D67', '#3A4DB0'];
 
 /** Resolve a department's colour: the DB row's colour, else a stable fallback. */
 export function deptColor(name: string, departments?: DepartmentInfo[]): string {
@@ -34,7 +34,7 @@ export const EMPLOYEE_STATUS_STYLE: Record<EmployeeStatus, { bg: string; fg: str
   Working: { bg: '#E1F5EE', fg: '#0F6E56' },
   'On break': { bg: '#FBEFDD', fg: '#9A6314' },
   Scheduled: { bg: '#E6F1FB', fg: '#0C447C' },
-  Off: { bg: '#F0F0EC', fg: '#9A9DA1' },
+  Off: { bg: '#EEF1F5', fg: '#8A8E86' },
   'On leave': { bg: '#FBEEDA', fg: '#854F0B' },
   Absent: { bg: '#FCEBEB', fg: '#A32D2D' },
 };
@@ -147,7 +147,7 @@ export const ATTENDANCE_STYLE: Record<AttendanceStatus, { bg: string; fg: string
   Absent: { bg: '#FCEBEB', fg: '#A32D2D' },
   'Early leave': { bg: '#FBEEDA', fg: '#854F0B' },
   Overtime: { bg: '#EAE7FB', fg: '#5B53C0' },
-  'Manual review': { bg: '#F0F0EC', fg: '#5F6368' },
+  'Manual review': { bg: '#EEF1F5', fg: '#6B6F68' },
 };
 
 export interface AttendanceRecord {

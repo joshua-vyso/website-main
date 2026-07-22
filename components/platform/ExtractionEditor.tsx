@@ -11,7 +11,7 @@ function ConfidenceChip({ confidence }: { confidence: number }) {
   const low = confidence < FIELD_REVIEW_THRESHOLD;
   return (
     <span
-      className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${
+      className={`of-num inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-semibold ${
         low ? 'bg-[#FBEEDA] text-[#854F0B]' : 'bg-[#E1F5EE] text-[#0F6E56]'
       }`}
     >
@@ -119,13 +119,13 @@ export function ExtractionEditor({
   };
 
   const cellCls =
-    'h-9 w-full rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:border-[#3E7BC4]/40 focus:outline-none';
+    'h-9 w-full rounded-[10px] border border-[#E4E9F0] bg-white px-2.5 text-[13px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]';
 
   return (
-    <div className="flex flex-col rounded-2xl border border-[#E7E7E2] bg-white">
-      <div className="border-b border-[#F0F0EC] px-6 py-5">
-        <h2 className="text-[16px] font-bold text-[#1A1C1E]">Extracted data</h2>
-        <p className="mt-1 text-[13px] text-[#5F6368]">Confirm or correct each field, then save</p>
+    <div className="flex flex-col rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+      <div className="border-b border-[#EEF1F5] px-6 py-5">
+        <h2 className="of-display text-[16px] font-semibold text-[#171A17]">Extracted data</h2>
+        <p className="mt-1 text-[13px] text-[#6B6F68]">Confirm or correct each field, then save</p>
       </div>
 
       <div className="px-6 py-5">
@@ -133,7 +133,7 @@ export function ExtractionEditor({
             here so a missed or mis-read counterparty can be corrected before it feeds
             ProcurePulse's per-product supplier prices. */}
         <div className="mb-5">
-          <label htmlFor="doc-supplier" className="mb-1.5 block text-[13px] text-[#5F6368]">
+          <label htmlFor="doc-supplier" className="mb-1.5 block text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">
             Supplier
           </label>
           <input
@@ -142,7 +142,7 @@ export function ExtractionEditor({
             value={supplier}
             onChange={(e) => setSupplier(e.target.value)}
             placeholder="e.g. Bacca Valley (Pty) Ltd — or the market agent"
-            className="h-10 w-full max-w-md rounded-xl border border-[#E7E7E2] bg-white px-3.5 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
+            className="h-11 w-full max-w-md rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]"
           />
         </div>
 
@@ -156,7 +156,7 @@ export function ExtractionEditor({
               return (
                 <div key={`${field.label}-${index}`} className="min-w-0">
                   <div className="mb-1.5 flex items-center justify-between gap-2">
-                    <label htmlFor={`field-${index}`} className="truncate text-[13px] text-[#5F6368]">
+                    <label htmlFor={`field-${index}`} className="truncate text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">
                       {field.label}
                     </label>
                     <ConfidenceChip confidence={field.confidence} />
@@ -166,10 +166,10 @@ export function ExtractionEditor({
                     type="text"
                     value={field.value}
                     onChange={(e) => updateValue(index, e.target.value)}
-                    className={`h-10 w-full rounded-xl border px-3.5 text-[14px] text-[#1A1C1E] focus:outline-none ${
+                    className={`h-11 w-full rounded-[12px] border px-4 text-[14px] text-[#171A17] outline-none ${
                       low
                         ? 'border-[#E7B97A] bg-[#FDF6EC] focus:border-[#D9730D]'
-                        : 'border-[#E7E7E2] bg-white focus:border-[#3E7BC4]/40'
+                        : 'border-[#E4E9F0] bg-white focus:border-[#3E7BC4]'
                     }`}
                   />
                 </div>
@@ -182,12 +182,17 @@ export function ExtractionEditor({
         {lines.length > 0 ? (
           <div className="mt-7">
             <div className="mb-2 flex items-baseline justify-between">
-              <h3 className="text-[14px] font-semibold text-[#1A1C1E]">Line items ({lines.length})</h3>
-              <span className="text-[13px] text-[#5F6368]">
-                Total {lineTotal.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}
+              <h3 className="of-display text-[16px] font-semibold text-[#171A17]">
+                Line items (<span className="of-num">{lines.length}</span>)
+              </h3>
+              <span className="text-[13px] text-[#6B6F68]">
+                Total{' '}
+                <span className="of-num font-semibold text-[#171A17]">
+                  {lineTotal.toLocaleString('en-ZA', { minimumFractionDigits: 2 })}
+                </span>
               </span>
             </div>
-            <div className={`${COLS} border-b border-[#E7E7E2] px-1 pb-2 text-[11px] text-[#5F6368]`}>
+            <div className={`${COLS} border-b border-[#EEF1F5] px-1 pb-2 text-[11px] uppercase tracking-[0.06em] text-[#A0A49C]`}>
               <span>Description</span>
               <span>Weight (kg)</span>
               <span>Qty</span>
@@ -201,8 +206,8 @@ export function ExtractionEditor({
               {lines.map((l, i) => (
                 <div key={i} className={COLS}>
                   <input className={cellCls} value={l.description ?? ''} onChange={(e) => updateLine(i, 'description', e.target.value)} />
-                  <input className={cellCls} value={l.weight ?? ''} onChange={(e) => updateLine(i, 'weight', e.target.value)} />
-                  <input className={`${cellCls} text-right`} value={l.quantity ?? ''} onChange={(e) => updateLine(i, 'quantity', e.target.value)} />
+                  <input className={`${cellCls} of-num`} value={l.weight ?? ''} onChange={(e) => updateLine(i, 'weight', e.target.value)} />
+                  <input className={`${cellCls} of-num text-right`} value={l.quantity ?? ''} onChange={(e) => updateLine(i, 'quantity', e.target.value)} />
                   <select
                     className={`${cellCls} cursor-pointer pr-1`}
                     value={l.unit ?? ''}
@@ -216,14 +221,14 @@ export function ExtractionEditor({
                       </option>
                     ))}
                   </select>
-                  <input className={`${cellCls} text-right`} value={l.units_per_box ?? ''} onChange={(e) => updateLine(i, 'units_per_box', e.target.value)} />
-                  <input className={`${cellCls} text-right`} value={l.unit_price ?? ''} onChange={(e) => updateLine(i, 'unit_price', e.target.value)} />
-                  <input className={`${cellCls} text-right`} value={l.amount ?? ''} onChange={(e) => updateLine(i, 'amount', e.target.value)} />
+                  <input className={`${cellCls} of-num text-right`} value={l.units_per_box ?? ''} onChange={(e) => updateLine(i, 'units_per_box', e.target.value)} />
+                  <input className={`${cellCls} of-num text-right`} value={l.unit_price ?? ''} onChange={(e) => updateLine(i, 'unit_price', e.target.value)} />
+                  <input className={`${cellCls} of-num text-right`} value={l.amount ?? ''} onChange={(e) => updateLine(i, 'amount', e.target.value)} />
                   <button
                     type="button"
                     onClick={() => removeLine(i)}
                     aria-label="Remove line"
-                    className="flex h-9 w-7 items-center justify-center rounded-lg text-[#9A9DA1] transition-colors hover:bg-[#FCEBEB] hover:text-[#A32D2D]"
+                    className="flex h-9 w-7 items-center justify-center rounded-[10px] text-[#A0A49C] transition-colors hover:bg-[#FCEBEB] hover:text-[#A32D2D]"
                   >
                     ✕
                   </button>
@@ -247,12 +252,12 @@ export function ExtractionEditor({
         </div>
       </div>
 
-      <div className="flex items-center justify-end gap-3 rounded-b-2xl border-t border-[#F0F0EC] bg-white px-6 py-4">
+      <div className="flex items-center justify-end gap-3 rounded-b-2xl border-t border-[#EEF1F5] bg-white px-6 py-4">
         <button
           type="button"
           disabled={busy}
           onClick={() => persist('error')}
-          className="inline-flex h-10 items-center rounded-xl border border-[#E7E7E2] bg-white px-4 text-[14px] font-medium text-[#1A1C1E] transition-colors hover:border-[#A32D2D]/40 hover:text-[#A32D2D] disabled:opacity-60"
+          className="inline-flex h-[42px] items-center rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#3E4A57] transition-all hover:border-[#A32D2D]/40 hover:bg-[#FCEBEB] hover:text-[#A32D2D] disabled:opacity-60"
         >
           Reject
         </button>
@@ -260,7 +265,7 @@ export function ExtractionEditor({
           type="button"
           disabled={busy}
           onClick={() => persist('reviewed')}
-          className="inline-flex h-10 items-center rounded-xl bg-[#D9730D] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#C2650B] disabled:opacity-60"
+          className="inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-60"
         >
           {busy ? 'Saving…' : status === 'reviewed' ? 'Save changes' : 'Save & confirm'}
         </button>

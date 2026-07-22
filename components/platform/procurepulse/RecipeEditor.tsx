@@ -30,7 +30,7 @@ interface Row {
 const READINESS: Record<RecipeReadiness, { bg: string; fg: string; label: string }> = {
   ready: { bg: '#E1F5EE', fg: '#0F6E56', label: 'Ready to produce' },
   blocked: { bg: '#FCEBEB', fg: '#A32D2D', label: 'Short on stock' },
-  unknown: { bg: '#F0F0EC', fg: '#5F6368', label: 'Link ingredients' },
+  unknown: { bg: '#EEF1F5', fg: '#6B6F68', label: 'Link ingredients' },
 };
 
 function sanitizeDecimal(s: string): string {
@@ -188,11 +188,11 @@ export function RecipeEditor({
   }
 
   const field =
-    'h-10 rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none';
+    'h-11 rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]';
 
   return (
     <div>
-      <Link href="/app/procurepulse/recipes" className="text-[13px] text-[#5F6368]">
+      <Link href="/app/procurepulse/recipes" className="text-[13px] text-[#6B6F68]">
         ‹&nbsp;&nbsp;Recipes
       </Link>
 
@@ -201,26 +201,26 @@ export function RecipeEditor({
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="Recipe name"
-          className="min-w-0 flex-1 border-0 bg-transparent text-[26px] font-bold text-[#1A1C1E] placeholder:text-[#C4C4BE] focus:outline-none"
+          className="of-display min-w-0 flex-1 border-0 bg-transparent text-[28px] font-semibold tracking-[-0.015em] text-[#171A17] outline-none placeholder:text-[#C4C4BE]"
         />
         <button
           type="button"
           onClick={() => void remove()}
           disabled={deleting}
-          className="shrink-0 rounded-lg border border-[#E7E7E2] bg-white px-3 py-2 text-[13px] font-medium text-[#5F6368] transition-colors hover:border-[#A32D2D]/40 hover:text-[#A32D2D] disabled:opacity-50"
+          className="inline-flex h-[42px] shrink-0 items-center rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#3E4A57] transition-all hover:border-[#A32D2D]/40 hover:text-[#A32D2D] disabled:opacity-50"
         >
           {deleting ? 'Deleting…' : 'Delete'}
         </button>
       </div>
 
       {/* Output definition */}
-      <div className="mt-3 flex flex-wrap items-center gap-2 text-[13px] text-[#5F6368]">
+      <div className="mt-3 flex flex-wrap items-center gap-2 text-[13px] text-[#6B6F68]">
         <span>Produces</span>
         <input
           value={outputProduct}
           onChange={(e) => setOutputProduct(e.target.value)}
           placeholder="output product (e.g. Mixed Veg)"
-          className="h-9 w-[220px] rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
+          className="h-10 w-[220px] rounded-[10px] border border-[#E4E9F0] bg-white px-3 text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]"
         />
         <span>· makes</span>
         <input
@@ -228,41 +228,41 @@ export function RecipeEditor({
           onChange={(e) => setOutputQty(sanitizeDecimal(e.target.value))}
           inputMode="decimal"
           placeholder="qty"
-          className="h-9 w-[72px] rounded-lg border border-[#E7E7E2] bg-white px-3 text-right text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
+          className="of-num h-10 w-[72px] rounded-[10px] border border-[#E4E9F0] bg-white px-3 text-right text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]"
         />
         <input
           value={outputUnit}
           onChange={(e) => setOutputUnit(e.target.value)}
           placeholder="unit"
-          className="h-9 w-[110px] rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
+          className="h-10 w-[110px] rounded-[10px] border border-[#E4E9F0] bg-white px-3 text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]"
         />
-        <span className="text-[#9A9DA1]">per batch</span>
+        <span className="text-[#8A8E86]">per batch</span>
       </div>
 
       <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-[1.6fr_1fr]">
         {/* LEFT — ingredients */}
         <div className="space-y-4">
-          <div className="rounded-2xl border border-[#E7E7E2] bg-white">
-            <div className="flex items-center justify-between border-b border-[#E7E7E2] px-4 py-3">
-              <div className="text-[14px] font-semibold text-[#1A1C1E]">
+          <div className="rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+            <div className="flex items-center justify-between border-b border-[#EEF1F5] px-5 py-4">
+              <div className="of-display text-[16px] font-semibold text-[#171A17]">
                 Ingredients{rows.length ? ` (${rows.length})` : ''}
               </div>
               <button
                 type="button"
                 onClick={addRow}
-                className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[13px] font-medium text-[#1F5FA8] transition-colors hover:border-[#3E7BC4]/40"
+                className="inline-flex h-[38px] items-center rounded-[11px] border border-[#E2E6EC] bg-white px-4 text-[13px] font-medium text-[#1F5FA8] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]"
               >
                 + Add ingredient
               </button>
             </div>
 
             {rows.length === 0 ? (
-              <div className="px-4 py-12 text-center text-[13px] text-[#9A9DA1]">
+              <div className="px-5 py-12 text-center text-[14px] text-[#8A8E86]">
                 No ingredients yet. Add stock products and how much each batch uses.
               </div>
             ) : (
               <>
-                <div className="flex items-center gap-2 px-4 py-2 text-[12px] font-medium text-[#9A9DA1]">
+                <div className="flex items-center gap-2 px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.06em] text-[#A0A49C]">
                   <div className="flex-1">Ingredient</div>
                   <div className="w-[92px] text-right">Per batch</div>
                   <div className="w-[88px]">Unit</div>
@@ -274,7 +274,7 @@ export function RecipeEditor({
                   const perBatch = Number(row.qty_per_batch) || 0;
                   const canBatches = item && perBatch > 0 ? Math.floor(item.on_hand / perBatch) : null;
                   return (
-                    <div key={row.key} className="border-t border-[#EFEFEC] px-4 py-3">
+                    <div key={row.key} className="border-t border-[#F4F5F7] px-5 py-3">
                       <div className="flex items-center gap-2">
                         <div className="relative flex-1">
                           <input
@@ -288,7 +288,7 @@ export function RecipeEditor({
                             }}
                           />
                           {matches.length > 0 ? (
-                            <div className="absolute left-0 right-0 top-[44px] z-20 max-h-[220px] overflow-auto rounded-lg border border-[#E7E7E2] bg-white py-1 shadow-[0_18px_50px_-8px_rgba(26,28,30,0.25)]">
+                            <div className="absolute left-0 right-0 top-[48px] z-20 max-h-[220px] overflow-auto rounded-lg border border-[#EAEDF2] bg-white py-1 shadow-[0_18px_50px_-8px_rgba(26,28,30,0.25)]">
                               {matches.map((it) => (
                                 <button
                                   key={it.id}
@@ -297,10 +297,10 @@ export function RecipeEditor({
                                     e.preventDefault();
                                     chooseItem(i, it);
                                   }}
-                                  className="flex w-full items-center justify-between px-3 py-2 text-left text-[13px] text-[#1A1C1E] hover:bg-[#FAFAF8]"
+                                  className="flex w-full items-center justify-between px-4 py-2 text-left text-[14px] text-[#171A17] hover:bg-[#F5F9FE]"
                                 >
                                   <span className="truncate">{it.name}</span>
-                                  <span className="ml-2 shrink-0 text-[11px] text-[#9A9DA1]">
+                                  <span className="of-num ml-2 shrink-0 text-[11px] text-[#A0A49C]">
                                     {it.on_hand} {it.unit}
                                   </span>
                                 </button>
@@ -309,7 +309,7 @@ export function RecipeEditor({
                           ) : null}
                         </div>
                         <input
-                          className={`${field} w-[92px] text-right`}
+                          className={`${field} of-num w-[92px] text-right`}
                           inputMode="decimal"
                           placeholder="0"
                           value={row.qty_per_batch}
@@ -325,7 +325,7 @@ export function RecipeEditor({
                           type="button"
                           onClick={() => removeRow(i)}
                           aria-label="Remove ingredient"
-                          className="flex h-9 w-6 items-center justify-center rounded-lg text-[#9A9DA1] transition-colors hover:bg-[#FCEBEB] hover:text-[#A32D2D]"
+                          className="flex h-9 w-6 items-center justify-center rounded-[10px] text-[#A0A49C] transition-colors hover:bg-[#FCEBEB] hover:text-[#A32D2D]"
                         >
                           ✕
                         </button>
@@ -334,7 +334,7 @@ export function RecipeEditor({
                         {!row.product_name.trim() ? (
                           <span className="text-[#C4C4BE]">—</span>
                         ) : item ? (
-                          <span className="text-[#5F6368]">
+                          <span className="of-num text-[#6B6F68]">
                             On hand: {item.on_hand} {item.unit}
                             {canBatches != null ? (
                               <>
@@ -357,14 +357,14 @@ export function RecipeEditor({
           </div>
 
           {/* Notes */}
-          <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
-            <div className="text-[14px] font-medium text-[#1A1C1E]">Notes</div>
+          <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+            <div className="of-display text-[16px] font-semibold text-[#171A17]">Notes</div>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               placeholder="Method, yield notes, anything the team should know."
               rows={3}
-              className="mt-2 w-full resize-y rounded-lg border border-[#E7E7E2] bg-white px-3 py-2 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
+              className="mt-2 w-full resize-y rounded-[12px] border border-[#E4E9F0] bg-white px-4 py-2.5 text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]"
             />
           </div>
 
@@ -379,7 +379,7 @@ export function RecipeEditor({
               type="button"
               onClick={() => void save()}
               disabled={busy}
-              className="inline-flex h-10 items-center rounded-lg bg-[#1F5FA8] px-5 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-50"
+              className="inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-50"
             >
               {busy ? 'Saving…' : 'Save recipe'}
             </button>
@@ -388,9 +388,9 @@ export function RecipeEditor({
 
         {/* RIGHT — availability + batch plan */}
         <div className="space-y-4">
-          <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
+          <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
             <div className="flex items-center justify-between">
-              <div className="text-[14px] font-medium text-[#1A1C1E]">Can make now</div>
+              <div className="of-display text-[16px] font-semibold text-[#171A17]">Can make now</div>
               <span
                 className="rounded-full px-2.5 py-1 text-[11px] font-medium"
                 style={{ backgroundColor: tone.bg, color: tone.fg }}
@@ -398,55 +398,55 @@ export function RecipeEditor({
                 {tone.label}
               </span>
             </div>
-            <div className="mt-2 text-[36px] font-bold leading-none text-[#1A1C1E]">
+            <div className="of-num mt-2 text-[30px] font-semibold leading-none tracking-[-0.02em] text-[#171A17]">
               {plan.batches == null ? '—' : plan.batches}
-              <span className="ml-2 text-[14px] font-normal text-[#9A9DA1]">batches</span>
+              <span className="ml-2 text-[14px] font-normal text-[#8A8E86]">batches</span>
             </div>
             {plan.limiting ? (
-              <div className="mt-2 text-[13px] text-[#5F6368]">
+              <div className="mt-2 text-[13px] text-[#6B6F68]">
                 {plan.readiness === 'blocked' ? 'Short: ' : 'Limited by '}
-                <span className="font-medium text-[#1A1C1E]">{plan.limiting.ingredient.product_name}</span>
-                {' '}· {plan.limiting.onHand} on hand
+                <span className="font-medium text-[#171A17]">{plan.limiting.ingredient.product_name}</span>
+                {' '}· <span className="of-num">{plan.limiting.onHand}</span> on hand
               </div>
             ) : (
-              <div className="mt-2 text-[13px] text-[#9A9DA1]">
+              <div className="mt-2 text-[13px] text-[#8A8E86]">
                 Link ingredients to stock to see live availability.
               </div>
             )}
-            <div className="mt-3 flex items-center justify-between border-t border-[#EFEFEC] pt-3 text-[13px]">
-              <span className="text-[#9A9DA1]">Stock cost · per batch</span>
-              <span className="font-medium text-[#1A1C1E]">{rand(plan.costPerBatch)}</span>
+            <div className="mt-3 flex items-center justify-between border-t border-[#EEF1F5] pt-3 text-[13px]">
+              <span className="text-[#8A8E86]">Stock cost · per batch</span>
+              <span className="of-num font-semibold text-[#171A17]">{rand(plan.costPerBatch)}</span>
             </div>
           </div>
 
           {/* Batch plan */}
-          <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
-            <div className="text-[14px] font-medium text-[#1A1C1E]">Batch plan</div>
-            <div className="mt-2 flex items-center gap-2 text-[13px] text-[#5F6368]">
+          <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+            <div className="of-display text-[16px] font-semibold text-[#171A17]">Batch plan</div>
+            <div className="mt-2 flex items-center gap-2 text-[13px] text-[#6B6F68]">
               <span>Plan</span>
               <input
                 value={planN}
                 onChange={(e) => setPlanN(sanitizeInt(e.target.value))}
                 inputMode="numeric"
                 placeholder={plan.batches != null ? String(plan.batches) : '0'}
-                className="h-9 w-[72px] rounded-lg border border-[#E7E7E2] bg-white px-3 text-right text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
+                className="of-num h-10 w-[72px] rounded-[10px] border border-[#E4E9F0] bg-white px-3 text-right text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]"
               />
               <span>batches</span>
             </div>
 
             {planCount > 0 && plan.availabilities.length > 0 ? (
-              <div className="mt-3 border-t border-[#EFEFEC] pt-1">
+              <div className="mt-3 border-t border-[#EEF1F5] pt-1">
                 {plan.availabilities.map((a) => {
                   const required = a.perBatch * planCount;
                   const shortfall = a.linked ? Math.max(0, required - a.onHand) : 0;
                   return (
                     <div
                       key={a.ingredient.id}
-                      className="flex items-center justify-between border-t border-[#F4F4F1] py-2 text-[13px] first:border-t-0"
+                      className="flex items-center justify-between border-t border-[#F4F5F7] py-2 text-[13px] first:border-t-0"
                     >
                       <div className="min-w-0">
-                        <div className="truncate text-[#1A1C1E]">{a.ingredient.product_name || '—'}</div>
-                        <div className="text-[12px] text-[#9A9DA1]">
+                        <div className="truncate text-[#171A17]">{a.ingredient.product_name || '—'}</div>
+                        <div className="of-num text-[12px] text-[#A0A49C]">
                           need {required}
                           {a.ingredient.unit ? ` ${a.ingredient.unit}` : ''}
                           {a.linked ? ` · have ${a.onHand}` : ' · not linked'}
@@ -454,7 +454,7 @@ export function RecipeEditor({
                       </div>
                       {a.linked ? (
                         shortfall > 0 ? (
-                          <span className="shrink-0 rounded-full bg-[#FCEBEB] px-2 py-0.5 text-[11px] font-medium text-[#A32D2D]">
+                          <span className="of-num shrink-0 rounded-full bg-[#FCEBEB] px-2 py-0.5 text-[11px] font-medium text-[#A32D2D]">
                             short {shortfall}
                           </span>
                         ) : (
@@ -463,26 +463,26 @@ export function RecipeEditor({
                           </span>
                         )
                       ) : (
-                        <span className="shrink-0 text-[11px] text-[#9A9DA1]">—</span>
+                        <span className="shrink-0 text-[11px] text-[#8A8E86]">—</span>
                       )}
                     </div>
                   );
                 })}
-                <div className="mt-2 flex items-center justify-between border-t border-[#EFEFEC] pt-2.5 text-[13px]">
-                  <span className="text-[#9A9DA1]">Stock cost · {planCount} batch{planCount === 1 ? '' : 'es'}</span>
-                  <span className="font-medium text-[#1A1C1E]">{rand(plan.costPerBatch * planCount)}</span>
+                <div className="mt-2 flex items-center justify-between border-t border-[#EEF1F5] pt-2.5 text-[13px]">
+                  <span className="text-[#8A8E86]">Stock cost · {planCount} batch{planCount === 1 ? '' : 'es'}</span>
+                  <span className="of-num font-semibold text-[#171A17]">{rand(plan.costPerBatch * planCount)}</span>
                 </div>
                 {plan.availabilities.some((a) => a.linked && a.perBatch * planCount - a.onHand > 0) ? (
                   <Link
                     href="/app/procurepulse/reorder"
-                    className="mt-3 inline-flex w-full items-center justify-center rounded-lg border border-[#D7DAD8] bg-white px-4 py-2.5 text-[13px] font-medium text-[#1F5FA8] transition-colors hover:border-[#3E7BC4]/40"
+                    className="mt-3 inline-flex h-[42px] w-full items-center justify-center rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#1F5FA8] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]"
                   >
                     Reorder what&apos;s short
                   </Link>
                 ) : null}
               </div>
             ) : (
-              <p className="mt-3 text-[13px] text-[#9A9DA1]">
+              <p className="mt-3 text-[13px] text-[#8A8E86]">
                 Enter a batch count to see the stock each run needs and any shortfalls.
               </p>
             )}

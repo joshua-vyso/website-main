@@ -52,8 +52,8 @@ function fmtDate(iso: string | null | undefined): string {
   return Number.isNaN(d.getTime()) ? '—' : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-const sectionCls = 'rounded-2xl border border-[#E7E7E2] bg-white p-5';
-const sectionTitle = 'text-[13px] font-semibold text-[#1A1C1E]';
+const sectionCls = 'rounded-2xl border border-[#EAEDF2] bg-white p-5';
+const sectionTitle = 'text-[13px] font-semibold text-[#171A17]';
 
 function SectionCard({ title, action, children }: { title: string; action?: React.ReactNode; children: React.ReactNode }) {
   return (
@@ -161,10 +161,10 @@ export function CustomerProfile({ data, orgName }: { data: CustomerProfileData |
   // ---- Not-found / not-connected ----
   if (!customer) {
     return (
-      <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
+      <div className="rounded-2xl border border-dashed border-[#E2E6EC] bg-[#FBFCFE] px-6 py-12 text-center">
         {toastNode}
-        <p className="text-[15px] font-medium text-[#1A1C1E]">Customer not found</p>
-        <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">
+        <p className="text-[15px] font-medium text-[#171A17]">Customer not found</p>
+        <p className="mx-auto mt-1 max-w-md text-[13px] text-[#6B6F68]">
           It may have been deleted, or the Core Data migration has not been run yet.
         </p>
         <Link href="/app/orderflow/customers" className="mt-3 inline-block text-[13px] font-medium text-[#1F5FA8] hover:underline">
@@ -357,7 +357,7 @@ export function CustomerProfile({ data, orgName }: { data: CustomerProfileData |
       {toastNode}
 
       {/* Back link */}
-      <Link href="/app/orderflow/customers" className="inline-flex items-center text-[13px] font-medium text-[#5F6368] transition-colors hover:text-[#1A1C1E]">
+      <Link href="/app/orderflow/customers" className="inline-flex items-center text-[13px] font-medium text-[#6B6F68] transition-colors hover:text-[#171A17]">
         ← Customers
       </Link>
 
@@ -365,25 +365,25 @@ export function CustomerProfile({ data, orgName }: { data: CustomerProfileData |
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2.5">
-            <h1 className="text-[22px] font-bold text-[#1A1C1E]">{customer.name}</h1>
+            <h1 className="text-[22px] font-bold text-[#171A17]">{customer.name}</h1>
             <Pill label={statusStyle.label} bg={statusStyle.bg} fg={statusStyle.fg} />
           </div>
-          <p className="mt-0.5 text-[13px] text-[#5F6368]">
+          <p className="mt-0.5 text-[13px] text-[#6B6F68]">
             {customer.trading_name ? `t/a ${customer.trading_name} · ` : ''}
             {typeLabel}
             {customer.email ? ` · ${customer.email}` : ''}
             {customer.phone ? ` · ${customer.phone}` : ''}
           </p>
           {customer.contact_name ? (
-            <p className="mt-0.5 text-[13px] text-[#5F6368]">
-              Contact: <span className="font-medium text-[#1A1C1E]">{customer.contact_name}</span>
+            <p className="mt-0.5 text-[13px] text-[#6B6F68]">
+              Contact: <span className="font-medium text-[#171A17]">{customer.contact_name}</span>
               {customer.contact_title ? ` · ${customer.contact_title}` : ''}
             </p>
           ) : null}
           {(customer.tags ?? []).length > 0 ? (
             <div className="mt-2 flex flex-wrap gap-1.5">
               {(customer.tags ?? []).map((t) => (
-                <span key={t} className="rounded-full border border-[#E7E7E2] bg-white px-2.5 py-0.5 text-[11px] text-[#5F6368]">
+                <span key={t} className="rounded-full border border-[#EAEDF2] bg-white px-2.5 py-0.5 text-[11px] text-[#6B6F68]">
                   {t}
                 </span>
               ))}
@@ -395,13 +395,13 @@ export function CustomerProfile({ data, orgName }: { data: CustomerProfileData |
           <SecondaryBtn onClick={() => setConfirmHold(true)}>{status === 'on_hold' ? 'Reactivate' : 'Place on hold'}</SecondaryBtn>
           <Link
             href={`/app/orderflow/quotes/new?customer=${customer.id}`}
-            className="inline-flex h-9 items-center justify-center rounded-lg border border-[#D7DAD8] bg-white px-4 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:bg-[#F0F0EC]"
+            className="inline-flex h-9 items-center justify-center rounded-lg border border-[#E2E6EC] bg-white px-4 text-[13px] font-medium text-[#171A17] transition-colors hover:bg-[#EEF1F5]"
           >
             New quote
           </Link>
           <Link
             href={`/app/orderflow/orders/new?customer=${customer.id}`}
-            className="inline-flex h-9 items-center justify-center rounded-lg border border-[#D7DAD8] bg-white px-4 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:bg-[#F0F0EC]"
+            className="inline-flex h-9 items-center justify-center rounded-lg border border-[#E2E6EC] bg-white px-4 text-[13px] font-medium text-[#171A17] transition-colors hover:bg-[#EEF1F5]"
           >
             New order
           </Link>
@@ -427,12 +427,12 @@ export function CustomerProfile({ data, orgName }: { data: CustomerProfileData |
 
       {creditLimit != null ? (
         <div
-          className={`rounded-2xl border p-4 text-[13px] ${overLimit ? 'border-[#F1C8C8] bg-[#FCEBEB]' : 'border-[#E7E7E2] bg-white'}`}
+          className={`rounded-2xl border p-4 text-[13px] ${overLimit ? 'border-[#F1C8C8] bg-[#FCEBEB]' : 'border-[#EAEDF2] bg-white'}`}
         >
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <span className="text-[#5F6368]">
-              Credit limit <span className="font-medium text-[#1A1C1E]">{zar(creditLimit)}</span> · outstanding{' '}
-              <span className="font-medium" style={{ color: finance.outstanding > 0 ? '#A32D2D' : '#1A1C1E' }}>
+            <span className="text-[#6B6F68]">
+              Credit limit <span className="font-medium text-[#171A17]">{zar(creditLimit)}</span> · outstanding{' '}
+              <span className="font-medium" style={{ color: finance.outstanding > 0 ? '#A32D2D' : '#171A17' }}>
                 {zar2(finance.outstanding)}
               </span>
             </span>
@@ -456,13 +456,13 @@ export function CustomerProfile({ data, orgName }: { data: CustomerProfileData |
                   const eff = effectiveQuoteStatus(q, now);
                   const s = QUOTE_STATUS_STYLE[eff];
                   return (
-                    <tr key={q.id} className="border-b border-[#F6F6F2] last:border-0">
-                      <td className="py-2 pr-2 font-medium text-[#1A1C1E]">{q.quote_number}</td>
-                      <td className="px-2 py-2 text-[#5F6368]">{fmtDate(q.issue_date)}</td>
+                    <tr key={q.id} className="border-b border-[#F5F9FE] last:border-0">
+                      <td className="py-2 pr-2 font-medium text-[#171A17]">{q.quote_number}</td>
+                      <td className="px-2 py-2 text-[#6B6F68]">{fmtDate(q.issue_date)}</td>
                       <td className="px-2 py-2">
                         <Pill label={s.label} bg={s.bg} fg={s.fg} />
                       </td>
-                      <td className="px-2 py-2 text-right tabular-nums text-[#1A1C1E]">—</td>
+                      <td className="px-2 py-2 text-right tabular-nums text-[#171A17]">—</td>
                       <td className="py-2 pl-2 text-right">
                         <Link href={`/app/orderflow/quotes/${q.id}`} className="text-[12px] font-medium text-[#1F5FA8] hover:underline">
                           Open
@@ -484,13 +484,13 @@ export function CustomerProfile({ data, orgName }: { data: CustomerProfileData |
                 {data!.orders.map((o) => {
                   const s = ORDER_STATUS_STYLE[o.status];
                   return (
-                    <tr key={o.id} className="border-b border-[#F6F6F2] last:border-0">
-                      <td className="py-2 pr-2 font-medium text-[#1A1C1E]">{o.order_number ?? `#${o.id.slice(0, 6).toUpperCase()}`}</td>
-                      <td className="px-2 py-2 text-[#5F6368]">{fmtDate(o.created_at)}</td>
+                    <tr key={o.id} className="border-b border-[#F5F9FE] last:border-0">
+                      <td className="py-2 pr-2 font-medium text-[#171A17]">{o.order_number ?? `#${o.id.slice(0, 6).toUpperCase()}`}</td>
+                      <td className="px-2 py-2 text-[#6B6F68]">{fmtDate(o.created_at)}</td>
                       <td className="px-2 py-2">
                         <Pill label={s.label} bg={s.bg} fg={s.fg} />
                       </td>
-                      <td className="px-2 py-2 text-right tabular-nums text-[#1A1C1E]">—</td>
+                      <td className="px-2 py-2 text-right tabular-nums text-[#171A17]">—</td>
                       <td className="py-2 pl-2 text-right">
                         <Link href={`/app/orderflow/orders/${o.id}`} className="text-[12px] font-medium text-[#1F5FA8] hover:underline">
                           Open
@@ -517,13 +517,13 @@ export function CustomerProfile({ data, orgName }: { data: CustomerProfileData |
                   const s = INVOICE_STATUS_STYLE[eff];
                   const bal = balanceDue(total, paid, credited);
                   return (
-                    <tr key={inv.id} className="border-b border-[#F6F6F2] last:border-0">
-                      <td className="py-2 pr-2 font-medium text-[#1A1C1E]">{inv.invoice_number}</td>
-                      <td className="px-2 py-2 text-[#5F6368]">{fmtDate(inv.issue_date)}</td>
+                    <tr key={inv.id} className="border-b border-[#F5F9FE] last:border-0">
+                      <td className="py-2 pr-2 font-medium text-[#171A17]">{inv.invoice_number}</td>
+                      <td className="px-2 py-2 text-[#6B6F68]">{fmtDate(inv.issue_date)}</td>
                       <td className="px-2 py-2">
                         <Pill label={s.label} bg={s.bg} fg={s.fg} />
                       </td>
-                      <td className="px-2 py-2 text-right tabular-nums text-[#1A1C1E]">{zar2(total)}</td>
+                      <td className="px-2 py-2 text-right tabular-nums text-[#171A17]">{zar2(total)}</td>
                       <td className="px-2 py-2 text-right tabular-nums" style={{ color: bal > 0 ? '#A32D2D' : '#0F6E56' }}>
                         {zar2(bal)}
                       </td>
@@ -549,19 +549,19 @@ export function CustomerProfile({ data, orgName }: { data: CustomerProfileData |
                   const inv = invoiceById.get(p.invoice_id) ?? null;
                   const methodLabel = PAYMENT_METHODS.find((m) => m.value === p.method)?.label ?? p.method;
                   return (
-                    <tr key={p.id} className="border-b border-[#F6F6F2] last:border-0">
-                      <td className="py-2 pr-2 text-[#5F6368]">{fmtDate(p.paid_on)}</td>
+                    <tr key={p.id} className="border-b border-[#F5F9FE] last:border-0">
+                      <td className="py-2 pr-2 text-[#6B6F68]">{fmtDate(p.paid_on)}</td>
                       <td className="px-2 py-2">
                         {inv ? (
                           <Link href={`/app/orderflow/invoices/${inv.id}`} className="font-medium text-[#1F5FA8] hover:underline">
                             {inv.invoice_number}
                           </Link>
                         ) : (
-                          <span className="text-[#9A9DA1]">—</span>
+                          <span className="text-[#8A8E86]">—</span>
                         )}
                       </td>
-                      <td className="px-2 py-2 text-[#5F6368]">{methodLabel}</td>
-                      <td className="px-2 py-2 text-[#5F6368]">{p.reference || '—'}</td>
+                      <td className="px-2 py-2 text-[#6B6F68]">{methodLabel}</td>
+                      <td className="px-2 py-2 text-[#6B6F68]">{p.reference || '—'}</td>
                       <td className="py-2 pl-2 text-right tabular-nums text-[#0F6E56]">{zar2(p.amount)}</td>
                     </tr>
                   );
@@ -587,9 +587,9 @@ export function CustomerProfile({ data, orgName }: { data: CustomerProfileData |
           {/* Price list */}
           <SectionCard title="Price list">
             <div className="space-y-2">
-              <div className="text-[13px] text-[#5F6368]">
+              <div className="text-[13px] text-[#6B6F68]">
                 Currently applied:{' '}
-                <span className="font-medium text-[#1A1C1E]">{priceList ? priceList.name : 'Base pricing (no list)'}</span>
+                <span className="font-medium text-[#171A17]">{priceList ? priceList.name : 'Base pricing (no list)'}</span>
               </div>
               <Field label="Default price list" hint="overrides the org default for this customer">
                 <select
@@ -606,7 +606,7 @@ export function CustomerProfile({ data, orgName }: { data: CustomerProfileData |
                 </select>
               </Field>
               {data!.priceLists.length === 0 ? (
-                <p className="text-[12px] text-[#9A9DA1]">No price lists yet — create one in PricePilot or Core Data.</p>
+                <p className="text-[12px] text-[#8A8E86]">No price lists yet — create one in PricePilot or Core Data.</p>
               ) : null}
             </div>
           </SectionCard>
@@ -627,10 +627,10 @@ export function CustomerProfile({ data, orgName }: { data: CustomerProfileData |
           {/* Delivery addresses */}
           <SectionCard title="Delivery addresses">
             {customer.delivery_address?.trim() ? (
-              <div className="mb-3 rounded-xl border border-[#F0F0EC] bg-[#FCFCFB] px-3.5 py-3">
-                <div className="text-[11px] font-medium uppercase tracking-wide text-[#9A9DA1]">Imported address</div>
-                <p className="mt-1 whitespace-pre-line text-[13px] text-[#1A1C1E]">{customer.delivery_address}</p>
-                <p className="mt-1 text-[11px] text-[#9A9DA1]">Edit via “Edit customer”, or add structured addresses below.</p>
+              <div className="mb-3 rounded-xl border border-[#EEF1F5] bg-[#FCFCFB] px-3.5 py-3">
+                <div className="text-[11px] font-medium uppercase tracking-wide text-[#8A8E86]">Imported address</div>
+                <p className="mt-1 whitespace-pre-line text-[13px] text-[#171A17]">{customer.delivery_address}</p>
+                <p className="mt-1 text-[11px] text-[#8A8E86]">Edit via “Edit customer”, or add structured addresses below.</p>
               </div>
             ) : null}
             <DeliveryAddressesEditor customerId={customer.id} addresses={data!.addresses} />
@@ -767,9 +767,9 @@ export function CustomerProfile({ data, orgName }: { data: CustomerProfileData |
 
 function OverviewStat({ label, value, accent }: { label: string; value: string; accent?: string }) {
   return (
-    <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
-      <div className="text-[12px] text-[#9A9DA1]">{label}</div>
-      <div className="mt-1.5 text-[22px] font-bold leading-none" style={{ color: accent ?? '#1A1C1E' }}>
+    <div className="rounded-2xl border border-[#EAEDF2] bg-white p-4">
+      <div className="text-[12px] text-[#8A8E86]">{label}</div>
+      <div className="mt-1.5 text-[22px] font-bold leading-none" style={{ color: accent ?? '#171A17' }}>
         {value}
       </div>
     </div>
@@ -785,7 +785,7 @@ function MiniTable({ head, children }: { head: string[]; children: React.ReactNo
     <div className="overflow-x-auto">
       <table className="w-full text-[13px]">
         <thead>
-          <tr className="border-b border-[#F0F0EC] text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+          <tr className="border-b border-[#EEF1F5] text-[11px] uppercase tracking-wide text-[#8A8E86]">
             {head.map((h, i) => (
               <th key={i} className={`py-1.5 font-medium ${i === 0 ? 'pr-2 text-left' : i === head.length - 1 ? 'pl-2 text-right' : 'px-2 text-left'}`}>
                 {h}
@@ -800,7 +800,7 @@ function MiniTable({ head, children }: { head: string[]; children: React.ReactNo
 }
 
 function EmptyRow({ label }: { label: string }) {
-  return <p className="py-4 text-[13px] text-[#9A9DA1]">{label}</p>;
+  return <p className="py-4 text-[13px] text-[#8A8E86]">{label}</p>;
 }
 
 // ---------------------------------------------------------------------------
@@ -929,20 +929,20 @@ function ContactsEditor({ customerId, contacts }: { customerId: string; contacts
       ) : (
         <div className="space-y-2">
           {contacts.map((c) => (
-            <div key={c.id} className="rounded-xl border border-[#F0F0EC] bg-[#FCFCFB] px-3.5 py-3">
+            <div key={c.id} className="rounded-xl border border-[#EEF1F5] bg-[#FCFCFB] px-3.5 py-3">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-1.5">
-                    <span className="text-[14px] font-medium text-[#1A1C1E]">{c.name}</span>
-                    {c.role ? <span className="rounded-full bg-[#F0F0EC] px-2 py-0.5 text-[11px] text-[#5F6368]">{c.role}</span> : null}
+                    <span className="text-[14px] font-medium text-[#171A17]">{c.name}</span>
+                    {c.role ? <span className="rounded-full bg-[#EEF1F5] px-2 py-0.5 text-[11px] text-[#6B6F68]">{c.role}</span> : null}
                     {c.is_primary ? <span className="rounded-full bg-[#E1F5EE] px-2 py-0.5 text-[11px] text-[#0F6E56]">Primary</span> : null}
                   </div>
-                  <div className="mt-0.5 text-[12px] text-[#5F6368]">
+                  <div className="mt-0.5 text-[12px] text-[#6B6F68]">
                     {[c.email, c.phone, c.whatsapp ? `WA ${c.whatsapp}` : null].filter(Boolean).join(' · ') || '—'}
                   </div>
                 </div>
                 <div className="flex shrink-0 gap-2">
-                  <button type="button" onClick={() => startEdit(c)} className="text-[12px] text-[#5F6368] hover:text-[#1A1C1E]">
+                  <button type="button" onClick={() => startEdit(c)} className="text-[12px] text-[#6B6F68] hover:text-[#171A17]">
                     Edit
                   </button>
                   <button type="button" onClick={() => setConfirmDel(c.id)} className="text-[12px] text-[#A32D2D] hover:underline">
@@ -985,7 +985,7 @@ function ContactsEditor({ customerId, contacts }: { customerId: string; contacts
           <Field label="WhatsApp" hint="optional">
             <input className={inputClass} value={draft.whatsapp} onChange={(e) => setDraft({ ...draft, whatsapp: e.target.value })} />
           </Field>
-          <label className="flex items-center gap-2 pt-6 text-[13px] text-[#5F6368]">
+          <label className="flex items-center gap-2 pt-6 text-[13px] text-[#6B6F68]">
             <input type="checkbox" checked={draft.is_primary} onChange={(e) => setDraft({ ...draft, is_primary: e.target.checked })} className="accent-[#3E7BC4]" />
             Primary contact
           </label>
@@ -1051,9 +1051,9 @@ function BillingAddressEditor({ customerId, value }: { customerId: string; value
       <div>
         {toastNode}
         {value.trim() ? (
-          <p className="whitespace-pre-line text-[13px] text-[#1A1C1E]">{value}</p>
+          <p className="whitespace-pre-line text-[13px] text-[#171A17]">{value}</p>
         ) : (
-          <p className="text-[13px] text-[#9A9DA1]">No billing address set.</p>
+          <p className="text-[13px] text-[#8A8E86]">No billing address set.</p>
         )}
         <button
           type="button"
@@ -1233,19 +1233,19 @@ function DeliveryAddressesEditor({ customerId, addresses }: { customerId: string
       ) : (
         <div className="space-y-2">
           {addresses.map((a) => (
-            <div key={a.id} className="rounded-xl border border-[#F0F0EC] bg-[#FCFCFB] px-3.5 py-3">
+            <div key={a.id} className="rounded-xl border border-[#EEF1F5] bg-[#FCFCFB] px-3.5 py-3">
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-1.5">
-                    <span className="text-[13px] font-medium text-[#1A1C1E]">{a.nickname || 'Delivery address'}</span>
+                    <span className="text-[13px] font-medium text-[#171A17]">{a.nickname || 'Delivery address'}</span>
                     {a.is_default ? <span className="rounded-full bg-[#E1F5EE] px-2 py-0.5 text-[11px] text-[#0F6E56]">Default</span> : null}
                   </div>
-                  <div className="mt-0.5 text-[12px] text-[#5F6368]">{formatAddress(a) || '—'}</div>
-                  {a.instructions ? <div className="mt-0.5 text-[12px] text-[#9A9DA1]">{a.instructions}</div> : null}
+                  <div className="mt-0.5 text-[12px] text-[#6B6F68]">{formatAddress(a) || '—'}</div>
+                  {a.instructions ? <div className="mt-0.5 text-[12px] text-[#8A8E86]">{a.instructions}</div> : null}
                 </div>
                 <div className="flex shrink-0 flex-col items-end gap-1">
                   <div className="flex gap-2">
-                    <button type="button" onClick={() => startEdit(a)} className="text-[12px] text-[#5F6368] hover:text-[#1A1C1E]">
+                    <button type="button" onClick={() => startEdit(a)} className="text-[12px] text-[#6B6F68] hover:text-[#171A17]">
                       Edit
                     </button>
                     <button type="button" onClick={() => setConfirmDel(a.id)} className="text-[12px] text-[#A32D2D] hover:underline">
@@ -1306,7 +1306,7 @@ function DeliveryAddressesEditor({ customerId, addresses }: { customerId: string
               <textarea className={`${inputClass} h-auto py-2`} rows={2} value={draft.instructions} onChange={(e) => setDraft({ ...draft, instructions: e.target.value })} />
             </Field>
           </div>
-          <label className="flex items-center gap-2 text-[13px] text-[#5F6368] sm:col-span-2">
+          <label className="flex items-center gap-2 text-[13px] text-[#6B6F68] sm:col-span-2">
             <input type="checkbox" checked={draft.is_default} onChange={(e) => setDraft({ ...draft, is_default: e.target.checked })} className="accent-[#3E7BC4]" />
             Default delivery address
           </label>

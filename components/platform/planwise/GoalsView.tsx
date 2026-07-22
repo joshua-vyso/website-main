@@ -92,57 +92,57 @@ export function GoalsView({ initial, needsSetup }: { initial: PlTargets | null; 
     router.refresh();
   }
 
-  const inputBox = 'mt-1.5 flex items-center rounded-lg border border-[#D7DAD8] bg-white px-3 transition-colors focus-within:border-[#3E7BC4]';
-  const inputEl = 'w-full bg-transparent py-2.5 text-[14px] text-[#1A1C1E] outline-none placeholder:text-[#C7C9C5]';
+  const inputBox = 'mt-1.5 flex h-11 items-center rounded-[12px] border border-[#E4E9F0] bg-white px-4 transition-colors focus-within:border-[#3E7BC4]';
+  const inputEl = 'of-num w-full bg-transparent text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C]';
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-[24px] font-bold leading-tight text-[#1A1C1E]">Goals</h1>
-        <p className="mt-0.5 text-[14px] text-[#5F6368]">Define where you want the business to go. Vyso measures progress against these across every module.</p>
+        <h1 className="of-display text-[28px] font-semibold leading-tight tracking-[-0.015em] text-[#171A17]">Goals</h1>
+        <p className="mt-1.5 text-[14px] text-[#8A8E86]">Define where you want the business to go. Vyso measures progress against these across every module.</p>
       </div>
 
       <GoalsDashboard />
 
-      <div className="border-t border-[#F0F0EC] pt-5">
-        <h2 className="text-[15px] font-semibold text-[#1A1C1E]">Set your goals</h2>
-        <p className="mt-0.5 text-[13px] text-[#9A9DA1]">These power the progress above and feed the modules that act on them.</p>
+      <div className="border-t border-[#EEF1F5] pt-5">
+        <h2 className="of-display text-[16px] font-semibold text-[#171A17]">Set your goals</h2>
+        <p className="mt-1 text-[13px] text-[#6B6F68]">These power the progress above and feed the modules that act on them.</p>
       </div>
 
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_320px]">
       <div className="space-y-5">
       {needsSetup ? (
         <div className="rounded-2xl border border-[#FBEEDA] bg-[#FFFBF4] p-5">
-          <h2 className="text-[14px] font-semibold text-[#854F0B]">One-time setup needed</h2>
+          <h2 className="of-display text-[15px] font-semibold text-[#854F0B]">One-time setup needed</h2>
           <p className="mt-1 text-[13px] text-[#7A6A4F]">Paste this once in the Supabase SQL editor, then fill in your goals below.</p>
-          <pre className="mt-3 overflow-x-auto rounded-xl border border-[#EEDFBF] bg-white p-4 text-[12px] leading-relaxed text-[#5F6368]">{SETUP_SQL}</pre>
+          <pre className="mt-3 overflow-x-auto rounded-[14px] border border-[#EEDFBF] bg-white p-4 text-[12px] leading-relaxed text-[#6B6F68]">{SETUP_SQL}</pre>
         </div>
       ) : null}
 
       {/* Core goals — persisted to pl_targets (the shared store other modules read) */}
-      <div className="rounded-2xl border border-[#E7E7E2] bg-white">
-        <div className="border-b border-[#F0F0EC] px-5 py-4">
-          <h2 className="text-[15px] font-semibold text-[#1A1C1E]">Core goals</h2>
-          <p className="mt-0.5 text-[12px] text-[#9A9DA1]">Saved to your workspace and read by the modules that act on them. Leave any blank to skip it.</p>
+      <div className="rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+        <div className="border-b border-[#EEF1F5] px-5 py-4">
+          <h2 className="of-display text-[16px] font-semibold text-[#171A17]">Core goals</h2>
+          <p className="mt-1 text-[13px] text-[#8A8E86]">Saved to your workspace and read by the modules that act on them. Leave any blank to skip it.</p>
         </div>
         <div className="grid grid-cols-1 gap-5 p-5 sm:grid-cols-2">
           {REAL_FIELDS.map((f) => (
             <label key={f.key} className="block">
-              <span className="text-[13px] font-medium text-[#1A1C1E]">{f.label}</span>
+              <span className="text-[13px] font-medium text-[#171A17]">{f.label}</span>
               <div className={inputBox}>
-                {f.side === 'left' ? <span className="mr-2 text-[14px] text-[#9A9DA1]">{f.adorn}</span> : null}
+                {f.side === 'left' ? <span className="mr-2 text-[14px] text-[#8A8E86]">{f.adorn}</span> : null}
                 <input inputMode="decimal" value={values[f.key]} onChange={(e) => { setValues((v) => ({ ...v, [f.key]: e.target.value })); setSaved(false); }} placeholder="—" className={inputEl} />
-                {f.side === 'right' ? <span className="ml-2 text-[14px] text-[#9A9DA1]">{f.adorn}</span> : null}
+                {f.side === 'right' ? <span className="ml-2 text-[14px] text-[#8A8E86]">{f.adorn}</span> : null}
               </div>
-              <span className="mt-1 block text-[12px] text-[#9A9DA1]">{f.help}</span>
+              <span className="mt-1.5 block text-[12px] text-[#A0A49C]">{f.help}</span>
               <Link href={MODULE_META[f.module].route} className="mt-1 inline-flex items-center gap-1 text-[11px] font-medium" style={{ color: MODULE_META[f.module].accent.fg }}>
                 {f.used} →
               </Link>
             </label>
           ))}
         </div>
-        <div className="flex items-center gap-3 border-t border-[#F0F0EC] px-5 py-4">
-          <button type="button" onClick={save} disabled={busy} className="inline-flex items-center justify-center rounded-lg bg-[#1F5FA8] px-4 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-50">
+        <div className="flex items-center gap-3 border-t border-[#EEF1F5] px-5 py-4">
+          <button type="button" onClick={save} disabled={busy} className="inline-flex h-[42px] items-center justify-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-50">
             {busy ? 'Saving…' : 'Save goals'}
           </button>
           {saved ? <span className="text-[13px] font-medium text-[#0F6E56]">✓ Saved</span> : null}
@@ -151,21 +151,21 @@ export function GoalsView({ initial, needsSetup }: { initial: PlTargets | null; 
       </div>
 
       {/* Additional strategic goals — UI ready, persistence coming with the planning store */}
-      <div className="rounded-2xl border border-[#E7E7E2] bg-white">
-        <div className="border-b border-[#F0F0EC] px-5 py-4">
-          <h2 className="text-[15px] font-semibold text-[#1A1C1E]">Strategic goals</h2>
-          <p className="mt-0.5 text-[12px] text-[#9A9DA1]">Captured here for now — wired to live data as PlanWise grows.</p>
+      <div className="rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+        <div className="border-b border-[#EEF1F5] px-5 py-4">
+          <h2 className="of-display text-[16px] font-semibold text-[#171A17]">Strategic goals</h2>
+          <p className="mt-1 text-[13px] text-[#8A8E86]">Captured here for now — wired to live data as PlanWise grows.</p>
         </div>
         <div className="grid grid-cols-1 gap-5 p-5 sm:grid-cols-3">
           {MOCK_GOALS.map((g) => (
             <label key={g.id} className="block">
-              <span className="text-[13px] font-medium text-[#1A1C1E]">{g.label}</span>
+              <span className="text-[13px] font-medium text-[#171A17]">{g.label}</span>
               <div className={inputBox}>
-                {g.adorn === 'R' ? <span className="mr-2 text-[14px] text-[#9A9DA1]">R</span> : null}
+                {g.adorn === 'R' ? <span className="mr-2 text-[14px] text-[#8A8E86]">R</span> : null}
                 <input inputMode="decimal" value={mock[g.id] ?? ''} onChange={(e) => setMock((m) => ({ ...m, [g.id]: e.target.value }))} placeholder={g.placeholder} className={inputEl} />
-                {g.adorn === '%' ? <span className="ml-2 text-[14px] text-[#9A9DA1]">%</span> : null}
+                {g.adorn === '%' ? <span className="ml-2 text-[14px] text-[#8A8E86]">%</span> : null}
               </div>
-              <span className="mt-1 block text-[12px] text-[#9A9DA1]">{g.used}</span>
+              <span className="mt-1.5 block text-[12px] text-[#A0A49C]">{g.used}</span>
             </label>
           ))}
         </div>
@@ -184,21 +184,21 @@ function GoalsSidePanel() {
     { goal: 'Expense ceiling', module: 'procurepulse', note: 'Spend visibility from ProcurePulse & Doc-U' },
   ];
   return (
-    <div className="h-fit rounded-2xl border border-[#E7E7E2] bg-[#FBFBF9] p-5 lg:sticky lg:top-6">
-      <h3 className="text-[15px] font-semibold text-[#1A1C1E]">How Vyso uses your goals</h3>
-      <p className="mt-1 text-[13px] text-[#5F6368]">Your goals become the benchmark every module measures against — and they feed the forecast and scenarios.</p>
+    <div className="h-fit rounded-2xl border border-[#EAEDF2] bg-[#FBFCFE] p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)] lg:sticky lg:top-6">
+      <h3 className="of-display text-[16px] font-semibold text-[#171A17]">How Vyso uses your goals</h3>
+      <p className="mt-1 text-[13px] text-[#6B6F68]">Your goals become the benchmark every module measures against — and they feed the forecast and scenarios.</p>
       <div className="mt-4 flex flex-col gap-3">
         {links.map((l) => {
           const m = MODULE_META[l.module];
           return (
             <div key={l.goal} className="flex items-start gap-2.5">
               <span className="mt-0.5 shrink-0 rounded-md px-2 py-0.5 text-[11px] font-medium" style={{ backgroundColor: m.accent.bg, color: m.accent.fg }}>{m.name}</span>
-              <span className="text-[12px] text-[#5F6368]">{l.note}</span>
+              <span className="text-[12px] text-[#6B6F68]">{l.note}</span>
             </div>
           );
         })}
       </div>
-      <div className="mt-4 rounded-xl border border-[#F0F0EC] bg-white p-3 text-[12px] text-[#5F6368]">
+      <div className="mt-4 rounded-[14px] border border-[#EEF1F5] bg-white p-3.5 text-[12px] text-[#6B6F68]">
         Set these once — PlanWise keeps measuring and tells you exactly what needs to change.
       </div>
     </div>

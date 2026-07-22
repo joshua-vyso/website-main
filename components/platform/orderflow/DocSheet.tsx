@@ -83,7 +83,7 @@ export function DocSheet({
     <>
       <style dangerouslySetInnerHTML={{ __html: PRINT_CSS }} />
 
-      <div id="of-doc-print" className="mx-auto max-w-[820px] rounded-2xl border border-[#E7E7E2] bg-white p-8 sm:p-10">
+      <div id="of-doc-print" className="mx-auto max-w-[820px] rounded-2xl border border-[#EAEDF2] bg-white p-8 sm:p-10">
         {/* Header — logo + document title on the left, seller block on the right */}
         <div className="flex flex-wrap items-start justify-between gap-6">
           <div>
@@ -91,7 +91,7 @@ export function DocSheet({
               /* eslint-disable-next-line @next/next/no-img-element */
               <img src={companyProfile.logo_data} alt={`${sellerName} logo`} className="mb-4 max-h-[64px] max-w-[220px] object-contain" />
             ) : null}
-            <div className="text-[26px] font-bold tracking-tight text-[#1A1C1E]">{title}</div>
+            <div className="text-[26px] font-bold tracking-tight text-[#171A17]">{title}</div>
             <div className="mt-1 flex items-center gap-2">
               <span className="text-[14px] font-medium text-[#1F5FA8]">{number}</span>
               {statusPill ? (
@@ -101,8 +101,8 @@ export function DocSheet({
               ) : null}
             </div>
           </div>
-          <div className="text-right text-[13px] text-[#5F6368]">
-            <div className="text-[16px] font-semibold text-[#1A1C1E]">{sellerName}</div>
+          <div className="text-right text-[13px] text-[#6B6F68]">
+            <div className="text-[16px] font-semibold text-[#171A17]">{sellerName}</div>
             {sellerEmail ? <div className="mt-0.5">{sellerEmail}</div> : null}
             {sellerPhone ? <div>{sellerPhone}</div> : null}
             {sellerAddress ? <div className="whitespace-pre-line">{sellerAddress}</div> : null}
@@ -115,18 +115,18 @@ export function DocSheet({
         <div className="mt-8 flex flex-wrap justify-between gap-6">
           <div className="space-y-4">
             <div>
-              <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">Bill to</div>
-              <div className="mt-1 text-[14px] font-semibold text-[#1A1C1E]">{customer?.name ?? '—'}</div>
-              {customer?.trading_name ? <div className="text-[13px] text-[#5F6368]">{customer.trading_name}</div> : null}
-              {customer?.email ? <div className="text-[13px] text-[#5F6368]">{customer.email}</div> : null}
-              {customer?.phone ? <div className="text-[13px] text-[#5F6368]">{customer.phone}</div> : null}
-              {billToText ? <div className="whitespace-pre-line text-[13px] text-[#5F6368]">{billToText}</div> : null}
-              {customer?.vat_number ? <div className="mt-0.5 text-[13px] text-[#5F6368]">VAT: {customer.vat_number}</div> : null}
+              <div className="text-[11px] uppercase tracking-wide text-[#8A8E86]">Bill to</div>
+              <div className="mt-1 text-[14px] font-semibold text-[#171A17]">{customer?.name ?? '—'}</div>
+              {customer?.trading_name ? <div className="text-[13px] text-[#6B6F68]">{customer.trading_name}</div> : null}
+              {customer?.email ? <div className="text-[13px] text-[#6B6F68]">{customer.email}</div> : null}
+              {customer?.phone ? <div className="text-[13px] text-[#6B6F68]">{customer.phone}</div> : null}
+              {billToText ? <div className="whitespace-pre-line text-[13px] text-[#6B6F68]">{billToText}</div> : null}
+              {customer?.vat_number ? <div className="mt-0.5 text-[13px] text-[#6B6F68]">VAT: {customer.vat_number}</div> : null}
             </div>
             {deliverTo ? (
               <div>
-                <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">Deliver to</div>
-                <div className="mt-1 whitespace-pre-line text-[13px] text-[#5F6368]">{deliverTo}</div>
+                <div className="text-[11px] uppercase tracking-wide text-[#8A8E86]">Deliver to</div>
+                <div className="mt-1 whitespace-pre-line text-[13px] text-[#6B6F68]">{deliverTo}</div>
               </div>
             ) : null}
           </div>
@@ -134,8 +134,8 @@ export function DocSheet({
             <div className="text-right text-[13px]">
               {meta.map((m, i) => (
                 <div key={`${m.label}-${i}`} className={`flex justify-end gap-6 ${i === 0 ? '' : 'mt-1'}`}>
-                  <span className="text-[#9A9DA1]">{m.label}</span>
-                  <span className="tabular-nums text-[#1A1C1E]">{m.value}</span>
+                  <span className="text-[#8A8E86]">{m.label}</span>
+                  <span className="tabular-nums text-[#171A17]">{m.value}</span>
                 </div>
               ))}
             </div>
@@ -145,7 +145,7 @@ export function DocSheet({
         {/* Items table */}
         <table className="mt-8 w-full text-[13px]">
           <thead>
-            <tr className="border-b border-[#E7E7E2] text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+            <tr className="border-b border-[#EAEDF2] text-[11px] uppercase tracking-wide text-[#8A8E86]">
               <th className="py-2 pr-2 text-left font-medium">Description</th>
               <th className="w-[72px] px-2 py-2 text-right font-medium">Qty</th>
               <th className="w-[72px] px-2 py-2 text-left font-medium">Unit</th>
@@ -156,16 +156,16 @@ export function DocSheet({
           <tbody>
             {lines.length === 0 ? (
               <tr>
-                <td colSpan={showPrices ? 5 : 3} className="py-6 text-center text-[#9A9DA1]">No line items.</td>
+                <td colSpan={showPrices ? 5 : 3} className="py-6 text-center text-[#8A8E86]">No line items.</td>
               </tr>
             ) : (
               lines.map((l) => (
-                <tr key={l.id} className="border-b border-[#F0F0EC]">
-                  <td className="py-2.5 pr-2 text-[#1A1C1E]">{l.name}</td>
-                  <td className="px-2 py-2.5 text-right tabular-nums text-[#5F6368]">{l.qty}</td>
-                  <td className="px-2 py-2.5 text-left text-[#5F6368]">{l.unit || '—'}</td>
-                  {showPrices ? <td className="px-2 py-2.5 text-right tabular-nums text-[#5F6368]">{zar2(l.unit_price)}</td> : null}
-                  {showPrices ? <td className="py-2.5 pl-2 text-right tabular-nums text-[#1A1C1E]">{zar2((Number(l.qty) || 0) * (Number(l.unit_price) || 0))}</td> : null}
+                <tr key={l.id} className="border-b border-[#EEF1F5]">
+                  <td className="py-2.5 pr-2 text-[#171A17]">{l.name}</td>
+                  <td className="px-2 py-2.5 text-right tabular-nums text-[#6B6F68]">{l.qty}</td>
+                  <td className="px-2 py-2.5 text-left text-[#6B6F68]">{l.unit || '—'}</td>
+                  {showPrices ? <td className="px-2 py-2.5 text-right tabular-nums text-[#6B6F68]">{zar2(l.unit_price)}</td> : null}
+                  {showPrices ? <td className="py-2.5 pl-2 text-right tabular-nums text-[#171A17]">{zar2((Number(l.qty) || 0) * (Number(l.unit_price) || 0))}</td> : null}
                 </tr>
               ))
             )}
@@ -176,28 +176,28 @@ export function DocSheet({
         {totals ? (
           <div className="mt-5 flex justify-end">
             <div className="w-full max-w-[280px] space-y-2 text-[13px]">
-              <div className="flex justify-between"><span className="text-[#5F6368]">Subtotal</span><span className="tabular-nums text-[#1A1C1E]">{zar2(totals.subtotal)}</span></div>
+              <div className="flex justify-between"><span className="text-[#6B6F68]">Subtotal</span><span className="tabular-nums text-[#171A17]">{zar2(totals.subtotal)}</span></div>
               {totals.discount > 0 ? (
-                <div className="flex justify-between"><span className="text-[#5F6368]">Discount</span><span className="tabular-nums text-[#1A1C1E]">−{zar2(totals.discount)}</span></div>
+                <div className="flex justify-between"><span className="text-[#6B6F68]">Discount</span><span className="tabular-nums text-[#171A17]">−{zar2(totals.discount)}</span></div>
               ) : null}
-              <div className="flex justify-between"><span className="text-[#5F6368]">VAT ({vatRate}%)</span><span className="tabular-nums text-[#1A1C1E]">{zar2(totals.vat)}</span></div>
-              <div className="flex justify-between border-t border-[#E7E7E2] pt-2 text-[16px] font-bold"><span className="text-[#1A1C1E]">Total</span><span className="tabular-nums text-[#1A1C1E]">{zar2(totals.total)}</span></div>
+              <div className="flex justify-between"><span className="text-[#6B6F68]">VAT ({vatRate}%)</span><span className="tabular-nums text-[#171A17]">{zar2(totals.vat)}</span></div>
+              <div className="flex justify-between border-t border-[#EAEDF2] pt-2 text-[16px] font-bold"><span className="text-[#171A17]">Total</span><span className="tabular-nums text-[#171A17]">{zar2(totals.total)}</span></div>
             </div>
           </div>
         ) : null}
 
         {/* Payment details + notes/terms */}
         {showBank || notes || terms ? (
-          <div className="mt-8 grid grid-cols-1 gap-6 border-t border-[#F0F0EC] pt-5 sm:grid-cols-2">
+          <div className="mt-8 grid grid-cols-1 gap-6 border-t border-[#EEF1F5] pt-5 sm:grid-cols-2">
             {showBank ? (
               <div>
-                <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">Payment details</div>
-                <div className="mt-1.5 space-y-0.5 text-[13px] text-[#1A1C1E]">
-                  {companyProfile?.bank_name ? <div><span className="text-[#9A9DA1]">Bank:</span> {companyProfile.bank_name}</div> : null}
-                  {companyProfile?.account_name ? <div><span className="text-[#9A9DA1]">Account name:</span> {companyProfile.account_name}</div> : null}
-                  {companyProfile?.account_number ? <div><span className="text-[#9A9DA1]">Account no:</span> <span className="tabular-nums">{companyProfile.account_number}</span></div> : null}
-                  {companyProfile?.branch_code ? <div><span className="text-[#9A9DA1]">Branch code:</span> <span className="tabular-nums">{companyProfile.branch_code}</span></div> : null}
-                  {companyProfile?.swift ? <div><span className="text-[#9A9DA1]">SWIFT:</span> {companyProfile.swift}</div> : null}
+                <div className="text-[11px] uppercase tracking-wide text-[#8A8E86]">Payment details</div>
+                <div className="mt-1.5 space-y-0.5 text-[13px] text-[#171A17]">
+                  {companyProfile?.bank_name ? <div><span className="text-[#8A8E86]">Bank:</span> {companyProfile.bank_name}</div> : null}
+                  {companyProfile?.account_name ? <div><span className="text-[#8A8E86]">Account name:</span> {companyProfile.account_name}</div> : null}
+                  {companyProfile?.account_number ? <div><span className="text-[#8A8E86]">Account no:</span> <span className="tabular-nums">{companyProfile.account_number}</span></div> : null}
+                  {companyProfile?.branch_code ? <div><span className="text-[#8A8E86]">Branch code:</span> <span className="tabular-nums">{companyProfile.branch_code}</span></div> : null}
+                  {companyProfile?.swift ? <div><span className="text-[#8A8E86]">SWIFT:</span> {companyProfile.swift}</div> : null}
                 </div>
               </div>
             ) : null}
@@ -205,14 +205,14 @@ export function DocSheet({
               <div className="space-y-4">
                 {notes ? (
                   <div>
-                    <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">Notes</div>
-                    <p className="mt-1.5 whitespace-pre-line text-[13px] text-[#5F6368]">{notes}</p>
+                    <div className="text-[11px] uppercase tracking-wide text-[#8A8E86]">Notes</div>
+                    <p className="mt-1.5 whitespace-pre-line text-[13px] text-[#6B6F68]">{notes}</p>
                   </div>
                 ) : null}
                 {terms ? (
                   <div>
-                    <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">Terms</div>
-                    <p className="mt-1.5 whitespace-pre-line text-[13px] text-[#5F6368]">{terms}</p>
+                    <div className="text-[11px] uppercase tracking-wide text-[#8A8E86]">Terms</div>
+                    <p className="mt-1.5 whitespace-pre-line text-[13px] text-[#6B6F68]">{terms}</p>
                   </div>
                 ) : null}
               </div>
@@ -222,24 +222,24 @@ export function DocSheet({
 
         {/* Signature block — delivery notes: received-by / signature / date */}
         {signatureBlock ? (
-          <div className="mt-10 grid grid-cols-1 gap-8 border-t border-[#F0F0EC] pt-6 sm:grid-cols-3">
+          <div className="mt-10 grid grid-cols-1 gap-8 border-t border-[#EEF1F5] pt-6 sm:grid-cols-3">
             <div>
-              <div className="h-8 border-b border-[#9A9DA1]" />
-              <div className="mt-1.5 text-[11px] uppercase tracking-wide text-[#9A9DA1]">Received by (name)</div>
+              <div className="h-8 border-b border-[#8A8E86]" />
+              <div className="mt-1.5 text-[11px] uppercase tracking-wide text-[#8A8E86]">Received by (name)</div>
             </div>
             <div>
-              <div className="h-8 border-b border-[#9A9DA1]" />
-              <div className="mt-1.5 text-[11px] uppercase tracking-wide text-[#9A9DA1]">Signature</div>
+              <div className="h-8 border-b border-[#8A8E86]" />
+              <div className="mt-1.5 text-[11px] uppercase tracking-wide text-[#8A8E86]">Signature</div>
             </div>
             <div>
-              <div className="h-8 border-b border-[#9A9DA1]" />
-              <div className="mt-1.5 text-[11px] uppercase tracking-wide text-[#9A9DA1]">Date</div>
+              <div className="h-8 border-b border-[#8A8E86]" />
+              <div className="mt-1.5 text-[11px] uppercase tracking-wide text-[#8A8E86]">Date</div>
             </div>
           </div>
         ) : null}
 
         {footerText ? (
-          <div className="mt-8 whitespace-pre-line text-center text-[12px] text-[#9A9DA1]">{footerText}</div>
+          <div className="mt-8 whitespace-pre-line text-center text-[12px] text-[#8A8E86]">{footerText}</div>
         ) : null}
       </div>
     </>

@@ -71,10 +71,10 @@ export function DocumentDetailPanel({
   const statementSummary = extracted?.summary ?? null;
 
   const preview = (
-    <div className="flex flex-col rounded-2xl border border-[#E7E7E2] bg-white">
-      <div className="flex items-center justify-between gap-3 border-b border-[#F0F0EC] px-6 py-5">
-        <h2 className="text-[15px] font-semibold text-[#1A1C1E]">Original document</h2>
-        <span className="truncate text-[12px] text-[#9A9DA1]">{doc.filename}</span>
+    <div className="flex flex-col rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+      <div className="flex items-center justify-between gap-3 border-b border-[#EEF1F5] px-6 py-5">
+        <h2 className="of-display text-[16px] font-semibold text-[#171A17]">Original document</h2>
+        <span className="truncate text-[12px] text-[#A0A49C]">{doc.filename}</span>
       </div>
       <div className="p-4">
         {originalUrl ? (
@@ -83,18 +83,18 @@ export function DocumentDetailPanel({
             <img
               src={originalUrl}
               alt="Original document"
-              className="max-h-[calc(100vh-16rem)] w-full rounded-xl border border-[#E7E7E2] object-contain"
+              className="max-h-[calc(100vh-16rem)] w-full rounded-xl border border-[#EAEDF2] object-contain"
             />
           ) : (
             <iframe
               src={originalUrl}
               title="Original document"
-              className="h-[calc(100vh-16rem)] min-h-[420px] w-full rounded-xl border border-[#E7E7E2]"
+              className="h-[calc(100vh-16rem)] min-h-[420px] w-full rounded-xl border border-[#EAEDF2]"
             />
           )
         ) : (
-          <div className="flex min-h-[50vh] items-center justify-center rounded-xl border border-dashed border-[#E7E7E2] bg-[#FAFAF8]">
-            <span className="text-[13px] text-[#9A9DA1]">Preview unavailable</span>
+          <div className="flex min-h-[50vh] items-center justify-center rounded-xl border border-dashed border-[#EAEDF2] bg-[#F5F9FE]">
+            <span className="text-[13px] text-[#8A8E86]">Preview unavailable</span>
           </div>
         )}
       </div>
@@ -108,21 +108,21 @@ export function DocumentDetailPanel({
         <div className="flex min-w-0 items-center gap-3">
           <Link
             href="/app/docu"
-            className="inline-flex h-8 shrink-0 items-center gap-1 rounded-full border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#5F6368] transition-colors hover:border-[#3E7BC4]/30 hover:text-[#1A1C1E]"
+            className="inline-flex h-[38px] shrink-0 items-center gap-1 rounded-full border border-[#E2E6EC] bg-white px-4 text-[13px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]"
           >
             <span aria-hidden>‹</span> Documents
           </Link>
           <div className="min-w-0">
             <DocumentRename documentId={doc.id} filename={doc.filename} />
             <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[13px]">
-              <span className="text-[#5F6368]">{supplierName}</span>
+              <span className="text-[#6B6F68]">{supplierName}</span>
               {autoMatched ? (
-                <span className="inline-flex items-center rounded-full bg-[#E6F1FB] px-2 py-0.5 text-[11px] font-medium text-[#0C447C]">
-                  auto-matched · {match.confidence}%
+                <span className="inline-flex items-center rounded-full bg-[#E6F1FB] px-2.5 py-1 text-[11px] font-medium text-[#0C447C]">
+                  auto-matched · <span className="of-num">{match.confidence}%</span>
                 </span>
               ) : null}
-              <span className="text-[#9A9DA1]">·</span>
-              <span className="text-[#5F6368]">
+              <span className="text-[#8A8E86]">·</span>
+              <span className="text-[#6B6F68]">
                 <ConfidenceText value={doc.confidence} /> confidence
               </span>
             </div>
@@ -164,21 +164,21 @@ export function DocumentDetailPanel({
       </div>
 
       {/* Additional information — collapsed by default */}
-      <div className="mt-6 overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
+      <div className="mt-6 overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
         <button
           type="button"
           onClick={() => setShowMore((s) => !s)}
-          className="flex w-full items-center justify-between px-6 py-4 text-left transition-colors hover:bg-[#FAFAF8]"
+          className="flex w-full items-center justify-between px-6 py-4 text-left transition-colors hover:bg-[#F5F9FE]"
           aria-expanded={showMore}
         >
           <span className="flex items-center gap-2">
-            <span className="text-[15px] font-semibold text-[#1A1C1E]">Additional information</span>
-            <span className="text-[12px] text-[#9A9DA1]">
+            <span className="of-display text-[16px] font-semibold text-[#171A17]">Additional information</span>
+            <span className="text-[12px] text-[#A0A49C]">
               Workflow, AI summary, flags, supplier intel & more
             </span>
           </span>
           <span
-            className={`text-[#9A9DA1] transition-transform ${showMore ? 'rotate-180' : ''}`}
+            className={`text-[#8A8E86] transition-transform ${showMore ? 'rotate-180' : ''}`}
             aria-hidden
           >
             ▾
@@ -186,13 +186,13 @@ export function DocumentDetailPanel({
         </button>
 
         {showMore ? (
-          <div className="border-t border-[#F0F0EC] p-5">
+          <div className="border-t border-[#EEF1F5] p-5">
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
               <ApprovalActions documentId={doc.id} status={doc.status} />
               <AiSummaryCard documentId={doc.id} initialSummary={initialSummary} />
               {statementSummary ? <StatementTotalsCard summary={statementSummary} /> : null}
-              <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
-                <h3 className="mb-3 text-[14px] font-medium text-[#1A1C1E]">Flags</h3>
+              <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+                <h3 className="of-display mb-3 text-[16px] font-semibold text-[#171A17]">Flags</h3>
                 <FlagsList flags={flags} />
               </div>
               <SupplierIntelligenceCard intel={intel} />

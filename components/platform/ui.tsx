@@ -18,7 +18,7 @@ export function StatusPill({ status }: { status: DocumentStatus }) {
 }
 
 export function ConfidenceText({ value }: { value: number | null }) {
-  if (value == null) return <span className="text-[#9A9DA1]">—</span>;
+  if (value == null) return <span className="text-[#8A8E86]">—</span>;
   const color = value >= 80 ? '#0F6E56' : value >= 70 ? '#854F0B' : '#A32D2D';
   return (
     <span className="font-semibold" style={{ color }}>
@@ -43,16 +43,19 @@ export function KpiTile({
   return (
     <Link
       href={href}
-      className="block rounded-2xl border border-[#E7E7E2] bg-white p-4 transition-colors hover:border-[#3E7BC4]/30"
+      className="block rounded-2xl border border-[#EAEDF2] bg-white px-6 py-[22px] shadow-[0_1px_2px_rgba(20,24,20,0.03)] transition-colors hover:border-[#C9DEF7] hover:bg-[#FBFCFE]"
     >
-      <div className="flex items-center justify-between">
-        <span className="text-[13px] text-[#5F6368]">{label}</span>
-        <span className="text-[15px] text-[#9A9DA1]">›</span>
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">{label}</span>
+        <span className="text-[15px] text-[#8A8E86]">›</span>
       </div>
-      <div className="mt-2 text-[28px] font-bold leading-none" style={accent ? { color: accent } : undefined}>
+      <div
+        className="of-num mt-2 text-[30px] font-semibold leading-none tracking-[-0.02em]"
+        style={accent ? { color: accent } : { color: '#171A17' }}
+      >
         {value}
       </div>
-      {sublabel ? <div className="mt-1 text-[12px] text-[#9A9DA1]">{sublabel}</div> : null}
+      {sublabel ? <div className="mt-1.5 text-[13px] text-[#6B6F68]">{sublabel}</div> : null}
     </Link>
   );
 }

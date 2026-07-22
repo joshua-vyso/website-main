@@ -102,18 +102,18 @@ export function ProductMatching({
   }
 
   return (
-    <div className="rounded-2xl border border-[#E7E7E2] bg-white">
-      <div className="flex items-center justify-between border-b border-[#E7E7E2] px-5 py-4">
+    <div className="rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+      <div className="flex items-center justify-between border-b border-[#EEF1F5] px-5 py-4">
         <div>
-          <h2 className="text-[16px] font-semibold text-[#1A1C1E]">Product matching</h2>
-          <p className="mt-0.5 text-[13px] text-[#5F6368]">
+          <h2 className="of-display text-[16px] font-semibold text-[#171A17]">Product matching</h2>
+          <p className="mt-0.5 text-[13px] text-[#6B6F68]">
             Reconcile products discovered from documents with your catalogue names. Confirm to merge
             duplicates; the link is remembered for future documents.
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-2">
           {visible.length > 0 ? (
-            <span className="rounded-full bg-[#FBEEDA] px-2.5 py-1 text-[12px] font-medium text-[#854F0B]">
+            <span className="of-num rounded-full bg-[#FBEEDA] px-2.5 py-1 text-[11px] font-medium text-[#854F0B]">
               {visible.length} to review
             </span>
           ) : null}
@@ -122,7 +122,7 @@ export function ProductMatching({
               type="button"
               onClick={() => void runAiScan()}
               disabled={scanning}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[13px] font-medium text-[#1F5FA8] transition-colors hover:border-[#3E7BC4]/40 disabled:opacity-50"
+              className="inline-flex h-[38px] items-center gap-1.5 rounded-[11px] border border-[#E2E6EC] bg-white px-4 text-[13px] font-medium text-[#1F5FA8] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87] disabled:opacity-50"
             >
               {scanning ? 'Scanning…' : '✦ Find matches with AI'}
             </button>
@@ -131,12 +131,12 @@ export function ProductMatching({
       </div>
 
       {visible.length === 0 ? (
-        <div className="px-5 py-10 text-center text-[13px] text-[#9A9DA1]">
+        <div className="px-5 py-12 text-center text-[14px] text-[#8A8E86]">
           No duplicate products to review — your catalogue names line up.
         </div>
       ) : (
         <>
-          <div className="flex items-center px-5 py-2.5 text-[12px] font-medium text-[#9A9DA1]">
+          <div className="flex items-center px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.06em] text-[#A0A49C]">
             <div className="flex-1">Discovered product</div>
             <div className="w-[220px]">Suggested product name</div>
             <div className="w-[220px]">Custom product name</div>
@@ -146,13 +146,13 @@ export function ProductMatching({
           {visible.map((c) => (
             <div
               key={c.itemId}
-              className="flex items-center gap-2 border-t border-[#EFEFEC] px-5 py-3 text-[13px]"
+              className="flex items-center gap-2 border-t border-[#F4F5F7] px-5 py-3 text-[14px]"
             >
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <span className="truncate font-medium text-[#1A1C1E]">{c.discoveredName}</span>
+                  <span className="truncate font-semibold text-[#171A17]">{c.discoveredName}</span>
                   {c.method === 'ai' ? (
-                    <span className="shrink-0 rounded-full bg-[#E6F1FB] px-2 py-0.5 text-[10px] font-medium text-[#0C447C]">
+                    <span className="of-num shrink-0 rounded-full bg-[#E6F1FB] px-2 py-0.5 text-[10px] font-medium text-[#0C447C]">
                       AI · {Math.round(c.score * 100)}%
                     </span>
                   ) : (
@@ -162,15 +162,15 @@ export function ProductMatching({
                   )}
                 </div>
                 {c.method === 'ai' && c.rationale ? (
-                  <p className="mt-0.5 truncate text-[11px] text-[#9A9DA1]">{c.rationale}</p>
+                  <p className="mt-0.5 truncate text-[11px] text-[#A0A49C]">{c.rationale}</p>
                 ) : null}
               </div>
-              <div className="w-[220px] truncate text-[#5F6368]">{c.suggestedName}</div>
+              <div className="w-[220px] truncate text-[#6B6F68]">{c.suggestedName}</div>
               <div className="w-[220px]">
                 <input
                   value={custom[c.itemId] ?? ''}
                   onChange={(e) => setCustom((m) => ({ ...m, [c.itemId]: e.target.value }))}
-                  className="h-9 w-full rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:border-[#3E7BC4]/40 focus:outline-none"
+                  className="h-10 w-full rounded-[10px] border border-[#E4E9F0] bg-white px-3 text-[14px] text-[#171A17] outline-none focus:border-[#3E7BC4]"
                 />
               </div>
               <div className="flex w-[150px] items-center justify-end gap-1.5">
@@ -178,7 +178,7 @@ export function ProductMatching({
                   type="button"
                   onClick={() => confirm(c)}
                   disabled={busy === c.itemId || !(custom[c.itemId] ?? '').trim()}
-                  className="rounded-lg bg-[#1F5FA8] px-3 py-1.5 text-[12px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
+                  className="inline-flex h-[34px] items-center rounded-[10px] bg-[#1F5FA8] px-3 text-[12px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
                 >
                   {busy === c.itemId ? '…' : 'Confirm'}
                 </button>
@@ -187,7 +187,7 @@ export function ProductMatching({
                   onClick={() => dismiss(c)}
                   disabled={busy === c.itemId}
                   aria-label="Dismiss match"
-                  className="flex h-8 w-8 items-center justify-center rounded-lg text-[#9A9DA1] transition-colors hover:bg-[#FCEBEB] hover:text-[#A32D2D] disabled:opacity-40"
+                  className="flex h-8 w-8 items-center justify-center rounded-[10px] text-[#A0A49C] transition-colors hover:bg-[#FCEBEB] hover:text-[#A32D2D] disabled:opacity-40"
                 >
                   ✕
                 </button>
@@ -197,7 +197,7 @@ export function ProductMatching({
         </>
       )}
 
-      {msg ? <p className="px-5 pb-4 text-[12px] text-[#A32D2D]">{msg}</p> : null}
+      {msg ? <p className="px-5 pb-4 text-[13px] text-[#A32D2D]">{msg}</p> : null}
     </div>
   );
 }

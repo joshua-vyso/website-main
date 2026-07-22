@@ -161,7 +161,7 @@ export const ORDER_STATUSES: readonly OrderStatus[] = [
 type Style = { bg: string; fg: string; label: string };
 
 export const ORDER_STATUS_STYLE: Record<OrderStatus, Style> = {
-  draft: { bg: '#F0F0EC', fg: '#5F6368', label: 'Draft' },
+  draft: { bg: '#EEF1F5', fg: '#6B6F68', label: 'Draft' },
   confirmed: { bg: '#E6F1FB', fg: '#0C447C', label: 'Confirmed' },
   picking: { bg: '#FBF3E4', fg: '#8A6D1B', label: 'Picking' },
   packed: { bg: '#EDE9FB', fg: '#5B3FA8', label: 'Packed' },
@@ -185,7 +185,7 @@ export const INVOICE_STATUSES: readonly InvoiceStatus[] = [
 ];
 
 export const INVOICE_STATUS_STYLE: Record<InvoiceStatus, Style> = {
-  draft: { bg: '#F0F0EC', fg: '#5F6368', label: 'Draft' },
+  draft: { bg: '#EEF1F5', fg: '#6B6F68', label: 'Draft' },
   sent: { bg: '#E6F1FB', fg: '#0C447C', label: 'Sent' },
   viewed: { bg: '#EDE9FB', fg: '#5B3FA8', label: 'Viewed' },
   partially_paid: { bg: '#FBE9D6', fg: '#B45309', label: 'Part-paid' },
@@ -196,7 +196,7 @@ export const INVOICE_STATUS_STYLE: Record<InvoiceStatus, Style> = {
 };
 
 export const PAYMENT_STATUS_STYLE: Record<PaymentStatus, Style> = {
-  unpaid: { bg: '#F0F0EC', fg: '#5F6368', label: 'Unpaid' },
+  unpaid: { bg: '#EEF1F5', fg: '#6B6F68', label: 'Unpaid' },
   partial: { bg: '#FBE9D6', fg: '#B45309', label: 'Partial' },
   paid: { bg: '#E1F5EE', fg: '#0F6E56', label: 'Paid' },
 };
@@ -487,7 +487,7 @@ export const DEFAULT_OF_SETTINGS: OfSettings = {
 };
 
 export const QUOTE_STATUS_STYLE: Record<QuoteStatus, Style> = {
-  draft: { bg: '#F0F0EC', fg: '#5F6368', label: 'Draft' },
+  draft: { bg: '#EEF1F5', fg: '#6B6F68', label: 'Draft' },
   sent: { bg: '#E6F1FB', fg: '#0C447C', label: 'Sent' },
   accepted: { bg: '#E1F5EE', fg: '#0F6E56', label: 'Accepted' },
   rejected: { bg: '#FCEBEB', fg: '#A32D2D', label: 'Rejected' },
@@ -495,12 +495,12 @@ export const QUOTE_STATUS_STYLE: Record<QuoteStatus, Style> = {
 };
 
 export const CREDIT_NOTE_STATUS_STYLE: Record<CreditNoteStatus, Style> = {
-  draft: { bg: '#F0F0EC', fg: '#5F6368', label: 'Draft' },
+  draft: { bg: '#EEF1F5', fg: '#6B6F68', label: 'Draft' },
   issued: { bg: '#EDE9FB', fg: '#5B3FA8', label: 'Issued' },
 };
 
 export const DELIVERY_NOTE_STATUS_STYLE: Record<DeliveryNoteStatus, Style> = {
-  draft: { bg: '#F0F0EC', fg: '#5F6368', label: 'Draft' },
+  draft: { bg: '#EEF1F5', fg: '#6B6F68', label: 'Draft' },
   out_for_delivery: { bg: '#E4F0FB', fg: '#1D5F8A', label: 'Out for delivery' },
   delivered: { bg: '#E8F3E8', fg: '#2F6B2F', label: 'Delivered' },
 };
@@ -514,7 +514,7 @@ export const PAYMENT_METHODS: { value: PaymentMethod; label: string }[] = [
 
 export const ACCOUNT_STATUS_STYLE: Record<AccountStatus, Style> = {
   active: { bg: '#E1F5EE', fg: '#0F6E56', label: 'Active' },
-  inactive: { bg: '#F0F0EC', fg: '#5F6368', label: 'Inactive' },
+  inactive: { bg: '#EEF1F5', fg: '#6B6F68', label: 'Inactive' },
   on_hold: { bg: '#FCEBEB', fg: '#A32D2D', label: 'On hold' },
 };
 

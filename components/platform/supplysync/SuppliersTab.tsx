@@ -57,7 +57,7 @@ const SORT_OPTIONS: { value: SortKey; label: string }[] = [
 const RISK_RANK: Record<SupplierRisk, number> = { high: 3, medium: 2, low: 1 };
 
 const SELECT_CLASS =
-  'h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#3E7BC4]';
+  'h-11 rounded-[12px] border border-[#E4E9F0] bg-white px-3.5 text-[14px] text-[#3E4A57] outline-none transition-colors focus:border-[#3E7BC4]';
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -147,13 +147,13 @@ export function SuppliersTab() {
     // Supplier — opens the profile drawer
     <SupplierNameButton key="name" id={s.id} name={s.name} />,
     // Category
-    <span key="cat" className="text-[13px] text-[#5F6368]">
+    <span key="cat" className="text-[14px] text-[#6B6F68]">
       {s.category || '—'}
     </span>,
     // Main contact (name + faint phone)
     <div key="contact" className="min-w-[140px]">
-      <div className="text-[13px] text-[#1A1C1E]">{s.contactName ?? '—'}</div>
-      {s.contactPhone ? <div className="text-[11px] text-[#9A9DA1]">{s.contactPhone}</div> : null}
+      <div className="text-[14px] text-[#2C333B]">{s.contactName ?? '—'}</div>
+      {s.contactPhone ? <div className="of-num mt-0.5 text-[12px] text-[#A0A49C]">{s.contactPhone}</div> : null}
     </div>,
     // Status
     <SupplierStatusBadge key="status" status={s.status} />,
@@ -168,7 +168,7 @@ export function SuppliersTab() {
     // Compliance
     <ScorePill key="compliance" value={s.scorecard.compliance} suffix="%" />,
     // Last order
-    <span key="last" className="text-[13px] text-[#5F6368]">
+    <span key="last" className="of-num text-[14px] text-[#6B6F68]">
       {fmtDate(s.lastOrder)}
     </span>,
     // Actions
@@ -202,7 +202,7 @@ export function SuppliersTab() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search suppliers, category or contact…"
-          className="h-9 min-w-[220px] flex-1 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] outline-none placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]"
+          className="h-11 min-w-[220px] flex-1 rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] outline-none transition-colors placeholder:text-[#A0A49C] focus:border-[#3E7BC4]"
         />
 
         <select
@@ -286,8 +286,8 @@ export function SuppliersTab() {
       </div>
 
       {/* Results count */}
-      <p className="text-[12px] text-[#9A9DA1]">
-        {filtered.length} of {suppliers.length} supplier{suppliers.length === 1 ? '' : 's'}
+      <p className="text-[12px] text-[#A0A49C]">
+        <span className="of-num">{filtered.length}</span> of <span className="of-num">{suppliers.length}</span> supplier{suppliers.length === 1 ? '' : 's'}
       </p>
 
       {/* Table */}

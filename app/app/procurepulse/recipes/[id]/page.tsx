@@ -16,12 +16,12 @@ export default async function RecipeDetailPage({ params }: { params: Promise<{ i
   if (!recipe) {
     return (
       <div className="space-y-4">
-        <Link href="/app/procurepulse/recipes" className="text-[13px] text-[#5F6368]">
+        <Link href="/app/procurepulse/recipes" className="text-[13px] text-[#6B6F68]">
           ‹&nbsp;&nbsp;Recipes
         </Link>
-        <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
-          <div className="text-[14px] font-medium text-[#1A1C1E]">Recipe not found</div>
-          <p className="mt-1 text-[13px] text-[#9A9DA1]">
+        <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <div className="of-display text-[16px] font-semibold text-[#171A17]">Recipe not found</div>
+          <p className="mt-1 text-[13px] text-[#8A8E86]">
             This recipe may have been removed or is not part of your organisation.
           </p>
         </div>

@@ -49,23 +49,23 @@ export function SupplierIntelligenceCard({ intel }: { intel: SupplierIntelligenc
   ];
 
   return (
-    <div className="rounded-2xl border border-[#E7E7E2] bg-white px-5 py-4">
+    <div className="rounded-2xl border border-[#EAEDF2] bg-white px-5 py-4 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
       <div className="flex items-center gap-3">
         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EAF2FC] text-[13px] font-semibold text-[#1F5FA8]">
           {initials(intel.name)}
         </div>
         <div className="min-w-0">
-          <div className="truncate text-[15px] font-semibold text-[#1A1C1E]">{intel.name}</div>
-          <div className="text-[12px] text-[#9A9DA1]">Supplier intelligence</div>
+          <div className="of-display truncate text-[16px] font-semibold text-[#171A17]">{intel.name}</div>
+          <div className="text-[12px] text-[#A0A49C]">Supplier intelligence</div>
         </div>
       </div>
 
       <div className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3">
         {rows.map((r) => (
           <div key={r.label} className="min-w-0">
-            <div className="text-[12px] text-[#5F6368]">{r.label}</div>
+            <div className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">{r.label}</div>
             <div
-              className="mt-0.5 truncate text-[14px] font-medium text-[#1A1C1E]"
+              className="of-num mt-1 truncate text-[15px] font-semibold text-[#171A17]"
               style={r.accent ? { color: r.accent } : undefined}
             >
               {r.value}
@@ -74,16 +74,16 @@ export function SupplierIntelligenceCard({ intel }: { intel: SupplierIntelligenc
         ))}
       </div>
 
-      <div className="mt-4 border-t border-[#F0F0EC] pt-3">
-        <div className="text-[12px] text-[#5F6368]">Linked modules</div>
+      <div className="mt-4 border-t border-[#EEF1F5] pt-3">
+        <div className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">Linked modules</div>
         {intel.linkedModules.length === 0 ? (
-          <p className="mt-1 text-[13px] text-[#9A9DA1]">—</p>
+          <p className="mt-1 text-[13px] text-[#A0A49C]">—</p>
         ) : (
           <div className="mt-1.5 flex flex-wrap gap-1.5">
             {intel.linkedModules.map((m) => (
               <span
                 key={m}
-                className="rounded-full bg-[#F0F0EC] px-2 py-0.5 text-[11px] text-[#5F6368]"
+                className="inline-flex items-center rounded-full bg-[#EEF1F5] px-2.5 py-1 text-[11px] font-medium text-[#6B6F68]"
               >
                 {m}
               </span>

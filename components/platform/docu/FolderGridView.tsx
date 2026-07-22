@@ -64,21 +64,21 @@ export function FolderGridView({
       {/* Header */}
       <div className="mt-6 flex flex-wrap items-start justify-between gap-x-4 gap-y-3">
         <div className="min-w-[12rem] flex-1">
-          <h1 className="text-[26px] font-bold leading-tight text-[#1A1C1E]">Documents</h1>
-          <p className="mt-1 text-[14px] text-[#5F6368]">
+          <h1 className="of-display text-[28px] font-semibold leading-tight tracking-[-0.015em] text-[#171A17]">Documents</h1>
+          <p className="mt-1.5 text-[14px] text-[#8A8E86]">
             Browse by folder — open one to see its documents by month
           </p>
         </div>
         <div className="flex shrink-0 items-center gap-3">
           {/* View toggle */}
-          <div className="inline-flex h-10 items-center rounded-xl border border-[#E7E7E2] bg-white p-0.5">
+          <div className="inline-flex h-[42px] items-center rounded-[11px] border border-[#E2E6EC] bg-white p-0.5">
             <button
               type="button"
               onClick={() => pickView('grid')}
               aria-pressed={view === 'grid'}
               aria-label="Grid view"
-              className={`flex h-9 w-9 items-center justify-center rounded-[10px] transition-colors ${
-                view === 'grid' ? 'bg-[#1A1C1E] text-white' : 'text-[#5F6368] hover:text-[#1A1C1E]'
+              className={`flex h-[38px] w-[38px] items-center justify-center rounded-[9px] transition-colors ${
+                view === 'grid' ? 'bg-[#1F5FA8] text-white' : 'text-[#6B6F68] hover:bg-[#EAF2FC] hover:text-[#174C87]'
               }`}
             >
               <svg width="15" height="15" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
@@ -93,8 +93,8 @@ export function FolderGridView({
               onClick={() => pickView('list')}
               aria-pressed={view === 'list'}
               aria-label="List view"
-              className={`flex h-9 w-9 items-center justify-center rounded-[10px] transition-colors ${
-                view === 'list' ? 'bg-[#1A1C1E] text-white' : 'text-[#5F6368] hover:text-[#1A1C1E]'
+              className={`flex h-[38px] w-[38px] items-center justify-center rounded-[9px] transition-colors ${
+                view === 'list' ? 'bg-[#1F5FA8] text-white' : 'text-[#6B6F68] hover:bg-[#EAF2FC] hover:text-[#174C87]'
               }`}
             >
               <svg width="15" height="15" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden>
@@ -107,7 +107,7 @@ export function FolderGridView({
             <button
               type="button"
               onClick={() => setUploadOpen((o) => !o)}
-              className="inline-flex h-10 shrink-0 items-center rounded-xl bg-[#D9730D] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#C2650B]"
+              className="inline-flex h-[42px] shrink-0 items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87]"
             >
               Upload document
             </button>
@@ -129,7 +129,7 @@ export function FolderGridView({
           ))}
         </div>
       ) : (
-        <div className="mt-6 overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
+        <div className="mt-6 overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
           {tiles.map((t, i) => (
             <FolderRow key={t.key} tile={t} first={i === 0} />
           ))}
@@ -141,7 +141,7 @@ export function FolderGridView({
 
 function FolderCard({ tile }: { tile: FolderTile }) {
   return (
-    <div className="group relative flex flex-col gap-4 rounded-2xl border border-[#E7E7E2] bg-white p-5 transition-colors hover:border-[#3E7BC4]/30 hover:bg-[#FAFAF8]">
+    <div className="group relative flex flex-col gap-4 rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)] transition-colors hover:border-[#3E7BC4]/30 hover:bg-[#F5F9FE]">
       <Link
         href={`/app/docu/folder/${tile.key}`}
         aria-label={`Open ${tile.name}`}
@@ -150,7 +150,7 @@ function FolderCard({ tile }: { tile: FolderTile }) {
       <div className="pointer-events-none relative z-10 flex items-start justify-between">
         <FolderIcon color={tile.color} />
         <span className="flex items-center gap-1">
-          <span className="text-[20px] font-bold leading-none text-[#1A1C1E]">{tile.count}</span>
+          <span className="of-num text-[22px] font-semibold leading-none tracking-[-0.02em] text-[#171A17]">{tile.count}</span>
           {tile.kind === 'custom' ? (
             <span className="pointer-events-auto">
               <FolderCardMenu folderId={tile.key} name={tile.name} color={tile.color} />
@@ -159,9 +159,9 @@ function FolderCard({ tile }: { tile: FolderTile }) {
         </span>
       </div>
       <div className="pointer-events-none relative z-10 min-w-0">
-        <p className="truncate text-[15px] font-semibold text-[#1A1C1E]">{tile.name}</p>
-        <p className="mt-0.5 text-[12px] text-[#9A9DA1]">
-          {tile.count} document{tile.count === 1 ? '' : 's'}
+        <p className="of-display truncate text-[15px] font-semibold text-[#171A17]">{tile.name}</p>
+        <p className="mt-0.5 text-[12px] text-[#A0A49C]">
+          <span className="of-num">{tile.count}</span> document{tile.count === 1 ? '' : 's'}
           {tile.kind === 'custom' ? ' · custom folder' : ''}
         </p>
       </div>
@@ -172,27 +172,27 @@ function FolderCard({ tile }: { tile: FolderTile }) {
 function FolderRow({ tile, first }: { tile: FolderTile; first: boolean }) {
   return (
     <div
-      className={`group relative flex items-center gap-3 px-5 py-3.5 transition-colors hover:bg-[#FAFAF8] ${
-        first ? '' : 'border-t border-[#F0F0EC]'
+      className={`group relative flex items-center gap-3 px-5 py-3.5 transition-colors hover:bg-[#F5F9FE] ${
+        first ? '' : 'border-t border-[#EEF1F5]'
       }`}
     >
       <Link href={`/app/docu/folder/${tile.key}`} aria-label={`Open ${tile.name}`} className="absolute inset-0 z-0" />
       <span className="pointer-events-none relative z-10 flex min-w-0 flex-1 items-center gap-3">
         <FolderIcon color={tile.color} />
         <span className="min-w-0">
-          <span className="block truncate text-[14px] font-medium text-[#1A1C1E]">{tile.name}</span>
-          <span className="block text-[12px] text-[#9A9DA1]">
+          <span className="of-display block truncate text-[14px] font-semibold text-[#171A17]">{tile.name}</span>
+          <span className="block text-[12px] text-[#A0A49C]">
             {tile.kind === 'custom' ? 'Custom folder' : tile.kind === 'all' ? 'Everything in Doc-U' : 'Default folder'}
           </span>
         </span>
       </span>
-      <span className="pointer-events-none relative z-10 text-[14px] font-semibold text-[#1A1C1E]">{tile.count}</span>
+      <span className="of-num pointer-events-none relative z-10 text-[14px] font-semibold text-[#171A17]">{tile.count}</span>
       {tile.kind === 'custom' ? (
         <span className="pointer-events-auto relative z-10">
           <FolderCardMenu folderId={tile.key} name={tile.name} color={tile.color} />
         </span>
       ) : (
-        <span className="relative z-10 text-[#C9CCC8]" aria-hidden>›</span>
+        <span className="relative z-10 text-[#BFC5CC]" aria-hidden>›</span>
       )}
     </div>
   );

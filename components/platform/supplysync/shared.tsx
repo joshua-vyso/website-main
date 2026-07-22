@@ -25,9 +25,9 @@ export const GREEN = '#0F6E56';
 export const AMBER = '#854F0B';
 export const RED = '#A32D2D';
 export const PURPLE = '#5B53C0';
-export const INK = '#1A1C1E';
-export const MUTE = '#5F6368';
-export const FAINT = '#9A9DA1';
+export const INK = '#171A17';
+export const MUTE = '#6B6F68';
+export const FAINT = '#8A8E86';
 
 /** Score → colour band (0–100). */
 export function scoreColor(n: number): string {
@@ -47,7 +47,7 @@ export function scoreTone(n: number): Tone {
 export function ScorePill({ value, suffix = '' }: { value: number; suffix?: string }) {
   const c = scoreColor(value);
   return (
-    <span className="inline-flex items-center rounded-full px-2 py-0.5 text-[12px] font-semibold tabular-nums" style={{ backgroundColor: `${c}1A`, color: c }}>
+    <span className="of-num inline-flex items-center rounded-full px-2 py-0.5 text-[12px] font-semibold" style={{ backgroundColor: `${c}1A`, color: c }}>
       {value}
       {suffix}
     </span>
@@ -58,9 +58,9 @@ export function ScorePill({ value, suffix = '' }: { value: number; suffix?: stri
 export function ScoreStat({ label, value, suffix = '' }: { label: string; value: number; suffix?: string }) {
   const c = scoreColor(value);
   return (
-    <div className="rounded-2xl border border-[#E7E7E2] bg-white p-3.5">
-      <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">{label}</div>
-      <div className="mt-1 text-[22px] font-bold leading-none tabular-nums" style={{ color: c }}>{value}{suffix}</div>
+    <div className="rounded-[14px] border border-[#EEF1F5] bg-white p-3.5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+      <div className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">{label}</div>
+      <div className="of-num mt-2 text-[22px] font-semibold leading-none tracking-[-0.02em]" style={{ color: c }}>{value}{suffix}</div>
     </div>
   );
 }
@@ -157,7 +157,7 @@ export function SupplierNameButton({ id, name, className = '' }: { id: string; n
     <button
       type="button"
       onClick={() => openProfile(id)}
-      className={`text-left font-medium text-[#1A1C1E] transition-colors hover:text-[#B0466A] hover:underline ${className}`}
+      className={`text-left font-medium text-[#171A17] transition-colors hover:text-[#1F5FA8] hover:underline ${className}`}
     >
       {name}
     </button>
@@ -213,9 +213,9 @@ export function eventMeta(eventType: string): { label: string; color: string } {
 
 export function EmptyState({ title, hint }: { title: string; hint: string }) {
   return (
-    <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
-      <p className="text-[15px] font-medium text-[#1A1C1E]">{title}</p>
-      <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">{hint}</p>
+    <div className="rounded-2xl border border-dashed border-[#E2E6EC] bg-[#FBFCFE] px-6 py-12 text-center">
+      <p className="of-display text-[16px] font-semibold text-[#171A17]">{title}</p>
+      <p className="mx-auto mt-1.5 max-w-md text-[13px] text-[#6B6F68]">{hint}</p>
     </div>
   );
 }

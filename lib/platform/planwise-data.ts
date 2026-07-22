@@ -34,7 +34,7 @@ export async function getPlanWiseData(orgId: string): Promise<PlanWiseData> {
     profitImpact: num(r.profit_impact),
     suggestedAction: r.suggested_action ?? '',
     module: r.module ?? undefined,
-    color: r.color ?? '#5F6368',
+    color: r.color ?? '#6B6F68',
   }));
 
   const goals: GoalSummary[] = ((goa.data as any[]) ?? []).map((r) => ({

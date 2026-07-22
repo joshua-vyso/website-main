@@ -98,17 +98,17 @@ export function ComplaintsManager({
     router.refresh();
   }
 
-  const field = 'h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none';
+  const field = 'h-11 w-full rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]';
 
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-[26px] font-bold text-[#1A1C1E]">Customer complaints</h1>
-          <p className="mt-1 text-[14px] text-[#5F6368]">Issues raised about orders — notes, photos and status</p>
+          <h1 className="of-display text-[28px] font-semibold tracking-[-0.015em] text-[#171A17]">Customer complaints</h1>
+          <p className="mt-1 text-[14px] text-[#8A8E86]">Issues raised about orders — notes, photos and status</p>
         </div>
         {!open ? (
-          <button type="button" onClick={() => setOpen(true)} className="inline-flex h-10 items-center rounded-xl bg-[#1F5FA8] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87]">
+          <button type="button" onClick={() => setOpen(true)} className="inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87]">
             + Log complaint
           </button>
         ) : null}
@@ -116,7 +116,7 @@ export function ComplaintsManager({
 
       <div className="mt-6 space-y-3">
         {open ? (
-          <div className="rounded-2xl border border-[#3E7BC4]/30 bg-[#FBFBF9] p-4">
+          <div className="rounded-2xl border border-[#C9DEF7] bg-[#FBFCFE] p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <input className={field} placeholder="What went wrong? (title)" value={title} onChange={(e) => setTitle(e.target.value)} />
               <select className={field} value={customerId} onChange={(e) => setCustomerId(e.target.value)}>
@@ -131,8 +131,8 @@ export function ComplaintsManager({
               <textarea className={`${field} sm:col-span-2 h-20 resize-none py-2`} placeholder="Details…" value={body} onChange={(e) => setBody(e.target.value)} />
             </div>
             <div className="mt-3 flex justify-end gap-2">
-              <button type="button" onClick={reset} className="rounded-lg px-3.5 py-2 text-[13px] text-[#5F6368] hover:bg-black/[0.03]">Cancel</button>
-              <button type="button" onClick={() => void create()} disabled={busy || !title.trim()} className="rounded-lg bg-[#1F5FA8] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-40">
+              <button type="button" onClick={reset} className="inline-flex h-[42px] items-center rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]">Cancel</button>
+              <button type="button" onClick={() => void create()} disabled={busy || !title.trim()} className="inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-40">
                 {busy ? 'Saving…' : 'Log complaint'}
               </button>
             </div>
@@ -141,33 +141,33 @@ export function ComplaintsManager({
         ) : null}
 
         {complaints.length === 0 && !open ? (
-          <div className="rounded-2xl border border-dashed border-[#E7E7E2] bg-white px-8 py-14 text-center">
-            <h2 className="text-[18px] font-semibold text-[#1A1C1E]">No complaints logged</h2>
-            <p className="mx-auto mt-1 max-w-md text-[14px] text-[#5F6368]">Issues customers raise about their orders will live here.</p>
+          <div className="rounded-2xl border border-dashed border-[#EAEDF2] bg-white px-8 py-14 text-center">
+            <h2 className="of-display text-[18px] font-semibold text-[#171A17]">No complaints logged</h2>
+            <p className="mx-auto mt-1 max-w-md text-[14px] text-[#8A8E86]">Issues customers raise about their orders will live here.</p>
           </div>
         ) : (
           complaints.map((c) => {
             const s = COMPLAINT_STATUS_STYLE[c.status] ?? COMPLAINT_STATUS_STYLE.open;
             return (
-              <div key={c.id} className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
+              <div key={c.id} className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="text-[15px] font-semibold text-[#1A1C1E]">{c.title}</span>
+                      <span className="of-display text-[16px] font-semibold text-[#171A17]">{c.title}</span>
                       <span className="rounded-full px-2 py-0.5 text-[11px] font-medium" style={{ backgroundColor: s.bg, color: s.fg }}>{s.label}</span>
                     </div>
-                    <div className="mt-0.5 text-[12px] text-[#9A9DA1]">
+                    <div className="mt-0.5 text-[12px] text-[#A0A49C]">
                       {c.customer_name}
                       {c.order_invoice ? (
                         <>
                           {' · '}
-                          <Link href={`/app/orderflow/orders/${c.order_id}`} className="text-[#1F5FA8] hover:underline">{c.order_invoice}</Link>
+                          <Link href={`/app/orderflow/orders/${c.order_id}`} className="of-num font-medium text-[#1F5FA8] hover:underline">{c.order_invoice}</Link>
                         </>
                       ) : null}
                       {' · '}
-                      {fmtDate(c.created_at)}
+                      <span className="of-num">{fmtDate(c.created_at)}</span>
                     </div>
-                    {c.body ? <p className="mt-2 text-[13px] text-[#3C3F43]">{c.body}</p> : null}
+                    {c.body ? <p className="mt-2 text-[13px] text-[#6B6F68]">{c.body}</p> : null}
                     {c.image_url ? (
                       <a href={c.image_url} target="_blank" rel="noreferrer" className="mt-2 inline-block text-[12px] text-[#1F5FA8] hover:underline">
                         View attached image →
@@ -178,11 +178,11 @@ export function ComplaintsManager({
                     <select
                       value={c.status}
                       onChange={(e) => void setStatus(c.id, e.target.value as ComplaintStatus)}
-                      className="h-8 rounded-lg border border-[#E7E7E2] bg-white px-2 text-[12px] text-[#1A1C1E] focus:outline-none"
+                      className="h-9 rounded-[10px] border border-[#E4E9F0] bg-white px-2.5 text-[12px] text-[#171A17] outline-none focus:border-[#3E7BC4]"
                     >
                       {COMPLAINT_STATUSES.map((st) => (<option key={st} value={st}>{COMPLAINT_STATUS_STYLE[st].label}</option>))}
                     </select>
-                    <button type="button" onClick={() => void remove(c.id)} aria-label="Delete" className="flex h-8 w-8 items-center justify-center rounded-lg text-[#9A9DA1] hover:bg-[#FCEBEB] hover:text-[#A32D2D]">✕</button>
+                    <button type="button" onClick={() => void remove(c.id)} aria-label="Delete" className="flex h-9 w-9 items-center justify-center rounded-[10px] text-[#A0A49C] transition-colors hover:bg-[#FCEBEB] hover:text-[#A32D2D]">✕</button>
                   </div>
                 </div>
               </div>

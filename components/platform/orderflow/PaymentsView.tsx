@@ -220,8 +220,8 @@ export function PaymentsView({
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-[18px] font-bold text-[#1A1C1E]">Payments</h1>
-          <p className="mt-0.5 text-[13px] text-[#5F6368]">
+          <h1 className="text-[18px] font-bold text-[#171A17]">Payments</h1>
+          <p className="mt-0.5 text-[13px] text-[#6B6F68]">
             Every receipt across your invoices — record payments and attach proof.
           </p>
         </div>
@@ -244,7 +244,7 @@ export function PaymentsView({
         <select
           value={method}
           onChange={(e) => setMethod(e.target.value as 'all' | PaymentMethod)}
-          className="h-9 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E]"
+          className="h-9 rounded-lg border border-[#E2E6EC] bg-white px-3 text-[13px] text-[#171A17]"
         >
           {METHOD_FILTERS.map((m) => (
             <option key={m.value} value={m.value}>
@@ -252,20 +252,20 @@ export function PaymentsView({
             </option>
           ))}
         </select>
-        <div className="flex items-center gap-1.5 text-[12px] text-[#5F6368]">
+        <div className="flex items-center gap-1.5 text-[12px] text-[#6B6F68]">
           <span>From</span>
           <input
             type="date"
             value={fromDate}
             onChange={(e) => setFromDate(e.target.value)}
-            className="h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#1A1C1E]"
+            className="h-9 rounded-lg border border-[#E2E6EC] bg-white px-2.5 text-[13px] text-[#171A17]"
           />
           <span>to</span>
           <input
             type="date"
             value={toDate}
             onChange={(e) => setToDate(e.target.value)}
-            className="h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#1A1C1E]"
+            className="h-9 rounded-lg border border-[#E2E6EC] bg-white px-2.5 text-[13px] text-[#171A17]"
           />
           {(fromDate || toDate) && (
             <button
@@ -292,10 +292,10 @@ export function PaymentsView({
         ) : filtered.length === 0 ? (
           <EmptyState title="No matching payments" body="Try a different search, method or date range." />
         ) : (
-          <div className="overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
+          <div className="overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white">
             <table className="w-full text-[13px]">
               <thead>
-                <tr className="border-b border-[#E7E7E2] text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+                <tr className="border-b border-[#EAEDF2] text-[11px] uppercase tracking-wide text-[#8A8E86]">
                   <th className="px-4 py-3 text-left font-medium">Date</th>
                   <th className="px-4 py-3 text-left font-medium">Customer</th>
                   <th className="px-4 py-3 text-left font-medium">Invoice</th>
@@ -310,9 +310,9 @@ export function PaymentsView({
                   const inv = invoiceById.get(p.invoice_id);
                   const name = (p.customer_id && custName.get(p.customer_id)) || 'No customer';
                   return (
-                    <tr key={p.id} className="border-b border-[#F0F0EC] transition-colors last:border-0 hover:bg-[#FAFAF8]">
-                      <td className="whitespace-nowrap px-4 py-3 text-[#5F6368]">{fmtDate(p.paid_on)}</td>
-                      <td className="px-4 py-3 text-[#1A1C1E]">{name}</td>
+                    <tr key={p.id} className="border-b border-[#EEF1F5] transition-colors last:border-0 hover:bg-[#F5F9FE]">
+                      <td className="whitespace-nowrap px-4 py-3 text-[#6B6F68]">{fmtDate(p.paid_on)}</td>
+                      <td className="px-4 py-3 text-[#171A17]">{name}</td>
                       <td className="px-4 py-3">
                         {inv ? (
                           <Link
@@ -322,15 +322,15 @@ export function PaymentsView({
                             {inv.invoice_number}
                           </Link>
                         ) : (
-                          <span className="text-[#9A9DA1]">—</span>
+                          <span className="text-[#8A8E86]">—</span>
                         )}
                       </td>
-                      <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums font-medium text-[#1A1C1E]">
+                      <td className="whitespace-nowrap px-4 py-3 text-right tabular-nums font-medium text-[#171A17]">
                         {zar2(p.amount)}
                       </td>
-                      <td className="px-4 py-3 text-[#5F6368]">{METHOD_LABEL[p.method] ?? p.method}</td>
-                      <td className="px-4 py-3 text-[#5F6368]">
-                        {p.reference ? p.reference : <span className="text-[#9A9DA1]">—</span>}
+                      <td className="px-4 py-3 text-[#6B6F68]">{METHOD_LABEL[p.method] ?? p.method}</td>
+                      <td className="px-4 py-3 text-[#6B6F68]">
+                        {p.reference ? p.reference : <span className="text-[#8A8E86]">—</span>}
                       </td>
                       <td className="px-4 py-3">
                         <ReceiptCell payment={p} invoiceNumber={inv?.invoice_number ?? ''} />
@@ -420,30 +420,30 @@ function PickInvoiceModal({
         <SearchInput value={search} onChange={setSearch} placeholder="Search invoice number or customer…" />
       </div>
 
-      <div className="max-h-[340px] overflow-y-auto rounded-xl border border-[#E7E7E2]">
+      <div className="max-h-[340px] overflow-y-auto rounded-xl border border-[#EAEDF2]">
         {openInvoices.length === 0 ? (
-          <p className="px-3.5 py-8 text-center text-[13px] text-[#9A9DA1]">
+          <p className="px-3.5 py-8 text-center text-[13px] text-[#8A8E86]">
             No open invoices — every invoice is fully paid.
           </p>
         ) : results.length === 0 ? (
-          <p className="px-3.5 py-8 text-center text-[13px] text-[#9A9DA1]">No invoices match that search.</p>
+          <p className="px-3.5 py-8 text-center text-[13px] text-[#8A8E86]">No invoices match that search.</p>
         ) : (
-          <ul className="divide-y divide-[#F0F0EC]">
+          <ul className="divide-y divide-[#EEF1F5]">
             {results.map(({ inv, d }) => (
               <li key={inv.id}>
                 <button
                   type="button"
                   onClick={() => onPick(inv)}
-                  className="flex w-full items-center justify-between gap-3 px-3.5 py-2.5 text-left transition-colors hover:bg-[#FAFAF8]"
+                  className="flex w-full items-center justify-between gap-3 px-3.5 py-2.5 text-left transition-colors hover:bg-[#F5F9FE]"
                 >
                   <div className="min-w-0">
-                    <div className="truncate text-[13px] font-medium text-[#1A1C1E]">{inv.invoice_number}</div>
-                    <div className="truncate text-[12px] text-[#5F6368]">
+                    <div className="truncate text-[13px] font-medium text-[#171A17]">{inv.invoice_number}</div>
+                    <div className="truncate text-[12px] text-[#6B6F68]">
                       {(inv.customer_id && custName.get(inv.customer_id)) || 'No customer'}
                     </div>
                   </div>
                   <div className="shrink-0 text-right">
-                    <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">Balance</div>
+                    <div className="text-[11px] uppercase tracking-wide text-[#8A8E86]">Balance</div>
                     <div className="tabular-nums text-[13px] font-semibold text-[#854F0B]">{zar2(d?.balance ?? 0)}</div>
                   </div>
                 </button>
@@ -552,7 +552,7 @@ function ReceiptCell({ payment, invoiceNumber }: { payment: OfPayment; invoiceNu
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={busy}
-          className="inline-flex h-7 items-center gap-1 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/40 disabled:opacity-60"
+          className="inline-flex h-7 items-center gap-1 rounded-lg border border-[#E2E6EC] bg-white px-2.5 text-[12px] font-medium text-[#171A17] transition-colors hover:border-[#3E7BC4]/40 disabled:opacity-60"
         >
           {busy ? 'Uploading…' : '↑ Attach receipt'}
         </button>

@@ -46,7 +46,7 @@ export function ModuleLockGuard({ children }: { children: React.ReactNode }) {
     <div className="flex h-full min-h-0 items-center justify-center px-6 py-16">
       <div className="max-w-sm text-center">
         <span
-          className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#EDEFF1] text-[#5F6368]"
+          className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#EDEFF1] text-[#6B6F68]"
           aria-hidden
         >
           <svg
@@ -63,8 +63,8 @@ export function ModuleLockGuard({ children }: { children: React.ReactNode }) {
             <path d="M7 11V7a5 5 0 0 1 10 0v4" />
           </svg>
         </span>
-        <h1 className="mt-5 text-[18px] font-semibold text-[#1A1C1E]">{label} is locked</h1>
-        <p className="mt-2 text-[14px] leading-relaxed text-[#5F6368]">
+        <h1 className="mt-5 text-[18px] font-semibold text-[#171A17]">{label} is locked</h1>
+        <p className="mt-2 text-[14px] leading-relaxed text-[#6B6F68]">
           This module isn&apos;t part of your plan yet — contact joshua@vyso.co.za to unlock it.
         </p>
         <a

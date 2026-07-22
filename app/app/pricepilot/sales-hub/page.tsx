@@ -49,30 +49,30 @@ export default async function PricePilotSalesHubPage() {
   return (
     <div>
       <div>
-        <h1 className="text-[26px] font-bold text-[#1A1C1E]">Sales hub</h1>
-        <p className="mt-1 text-[14px] text-[#5F6368]">All sales grouped by month, each linked to its OrderFlow invoice</p>
+        <h1 className="of-display text-[28px] font-semibold tracking-[-0.015em] text-[#171A17]">Sales hub</h1>
+        <p className="mt-1 text-[14px] text-[#8A8E86]">All sales grouped by month, each linked to its OrderFlow invoice</p>
       </div>
 
       {groups.length === 0 ? (
-        <div className="mt-6 rounded-2xl border border-dashed border-[#E7E7E2] bg-white px-8 py-14 text-center">
-          <h2 className="text-[18px] font-semibold text-[#1A1C1E]">No sales yet</h2>
-          <p className="mx-auto mt-1 max-w-md text-[14px] text-[#5F6368]">Invoiced orders from OrderFlow will roll up here by month.</p>
+        <div className="mt-6 rounded-2xl border border-dashed border-[#EAEDF2] bg-white px-8 py-14 text-center">
+          <h2 className="of-display text-[18px] font-semibold text-[#171A17]">No sales yet</h2>
+          <p className="mx-auto mt-1 max-w-md text-[14px] text-[#8A8E86]">Invoiced orders from OrderFlow will roll up here by month.</p>
         </div>
       ) : (
         <div className="mt-6 space-y-4">
           {groups.map((g) => (
-            <div key={g.key} className="overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
-              <div className="flex items-center justify-between border-b border-[#F0F0EC] bg-[#FBFBF9] px-5 py-3">
-                <span className="text-[15px] font-semibold text-[#1A1C1E]">{monthLabel(g.key)}</span>
-                <span className="text-[13px] text-[#5F6368]">
-                  {g.orders.length} sale{g.orders.length === 1 ? '' : 's'} · <span className="font-semibold text-[#1A1C1E]">{zar(g.total)}</span>
+            <div key={g.key} className="overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+              <div className="flex items-center justify-between border-b border-[#EEF1F5] bg-[#FBFCFE] px-5 py-3">
+                <span className="of-display text-[16px] font-semibold text-[#171A17]">{monthLabel(g.key)}</span>
+                <span className="text-[13px] text-[#8A8E86]">
+                  <span className="of-num">{g.orders.length}</span> sale{g.orders.length === 1 ? '' : 's'} · <span className="of-num font-semibold text-[#171A17]">{zar(g.total)}</span>
                 </span>
               </div>
               {g.orders.map((o) => (
-                <Link key={o.id} href={`/app/orderflow/orders/${o.id}`} className="flex items-center border-t border-[#F0F0EC] px-5 py-3 text-[13px] text-[#1A1C1E] transition-colors hover:bg-[#FAFAF8] first:border-t-0">
-                  <div className="w-[130px] font-medium">{o.invoice_number ?? '—'}</div>
-                  <div className="flex-1">{(o.customer_id && custName.get(o.customer_id)) || 'No customer'}</div>
-                  <div className="w-[120px] text-right font-medium">{zar(byOrder.get(o.id) ?? 0)}</div>
+                <Link key={o.id} href={`/app/orderflow/orders/${o.id}`} className="flex items-center border-t border-[#F4F5F7] px-5 py-3 text-[14px] text-[#171A17] transition-colors hover:bg-[#F5F9FE] first:border-t-0">
+                  <div className="of-num w-[130px] font-semibold">{o.invoice_number ?? '—'}</div>
+                  <div className="flex-1 text-[#2C333B]">{(o.customer_id && custName.get(o.customer_id)) || 'No customer'}</div>
+                  <div className="of-num w-[120px] text-right font-semibold">{zar(byOrder.get(o.id) ?? 0)}</div>
                 </Link>
               ))}
             </div>

@@ -27,14 +27,14 @@ export default async function DocumentReviewPage({
   if (!doc) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center px-8 py-7">
-        <div className="max-w-sm rounded-2xl border border-[#E7E7E2] bg-white px-8 py-10 text-center">
-          <h1 className="text-[18px] font-bold text-[#1A1C1E]">Document not found</h1>
-          <p className="mt-2 text-[14px] text-[#5F6368]">
+        <div className="max-w-sm rounded-2xl border border-[#EAEDF2] bg-white px-8 py-10 text-center shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <h1 className="of-display text-[18px] font-semibold text-[#171A17]">Document not found</h1>
+          <p className="mt-2 text-[14px] text-[#6B6F68]">
             This document may have been removed or you don&apos;t have access to it.
           </p>
           <Link
             href="/app/docu"
-            className="mt-5 inline-flex h-10 items-center rounded-xl bg-[#1A1C1E] px-4 text-[14px] font-medium text-white transition-colors hover:bg-black"
+            className="mt-5 inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87]"
           >
             Back to Documents
           </Link>

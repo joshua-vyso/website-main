@@ -39,7 +39,7 @@ export function AlertRowActions({
   }
 
   if (snoozed) {
-    return <span className="text-[12px] text-[#9A9DA1]">Snoozed</span>;
+    return <span className="text-[12px] text-[#8A8E86]">Snoozed</span>;
   }
 
   return (
@@ -48,7 +48,7 @@ export function AlertRowActions({
         type="button"
         onClick={() => void reorder()}
         disabled={state === 'busy' || state === 'added'}
-        className={`rounded-lg px-3.5 py-1.5 text-[12px] font-medium text-white transition-colors disabled:opacity-70 ${
+        className={`inline-flex h-[34px] items-center rounded-[10px] px-3.5 text-[12px] font-semibold text-white transition-colors disabled:opacity-70 ${
           state === 'added' ? 'bg-[#0F6E56]' : state === 'error' ? 'bg-[#A32D2D] hover:bg-[#8f2727]' : 'bg-[#1F5FA8] hover:bg-[#174C87]'
         }`}
       >
@@ -57,7 +57,7 @@ export function AlertRowActions({
       <button
         type="button"
         onClick={() => setSnoozed(true)}
-        className="rounded-lg border border-[#D7DAD8] px-3.5 py-1.5 text-[12px] font-medium text-[#5F6368] transition-colors hover:bg-[#FAFAF8]"
+        className="inline-flex h-[34px] items-center rounded-[10px] border border-[#E2E6EC] bg-white px-3.5 text-[12px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]"
       >
         Snooze
       </button>

@@ -296,19 +296,19 @@ export function OrderDetail({
           <div className="flex flex-wrap items-center gap-3">
             <Link
               href="/app/orderflow/orders"
-              className="inline-flex h-8 items-center gap-1 rounded-full border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#5F6368] transition-colors hover:border-[#3E7BC4]/30 hover:text-[#1A1C1E]"
+              className="inline-flex h-8 items-center gap-1 rounded-full border border-[#EAEDF2] bg-white px-3 text-[13px] text-[#6B6F68] transition-colors hover:border-[#3E7BC4]/30 hover:text-[#171A17]"
             >
               <span aria-hidden>‹</span> Orders
             </Link>
-            <h1 className="text-[22px] font-bold text-[#1A1C1E]">{ref}</h1>
+            <h1 className="text-[22px] font-bold text-[#171A17]">{ref}</h1>
             <span className="rounded-full px-2.5 py-1 text-[11px] font-medium" style={{ backgroundColor: s.bg, color: s.fg }}>
               {s.label}
             </span>
             {order.source_document_id ? (
-              <span className="rounded-full bg-[#F0F0EC] px-2.5 py-1 text-[11px] font-medium text-[#5F6368]">From uploaded order</span>
+              <span className="rounded-full bg-[#EEF1F5] px-2.5 py-1 text-[11px] font-medium text-[#6B6F68]">From uploaded order</span>
             ) : null}
           </div>
-          <p className="mt-1.5 text-[13px] text-[#5F6368]">
+          <p className="mt-1.5 text-[13px] text-[#6B6F68]">
             {customer ? (
               <Link href={`/app/orderflow/customers/${customer.id}`} className="font-medium text-[#1F5FA8] hover:text-[#174C87]">
                 {customer.name}
@@ -316,8 +316,8 @@ export function OrderDetail({
             ) : (
               'No customer'
             )}
-            <span className="text-[#9A9DA1]"> · Created {fmtDate(order.created_at)}</span>
-            {order.customer_po ? <span className="text-[#9A9DA1]"> · PO {order.customer_po}</span> : null}
+            <span className="text-[#8A8E86]"> · Created {fmtDate(order.created_at)}</span>
+            {order.customer_po ? <span className="text-[#8A8E86]"> · PO {order.customer_po}</span> : null}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
@@ -336,7 +336,7 @@ export function OrderDetail({
               type="button"
               onClick={() => void makeDeliveryNote()}
               disabled={busy || items.length === 0}
-              className="inline-flex h-9 items-center rounded-lg border border-[#D7DAD8] bg-white px-4 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/40 disabled:opacity-40"
+              className="inline-flex h-9 items-center rounded-lg border border-[#E2E6EC] bg-white px-4 text-[13px] font-medium text-[#171A17] transition-colors hover:border-[#3E7BC4]/40 disabled:opacity-40"
             >
               Create delivery note
             </button>
@@ -346,7 +346,7 @@ export function OrderDetail({
               type="button"
               onClick={() => setConfirmDel(true)}
               disabled={busy}
-              className="inline-flex h-9 items-center rounded-lg border border-[#E7E7E2] px-3.5 text-[13px] text-[#9A9DA1] transition-colors hover:border-[#A32D2D]/40 hover:text-[#A32D2D] disabled:opacity-40"
+              className="inline-flex h-9 items-center rounded-lg border border-[#EAEDF2] px-3.5 text-[13px] text-[#8A8E86] transition-colors hover:border-[#A32D2D]/40 hover:text-[#A32D2D] disabled:opacity-40"
             >
               Delete
             </button>
@@ -360,7 +360,7 @@ export function OrderDetail({
           This order was cancelled — its history and documents are kept for reference.
         </div>
       ) : (
-        <div className="mt-6 rounded-2xl border border-[#E7E7E2] bg-white px-5 py-4">
+        <div className="mt-6 rounded-2xl border border-[#EAEDF2] bg-white px-5 py-4">
           <div className="flex flex-wrap items-center gap-y-3">
             {PIPELINE.map((st, i) => {
               const done = i <= stepIdx;
@@ -368,7 +368,7 @@ export function OrderDetail({
               const clickable = isPipeline && !busy && st !== order.status;
               return (
                 <div key={st} className="flex items-center">
-                  {i > 0 ? <span className={`mx-2 h-px w-6 sm:w-10 ${i <= stepIdx ? 'bg-[#1F5FA8]' : 'bg-[#E7E7E2]'}`} aria-hidden /> : null}
+                  {i > 0 ? <span className={`mx-2 h-px w-6 sm:w-10 ${i <= stepIdx ? 'bg-[#1F5FA8]' : 'bg-[#EAEDF2]'}`} aria-hidden /> : null}
                   <button
                     type="button"
                     onClick={() => clickable && void setStatus(st)}
@@ -378,12 +378,12 @@ export function OrderDetail({
                   >
                     <span
                       className={`flex h-5 w-5 items-center justify-center rounded-full border text-[10px] font-semibold ${
-                        done ? 'border-[#3E7BC4] bg-[#1F5FA8] text-white' : 'border-[#D7DAD8] bg-white text-[#9A9DA1]'
+                        done ? 'border-[#3E7BC4] bg-[#1F5FA8] text-white' : 'border-[#E2E6EC] bg-white text-[#8A8E86]'
                       } ${current ? 'ring-2 ring-[#3E7BC4]/25' : ''}`}
                     >
                       {done ? '✓' : i + 1}
                     </span>
-                    <span className={`text-[12px] font-medium ${current ? 'text-[#1F5FA8]' : done ? 'text-[#1A1C1E]' : 'text-[#9A9DA1]'}`}>
+                    <span className={`text-[12px] font-medium ${current ? 'text-[#1F5FA8]' : done ? 'text-[#171A17]' : 'text-[#8A8E86]'}`}>
                       {ORDER_STATUS_STYLE[st].label}
                     </span>
                   </button>
@@ -397,7 +397,7 @@ export function OrderDetail({
             ) : null}
           </div>
           {isPipeline ? (
-            <p className="mt-2 text-[12px] text-[#9A9DA1]">Click a step to move the order along its pipeline.</p>
+            <p className="mt-2 text-[12px] text-[#8A8E86]">Click a step to move the order along its pipeline.</p>
           ) : null}
         </div>
       )}
@@ -406,41 +406,41 @@ export function OrderDetail({
         {/* Main column */}
         <div className="space-y-5">
           {/* Items */}
-          <div className="rounded-2xl border border-[#E7E7E2] bg-white p-5">
-            <h2 className="text-[14px] font-semibold text-[#1A1C1E]">Items</h2>
-            <div className="mt-3 overflow-hidden rounded-xl border border-[#F0F0EC]">
-              <div className="grid grid-cols-[1fr_80px_100px_110px] gap-2 border-b border-[#F0F0EC] bg-[#FBFBF9] px-4 py-2 text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+          <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5">
+            <h2 className="text-[14px] font-semibold text-[#171A17]">Items</h2>
+            <div className="mt-3 overflow-hidden rounded-xl border border-[#EEF1F5]">
+              <div className="grid grid-cols-[1fr_80px_100px_110px] gap-2 border-b border-[#EEF1F5] bg-[#FBFCFE] px-4 py-2 text-[11px] uppercase tracking-wide text-[#8A8E86]">
                 <span>Item</span>
                 <span className="text-right">Qty</span>
                 <span className="text-right">Unit price</span>
                 <span className="text-right">Amount</span>
               </div>
               {items.length === 0 ? (
-                <div className="px-4 py-8 text-center text-[13px] text-[#9A9DA1]">No line items.</div>
+                <div className="px-4 py-8 text-center text-[13px] text-[#8A8E86]">No line items.</div>
               ) : (
                 items.map((it) => (
-                  <div key={it.id} className="grid grid-cols-[1fr_80px_100px_110px] gap-2 border-b border-[#F0F0EC] px-4 py-2.5 text-[13px] text-[#1A1C1E] last:border-b-0">
+                  <div key={it.id} className="grid grid-cols-[1fr_80px_100px_110px] gap-2 border-b border-[#EEF1F5] px-4 py-2.5 text-[13px] text-[#171A17] last:border-b-0">
                     <span className="truncate">{it.name}</span>
-                    <span className="text-right tabular-nums text-[#5F6368]">
+                    <span className="text-right tabular-nums text-[#6B6F68]">
                       {it.qty}
                       {it.unit ? ` ${it.unit}` : ''}
                     </span>
-                    <span className="text-right tabular-nums text-[#5F6368]">{zar2(it.unit_price)}</span>
+                    <span className="text-right tabular-nums text-[#6B6F68]">{zar2(it.unit_price)}</span>
                     <span className="text-right font-medium tabular-nums">{zar2(lineTotal(it))}</span>
                   </div>
                 ))
               )}
             </div>
             <div className="mt-4 ml-auto w-full max-w-[280px] space-y-1.5 text-[13px]">
-              <div className="flex justify-between text-[#5F6368]">
+              <div className="flex justify-between text-[#6B6F68]">
                 <span>Subtotal</span>
                 <span className="tabular-nums">{zar2(totals.subtotal)}</span>
               </div>
-              <div className="flex justify-between text-[#9A9DA1]">
+              <div className="flex justify-between text-[#8A8E86]">
                 <span>VAT ({vatRate}%)</span>
                 <span className="tabular-nums">{zar2(totals.vat)}</span>
               </div>
-              <div className="flex justify-between border-t border-[#F0F0EC] pt-1.5 text-[15px] font-bold text-[#1A1C1E]">
+              <div className="flex justify-between border-t border-[#EEF1F5] pt-1.5 text-[15px] font-bold text-[#171A17]">
                 <span>Total</span>
                 <span className="tabular-nums">{zar2(totals.total)}</span>
               </div>
@@ -448,9 +448,9 @@ export function OrderDetail({
           </div>
 
           {/* Delivery */}
-          <div className="rounded-2xl border border-[#E7E7E2] bg-white p-5">
+          <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5">
             <div className="flex items-center justify-between gap-3">
-              <h2 className="text-[14px] font-semibold text-[#1A1C1E]">Delivery</h2>
+              <h2 className="text-[14px] font-semibold text-[#171A17]">Delivery</h2>
               {editDelivery ? (
                 <div className="flex items-center gap-2">
                   <button
@@ -461,7 +461,7 @@ export function OrderDetail({
                       setDInstructions(order.delivery_instructions ?? '');
                       setDDate(order.delivery_date ?? '');
                     }}
-                    className="text-[12px] text-[#9A9DA1] hover:text-[#5F6368]"
+                    className="text-[12px] text-[#8A8E86] hover:text-[#6B6F68]"
                   >
                     Cancel
                   </button>
@@ -478,7 +478,7 @@ export function OrderDetail({
                 <button
                   type="button"
                   onClick={() => setEditDelivery(true)}
-                  className="inline-flex h-8 items-center rounded-lg border border-[#D7DAD8] bg-white px-3 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/40"
+                  className="inline-flex h-8 items-center rounded-lg border border-[#E2E6EC] bg-white px-3 text-[12px] font-medium text-[#171A17] transition-colors hover:border-[#3E7BC4]/40"
                 >
                   Edit
                 </button>
@@ -487,21 +487,21 @@ export function OrderDetail({
             {editDelivery ? (
               <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div className="sm:col-span-2">
-                  <label className="mb-1 block text-[12px] text-[#5F6368]">Delivery address</label>
+                  <label className="mb-1 block text-[12px] text-[#6B6F68]">Delivery address</label>
                   <textarea
                     value={dAddress}
                     onChange={(e) => setDAddress(e.target.value)}
                     rows={2}
                     placeholder="Street, suburb, city…"
-                    className="w-full rounded-lg border border-[#D7DAD8] bg-white px-3 py-2 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/50 focus:outline-none"
+                    className="w-full rounded-lg border border-[#E2E6EC] bg-white px-3 py-2 text-[13px] text-[#171A17] placeholder:text-[#8A8E86] focus:border-[#3E7BC4]/50 focus:outline-none"
                   />
                 </div>
                 <div>
-                  <label className="mb-1 block text-[12px] text-[#5F6368]">Delivery date</label>
+                  <label className="mb-1 block text-[12px] text-[#6B6F68]">Delivery date</label>
                   <input type="date" value={dDate} onChange={(e) => setDDate(e.target.value)} className={inputClass} />
                 </div>
                 <div>
-                  <label className="mb-1 block text-[12px] text-[#5F6368]">Instructions</label>
+                  <label className="mb-1 block text-[12px] text-[#6B6F68]">Instructions</label>
                   <input
                     value={dInstructions}
                     onChange={(e) => setDInstructions(e.target.value)}
@@ -513,16 +513,16 @@ export function OrderDetail({
             ) : (
               <div className="mt-4 grid grid-cols-1 gap-3 text-[13px] sm:grid-cols-3">
                 <div>
-                  <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">Address</div>
-                  <div className="mt-1 text-[#1A1C1E]">{order.delivery_address || '—'}</div>
+                  <div className="text-[11px] uppercase tracking-wide text-[#8A8E86]">Address</div>
+                  <div className="mt-1 text-[#171A17]">{order.delivery_address || '—'}</div>
                 </div>
                 <div>
-                  <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">Date</div>
-                  <div className="mt-1 text-[#1A1C1E]">{fmtDate(order.delivery_date)}</div>
+                  <div className="text-[11px] uppercase tracking-wide text-[#8A8E86]">Date</div>
+                  <div className="mt-1 text-[#171A17]">{fmtDate(order.delivery_date)}</div>
                 </div>
                 <div>
-                  <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">Instructions</div>
-                  <div className="mt-1 text-[#1A1C1E]">{order.delivery_instructions || '—'}</div>
+                  <div className="text-[11px] uppercase tracking-wide text-[#8A8E86]">Instructions</div>
+                  <div className="mt-1 text-[#171A17]">{order.delivery_instructions || '—'}</div>
                 </div>
               </div>
             )}
@@ -530,9 +530,9 @@ export function OrderDetail({
 
           {/* Notes */}
           {order.notes ? (
-            <div className="rounded-2xl border border-[#E7E7E2] bg-white p-5">
-              <h2 className="text-[14px] font-semibold text-[#1A1C1E]">Notes</h2>
-              <p className="mt-2 whitespace-pre-wrap text-[13px] text-[#5F6368]">{order.notes}</p>
+            <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5">
+              <h2 className="text-[14px] font-semibold text-[#171A17]">Notes</h2>
+              <p className="mt-2 whitespace-pre-wrap text-[13px] text-[#6B6F68]">{order.notes}</p>
             </div>
           ) : null}
         </div>
@@ -540,44 +540,44 @@ export function OrderDetail({
         {/* Side column */}
         <div className="space-y-5">
           {/* Invoice link */}
-          <div className="rounded-2xl border border-[#E7E7E2] bg-white p-5">
-            <h2 className="text-[14px] font-semibold text-[#1A1C1E]">Invoice</h2>
+          <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5">
+            <h2 className="text-[14px] font-semibold text-[#171A17]">Invoice</h2>
             {invoice ? (
               <Link
                 href={`/app/orderflow/invoices/${invoice.id}`}
-                className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-[#F0F0EC] bg-[#FBFBF9] px-3.5 py-3 transition-colors hover:border-[#3E7BC4]/30"
+                className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-[#EEF1F5] bg-[#FBFCFE] px-3.5 py-3 transition-colors hover:border-[#3E7BC4]/30"
               >
                 <div className="min-w-0">
                   <div className="truncate text-[13px] font-medium text-[#1F5FA8]">{invoice.invoice_number}</div>
-                  <div className="mt-0.5 text-[11px] text-[#9A9DA1]">Issued {fmtDate(invoice.issue_date)}</div>
+                  <div className="mt-0.5 text-[11px] text-[#8A8E86]">Issued {fmtDate(invoice.issue_date)}</div>
                 </div>
                 {invoiceStyle ? <Pill label={invoiceStyle.label} bg={invoiceStyle.bg} fg={invoiceStyle.fg} /> : null}
               </Link>
             ) : order.invoice_number ? (
-              <p className="mt-3 text-[13px] text-[#5F6368]">
-                Invoiced as <span className="font-medium text-[#1A1C1E]">{order.invoice_number}</span>
-                <span className="text-[#9A9DA1]"> — no linked invoice record yet. Generate invoice to create one.</span>
+              <p className="mt-3 text-[13px] text-[#6B6F68]">
+                Invoiced as <span className="font-medium text-[#171A17]">{order.invoice_number}</span>
+                <span className="text-[#8A8E86]"> — no linked invoice record yet. Generate invoice to create one.</span>
               </p>
             ) : (
-              <p className="mt-3 text-[13px] text-[#9A9DA1]">Not invoiced yet.</p>
+              <p className="mt-3 text-[13px] text-[#8A8E86]">Not invoiced yet.</p>
             )}
           </div>
 
           {/* Delivery notes */}
-          <div className="rounded-2xl border border-[#E7E7E2] bg-white p-5">
-            <h2 className="text-[14px] font-semibold text-[#1A1C1E]">Delivery notes</h2>
+          <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5">
+            <h2 className="text-[14px] font-semibold text-[#171A17]">Delivery notes</h2>
             {deliveryNotes.length === 0 ? (
-              <p className="mt-3 text-[13px] text-[#9A9DA1]">No delivery notes for this order yet.</p>
+              <p className="mt-3 text-[13px] text-[#8A8E86]">No delivery notes for this order yet.</p>
             ) : (
-              <ul className="mt-3 divide-y divide-[#F0F0EC] overflow-hidden rounded-xl border border-[#E7E7E2]">
+              <ul className="mt-3 divide-y divide-[#EEF1F5] overflow-hidden rounded-xl border border-[#EAEDF2]">
                 {deliveryNotes.map((dn) => {
                   const ds = DELIVERY_NOTE_STATUS_STYLE[dn.status] ?? DELIVERY_NOTE_STATUS_STYLE.draft;
                   return (
                     <li key={dn.id}>
-                      <Link href={`/app/orderflow/delivery-notes/${dn.id}`} className="flex items-center justify-between gap-3 px-3.5 py-2.5 transition-colors hover:bg-[#FAFAF8]">
+                      <Link href={`/app/orderflow/delivery-notes/${dn.id}`} className="flex items-center justify-between gap-3 px-3.5 py-2.5 transition-colors hover:bg-[#F5F9FE]">
                         <div className="min-w-0">
                           <div className="truncate text-[13px] font-medium text-[#1F5FA8]">{dn.dn_number}</div>
-                          <div className="mt-0.5 text-[11px] text-[#9A9DA1]">{fmtDate(dn.created_at)}</div>
+                          <div className="mt-0.5 text-[11px] text-[#8A8E86]">{fmtDate(dn.created_at)}</div>
                         </div>
                         <Pill label={ds.label} bg={ds.bg} fg={ds.fg} />
                       </Link>
@@ -589,7 +589,7 @@ export function OrderDetail({
           </div>
 
           {/* Customer POs / attached documents */}
-          <div className="rounded-2xl border border-[#E7E7E2] bg-white p-5">
+          <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5">
             <AttachDocuments
               entityType="order"
               entityId={order.id}
@@ -601,8 +601,8 @@ export function OrderDetail({
           </div>
 
           {/* Activity */}
-          <div className="rounded-2xl border border-[#E7E7E2] bg-white p-5">
-            <h2 className="mb-3 text-[14px] font-semibold text-[#1A1C1E]">Activity</h2>
+          <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5">
+            <h2 className="mb-3 text-[14px] font-semibold text-[#171A17]">Activity</h2>
             <ActivityFeed events={activity} emptyLabel="No activity on this order yet." />
           </div>
         </div>

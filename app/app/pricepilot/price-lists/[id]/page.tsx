@@ -23,9 +23,9 @@ export default async function PriceListDetailPage({ params }: { params: Promise<
   if (!list) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <div className="max-w-sm rounded-2xl border border-[#E7E7E2] bg-white px-8 py-10 text-center">
-          <h1 className="text-[18px] font-bold text-[#1A1C1E]">Price list not found</h1>
-          <Link href="/app/pricepilot/price-lists" className="mt-4 inline-flex h-9 items-center rounded-lg bg-[#1A1C1E] px-4 text-[13px] font-medium text-white">
+        <div className="max-w-sm rounded-2xl border border-[#EAEDF2] bg-white px-8 py-10 text-center shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <h1 className="of-display text-[18px] font-semibold text-[#171A17]">Price list not found</h1>
+          <Link href="/app/pricepilot/price-lists" className="mt-4 inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87]">
             Back to price lists
           </Link>
         </div>

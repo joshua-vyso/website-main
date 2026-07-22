@@ -42,9 +42,9 @@ export function BudgetWorkspace() {
 
   if (budget.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
-        <p className="text-[15px] font-medium text-[#1A1C1E]">No budget set yet</p>
-        <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">Add budget categories to see where your money goes and how actuals track against plan.</p>
+      <div className="rounded-2xl border border-dashed border-[#E2E6EC] bg-[#FBFCFE] px-6 py-12 text-center">
+        <p className="of-display text-[18px] font-semibold text-[#171A17]">No budget set yet</p>
+        <p className="mx-auto mt-2 max-w-md text-[14px] text-[#6B6F68]">Add budget categories to see where your money goes and how actuals track against plan.</p>
       </div>
     );
   }
@@ -53,7 +53,7 @@ export function BudgetWorkspace() {
     <div className="space-y-5">
       {/* Hero: doughnut + detail panel */}
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[auto_1fr]">
-        <div className="flex items-center justify-center rounded-2xl border border-[#E7E7E2] bg-white p-6">
+        <div className="flex items-center justify-center rounded-2xl border border-[#EAEDF2] bg-white p-6 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
           <div className="relative" style={{ width: SIZE, height: SIZE }}>
             <svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`}>
               <circle cx={SIZE / 2} cy={SIZE / 2} r={R} fill="none" stroke="#F4F4F1" strokeWidth={THICK} />
@@ -80,14 +80,14 @@ export function BudgetWorkspace() {
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center text-center">
               {activeRow ? (
                 <>
-                  <span className="text-[12px] text-[#9A9DA1]">{activeRow.cat}</span>
-                  <span className="text-[24px] font-bold leading-none text-[#1A1C1E]">{zar(activeRow.budgeted)}</span>
-                  <span className="mt-1 text-[11px] text-[#9A9DA1]">{totalBudget > 0 ? Math.round((activeRow.budgeted / totalBudget) * 100) : 0}% of budget</span>
+                  <span className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">{activeRow.cat}</span>
+                  <span className="of-num mt-1.5 text-[24px] font-semibold leading-none tracking-[-0.02em] text-[#171A17]">{zar(activeRow.budgeted)}</span>
+                  <span className="of-num mt-1.5 text-[12px] text-[#A0A49C]">{totalBudget > 0 ? Math.round((activeRow.budgeted / totalBudget) * 100) : 0}% of budget</span>
                 </>
               ) : (
                 <>
-                  <span className="text-[12px] text-[#9A9DA1]">Total budget</span>
-                  <span className="text-[26px] font-bold leading-none text-[#1A1C1E]">{zar(totalBudget)}</span>
+                  <span className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">Total budget</span>
+                  <span className="of-num mt-1.5 text-[26px] font-semibold leading-none tracking-[-0.02em] text-[#171A17]">{zar(totalBudget)}</span>
                 </>
               )}
             </div>
@@ -95,12 +95,12 @@ export function BudgetWorkspace() {
         </div>
 
         {/* Detail panel reflecting hover/selection */}
-        <div className="rounded-2xl border border-[#E7E7E2] bg-white p-5">
+        <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
           {activeRow ? (
             <div>
               <div className="flex items-center gap-2">
                 <span className="h-3 w-3 rounded-sm" style={{ backgroundColor: activeRow.color }} />
-                <h3 className="text-[16px] font-semibold text-[#1A1C1E]">{activeRow.cat}</h3>
+                <h3 className="of-display text-[16px] font-semibold text-[#171A17]">{activeRow.cat}</h3>
                 <Badge label={budgetStatus(activeRow).label} tone={budgetStatus(activeRow).tone} />
               </div>
               <div className="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4">
@@ -109,12 +109,12 @@ export function BudgetWorkspace() {
                 <Detail label="Variance" value={`${activeRow.budgeted - activeRow.actual >= 0 ? '+' : '−'}${zar(Math.abs(activeRow.budgeted - activeRow.actual))}`} color={activeRow.actual > activeRow.budgeted ? '#A32D2D' : '#0F6E56'} />
                 <Detail label="% of budget" value={`${totalBudget > 0 ? Math.round((activeRow.budgeted / totalBudget) * 100) : 0}%`} />
               </div>
-              <p className="mt-4 rounded-lg bg-[#F5F9FE] px-3 py-2 text-[13px] text-[#5F6368]">{activeRow.suggestedAction}</p>
+              <p className="mt-4 rounded-[10px] bg-[#F5F9FE] px-3.5 py-2.5 text-[13px] text-[#6B6F68]">{activeRow.suggestedAction}</p>
             </div>
           ) : (
             <div className="flex h-full flex-col justify-center">
-              <h3 className="text-[16px] font-semibold text-[#1A1C1E]">Where your budget goes</h3>
-              <p className="mt-1 text-[13px] text-[#5F6368]">Hover a segment to inspect it, or click to filter the breakdown below to that category.</p>
+              <h3 className="of-display text-[16px] font-semibold text-[#171A17]">Where your budget goes</h3>
+              <p className="mt-1.5 text-[13px] text-[#6B6F68]">Hover a segment to inspect it, or click to filter the breakdown below to that category.</p>
             </div>
           )}
         </div>
@@ -132,14 +132,14 @@ export function BudgetWorkspace() {
               onMouseEnter={() => setHovered(b.cat)}
               onMouseLeave={() => setHovered(null)}
               onClick={() => toggle(b.cat)}
-              className={`rounded-2xl border bg-white p-3.5 text-left transition-all hover:shadow-sm ${isSel ? 'border-[#3E7BC4] ring-1 ring-[#3E7BC4]/20' : 'border-[#E7E7E2]'}`}
+              className={`rounded-[14px] border bg-white p-3.5 text-left shadow-[0_1px_2px_rgba(20,24,20,0.03)] transition-all hover:shadow-sm ${isSel ? 'border-[#3E7BC4] ring-1 ring-[#3E7BC4]/20' : 'border-[#EEF1F5]'}`}
             >
               <div className="flex items-center gap-1.5">
                 <span className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: b.color }} />
-                <span className="truncate text-[12px] font-medium text-[#1A1C1E]">{b.cat}</span>
+                <span className="truncate text-[12px] font-medium text-[#171A17]">{b.cat}</span>
               </div>
-              <div className="mt-2 text-[15px] font-bold leading-none text-[#1A1C1E]">{zar(b.budgeted)}</div>
-              <div className="mt-1 text-[11px] text-[#9A9DA1]">actual {zar(b.actual)}</div>
+              <div className="of-num mt-2 text-[16px] font-semibold leading-none tracking-[-0.02em] text-[#171A17]">{zar(b.budgeted)}</div>
+              <div className="mt-1.5 text-[12px] text-[#A0A49C]">actual <span className="of-num">{zar(b.actual)}</span></div>
               <div className="mt-2"><Badge label={st.label} tone={st.tone} /></div>
             </button>
           );
@@ -150,8 +150,8 @@ export function BudgetWorkspace() {
       <div>
         {selected ? (
           <div className="mb-2 flex items-center gap-2 text-[13px]">
-            <span className="text-[#5F6368]">Showing <span className="font-medium text-[#1A1C1E]">{selected}</span></span>
-            <button type="button" onClick={() => setSelected(null)} className="text-[12px] font-medium text-[#1F5FA8] hover:underline">Clear filter</button>
+            <span className="text-[#6B6F68]">Showing <span className="font-medium text-[#171A17]">{selected}</span></span>
+            <button type="button" onClick={() => setSelected(null)} className="text-[13px] font-semibold text-[#1F5FA8] hover:underline">Clear filter</button>
           </div>
         ) : null}
         <BudgetTable filter={selected} />
@@ -163,8 +163,8 @@ export function BudgetWorkspace() {
 function Detail({ label, value, color }: { label: string; value: string; color?: string }) {
   return (
     <div>
-      <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">{label}</div>
-      <div className="mt-1 text-[16px] font-bold leading-none" style={color ? { color } : { color: '#1A1C1E' }}>{value}</div>
+      <div className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">{label}</div>
+      <div className="of-num mt-2 text-[18px] font-semibold leading-none tracking-[-0.02em]" style={color ? { color } : { color: '#171A17' }}>{value}</div>
     </div>
   );
 }

@@ -195,13 +195,13 @@ export function InboxView({
           {backHref ? (
             <Link
               href={backHref}
-              className="mb-1.5 inline-flex items-center gap-1 text-[13px] text-[#5F6368] transition-colors hover:text-[#1A1C1E]"
+              className="mb-1.5 inline-flex items-center gap-1 text-[13px] text-[#8A8E86] transition-colors hover:text-[#171A17]"
             >
               <span aria-hidden>‹</span> {backLabel ?? 'Back'}
             </Link>
           ) : null}
-          <h1 className="text-[26px] font-bold leading-tight text-[#1A1C1E]">{title}</h1>
-          <p className="mt-1 text-[14px] text-[#5F6368]">{subtitle}</p>
+          <h1 className="of-display text-[28px] font-semibold leading-tight tracking-[-0.015em] text-[#171A17]">{title}</h1>
+          <p className="mt-1.5 text-[14px] text-[#8A8E86]">{subtitle}</p>
         </div>
         <div className="flex shrink-0 items-center gap-3">
           <input
@@ -210,13 +210,13 @@ export function InboxView({
             onChange={(e) => setSearch(e.target.value)}
             placeholder={`Try: ${SEARCH_EXAMPLES[0]}`}
             aria-label="Search documents"
-            className="h-10 w-72 rounded-xl border border-[#E7E7E2] bg-white px-4 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
+            className="h-11 w-72 rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]"
           />
           {localDocs.length > 0 ? (
             <button
               type="button"
               onClick={() => (selectMode ? exitSelect() : setSelectMode(true))}
-              className="inline-flex h-10 shrink-0 items-center rounded-xl border border-[#E7E7E2] bg-white px-4 text-[14px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/30"
+              className="inline-flex h-[42px] shrink-0 items-center rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]"
             >
               {selectMode ? 'Cancel' : 'Select'}
             </button>
@@ -225,7 +225,7 @@ export function InboxView({
             <button
               type="button"
               onClick={() => setUploadOpen((o) => !o)}
-              className="inline-flex h-10 shrink-0 items-center rounded-xl bg-[#D9730D] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#C2650B]"
+              className="inline-flex h-[42px] shrink-0 items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87]"
             >
               Upload document
             </button>
@@ -243,11 +243,11 @@ export function InboxView({
 
       {/* Table or empty state */}
       {localDocs.length === 0 ? (
-        <div className="mt-6 rounded-2xl border border-dashed border-[#E7E7E2] bg-white px-8 py-14 text-center">
-          <h2 className="text-[18px] font-semibold text-[#1A1C1E]">
+        <div className="mt-6 rounded-2xl border border-dashed border-[#D8DFE8] bg-white px-8 py-14 text-center">
+          <h2 className="of-display text-[18px] font-semibold text-[#171A17]">
             {emptyTitle ?? 'No documents yet'}
           </h2>
-          <p className="mx-auto mt-1 max-w-md text-[14px] text-[#5F6368]">
+          <p className="mx-auto mt-2 max-w-md text-[14px] text-[#6B6F68]">
             {emptyBody ??
               'Upload your first document and Doc-U will extract the details automatically. Your stats above will fill in as documents come through.'}
           </p>
@@ -255,7 +255,7 @@ export function InboxView({
             <button
               type="button"
               onClick={() => setUploadOpen(true)}
-              className="mt-5 inline-flex h-10 items-center rounded-xl bg-[#D9730D] px-5 text-[14px] font-medium text-white transition-colors hover:bg-[#C2650B]"
+              className="mt-5 inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87]"
             >
               Upload your first document
             </button>
@@ -277,26 +277,28 @@ export function InboxView({
             />
           </div>
           {selectMode ? (
-            <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#3E7BC4]/30 bg-[#E7EEF8] px-4 py-2.5">
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-[#C9DEF7] bg-[#EAF2FC] px-4 py-2.5">
               <div className="flex items-center gap-4 text-[13px]">
-                <span className="font-medium text-[#174C87]">{selected.size} selected</span>
+                <span className="font-semibold text-[#174C87]">
+                  <span className="of-num">{selected.size}</span> selected
+                </span>
                 <button
                   type="button"
                   onClick={() => setSelected(allSelected ? new Set() : new Set(selectableIds))}
-                  className="text-[#1F5FA8] hover:underline"
+                  className="font-medium text-[#1F5FA8] hover:underline"
                 >
                   {allSelected ? 'Clear all' : 'Select all'}
                 </button>
               </div>
               {confirmBulk ? (
                 <div className="flex items-center gap-2 text-[13px]">
-                  <span className="text-[#5F6368]">
-                    Delete {selected.size} document{selected.size === 1 ? '' : 's'} permanently?
+                  <span className="text-[#6B6F68]">
+                    Delete <span className="of-num">{selected.size}</span> document{selected.size === 1 ? '' : 's'} permanently?
                   </span>
                   <button
                     type="button"
                     onClick={() => setConfirmBulk(false)}
-                    className="rounded-lg px-2.5 py-1 text-[#5F6368] hover:bg-white/60"
+                    className="rounded-[9px] px-2.5 py-1 font-medium text-[#6B6F68] transition-colors hover:bg-white/70 hover:text-[#171A17]"
                   >
                     Cancel
                   </button>
@@ -304,7 +306,7 @@ export function InboxView({
                     type="button"
                     onClick={() => void bulkDelete()}
                     disabled={bulkBusy}
-                    className="rounded-lg bg-[#A32D2D] px-3 py-1 font-medium text-white transition-colors hover:bg-[#8f2727] disabled:opacity-40"
+                    className="rounded-[9px] bg-[#A32D2D] px-3 py-1 font-semibold text-white transition-colors hover:bg-[#8A2626] disabled:opacity-40"
                   >
                     {bulkBusy ? '…' : 'Confirm delete'}
                   </button>
@@ -315,7 +317,7 @@ export function InboxView({
                     type="button"
                     onClick={() => void bulkReview()}
                     disabled={selected.size === 0 || bulkBusy}
-                    className="inline-flex items-center rounded-lg bg-[#1F5FA8] px-3 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:cursor-not-allowed disabled:opacity-40"
+                    className="inline-flex items-center rounded-[9px] bg-[#1F5FA8] px-3 py-1.5 text-[13px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     {bulkBusy ? '…' : `Mark reviewed${selected.size ? ` (${selected.size})` : ''}`}
                   </button>
@@ -323,7 +325,7 @@ export function InboxView({
                     type="button"
                     onClick={() => setConfirmBulk(true)}
                     disabled={selected.size === 0}
-                    className="inline-flex items-center rounded-lg border border-[#A32D2D]/40 px-3 py-1.5 text-[13px] font-medium text-[#A32D2D] transition-colors hover:bg-[#FCEBEB] disabled:cursor-not-allowed disabled:opacity-40"
+                    className="inline-flex items-center rounded-[9px] border border-[#A32D2D]/40 bg-white px-3 py-1.5 text-[13px] font-medium text-[#A32D2D] transition-colors hover:bg-[#FCEBEB] disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     Delete{selected.size ? ` (${selected.size})` : ''}
                   </button>
@@ -333,17 +335,17 @@ export function InboxView({
           ) : null}
           <div className="mt-4">
             {rows.length === 0 && search.trim() ? (
-              <div className="rounded-2xl border border-[#E7E7E2] bg-white px-6 py-12 text-center">
-                <p className="text-[14px] text-[#5F6368]">No documents match “{search}”.</p>
-                <p className="mt-1 text-[13px] text-[#9A9DA1]">
+              <div className="rounded-2xl border border-[#EAEDF2] bg-white px-6 py-12 text-center shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+                <p className="text-[14px] text-[#6B6F68]">No documents match “{search}”.</p>
+                <p className="mt-1.5 text-[12px] text-[#A0A49C]">
                   Try: {SEARCH_EXAMPLES.slice(1).join(' · ')}
                 </p>
               </div>
             ) : groupMode === 'recent' ? (
               recentNow == null ? (
                 <div className="space-y-3">
-                  <div className="h-14 animate-pulse rounded-2xl border border-[#E7E7E2] bg-[#FAFAF8]" />
-                  <div className="h-14 animate-pulse rounded-2xl border border-[#E7E7E2] bg-[#FAFAF8]" />
+                  <div className="h-14 animate-pulse rounded-2xl border border-[#EAEDF2] bg-[#F5F9FE]" />
+                  <div className="h-14 animate-pulse rounded-2xl border border-[#EAEDF2] bg-[#F5F9FE]" />
                 </div>
               ) : (
                 <DocumentTable

@@ -87,8 +87,8 @@ export function CreditNotesView({ data }: { data: CreditNotesData }) {
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-[26px] font-bold text-[#1A1C1E]">Credit notes</h1>
-          <p className="mt-1 text-[14px] text-[#5F6368]">Credit a customer against an invoice for returns, shortfalls or adjustments</p>
+          <h1 className="text-[26px] font-bold text-[#171A17]">Credit notes</h1>
+          <p className="mt-1 text-[14px] text-[#6B6F68]">Credit a customer against an invoice for returns, shortfalls or adjustments</p>
         </div>
         {isAdmin ? (
           <Link
@@ -113,11 +113,11 @@ export function CreditNotesView({ data }: { data: CreditNotesData }) {
       </div>
 
       {/* Table */}
-      <div className="mt-4 overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
+      <div className="mt-4 overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white">
         <div className="overflow-x-auto">
           <table className="w-full text-[13px]">
             <thead>
-              <tr className="border-b border-[#F0F0EC] bg-[#FBFBF9] text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+              <tr className="border-b border-[#EEF1F5] bg-[#FBFCFE] text-[11px] uppercase tracking-wide text-[#8A8E86]">
                 <th className="px-4 py-2.5 text-left font-medium">Credit #</th>
                 <th className="px-2 py-2.5 text-left font-medium">Customer</th>
                 <th className="px-2 py-2.5 text-left font-medium">Against invoice</th>
@@ -151,7 +151,7 @@ export function CreditNotesView({ data }: { data: CreditNotesData }) {
                 </tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-12 text-center text-[14px] text-[#9A9DA1]">
+                  <td colSpan={7} className="px-5 py-12 text-center text-[14px] text-[#8A8E86]">
                     No credit notes match your search.
                   </td>
                 </tr>
@@ -162,10 +162,10 @@ export function CreditNotesView({ data }: { data: CreditNotesData }) {
                     <tr
                       key={e.cn.id}
                       onClick={() => router.push(`/app/orderflow/credit-notes/${e.cn.id}`)}
-                      className="cursor-pointer border-b border-[#F6F6F2] last:border-0 hover:bg-[#FAFAF8]"
+                      className="cursor-pointer border-b border-[#F5F9FE] last:border-0 hover:bg-[#F5F9FE]"
                     >
-                      <td className="px-4 py-3 font-medium text-[#1A1C1E]">{e.cn.credit_number}</td>
-                      <td className="px-2 py-3 text-[#1A1C1E]">{e.name}</td>
+                      <td className="px-4 py-3 font-medium text-[#171A17]">{e.cn.credit_number}</td>
+                      <td className="px-2 py-3 text-[#171A17]">{e.name}</td>
                       <td className="px-2 py-3">
                         {e.invoice ? (
                           <Link
@@ -176,12 +176,12 @@ export function CreditNotesView({ data }: { data: CreditNotesData }) {
                             {e.invoice.invoice_number}
                           </Link>
                         ) : (
-                          <span className="text-[#9A9DA1]">—</span>
+                          <span className="text-[#8A8E86]">—</span>
                         )}
                       </td>
-                      <td className="px-2 py-3 text-[#5F6368]">{fmtDate(e.cn.issue_date)}</td>
-                      <td className="px-2 py-3 text-right tabular-nums text-[#1A1C1E]">{zar2(e.total)}</td>
-                      <td className="max-w-[220px] truncate px-2 py-3 text-[#5F6368]">{e.cn.reason || '—'}</td>
+                      <td className="px-2 py-3 text-[#6B6F68]">{fmtDate(e.cn.issue_date)}</td>
+                      <td className="px-2 py-3 text-right tabular-nums text-[#171A17]">{zar2(e.total)}</td>
+                      <td className="max-w-[220px] truncate px-2 py-3 text-[#6B6F68]">{e.cn.reason || '—'}</td>
                       <td className="px-2 py-3">
                         <Pill label={s.label} bg={s.bg} fg={s.fg} />
                       </td>

@@ -97,10 +97,10 @@ export function LiveStockView({
   }
 
   const pill = (active: boolean) =>
-    `rounded-full px-3 py-1.5 text-[12px] transition-colors ${
+    `h-11 rounded-[12px] px-4 text-[13px] font-medium transition-colors ${
       active
-        ? 'bg-[#1A1C1E] text-white'
-        : 'border border-[#E7E7E2] bg-white text-[#5F6368] hover:bg-black/[0.03]'
+        ? 'bg-[#1F5FA8] text-white'
+        : 'border border-[#E4E9F0] bg-white text-[#6B6F68] hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]'
     }`;
 
   return (
@@ -111,7 +111,7 @@ export function LiveStockView({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search products"
-          className="h-[34px] w-[240px] rounded-lg border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
+          className="h-11 w-[240px] rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]"
         />
         <button type="button" onClick={() => setStatus('all')} className={pill(status === 'all')}>
           All
@@ -126,10 +126,10 @@ export function LiveStockView({
           value={category}
           onChange={(e) => setCategory(e.target.value)}
           aria-label="Filter by category"
-          className={`h-[31px] cursor-pointer rounded-full border px-3 text-[12px] focus:outline-none ${
+          className={`h-11 cursor-pointer rounded-[12px] border px-4 text-[13px] font-medium outline-none focus:border-[#3E7BC4] ${
             category === 'all'
-              ? 'border-[#E7E7E2] bg-white text-[#5F6368]'
-              : 'border-[#1A1C1E] bg-[#1A1C1E] text-white'
+              ? 'border-[#E4E9F0] bg-white text-[#6B6F68]'
+              : 'border-[#1F5FA8] bg-[#1F5FA8] text-white'
           }`}
         >
           <option value="all">All categories</option>
@@ -146,17 +146,17 @@ export function LiveStockView({
           type="button"
           onClick={() => void autoCategorise()}
           disabled={categorising}
-          className="inline-flex items-center gap-1.5 rounded-lg border border-[#D7DAD8] bg-white px-3.5 py-2 text-[13px] font-medium text-[#1F5FA8] transition-colors hover:border-[#3E7BC4]/40 disabled:opacity-50"
+          className="inline-flex h-[42px] items-center gap-1.5 rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#1F5FA8] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87] disabled:opacity-50"
         >
           {categorising ? 'Categorising…' : uncategorised > 0 ? `✦ Categorise ${uncategorised}` : '✦ Re-categorise'}
         </button>
         <PpButton href="/app/procurepulse/reorder">Reorder low · {lowCount}</PpButton>
       </div>
 
-      {msg ? <p className="mb-3 text-[12px] text-[#174C87]">{msg}</p> : null}
+      {msg ? <p className="mb-3 text-[13px] text-[#174C87]">{msg}</p> : null}
 
-      <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
-        <div className="flex items-center border-b border-[#E7E7E2] pb-2.5 text-[12px] font-medium text-[#9A9DA1]">
+      <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+        <div className="flex items-center border-b border-[#EEF1F5] pb-2.5 text-[11px] font-medium uppercase tracking-[0.06em] text-[#A0A49C]">
           <div className="flex-1">Product</div>
           <div className="w-[140px] text-right">Stock on hand (kg)</div>
           <div className="w-[120px] text-right">Units on hand</div>
@@ -167,7 +167,7 @@ export function LiveStockView({
         </div>
 
         {filtered.length === 0 ? (
-          <div className="py-12 text-center text-[13px] text-[#9A9DA1]">
+          <div className="py-12 text-center text-[14px] text-[#8A8E86]">
             {items.length === 0 ? 'No stock items yet.' : 'No products match these filters.'}
           </div>
         ) : (
@@ -177,19 +177,19 @@ export function LiveStockView({
               <Link
                 key={item.id}
                 href={`/app/procurepulse/stock/${item.id}`}
-                className="flex items-center border-t border-[#EFEFEC] py-3.5 text-[13px] text-[#1A1C1E] hover:bg-black/[0.02]"
+                className="flex items-center border-t border-[#F4F5F7] py-3.5 text-[14px] text-[#171A17] hover:bg-[#F5F9FE]"
               >
-                <div className="flex-1 font-medium">{item.name}</div>
-                <div className="w-[140px] text-right">
+                <div className="flex-1 font-semibold">{item.name}</div>
+                <div className="of-num w-[140px] text-right">
                   {item.kg_per_unit != null && item.kg_per_unit > 0 ? (
-                    <span className="font-medium text-[#1A1C1E]">
+                    <span className="font-semibold text-[#171A17]">
                       {fmtQty(item.on_hand * item.kg_per_unit)} kg
                     </span>
                   ) : (
                     <span className="text-[#C2C4C0]">—</span>
                   )}
                 </div>
-                <div className="w-[120px] text-right text-[#5F6368]">
+                <div className="of-num w-[120px] text-right text-[#6B6F68]">
                   {fmtQty(item.on_hand)} {item.unit}
                 </div>
                 <div className="w-[110px] pl-5">
@@ -197,15 +197,15 @@ export function LiveStockView({
                 </div>
                 <div className="w-[140px] text-right">
                   {r ? (
-                    <span className="text-[#3C3F43]">
+                    <span className="of-num text-[#3C3F43]">
                       {fmtQty(r.qty)} {r.unit ?? item.unit}
                     </span>
                   ) : (
-                    <span className="text-[#C2C4C0]">No orders yet</span>
+                    <span className="text-[13px] text-[#C2C4C0]">No orders yet</span>
                   )}
                 </div>
-                <div className="w-[90px] text-right text-[#9A9DA1]">{timeAgo(item.updated_at)}</div>
-                <div className="w-[140px] pl-4 text-[#5F6368]">{item.category?.trim() || '—'}</div>
+                <div className="of-num w-[90px] text-right text-[13px] text-[#A0A49C]">{timeAgo(item.updated_at)}</div>
+                <div className="w-[140px] pl-4 text-[#6B6F68]">{item.category?.trim() || '—'}</div>
               </Link>
             );
           })

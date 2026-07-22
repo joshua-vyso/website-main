@@ -50,15 +50,15 @@ export default async function DatabasesIndexPage() {
 
       <div className="mt-6 flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-[26px] font-bold leading-tight text-[#1A1C1E]">Databases</h1>
-          <p className="mt-1 max-w-2xl text-[14px] text-[#5F6368]">
+          <h1 className="of-display text-[28px] font-semibold leading-tight tracking-[-0.015em] text-[#171A17]">Databases</h1>
+          <p className="mt-1.5 max-w-2xl text-[14px] text-[#8A8E86]">
             Your Core Data — the single source of truth behind every document. Manage it here and it flows straight
             through to OrderFlow invoices, quotes, orders and delivery notes.
           </p>
         </div>
         <Link
           href="/app/docu/databases/import"
-          className="inline-flex h-10 shrink-0 items-center rounded-xl bg-[#1F5FA8] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87]"
+          className="inline-flex h-[42px] shrink-0 items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87]"
         >
           Import Excel / CSV
         </Link>
@@ -71,19 +71,19 @@ export default async function DatabasesIndexPage() {
             <Link
               key={e.key}
               href={`/app/docu/databases/${e.key}`}
-              className="group flex flex-col rounded-2xl border border-[#E7E7E2] bg-white p-5 transition-colors hover:border-[#3E7BC4]/40 hover:bg-[#FAFAF8]"
+              className="group flex flex-col rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)] transition-colors hover:border-[#3E7BC4]/40 hover:bg-[#F5F9FE]"
             >
               <div className="flex items-start justify-between gap-3">
-                <h2 className="text-[15px] font-semibold text-[#1A1C1E] transition-colors group-hover:text-[#174C87]">
+                <h2 className="of-display text-[16px] font-semibold text-[#171A17] transition-colors group-hover:text-[#174C87]">
                   {e.label}
                 </h2>
-                <span className="shrink-0 text-[20px] font-bold leading-none text-[#1A1C1E]">{count}</span>
+                <span className="of-num shrink-0 text-[22px] font-semibold leading-none tracking-[-0.02em] text-[#171A17]">{count}</span>
               </div>
-              <p className="mt-1.5 flex-1 text-[13px] leading-relaxed text-[#5F6368]">{e.description}</p>
-              <div className="mt-3 flex items-center justify-between gap-2 border-t border-[#F0F0EC] pt-3">
-                <code className="truncate font-mono text-[11px] text-[#9A9DA1]">{e.tables}</code>
+              <p className="mt-1.5 flex-1 text-[13px] leading-relaxed text-[#6B6F68]">{e.description}</p>
+              <div className="mt-3 flex items-center justify-between gap-2 border-t border-[#EEF1F5] pt-3">
+                <code className="truncate font-mono text-[11px] text-[#A0A49C]">{e.tables}</code>
                 {e.csv ? (
-                  <span className="shrink-0 rounded-full bg-[#F0F0EC] px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide text-[#5F6368]">
+                  <span className="shrink-0 rounded-full bg-[#EEF1F5] px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.05em] text-[#6B6F68]">
                     CSV
                   </span>
                 ) : null}

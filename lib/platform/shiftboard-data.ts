@@ -48,7 +48,7 @@ export async function getShiftBoardData(orgId: string): Promise<ShiftBoardData> 
     sb.from('sb_leave_requests').select('*').eq('org_id', orgId).order('start_date'),
   ]);
 
-  const departments: DepartmentInfo[] = ((dep.data as any[]) ?? []).map((r) => ({ name: r.name, required: num(r.required), color: r.color ?? '#5F6368' }));
+  const departments: DepartmentInfo[] = ((dep.data as any[]) ?? []).map((r) => ({ name: r.name, required: num(r.required), color: r.color ?? '#6B6F68' }));
 
   const employees: Employee[] = ((emp.data as any[]) ?? []).map((r) => ({
     id: r.id,

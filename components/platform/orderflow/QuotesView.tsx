@@ -246,7 +246,7 @@ export function QuotesView({
   }
 
   const filterSel =
-    'h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#3E7BC4]';
+    'h-9 rounded-lg border border-[#E2E6EC] bg-white px-2.5 text-[13px] text-[#6B6F68] outline-none focus:border-[#3E7BC4]';
 
   return (
     <div>
@@ -254,8 +254,8 @@ export function QuotesView({
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-[26px] font-bold text-[#1A1C1E]">Quotes</h1>
-          <p className="mt-1 text-[14px] text-[#5F6368]">Send priced quotes and convert accepted ones to orders or invoices</p>
+          <h1 className="text-[26px] font-bold text-[#171A17]">Quotes</h1>
+          <p className="mt-1 text-[14px] text-[#6B6F68]">Send priced quotes and convert accepted ones to orders or invoices</p>
         </div>
         <Link
           href="/app/orderflow/quotes/new"
@@ -286,11 +286,11 @@ export function QuotesView({
       </div>
 
       {/* Table */}
-      <div className="mt-4 overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
+      <div className="mt-4 overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white">
         <div className="overflow-x-auto">
           <table className="w-full text-[13px]">
             <thead>
-              <tr className="border-b border-[#F0F0EC] bg-[#FBFBF9] text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+              <tr className="border-b border-[#EEF1F5] bg-[#FBFCFE] text-[11px] uppercase tracking-wide text-[#8A8E86]">
                 <th className="px-4 py-2.5 text-left font-medium">Quote #</th>
                 <th className="px-2 py-2.5 text-left font-medium">Customer</th>
                 <th className="px-2 py-2.5 text-left font-medium">Issued</th>
@@ -322,7 +322,7 @@ export function QuotesView({
                 </tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-12 text-center text-[14px] text-[#9A9DA1]">
+                  <td colSpan={7} className="px-5 py-12 text-center text-[14px] text-[#8A8E86]">
                     No quotes match your filters.
                   </td>
                 </tr>
@@ -350,18 +350,18 @@ export function QuotesView({
                     <tr
                       key={e.quote.id}
                       onClick={() => router.push(`/app/orderflow/quotes/${e.quote.id}`)}
-                      className={`cursor-pointer border-b border-[#F6F6F2] last:border-0 hover:bg-[#FAFAF8] ${
+                      className={`cursor-pointer border-b border-[#F5F9FE] last:border-0 hover:bg-[#F5F9FE] ${
                         busyId === e.quote.id ? 'opacity-60' : ''
                       }`}
                     >
-                      <td className="px-4 py-3 font-medium text-[#1A1C1E]">
+                      <td className="px-4 py-3 font-medium text-[#171A17]">
                         {e.quote.quote_number}
-                        {converted ? <span className="ml-2 text-[11px] font-normal text-[#9A9DA1]">converted</span> : null}
+                        {converted ? <span className="ml-2 text-[11px] font-normal text-[#8A8E86]">converted</span> : null}
                       </td>
-                      <td className="px-2 py-3 text-[#1A1C1E]">{e.customerName}</td>
-                      <td className="px-2 py-3 text-[#5F6368]">{fmtDate(e.quote.issue_date)}</td>
-                      <td className="px-2 py-3 text-[#5F6368]">{fmtDate(e.quote.valid_until)}</td>
-                      <td className="px-2 py-3 text-right tabular-nums text-[#1A1C1E]">{zar2(e.total)}</td>
+                      <td className="px-2 py-3 text-[#171A17]">{e.customerName}</td>
+                      <td className="px-2 py-3 text-[#6B6F68]">{fmtDate(e.quote.issue_date)}</td>
+                      <td className="px-2 py-3 text-[#6B6F68]">{fmtDate(e.quote.valid_until)}</td>
+                      <td className="px-2 py-3 text-right tabular-nums text-[#171A17]">{zar2(e.total)}</td>
                       <td className="px-2 py-3">
                         <Pill label={s.label} bg={s.bg} fg={s.fg} />
                       </td>

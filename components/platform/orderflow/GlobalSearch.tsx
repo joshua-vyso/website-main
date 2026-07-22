@@ -175,20 +175,20 @@ export function GlobalSearch({ items, placeholder }: { items: SearchIndexItem[];
                   left: pos.left,
                   width: pos.width,
                   zIndex: 96,
-                  fontFamily: 'var(--font-inter)',
+                  fontFamily: 'var(--font-instrument)',
                   ['--radius' as string]: '0.625rem',
                 } as React.CSSProperties
               }
-              className="max-h-[420px] overflow-y-auto rounded-xl border border-[#E7E7E2] bg-white py-1 shadow-[0_16px_50px_-12px_rgba(26,28,30,0.28)]"
+              className="max-h-[420px] overflow-y-auto rounded-xl border border-[#EAEDF2] bg-white py-1 shadow-[0_16px_50px_-12px_rgba(26,28,30,0.28)]"
             >
               {results.length === 0 ? (
-                <div className="px-3.5 py-4 text-[13px] text-[#9A9DA1]">
+                <div className="px-3.5 py-4 text-[13px] text-[#8A8E86]">
                   No matches for &ldquo;{query.trim()}&rdquo;.
                 </div>
               ) : (
                 groups.map((g) => (
                   <div key={g.type} className="py-0.5">
-                    <div className="px-3.5 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-wide text-[#9A9DA1]">
+                    <div className="px-3.5 pb-1 pt-2 text-[10px] font-semibold uppercase tracking-wide text-[#8A8E86]">
                       {TYPE_LABEL[g.type]}
                     </div>
                     {g.rows.map(({ item, index }) => (
@@ -202,11 +202,11 @@ export function GlobalSearch({ items, placeholder }: { items: SearchIndexItem[];
                         }}
                         onMouseEnter={() => setActive(index)}
                         className={`block w-full px-3.5 py-2 text-left transition-colors ${
-                          index === active ? 'bg-[#F0F5F3]' : 'hover:bg-[#FAFAF8]'
+                          index === active ? 'bg-[#F0F5F3]' : 'hover:bg-[#F5F9FE]'
                         }`}
                       >
-                        <div className="truncate text-[13px] font-medium text-[#1A1C1E]">{item.title}</div>
-                        {item.sub ? <div className="truncate text-[12px] text-[#5F6368]">{item.sub}</div> : null}
+                        <div className="truncate text-[13px] font-medium text-[#171A17]">{item.title}</div>
+                        {item.sub ? <div className="truncate text-[12px] text-[#6B6F68]">{item.sub}</div> : null}
                       </button>
                     ))}
                   </div>

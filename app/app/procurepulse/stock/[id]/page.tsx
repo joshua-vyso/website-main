@@ -32,12 +32,12 @@ export default async function StockDetailPage({
   if (!item) {
     return (
       <div className="space-y-4">
-        <Link href="/app/procurepulse/stock" className="text-[13px] text-[#5F6368]">
+        <Link href="/app/procurepulse/stock" className="text-[13px] text-[#6B6F68]">
           ‹&nbsp;&nbsp;Live stock
         </Link>
-        <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
-          <div className="text-[14px] font-medium text-[#1A1C1E]">Item not found</div>
-          <p className="mt-1 text-[13px] text-[#9A9DA1]">
+        <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <div className="of-display text-[16px] font-semibold text-[#171A17]">Item not found</div>
+          <p className="mt-1 text-[13px] text-[#8A8E86]">
             This stock line may have been removed or is not part of your organisation.
           </p>
         </div>
@@ -60,17 +60,17 @@ export default async function StockDetailPage({
 
   return (
     <div>
-      <Link href="/app/procurepulse/stock" className="text-[13px] text-[#5F6368]">
+      <Link href="/app/procurepulse/stock" className="text-[13px] text-[#6B6F68]">
         ‹&nbsp;&nbsp;Live stock
       </Link>
 
       <div className="mt-2 flex items-start justify-between gap-4">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2.5">
-            <h1 className="text-[26px] font-bold text-[#1A1C1E]">{item.name}</h1>
+            <h1 className="of-display text-[28px] font-semibold leading-tight tracking-[-0.015em] text-[#171A17]">{item.name}</h1>
             <StockStatusPill status={status} />
           </div>
-          <p className="mt-1 text-[14px] text-[#9A9DA1]">
+          <p className="mt-1 text-[14px] text-[#8A8E86]">
             {[item.pack, item.category].filter(Boolean).join(' · ') || item.unit}
           </p>
         </div>
@@ -85,14 +85,14 @@ export default async function StockDetailPage({
         {/* LEFT */}
         <div className="space-y-4">
           {/* Level card */}
-          <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
+          <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
             <div className="flex items-end justify-between gap-3">
               <div>
-                <span className="text-[30px] font-bold text-[#1A1C1E]">{item.on_hand}</span>
-                <span className="ml-1.5 text-[14px] text-[#9A9DA1]">{item.unit} on hand</span>
+                <span className="of-num text-[30px] font-semibold tracking-[-0.02em] text-[#171A17]">{item.on_hand}</span>
+                <span className="ml-1.5 text-[14px] text-[#8A8E86]">{item.unit} on hand</span>
               </div>
               <div className="text-[13px] text-[#854F0B]">
-                Low-stock threshold: {item.low_threshold} {item.unit}
+                Low-stock threshold: <span className="of-num">{item.low_threshold}</span> {item.unit}
               </div>
             </div>
             <div className="mt-3.5">
@@ -101,8 +101,8 @@ export default async function StockDetailPage({
           </div>
 
           {/* Stock level chart */}
-          <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
-            <div className="text-[14px] font-medium text-[#1A1C1E]">
+          <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+            <div className="of-display text-[16px] font-semibold text-[#171A17]">
               Stock level · last 30 days
             </div>
             <div className="mt-3">
@@ -115,27 +115,27 @@ export default async function StockDetailPage({
           </div>
 
           {/* Movement history */}
-          <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
-            <div className="text-[14px] font-medium text-[#1A1C1E]">Movement history</div>
+          <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+            <div className="of-display text-[16px] font-semibold text-[#171A17]">Movement history</div>
             <div className="mt-2">
               {moves.length === 0 ? (
-                <p className="py-3 text-[13px] text-[#9A9DA1]">No movements recorded yet.</p>
+                <p className="py-3 text-[13px] text-[#8A8E86]">No movements recorded yet.</p>
               ) : (
                 moves.map((m, i) => (
                   <div
                     key={m.id}
                     className={`flex items-center justify-between gap-3 py-3.5 ${
-                      i === 0 ? '' : 'border-t border-[#EFEFEC]'
+                      i === 0 ? '' : 'border-t border-[#EEF1F5]'
                     }`}
                   >
-                    <div className="min-w-0 text-[13px] text-[#5F6368]">
+                    <div className="min-w-0 text-[13px] text-[#6B6F68]">
                       {[fmtDate(m.occurred_at), m.reason, m.source_label]
                         .filter(Boolean)
                         .join(' · ')}
                     </div>
                     <div
-                      className="shrink-0 text-[13px] font-medium"
-                      style={{ color: m.change > 0 ? '#0F6E56' : '#5F6368' }}
+                      className="of-num shrink-0 text-[13px] font-semibold"
+                      style={{ color: m.change > 0 ? '#0F6E56' : '#6B6F68' }}
                     >
                       {m.change > 0 ? '+' : ''}
                       {m.change}
@@ -150,31 +150,31 @@ export default async function StockDetailPage({
         {/* RIGHT */}
         <div className="space-y-4">
           {/* At a glance */}
-          <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
-            <div className="text-[14px] font-medium text-[#1A1C1E]">At a glance</div>
+          <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+            <div className="of-display text-[16px] font-semibold text-[#171A17]">At a glance</div>
             <div className="mt-2">
               <div className="flex items-center justify-between py-2.5">
-                <span className="text-[13px] text-[#9A9DA1]">On hand</span>
-                <span className="text-[13px] font-medium text-[#1A1C1E]">
+                <span className="text-[13px] text-[#8A8E86]">On hand</span>
+                <span className="of-num text-[13px] font-semibold text-[#171A17]">
                   {item.on_hand} {item.unit}
                 </span>
               </div>
-              <div className="flex items-center justify-between border-t border-[#EFEFEC] py-2.5">
-                <span className="text-[13px] text-[#9A9DA1]">Avg unit price</span>
-                <span className="text-[13px] font-medium text-[#1A1C1E]">
+              <div className="flex items-center justify-between border-t border-[#EEF1F5] py-2.5">
+                <span className="text-[13px] text-[#8A8E86]">Avg unit price</span>
+                <span className="of-num text-[13px] font-semibold text-[#171A17]">
                   {rand(item.avg_unit_price)} / {item.unit}
                 </span>
               </div>
-              <div className="flex items-center justify-between border-t border-[#EFEFEC] py-2.5">
-                <span className="text-[13px] text-[#9A9DA1]">Reorder point</span>
-                <span className="text-[13px] font-medium text-[#1A1C1E]">
+              <div className="flex items-center justify-between border-t border-[#EEF1F5] py-2.5">
+                <span className="text-[13px] text-[#8A8E86]">Reorder point</span>
+                <span className="of-num text-[13px] font-semibold text-[#171A17]">
                   {item.low_threshold} {item.unit}
                 </span>
               </div>
             </div>
             {item.price_history && item.price_history.length > 0 ? (
-              <div className="mt-3 border-t border-[#EFEFEC] pt-3">
-                <div className="text-[12px] text-[#9A9DA1]">Avg price trend</div>
+              <div className="mt-3 border-t border-[#EEF1F5] pt-3">
+                <div className="text-[12px] text-[#A0A49C]">Avg price trend</div>
                 <div className="mt-1.5">
                   <Sparkline data={item.price_history} />
                 </div>
@@ -183,30 +183,30 @@ export default async function StockDetailPage({
           </div>
 
           {/* Suppliers */}
-          <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
-            <div className="text-[14px] font-medium text-[#1A1C1E]">Suppliers</div>
+          <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+            <div className="of-display text-[16px] font-semibold text-[#171A17]">Suppliers</div>
             <div className="mt-2">
               {prices.length === 0 ? (
-                <p className="py-3 text-[13px] text-[#9A9DA1]">No supplier prices yet.</p>
+                <p className="py-3 text-[13px] text-[#8A8E86]">No supplier prices yet.</p>
               ) : (
                 prices.map((p, i) => (
                   <div
                     key={p.id}
                     className={`flex items-center justify-between gap-3 py-3 ${
-                      i === 0 ? '' : 'border-t border-[#EFEFEC]'
+                      i === 0 ? '' : 'border-t border-[#EEF1F5]'
                     }`}
                   >
                     <div className="flex min-w-0 items-center gap-2">
-                      <span className="truncate text-[13px] text-[#1A1C1E]">
+                      <span className="truncate text-[13px] text-[#171A17]">
                         {p.supplier_name}
                       </span>
                       {i === 0 ? (
-                        <span className="rounded-full bg-[#E1F5EE] px-2 py-0.5 text-[11px] text-[#0F6E56]">
+                        <span className="rounded-full bg-[#E1F5EE] px-2 py-0.5 text-[11px] font-medium text-[#0F6E56]">
                           Cheapest
                         </span>
                       ) : null}
                     </div>
-                    <span className="shrink-0 text-[13px] font-medium text-[#1A1C1E]">
+                    <span className="of-num shrink-0 text-[13px] font-semibold text-[#171A17]">
                       {rand(p.price)}
                     </span>
                   </div>
@@ -216,17 +216,17 @@ export default async function StockDetailPage({
           </div>
 
           {/* Reorder panel */}
-          <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
-            <div className="text-[13px] text-[#9A9DA1]">Suggested reorder</div>
-            <div className="mt-1 text-[26px] font-bold text-[#1A1C1E]">
+          <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+            <div className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">Suggested reorder</div>
+            <div className="of-num mt-2 text-[22px] font-semibold leading-none tracking-[-0.02em] text-[#171A17]">
               {suggested} {item.unit}
             </div>
-            <div className="mt-1 text-[13px] text-[#5F6368]">
+            <div className="mt-1.5 text-[13px] text-[#6B6F68]">
               ≈ {rand(suggested * cheapestPrice)} · {cheapestSupplier}
             </div>
             <Link
               href="/app/procurepulse/reorder"
-              className="mt-2 inline-flex w-full items-center justify-center rounded-lg bg-[#1F5FA8] px-4 py-2.5 text-[14px] font-medium text-white"
+              className="mt-3 inline-flex h-[42px] w-full items-center justify-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87]"
             >
               Add to order
             </Link>

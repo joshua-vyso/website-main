@@ -78,24 +78,24 @@ export function CustomersView() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           <Kpi label="Customers" value={String(customers.length)} />
-          <Kpi label="With email" value={String(customers.filter((c) => c.email).length)} accent="#5B53C0" sub="reachable" />
+          <Kpi label="With email" value={String(customers.filter((c) => c.email).length)} accent="#1F5FA8" sub="reachable" />
         </div>
         <SdPrimary onClick={openAdd}>+ Add customer</SdPrimary>
       </div>
 
       {customers.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
-          <p className="text-[15px] font-medium text-[#1A1C1E]">No customers yet</p>
-          <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">Add the people and businesses you invoice — you&rsquo;ll pick them when creating an invoice.</p>
+        <div className="rounded-2xl border border-dashed border-[#D8DFE8] bg-white px-6 py-12 text-center">
+          <p className="of-display text-[18px] font-semibold text-[#171A17]">No customers yet</p>
+          <p className="mx-auto mt-2 max-w-md text-[14px] text-[#6B6F68]">Add the people and businesses you invoice — you&rsquo;ll pick them when creating an invoice.</p>
         </div>
       ) : (
         <DataTable
           columns={[{ label: 'Name' }, { label: 'Company' }, { label: 'Email' }, { label: 'Phone' }, { label: '', align: 'right' }]}
           rows={customers.map((c) => [
-            <button key="n" type="button" onClick={() => openEdit(c)} className="text-left font-medium text-[#1A1C1E] transition-colors hover:text-[#5B53C0] hover:underline">{c.name}</button>,
+            <button key="n" type="button" onClick={() => openEdit(c)} className="text-left font-semibold text-[#171A17] transition-colors hover:text-[#1F5FA8] hover:underline">{c.name}</button>,
             c.company ?? '—',
             c.email ?? '—',
-            c.phone ?? '—',
+            <span key="p" className="of-num">{c.phone ?? '—'}</span>,
             <RowActionsMenu key="a" actions={[{ label: 'Edit', onClick: () => openEdit(c) }, { label: 'Delete', onClick: () => void remove(c), danger: true }]} />,
           ])}
           empty="No customers."
@@ -126,7 +126,7 @@ export function CustomersView() {
         <Field label="Notes" hint="(optional)">
           <textarea value={form.notes} onChange={(e) => setForm({ ...form, notes: e.target.value })} className={`${inputClass} h-20 py-2`} />
         </Field>
-        {error ? <p className="text-[12px] text-[#A32D2D]">{error}</p> : null}
+        {error ? <p className="text-[13px] text-[#A32D2D]">{error}</p> : null}
       </Modal>
     </div>
   );

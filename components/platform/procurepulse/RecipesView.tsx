@@ -21,7 +21,7 @@ export interface RecipeCard {
 const READINESS: Record<RecipeReadiness, { bg: string; fg: string; label: (b: number | null) => string }> = {
   ready: { bg: '#E1F5EE', fg: '#0F6E56', label: (b) => `Make ${b} now` },
   blocked: { bg: '#FCEBEB', fg: '#A32D2D', label: () => 'Short on stock' },
-  unknown: { bg: '#F0F0EC', fg: '#5F6368', label: () => 'Link ingredients' },
+  unknown: { bg: '#EEF1F5', fg: '#6B6F68', label: () => 'Link ingredients' },
 };
 
 export function RecipesView({ recipes }: { recipes: RecipeCard[] }) {
@@ -48,24 +48,24 @@ export function RecipesView({ recipes }: { recipes: RecipeCard[] }) {
   return (
     <div className="mt-4 space-y-4">
       <div className="flex items-center justify-between">
-        <div className="text-[14px] font-semibold text-[#1A1C1E]">
+        <div className="of-display text-[16px] font-semibold text-[#171A17]">
           Recipes {recipes.length > 0 ? `(${recipes.length})` : ''}
         </div>
         <button
           type="button"
           onClick={() => void newRecipe()}
           disabled={creating}
-          className="rounded-lg bg-[#1F5FA8] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-50"
+          className="inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-50"
         >
           {creating ? 'Creating…' : '+ New recipe'}
         </button>
       </div>
 
       {recipes.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-[#E7E7E2] bg-white px-8 py-16 text-center">
-          <h2 className="text-[18px] font-semibold text-[#1A1C1E]">No recipes yet</h2>
-          <p className="mx-auto mt-1 max-w-md text-[14px] text-[#5F6368]">
-            Build a recipe like <span className="font-medium text-[#1A1C1E]">Mixed Veg</span> from your
+        <div className="rounded-2xl border border-dashed border-[#D8DFE8] bg-white px-8 py-16 text-center">
+          <h2 className="of-display text-[18px] font-semibold text-[#171A17]">No recipes yet</h2>
+          <p className="mx-auto mt-1 max-w-md text-[14px] text-[#6B6F68]">
+            Build a recipe like <span className="font-medium text-[#171A17]">Mixed Veg</span> from your
             stock products. You&apos;ll see how many batches you can make now, the limiting ingredient,
             and the stock cost per batch.
           </p>
@@ -73,7 +73,7 @@ export function RecipesView({ recipes }: { recipes: RecipeCard[] }) {
             type="button"
             onClick={() => void newRecipe()}
             disabled={creating}
-            className="mt-5 inline-flex items-center justify-center rounded-lg bg-[#1F5FA8] px-4 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-50"
+            className="mt-5 inline-flex h-[42px] items-center justify-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-50"
           >
             {creating ? 'Creating…' : 'Create your first recipe'}
           </button>
@@ -86,12 +86,12 @@ export function RecipesView({ recipes }: { recipes: RecipeCard[] }) {
               <Link
                 key={r.id}
                 href={`/app/procurepulse/recipes/${r.id}`}
-                className="group flex flex-col rounded-2xl border border-[#E7E7E2] bg-white p-4 transition-colors hover:border-[#3E7BC4]/40"
+                className="group flex flex-col rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)] transition-colors hover:border-[#C9DEF7]"
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <div className="truncate text-[15px] font-semibold text-[#1A1C1E]">{r.name}</div>
-                    <div className="mt-0.5 truncate text-[12px] text-[#9A9DA1]">
+                    <div className="of-display truncate text-[16px] font-semibold text-[#171A17]">{r.name}</div>
+                    <div className="mt-0.5 truncate text-[12px] text-[#A0A49C]">
                       {r.output ?? `${r.ingredientCount} ingredient${r.ingredientCount === 1 ? '' : 's'}`}
                     </div>
                   </div>
@@ -105,29 +105,29 @@ export function RecipesView({ recipes }: { recipes: RecipeCard[] }) {
 
                 <div className="mt-4 flex items-end justify-between">
                   <div>
-                    <div className="text-[28px] font-bold leading-none text-[#1A1C1E]">
+                    <div className="of-num text-[30px] font-semibold leading-none tracking-[-0.02em] text-[#171A17]">
                       {r.batches == null ? '—' : r.batches}
                     </div>
-                    <div className="mt-1 text-[12px] text-[#9A9DA1]">batches now</div>
+                    <div className="mt-1.5 text-[12px] text-[#A0A49C]">batches now</div>
                   </div>
                   <div className="text-right">
-                    <div className="text-[14px] font-medium text-[#1A1C1E]">
+                    <div className="of-num text-[16px] font-semibold text-[#171A17]">
                       {rand(r.costPerBatch)}
                     </div>
-                    <div className="mt-1 text-[12px] text-[#9A9DA1]">stock / batch</div>
+                    <div className="mt-1.5 text-[12px] text-[#A0A49C]">stock / batch</div>
                   </div>
                 </div>
 
                 {r.readiness === 'blocked' && r.limitingName ? (
-                  <div className="mt-3 border-t border-[#EFEFEC] pt-2.5 text-[12px] text-[#A32D2D]">
+                  <div className="mt-3 border-t border-[#EEF1F5] pt-2.5 text-[12px] text-[#A32D2D]">
                     Short: {r.limitingName}
                   </div>
                 ) : r.readiness === 'ready' && r.limitingName ? (
-                  <div className="mt-3 border-t border-[#EFEFEC] pt-2.5 text-[12px] text-[#5F6368]">
+                  <div className="mt-3 border-t border-[#EEF1F5] pt-2.5 text-[12px] text-[#6B6F68]">
                     Limited by {r.limitingName}
                   </div>
                 ) : (
-                  <div className="mt-3 border-t border-[#EFEFEC] pt-2.5 text-[12px] text-[#9A9DA1]">
+                  <div className="mt-3 border-t border-[#EEF1F5] pt-2.5 text-[12px] text-[#A0A49C]">
                     {r.ingredientCount} ingredient{r.ingredientCount === 1 ? '' : 's'}
                   </div>
                 )}

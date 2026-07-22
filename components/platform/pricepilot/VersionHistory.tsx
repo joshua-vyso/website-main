@@ -88,17 +88,17 @@ export function VersionHistory({
   }
 
   return (
-    <div className="mt-6 rounded-2xl border border-[#E7E7E2] bg-white">
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#F0F0EC] px-5 py-4">
+    <div className="mt-6 rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#EEF1F5] px-5 py-4">
         <div>
-          <h2 className="text-[15px] font-semibold text-[#1A1C1E]">Version history</h2>
-          <p className="mt-0.5 text-[12px] text-[#9A9DA1]">Publish snapshots, roll back, and compare changes</p>
+          <h2 className="of-display text-[16px] font-semibold text-[#171A17]">Version history</h2>
+          <p className="mt-0.5 text-[12px] text-[#8A8E86]">Publish snapshots, roll back, and compare changes</p>
         </div>
         <span
           className="inline-flex items-center rounded-full px-2.5 py-1 text-[12px] font-medium"
           style={
             !latest
-              ? { backgroundColor: '#F0F0EC', color: '#5F6368' }
+              ? { backgroundColor: '#EEF1F5', color: '#6B6F68' }
               : upToDate
                 ? { backgroundColor: '#E1F5EE', color: '#0F6E56' }
                 : { backgroundColor: '#FBEEDA', color: '#854F0B' }
@@ -108,18 +108,18 @@ export function VersionHistory({
         </span>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2 border-b border-[#F0F0EC] px-5 py-4">
+      <div className="flex flex-wrap items-center gap-2 border-b border-[#EEF1F5] px-5 py-4">
         <input
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="Optional note (e.g. Q3 price increase)"
-          className="h-9 flex-1 min-w-[200px] rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] outline-none placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]"
+          className="h-11 flex-1 min-w-[200px] rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]"
         />
         <button
           type="button"
           onClick={publish}
           disabled={busy !== null || upToDate}
-          className="inline-flex h-9 items-center rounded-lg bg-[#1F5FA8] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
+          className="inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
         >
           {busy === 'publish' ? 'Publishing…' : 'Publish version'}
         </button>
@@ -129,7 +129,7 @@ export function VersionHistory({
 
       <div className="px-5 py-2">
         {versions.length === 0 ? (
-          <p className="py-6 text-center text-[13px] text-[#9A9DA1]">
+          <p className="py-6 text-center text-[13px] text-[#8A8E86]">
             No versions yet. Publish the current margins to start a history you can roll back to.
           </p>
         ) : (
@@ -138,24 +138,24 @@ export function VersionHistory({
             const diff = diffSnapshots({ defaultMargin: Number(v.default_margin_pct), overrides: v.overrides }, live);
             const changeCount = (diff.defaultChanged ? 1 : 0) + diff.overrides.length;
             return (
-              <div key={v.id} className={`py-3 ${i > 0 ? 'border-t border-[#F0F0EC]' : ''}`}>
+              <div key={v.id} className={`py-3 ${i > 0 ? 'border-t border-[#F4F5F7]' : ''}`}>
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 text-[13px]">
-                    <span className="font-semibold text-[#1A1C1E]">v{v.version_no}</span>
+                  <div className="flex items-center gap-2 text-[14px]">
+                    <span className="of-num font-semibold text-[#171A17]">v{v.version_no}</span>
                     {i === 0 ? (
                       <span className="rounded-full bg-[#E6F1FB] px-2 py-0.5 text-[11px] font-medium text-[#0C447C]">Latest</span>
                     ) : null}
-                    <span className="text-[#9A9DA1]">
+                    <span className="of-num text-[#A0A49C]">
                       {new Date(v.created_at).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short', year: 'numeric' })}
                       {v.created_by && authors[v.created_by] ? ` · ${authors[v.created_by]}` : ''}
                     </span>
-                    <span className="text-[#5F6368]">· {Math.round(Number(v.default_margin_pct))}% default · {v.overrides.length} overrides</span>
+                    <span className="of-num text-[#6B6F68]">· {Math.round(Number(v.default_margin_pct))}% default · {v.overrides.length} overrides</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
                       type="button"
                       onClick={() => setCompareId(open ? null : v.id)}
-                      className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[12px] font-medium text-[#5F6368] transition-colors hover:border-[#3E7BC4]/40"
+                      className="inline-flex h-9 items-center rounded-[10px] border border-[#E2E6EC] bg-white px-3 text-[12px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]"
                     >
                       {open ? 'Hide' : `Compare (${changeCount})`}
                     </button>
@@ -163,43 +163,43 @@ export function VersionHistory({
                       type="button"
                       disabled={busy !== null}
                       onClick={() => rollback(v)}
-                      className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[12px] font-medium text-[#5F6368] transition-colors hover:border-[#3E7BC4]/40 disabled:opacity-40"
+                      className="inline-flex h-9 items-center rounded-[10px] border border-[#E2E6EC] bg-white px-3 text-[12px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87] disabled:opacity-40"
                     >
                       {busy === v.id ? '…' : 'Restore'}
                     </button>
                   </div>
                 </div>
-                {v.note ? <p className="mt-1 text-[12px] text-[#9A9DA1]">{v.note}</p> : null}
+                {v.note ? <p className="mt-1 text-[12px] text-[#A0A49C]">{v.note}</p> : null}
 
                 {open ? (
-                  <div className="mt-3 rounded-xl border border-[#F0F0EC] bg-[#FCFCFB] p-3 text-[12px]">
-                    <p className="mb-2 font-medium text-[#5F6368]">Changes from v{v.version_no} → current</p>
+                  <div className="mt-3 rounded-[14px] border border-[#EEF1F5] bg-[#FBFCFE] p-3 text-[12px]">
+                    <p className="mb-2 font-medium text-[#6B6F68]">Changes from v{v.version_no} → current</p>
                     {changeCount === 0 ? (
-                      <p className="text-[#9A9DA1]">Identical to the current margins.</p>
+                      <p className="text-[#8A8E86]">Identical to the current margins.</p>
                     ) : (
                       <div className="flex flex-col gap-1">
                         {diff.defaultChanged ? (
                           <div className="flex justify-between">
-                            <span className="text-[#5F6368]">Default margin</span>
-                            <span className="tabular-nums text-[#1A1C1E]">
-                              {Math.round(Number(v.default_margin_pct))}% → <span className="font-medium text-[#0F6E56]">{Math.round(live.defaultMargin)}%</span>
+                            <span className="text-[#6B6F68]">Default margin</span>
+                            <span className="of-num text-[#171A17]">
+                              {Math.round(Number(v.default_margin_pct))}% → <span className="font-semibold text-[#0F6E56]">{Math.round(live.defaultMargin)}%</span>
                             </span>
                           </div>
                         ) : null}
                         {diff.overrides.slice(0, 30).map((o) => (
                           <div key={o.stock_item_id} className="flex justify-between">
-                            <span className="min-w-0 truncate text-[#5F6368]">
+                            <span className="min-w-0 truncate text-[#6B6F68]">
                               {productNames[o.stock_item_id] ?? 'Product'}{' '}
-                              <span className="text-[#9A9DA1]">({o.kind})</span>
+                              <span className="text-[#8A8E86]">({o.kind})</span>
                             </span>
-                            <span className="shrink-0 tabular-nums text-[#1A1C1E]">
+                            <span className="of-num shrink-0 text-[#171A17]">
                               {o.from != null ? `${Math.round(o.from)}%` : '—'} →{' '}
-                              <span className="font-medium text-[#0F6E56]">{o.to != null ? `${Math.round(o.to)}%` : '—'}</span>
+                              <span className="font-semibold text-[#0F6E56]">{o.to != null ? `${Math.round(o.to)}%` : '—'}</span>
                             </span>
                           </div>
                         ))}
                         {diff.overrides.length > 30 ? (
-                          <p className="text-[#9A9DA1]">+{diff.overrides.length - 30} more…</p>
+                          <p className="of-num text-[#A0A49C]">+{diff.overrides.length - 30} more…</p>
                         ) : null}
                       </div>
                     )}

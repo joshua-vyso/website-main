@@ -58,7 +58,7 @@ export async function fetchModuleNotifications(
 
   // Fallback styling — pp_notifications.kind has no DB enum, so a row could carry
   // an unknown kind; never let that crash the whole feed.
-  const fallback = { bg: '#EFEFEC', fg: '#5F6368', label: 'Update' };
+  const fallback = { bg: '#EEF1F5', fg: '#6B6F68', label: 'Update' };
   const pp: ModuleNotification[] = ((ppRows ?? []) as PpNotification[]).map((n) => {
     const k = NOTIFICATION_KINDS[n.kind] ?? fallback;
     return {

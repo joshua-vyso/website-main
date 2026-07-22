@@ -82,7 +82,7 @@ const SLASH_TOKEN_RE = /(^|\s)\/([^\s/]*)$/;
 // Portals mount on document.body, outside the platform subtree's --radius
 // override — re-declare it (else rounded corners collapse) plus the app font.
 const PORTAL_STYLE = {
-  fontFamily: 'var(--font-inter)',
+  fontFamily: 'var(--font-instrument)',
   ['--radius' as string]: '0.625rem',
 } as React.CSSProperties;
 
@@ -536,7 +536,7 @@ export function VysoAIModal({
           const files = Array.from(e.dataTransfer.files ?? []);
           if (files.length) void attachFiles(files);
         }}
-        className="relative flex h-[560px] max-h-[85vh] w-full max-w-[560px] flex-col overflow-hidden rounded-3xl border border-[#E7E7E2] bg-white shadow-[0_30px_80px_-24px_rgba(15,23,32,0.55)]"
+        className="relative flex h-[560px] max-h-[85vh] w-full max-w-[560px] flex-col overflow-hidden rounded-3xl border border-[#EAEDF2] bg-white shadow-[0_30px_80px_-24px_rgba(15,23,32,0.55)]"
       >
         {dragOver ? (
           <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center rounded-3xl border-2 border-dashed border-[#3E8FE0] bg-[#F2F8FE]/85 backdrop-blur-[1px]">
@@ -544,20 +544,20 @@ export function VysoAIModal({
           </div>
         ) : null}
         {/* Header */}
-        <div className="flex items-center justify-between gap-3 border-b border-[#F0F0EC] px-5 py-3.5">
+        <div className="flex items-center justify-between gap-3 border-b border-[#EEF1F5] px-5 py-3.5">
           <div className="flex items-center gap-2">
             <span className="vyso-ai-gradient flex h-6 w-6 items-center justify-center rounded-full">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M12 3l1.6 4.6L18 9.2l-4.4 1.6L12 15l-1.6-4.2L6 9.2l4.4-1.6L12 3z" fill="#fff" />
               </svg>
             </span>
-            <span className="text-[15px] font-semibold text-[#1A1C1E]">Vyso AI</span>
+            <span className="of-display text-[15px] font-semibold text-[#171A17]">Vyso AI</span>
           </div>
           <button
             type="button"
             onClick={onClose}
             aria-label="Close"
-            className="flex h-8 w-8 items-center justify-center rounded-lg text-[16px] text-[#9A9DA1] transition-colors hover:bg-[#F0F0EC] hover:text-[#1A1C1E]"
+            className="flex h-8 w-8 items-center justify-center rounded-lg text-[16px] text-[#8A8E86] transition-colors hover:bg-[#EEF1F5] hover:text-[#171A17]"
           >
             ✕
           </button>
@@ -568,7 +568,7 @@ export function VysoAIModal({
           {empty ? (
             <div className="flex h-full flex-col items-center justify-center text-center">
               <BouncingDots size={9} />
-              <p className="mt-4 max-w-[320px] text-[14px] leading-5 text-[#5F6368]">
+              <p className="mt-4 max-w-[320px] text-[14px] leading-5 text-[#6B6F68]">
                 Ask me how to do anything in this module, or about your live numbers, orders and customers. You can also
                 attach a document (📎) — an order, invoice or statement — add a note, and send: I'll file it in Doc-U and
                 invoice orders automatically
@@ -583,7 +583,7 @@ export function VysoAIModal({
                     className={`max-w-[85%] whitespace-pre-wrap rounded-2xl px-3.5 py-2.5 text-[13.5px] leading-5 ${
                       m.role === 'user'
                         ? 'bg-[#EAF3FC] text-[#123]'
-                        : 'border border-[#EFEFEA] bg-[#FBFBF9] text-[#1A1C1E]'
+                        : 'border border-[#EFEFEA] bg-[#FBFCFE] text-[#171A17]'
                     }`}
                   >
                     {m.role === 'assistant' ? renderContent(m.content) : m.content}
@@ -592,13 +592,13 @@ export function VysoAIModal({
               ))}
               {streaming ? (
                 <div className="flex justify-start">
-                  <div className="max-w-[85%] rounded-2xl border border-[#EFEFEA] bg-[#FBFBF9] px-3.5 py-2.5 text-[13.5px] leading-5 text-[#1A1C1E]">
+                  <div className="max-w-[85%] rounded-2xl border border-[#EFEFEA] bg-[#FBFCFE] px-3.5 py-2.5 text-[13.5px] leading-5 text-[#171A17]">
                     {streamText ? (
                       <span className="whitespace-pre-wrap">{renderContent(streamText)}</span>
                     ) : (
                       <span className="flex items-center gap-2">
                         <BouncingDots size={7} />
-                        {streamStatus ? <span className="text-[12px] text-[#5F6368]">{streamStatus}</span> : null}
+                        {streamStatus ? <span className="text-[12px] text-[#6B6F68]">{streamStatus}</span> : null}
                       </span>
                     )}
                   </div>
@@ -609,10 +609,10 @@ export function VysoAIModal({
                 slot.status === 'parsing' ? (
                   <div
                     key={slot.id}
-                    className="flex items-center gap-2 rounded-2xl border border-[#EFEFEA] bg-[#FBFBF9] px-3.5 py-2.5"
+                    className="flex items-center gap-2 rounded-2xl border border-[#EFEFEA] bg-[#FBFCFE] px-3.5 py-2.5"
                   >
                     <BouncingDots size={7} />
-                    <span className="truncate text-[12px] text-[#5F6368]">Reading &amp; filing {slot.filename}…</span>
+                    <span className="truncate text-[12px] text-[#6B6F68]">Reading &amp; filing {slot.filename}…</span>
                   </div>
                 ) : slot.status === 'error' ? (
                   <p key={slot.id} className="px-1 text-[12px] text-[#A32D2D]">
@@ -650,14 +650,14 @@ export function VysoAIModal({
         </div>
 
         {/* Composer */}
-        <div className="border-t border-[#F0F0EC] p-3">
+        <div className="border-t border-[#EEF1F5] p-3">
           {customerMenu ? (
-            <div className="mb-2 max-h-44 overflow-y-auto rounded-xl border border-[#D7DAD8] bg-white py-1 shadow-[0_12px_30px_-12px_rgba(15,23,32,0.3)]">
-              <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-[#9A9DA1]">
+            <div className="mb-2 max-h-44 overflow-y-auto rounded-xl border border-[#E2E6EC] bg-white py-1 shadow-[0_12px_30px_-12px_rgba(15,23,32,0.3)]">
+              <div className="px-3 py-1 text-[10px] font-semibold uppercase tracking-wide text-[#8A8E86]">
                 Create an order for…
               </div>
               {customers === null ? (
-                <div className="px-3 py-1.5 text-[12px] text-[#5F6368]">Loading customers…</div>
+                <div className="px-3 py-1.5 text-[12px] text-[#6B6F68]">Loading customers…</div>
               ) : customerMatches.length ? (
                 customerMatches.map((c) => (
                   <button
@@ -665,13 +665,13 @@ export function VysoAIModal({
                     type="button"
                     onMouseDown={(e) => e.preventDefault()}
                     onClick={() => pickWorkflowCustomer(c.name)}
-                    className="block w-full truncate px-3 py-1.5 text-left text-[13px] text-[#1A1C1E] transition-colors hover:bg-[#F2F8FE]"
+                    className="block w-full truncate px-3 py-1.5 text-left text-[13px] text-[#171A17] transition-colors hover:bg-[#F2F8FE]"
                   >
                     {c.name}
                   </button>
                 ))
               ) : (
-                <div className="px-3 py-1.5 text-[12px] text-[#5F6368]">
+                <div className="px-3 py-1.5 text-[12px] text-[#6B6F68]">
                   {customerQuery ? `No customer matches “${customerQuery}”.` : 'No customers yet.'}
                 </div>
               )}
@@ -683,7 +683,7 @@ export function VysoAIModal({
               {pending.map((p) => (
                 <div
                   key={p.id}
-                  className="flex items-center gap-1.5 rounded-lg border border-[#D7DAD8] bg-[#F7FAFD] py-1 pl-1 pr-1.5"
+                  className="flex items-center gap-1.5 rounded-lg border border-[#E2E6EC] bg-[#F7FAFD] py-1 pl-1 pr-1.5"
                 >
                   {p.previewUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -693,12 +693,12 @@ export function VysoAIModal({
                       PDF
                     </span>
                   )}
-                  <span className="max-w-[120px] truncate text-[11.5px] text-[#1A1C1E]">{p.name}</span>
+                  <span className="max-w-[120px] truncate text-[11.5px] text-[#171A17]">{p.name}</span>
                   <button
                     type="button"
                     onClick={() => removePending(p.id)}
                     aria-label={`Remove ${p.name}`}
-                    className="flex h-5 w-5 items-center justify-center rounded-full text-[12px] text-[#9A9DA1] transition-colors hover:bg-[#E4EFFA] hover:text-[#1A1C1E]"
+                    className="flex h-5 w-5 items-center justify-center rounded-full text-[12px] text-[#8A8E86] transition-colors hover:bg-[#E4EFFA] hover:text-[#171A17]"
                   >
                     ✕
                   </button>
@@ -706,7 +706,7 @@ export function VysoAIModal({
               ))}
             </div>
           ) : null}
-          <div className="flex items-center gap-2 rounded-2xl border border-[#D7DAD8] bg-white px-3 py-2 focus-within:border-[#3E8FE0]/60">
+          <div className="flex items-center gap-2 rounded-2xl border border-[#E2E6EC] bg-white px-3 py-2 focus-within:border-[#3E8FE0]/60">
             <input
               ref={fileInputRef}
               type="file"
@@ -724,7 +724,7 @@ export function VysoAIModal({
               onClick={() => fileInputRef.current?.click()}
               aria-label="Attach order documents"
               title="Attach one or more orders"
-              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#5F6368] transition-colors hover:bg-[#F0F0EC] disabled:opacity-40"
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-[#6B6F68] transition-colors hover:bg-[#EEF1F5] disabled:opacity-40"
             >
               <svg width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path
@@ -767,7 +767,7 @@ export function VysoAIModal({
               }}
               rows={1}
               placeholder={`How can I help ${orgLabel} today?`}
-              className="max-h-28 flex-1 resize-none bg-transparent text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:outline-none"
+              className="max-h-28 flex-1 resize-none bg-transparent text-[14px] text-[#171A17] placeholder:text-[#8A8E86] focus:outline-none"
             />
             <button
               type="button"
@@ -817,7 +817,7 @@ function ParsedOrderCard({
             <path d="M12 3l1.6 4.6L18 9.2l-4.4 1.6L12 15l-1.6-4.2L6 9.2l4.4-1.6L12 3z" fill="#fff" />
           </svg>
         </span>
-        <span>{label ?? 'Parsed order'}</span>
+        <span className="of-display">{label ?? 'Parsed order'}</span>
         {order.filename ? (
           <span className="min-w-0 truncate text-[11px] font-normal text-[#5F80A0]">· {order.filename}</span>
         ) : null}
@@ -839,8 +839,8 @@ function ParsedOrderCard({
               key={i}
               className="flex items-center justify-between gap-3 border-b border-[#EEF4FB] px-3 py-1.5 text-[12px] last:border-0"
             >
-              <span className="truncate text-[#1A1C1E]">{it.name}</span>
-              <span className="shrink-0 tabular-nums text-[#5F6368]">
+              <span className="truncate text-[#171A17]">{it.name}</span>
+              <span className="of-num shrink-0 text-[#6B6F68]">
                 {it.qty}
                 {it.unit_price ? ` × R ${it.unit_price.toFixed(2)}` : ''}
               </span>
@@ -848,7 +848,7 @@ function ParsedOrderCard({
           ))}
         </div>
       ) : (
-        <div className="mt-2 text-[12px] text-[#5F6368]">No line items detected.</div>
+        <div className="mt-2 text-[12px] text-[#6B6F68]">No line items detected.</div>
       )}
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
@@ -866,14 +866,14 @@ function ParsedOrderCard({
             setCopied(true);
             setTimeout(() => setCopied(false), 1500);
           }}
-          className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:bg-[#F7FAFD]"
+          className="rounded-lg border border-[#E2E6EC] bg-white px-3 py-1.5 text-[12px] font-medium text-[#171A17] transition-colors hover:bg-[#F7FAFD]"
         >
           {copied ? 'Copied' : 'Copy'}
         </button>
         <button
           type="button"
           onClick={onDismiss}
-          className="rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-[#5F6368] transition-colors hover:bg-[#E4EFFA]"
+          className="rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-[#6B6F68] transition-colors hover:bg-[#E4EFFA]"
         >
           Dismiss
         </button>
@@ -919,7 +919,7 @@ function IngestResultCard({
             <path d="M5 12.5l4 4 10-11" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
         </span>
-        <span>Filed in Doc-U</span>
+        <span className="of-display">Filed in Doc-U</span>
         <span className="min-w-0 truncate text-[11px] font-normal text-[#5F80A0]">· {filename}</span>
       </div>
 
@@ -942,7 +942,9 @@ function IngestResultCard({
       </div>
 
       {invoiced ? (
-        <div className="mt-1.5 text-[12px] font-medium text-[#1F5FA8]">Invoice {result.invoiceNumber} created.</div>
+        <div className="mt-1.5 text-[12px] font-medium text-[#1F5FA8]">
+          Invoice <span className="of-num font-semibold">{result.invoiceNumber}</span> created.
+        </div>
       ) : draftHeld ? (
         <div className="mt-1.5 text-[12px] text-[#9A6A00]">Saved as a draft order — confirm the customer to invoice it.</div>
       ) : orderNotBuilt ? (
@@ -962,7 +964,7 @@ function IngestResultCard({
             <button
               type="button"
               onClick={() => onOpenDoc(result.documentId)}
-              className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:bg-[#F7FAFD]"
+              className="rounded-lg border border-[#E2E6EC] bg-white px-3 py-1.5 text-[12px] font-medium text-[#171A17] transition-colors hover:bg-[#F7FAFD]"
             >
               Open in Doc-U
             </button>
@@ -979,7 +981,7 @@ function IngestResultCard({
         <button
           type="button"
           onClick={onDismiss}
-          className="rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-[#5F6368] transition-colors hover:bg-[#E4EFFA]"
+          className="rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-[#6B6F68] transition-colors hover:bg-[#E4EFFA]"
         >
           Dismiss
         </button>

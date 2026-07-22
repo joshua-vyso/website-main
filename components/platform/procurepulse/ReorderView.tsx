@@ -248,7 +248,7 @@ export function ReorderView({
   }
 
   const field =
-    'h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none';
+    'h-11 w-full rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]';
 
   return (
     <div className="mt-4 space-y-6">
@@ -256,17 +256,17 @@ export function ReorderView({
       {/* Left column: suggested orders + manual requests */}
       <div className="space-y-4">
         {/* Suggested from low stock */}
-        <div className="overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
-          <div className="flex items-center justify-between gap-3 border-b border-[#E7E7E2] px-4 py-3">
-            <div className="text-[14px] font-semibold text-[#1A1C1E]">Suggested from low stock</div>
+        <div className="overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <div className="flex items-center justify-between gap-3 border-b border-[#EEF1F5] px-5 py-4">
+            <div className="of-display text-[16px] font-semibold text-[#171A17]">Suggested from low stock</div>
             <div className="flex items-center gap-3">
-              <span className="text-[12px] text-[#9A9DA1]">{order.itemCount} item{order.itemCount === 1 ? '' : 's'}</span>
+              <span className="of-num text-[12px] text-[#A0A49C]">{order.itemCount} item{order.itemCount === 1 ? '' : 's'}</span>
               {order.itemCount > 0 ? (
                 <button
                   type="button"
                   onClick={() => void reorderAllSuggested()}
                   disabled={reordering}
-                  className="rounded-lg bg-[#1F5FA8] px-3 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-50"
+                  className="inline-flex h-[38px] items-center rounded-[11px] bg-[#1F5FA8] px-4 text-[13px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-50"
                 >
                   {reordering ? 'Adding…' : `Reorder all · ${order.itemCount}`}
                 </button>
@@ -275,12 +275,12 @@ export function ReorderView({
           </div>
 
           {order.groups.length === 0 ? (
-            <div className="px-4 py-12 text-center text-[13px] text-[#9A9DA1]">
+            <div className="px-5 py-12 text-center text-[14px] text-[#8A8E86]">
               Nothing is low or out — you&apos;re well stocked.
             </div>
           ) : (
             <>
-              <div className="flex items-center px-4 py-2 text-[12px] font-medium text-[#9A9DA1]">
+              <div className="flex items-center px-5 py-2.5 text-[11px] font-medium uppercase tracking-[0.06em] text-[#A0A49C]">
                 <div className="flex-1">Product</div>
                 <div className="w-[110px] text-right">Qty</div>
                 <div className="w-[110px] text-right">Unit price</div>
@@ -288,21 +288,21 @@ export function ReorderView({
               </div>
               {order.groups.map((group) => (
                 <div key={group.supplier}>
-                  <div className="flex items-center justify-between bg-[#FAFAF8] px-4 py-2.5">
-                    <div className="text-[13px] font-medium text-[#1A1C1E]">{group.supplier}</div>
-                    <div className="text-[12px] text-[#5F6368]">Subtotal {rand(group.subtotal)}</div>
+                  <div className="flex items-center justify-between bg-[#F5F9FE] px-5 py-2.5">
+                    <div className="text-[13px] font-semibold text-[#171A17]">{group.supplier}</div>
+                    <div className="text-[12px] text-[#6B6F68]">Subtotal <span className="of-num">{rand(group.subtotal)}</span></div>
                   </div>
                   {group.lines.map((line) => (
                     <div
                       key={line.item.id}
-                      className="flex items-center border-t border-[#EFEFEC] px-4 py-3 text-[13px] text-[#1A1C1E]"
+                      className="flex items-center border-t border-[#F4F5F7] px-5 py-3 text-[14px] text-[#171A17]"
                     >
-                      <div className="flex-1 font-medium">{line.item.name}</div>
-                      <div className="w-[110px] text-right text-[#5F6368]">
+                      <div className="flex-1 font-semibold">{line.item.name}</div>
+                      <div className="of-num w-[110px] text-right text-[#6B6F68]">
                         {line.qty} {line.item.unit}
                       </div>
-                      <div className="w-[110px] text-right text-[#5F6368]">{rand(line.unitPrice)}</div>
-                      <div className="w-[120px] text-right font-medium">{rand(line.lineTotal)}</div>
+                      <div className="of-num w-[110px] text-right text-[#6B6F68]">{rand(line.unitPrice)}</div>
+                      <div className="of-num w-[120px] text-right font-semibold">{rand(line.lineTotal)}</div>
                     </div>
                   ))}
                 </div>
@@ -312,14 +312,14 @@ export function ReorderView({
         </div>
 
         {/* Manual reorder requests */}
-        <div className="rounded-2xl border border-[#E7E7E2] bg-white">
-          <div className="flex items-center justify-between border-b border-[#E7E7E2] px-4 py-3">
-            <div className="text-[14px] font-semibold text-[#1A1C1E]">Your reorder requests</div>
+        <div className="rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <div className="flex items-center justify-between border-b border-[#EEF1F5] px-5 py-4">
+            <div className="of-display text-[16px] font-semibold text-[#171A17]">Your reorder requests</div>
             {!open ? (
               <button
                 type="button"
                 onClick={() => setOpen(true)}
-                className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[13px] font-medium text-[#1F5FA8] transition-colors hover:border-[#3E7BC4]/40"
+                className="inline-flex h-[38px] items-center rounded-[11px] border border-[#E2E6EC] bg-white px-4 text-[13px] font-medium text-[#1F5FA8] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]"
               >
                 + Add request
               </button>
@@ -327,7 +327,7 @@ export function ReorderView({
           </div>
 
           {open ? (
-            <div className="border-b border-[#EFEFEC] bg-[#FBFBF9] p-4">
+            <div className="border-b border-[#EEF1F5] bg-[#FBFCFE] p-5">
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <div className="relative sm:col-span-2">
                   <input
@@ -340,16 +340,16 @@ export function ReorderView({
                     }}
                   />
                   {matches.length > 0 ? (
-                    <div className="absolute left-0 right-0 top-[44px] z-20 max-h-[220px] overflow-auto rounded-lg border border-[#E7E7E2] bg-white py-1 shadow-[0_18px_50px_-8px_rgba(26,28,30,0.25)]">
+                    <div className="absolute left-0 right-0 top-[48px] z-20 max-h-[220px] overflow-auto rounded-[12px] border border-[#EAEDF2] bg-white py-1 shadow-[0_18px_50px_-8px_rgba(26,28,30,0.25)]">
                       {matches.map((it) => (
                         <button
                           key={it.id}
                           type="button"
                           onClick={() => choose(it)}
-                          className="flex w-full items-center justify-between px-3 py-2 text-left text-[13px] text-[#1A1C1E] hover:bg-[#FAFAF8]"
+                          className="flex w-full items-center justify-between px-4 py-2 text-left text-[14px] text-[#171A17] hover:bg-[#F5F9FE]"
                         >
                           <span className="truncate">{it.name}</span>
-                          <span className="ml-2 shrink-0 text-[11px] text-[#9A9DA1]">{it.unit}</span>
+                          <span className="ml-2 shrink-0 text-[11px] text-[#A0A49C]">{it.unit}</span>
                         </button>
                       ))}
                     </div>
@@ -361,15 +361,15 @@ export function ReorderView({
                 <input className={field} placeholder="Note (optional)" value={note} onChange={(e) => setNote(e.target.value)} />
               </div>
               <div className="mt-3 flex items-center justify-end gap-2">
-                {msg ? <span className="mr-auto text-[12px] text-[#A32D2D]">{msg}</span> : null}
-                <button type="button" onClick={resetForm} className="rounded-lg px-3.5 py-2 text-[13px] text-[#5F6368] hover:bg-black/[0.03]">
+                {msg ? <span className="mr-auto text-[13px] text-[#A32D2D]">{msg}</span> : null}
+                <button type="button" onClick={resetForm} className="inline-flex h-[42px] items-center rounded-[11px] px-[18px] text-[14px] font-medium text-[#6B6F68] transition-colors hover:bg-black/[0.03]">
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={() => void submit()}
                   disabled={busy || !query.trim()}
-                  className="rounded-lg bg-[#1F5FA8] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
+                  className="inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
                 >
                   {busy ? 'Adding…' : 'Add request'}
                 </button>
@@ -378,15 +378,15 @@ export function ReorderView({
           ) : null}
 
           {manual.length === 0 && !open ? (
-            <div className="px-4 py-10 text-center text-[13px] text-[#9A9DA1]">
+            <div className="px-5 py-12 text-center text-[14px] text-[#8A8E86]">
               No manual requests yet. Add anything you want to order that isn&apos;t flagged automatically.
             </div>
           ) : (
             manual.map((r) => (
-              <div key={r.id} className="flex items-center gap-3 border-t border-[#EFEFEC] px-4 py-3 text-[13px] first:border-t-0">
+              <div key={r.id} className="flex items-center gap-3 border-t border-[#F4F5F7] px-5 py-3 text-[14px] first:border-t-0">
                 <div className="min-w-0 flex-1">
-                  <div className="font-medium text-[#1A1C1E]">{r.product_name}</div>
-                  <div className="mt-0.5 text-[12px] text-[#9A9DA1]">
+                  <div className="font-semibold text-[#171A17]">{r.product_name}</div>
+                  <div className="mt-0.5 text-[12px] text-[#A0A49C]">
                     {r.qty ? `${r.qty}${r.unit ? ' ' + r.unit : ''}` : '—'}
                     {r.supplier ? ` · ${r.supplier}` : ''}
                     {r.note ? ` · ${r.note}` : ''}
@@ -395,7 +395,7 @@ export function ReorderView({
                 <button
                   type="button"
                   onClick={() => void patch(r.id, { status: 'ordered' })}
-                  className="shrink-0 rounded-lg border border-[#D7DAD8] bg-white px-2.5 py-1.5 text-[12px] font-medium text-[#1F5FA8] transition-colors hover:border-[#3E7BC4]/40"
+                  className="inline-flex h-[34px] shrink-0 items-center rounded-[10px] border border-[#E2E6EC] bg-white px-3 text-[12px] font-medium text-[#1F5FA8] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]"
                 >
                   Mark ordered
                 </button>
@@ -403,7 +403,7 @@ export function ReorderView({
                   type="button"
                   onClick={() => void patch(r.id, { status: 'cancelled' })}
                   aria-label="Cancel request"
-                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[#9A9DA1] hover:bg-[#FCEBEB] hover:text-[#A32D2D]"
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[#8A8E86] hover:bg-[#FCEBEB] hover:text-[#A32D2D]"
                 >
                   ✕
                 </button>
@@ -414,38 +414,38 @@ export function ReorderView({
       </div>
 
       {/* Right column: order summary */}
-      <div className="h-fit rounded-2xl border border-[#E7E7E2] bg-white p-4">
-        <div className="text-[14px] font-medium text-[#1A1C1E]">Order summary</div>
+      <div className="h-fit rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+        <div className="of-display text-[16px] font-semibold text-[#171A17]">Order summary</div>
 
-        <div className="mt-4 text-[13px] text-[#9A9DA1]">Suggested total (excl. VAT)</div>
-        <div className="mt-1 text-[28px] font-bold text-[#1A1C1E]">{rand(order.total)}</div>
+        <div className="mt-4 text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">Suggested total (excl. VAT)</div>
+        <div className="of-num mt-2 text-[30px] font-semibold tracking-[-0.02em] text-[#171A17]">{rand(order.total)}</div>
 
-        <div className="my-4 border-t border-[#EFEFEC]" />
+        <div className="my-4 border-t border-[#EEF1F5]" />
 
         <div className="space-y-2.5 text-[13px]">
           <div className="flex items-center justify-between">
-            <span className="text-[#5F6368]">Suggested items</span>
-            <span className="font-medium text-[#1A1C1E]">{order.itemCount}</span>
+            <span className="text-[#6B6F68]">Suggested items</span>
+            <span className="of-num font-semibold text-[#171A17]">{order.itemCount}</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-[#5F6368]">Suppliers</span>
-            <span className="font-medium text-[#1A1C1E]">{order.groups.length}</span>
+            <span className="text-[#6B6F68]">Suppliers</span>
+            <span className="of-num font-semibold text-[#171A17]">{order.groups.length}</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-[#5F6368]">Your requests</span>
-            <span className="font-medium text-[#1A1C1E]">{manual.length}</span>
+            <span className="text-[#6B6F68]">Your requests</span>
+            <span className="of-num font-semibold text-[#171A17]">{manual.length}</span>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-[#5F6368]">VAT (15%)</span>
-            <span className="font-medium text-[#1A1C1E]">{rand(order.total * 0.15)}</span>
+            <span className="text-[#6B6F68]">VAT (15%)</span>
+            <span className="of-num font-semibold text-[#171A17]">{rand(order.total * 0.15)}</span>
           </div>
         </div>
 
-        <div className="my-4 border-t border-[#EFEFEC]" />
+        <div className="my-4 border-t border-[#EEF1F5]" />
 
         <div className="flex items-center justify-between text-[14px]">
-          <span className="font-medium text-[#1A1C1E]">Total incl. VAT</span>
-          <span className="font-bold text-[#1A1C1E]">{rand(order.total * 1.15)}</span>
+          <span className="font-medium text-[#171A17]">Total incl. VAT</span>
+          <span className="of-num text-[16px] font-semibold text-[#171A17]">{rand(order.total * 1.15)}</span>
         </div>
 
         <div className="mt-5 flex flex-col gap-2.5">
@@ -453,22 +453,22 @@ export function ReorderView({
             type="button"
             onClick={() => void sendToTeam()}
             disabled={sending}
-            className="inline-flex items-center justify-center rounded-lg bg-[#1F5FA8] px-4 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-50"
+            className="inline-flex h-[42px] items-center justify-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-50"
           >
             {sending ? 'Sending…' : 'Send to team'}
           </button>
-          {msg ? <p className="text-center text-[12px] text-[#174C87]">{msg}</p> : null}
+          {msg ? <p className="text-center text-[13px] text-[#174C87]">{msg}</p> : null}
         </div>
       </div>
       </div>
 
       {/* Order history — grouped by week, collapsible */}
-      <div className="rounded-2xl border border-[#E7E7E2] bg-white">
-        <div className="border-b border-[#E7E7E2] px-4 py-3 text-[14px] font-semibold text-[#1A1C1E]">
+      <div className="rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+        <div className="of-display border-b border-[#EEF1F5] px-5 py-4 text-[16px] font-semibold text-[#171A17]">
           Order history
         </div>
         {weeks.length === 0 ? (
-          <div className="px-4 py-10 text-center text-[13px] text-[#9A9DA1]">
+          <div className="px-5 py-12 text-center text-[14px] text-[#8A8E86]">
             No stock orders yet. Send one to your team above and it&apos;ll be tracked here by week.
           </div>
         ) : (
@@ -476,7 +476,7 @@ export function ReorderView({
             const isOpen = openWeeks.has(key);
             const weekTotal = list.reduce((s, o) => s + (Number(o.total) || 0), 0);
             return (
-              <div key={key} className="border-b border-[#F0F0EC] last:border-b-0">
+              <div key={key} className="border-b border-[#EEF1F5] last:border-b-0">
                 <button
                   type="button"
                   onClick={() =>
@@ -487,35 +487,35 @@ export function ReorderView({
                       return n;
                     })
                   }
-                  className="flex w-full items-center justify-between px-4 py-3 text-left transition-colors hover:bg-[#FAFAF8]"
+                  className="flex w-full items-center justify-between px-5 py-3 text-left transition-colors hover:bg-[#F5F9FE]"
                 >
-                  <span className="flex items-center gap-2 text-[13px] font-medium text-[#1A1C1E]">
-                    <span aria-hidden className="text-[#9A9DA1]">{isOpen ? '▾' : '▸'}</span>
+                  <span className="flex items-center gap-2 text-[14px] font-semibold text-[#171A17]">
+                    <span aria-hidden className="text-[#A0A49C]">{isOpen ? '▾' : '▸'}</span>
                     {weekLabel(key)}
                   </span>
-                  <span className="text-[12px] text-[#9A9DA1]">
+                  <span className="of-num text-[12px] text-[#A0A49C]">
                     {list.length} order{list.length === 1 ? '' : 's'} · {rand(weekTotal)}
                   </span>
                 </button>
                 {isOpen ? (
-                  <div className="px-4 pb-2">
+                  <div className="px-5 pb-2">
                     {list.map((o) => (
                       <div
                         key={o.id}
-                        className="flex items-center justify-between border-t border-[#F4F4F1] py-2.5 text-[13px] first:border-t-0"
+                        className="flex items-center justify-between border-t border-[#F4F5F7] py-2.5 text-[14px] first:border-t-0"
                       >
                         <div className="min-w-0">
-                          <div className="font-medium text-[#1A1C1E]">{fmtDate(o.created_at)}</div>
-                          <div className="text-[12px] text-[#9A9DA1]">
+                          <div className="of-num font-semibold text-[#171A17]">{fmtDate(o.created_at)}</div>
+                          <div className="text-[12px] text-[#A0A49C]">
                             {o.item_count} item{o.item_count === 1 ? '' : 's'}
                             {o.supplier ? ` · ${o.supplier}` : ''}
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
-                          <span className="rounded-full bg-[#EAF2FC] px-2.5 py-0.5 text-[11px] font-medium capitalize text-[#1F5FA8]">
+                          <span className="rounded-full bg-[#EAF2FC] px-2.5 py-1 text-[11px] font-medium capitalize text-[#1F5FA8]">
                             {o.status}
                           </span>
-                          <span className="font-medium text-[#1A1C1E]">{rand(o.total)}</span>
+                          <span className="of-num font-semibold text-[#171A17]">{rand(o.total)}</span>
                         </div>
                       </div>
                     ))}

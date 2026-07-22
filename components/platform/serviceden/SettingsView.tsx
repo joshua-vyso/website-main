@@ -111,7 +111,7 @@ export function SettingsView() {
     <div className="max-w-[760px] space-y-5">
       {node}
 
-      <SectionCard title="Business details" right={<span className="text-[12px] text-[#9A9DA1]">Shown as the &ldquo;from&rdquo; on invoices</span>}>
+      <SectionCard title="Business details" right={<span className="text-[12px] text-[#A0A49C]">Shown as the &ldquo;from&rdquo; on invoices</span>}>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <Field label="Business name" hint={org?.name ? `(default: ${org.name})` : undefined}><input value={form.businessName} onChange={set('businessName')} placeholder={org?.name ?? 'Your business'} className={inputClass} /></Field>
           <Field label="Email"><input value={form.businessEmail} onChange={set('businessEmail')} placeholder="billing@yourbusiness.co.za" className={inputClass} /></Field>
@@ -123,7 +123,7 @@ export function SettingsView() {
         </div>
       </SectionCard>
 
-      <SectionCard title="Banking details" right={<span className="text-[12px] text-[#9A9DA1]">The &ldquo;pay to&rdquo; block on invoices</span>}>
+      <SectionCard title="Banking details" right={<span className="text-[12px] text-[#A0A49C]">The &ldquo;pay to&rdquo; block on invoices</span>}>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <Field label="Bank"><input value={form.bankName} onChange={set('bankName')} placeholder="e.g. FNB, Standard Bank" className={inputClass} /></Field>
           <Field label="Account name"><input value={form.accountName} onChange={set('accountName')} placeholder="Account holder" className={inputClass} /></Field>
@@ -134,29 +134,29 @@ export function SettingsView() {
         </div>
       </SectionCard>
 
-      <SectionCard title="Logo" right={<span className="text-[12px] text-[#9A9DA1]">Appears on your invoices</span>}>
+      <SectionCard title="Logo" right={<span className="text-[12px] text-[#A0A49C]">Appears on your invoices</span>}>
         <div className="flex flex-wrap items-center gap-4">
-          <div className="flex h-24 w-40 items-center justify-center overflow-hidden rounded-xl border border-[#E7E7E2] bg-[#FBFBF9]">
+          <div className="flex h-24 w-40 items-center justify-center overflow-hidden rounded-[14px] border border-[#EEF1F5] bg-[#FBFCFE]">
             {logo ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img src={logo} alt="Logo preview" className="max-h-full max-w-full object-contain" />
             ) : (
-              <span className="text-[12px] text-[#9A9DA1]">No logo</span>
+              <span className="text-[12px] text-[#A0A49C]">No logo</span>
             )}
           </div>
           <div className="space-y-2">
             <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={(e) => onLogoFile(e.target.files?.[0] ?? null)} />
             <div className="flex gap-2">
-              <button type="button" onClick={() => fileRef.current?.click()} className="rounded-lg border border-[#D7DAD8] bg-white px-3.5 py-2 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#5B53C0]/50">{logo ? 'Replace logo' : 'Upload logo'}</button>
-              {logo ? <button type="button" onClick={() => setLogo(null)} className="rounded-lg px-3.5 py-2 text-[13px] font-medium text-[#A32D2D] transition-colors hover:bg-[#FCEBEB]">Remove</button> : null}
+              <button type="button" onClick={() => fileRef.current?.click()} className="inline-flex h-[42px] items-center rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]">{logo ? 'Replace logo' : 'Upload logo'}</button>
+              {logo ? <button type="button" onClick={() => setLogo(null)} className="inline-flex h-[42px] items-center rounded-[11px] px-[18px] text-[14px] font-medium text-[#A32D2D] transition-colors hover:bg-[#FCEBEB]">Remove</button> : null}
             </div>
-            <p className="text-[12px] text-[#9A9DA1]">PNG or JPG, under 4 MB. Auto-resized for the invoice.</p>
+            <p className="text-[12px] text-[#A0A49C]">PNG or JPG, under 4 MB. Auto-resized for the invoice.</p>
           </div>
         </div>
       </SectionCard>
 
       <div className="flex items-center justify-end gap-3">
-        {error ? <span className="text-[12px] text-[#A32D2D]">{error}</span> : null}
+        {error ? <span className="text-[13px] text-[#A32D2D]">{error}</span> : null}
         <SdPrimary onClick={save} disabled={busy}>{busy ? 'Saving…' : 'Save settings'}</SdPrimary>
       </div>
     </div>

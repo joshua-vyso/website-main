@@ -150,14 +150,14 @@ export function PriceListsDb({ data }: { data: CoreData }) {
     <div className="space-y-4">
       {toastNode}
 
-      <div className="flex flex-wrap items-start justify-between gap-3 rounded-2xl border border-[#E7E7E2] bg-[#FBFBF9] px-4 py-3">
-        <p className="max-w-2xl text-[13px] text-[#5F6368]">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-[#EAEDF2] bg-[#FBFCFE] px-5 py-4">
+        <p className="max-w-2xl text-[13px] text-[#6B6F68]">
           This is the governance view — list settings and validity. To set per-product margins and custom prices, open the full
           editor in OrderFlow.
         </p>
         <Link
           href="/app/orderflow/pricelists"
-          className="inline-flex h-9 items-center justify-center rounded-lg border border-[#D7DAD8] bg-white px-4 text-[13px] font-medium text-[#1F5FA8] transition-colors hover:bg-[#F0F0EC]"
+          className="inline-flex h-[42px] shrink-0 items-center justify-center rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#1F5FA8] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]"
         >
           Open the full editor →
         </Link>
@@ -185,16 +185,16 @@ export function PriceListsDb({ data }: { data: CoreData }) {
       ) : filtered.length === 0 ? (
         <EmptyState title="No matches" body="No price lists match your search and filters." />
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-[#E7E7E2] bg-white">
-          <table className="w-full text-[13px]">
+        <div className="overflow-x-auto rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <table className="w-full text-[14px]">
             <thead>
-              <tr className="border-b border-[#E7E7E2] text-left text-[11px] uppercase tracking-wide text-[#9A9DA1]">
-                <th className="px-4 py-3 font-semibold">Name</th>
-                <th className="px-4 py-3 font-semibold">Customer</th>
-                <th className="px-4 py-3 text-right font-semibold">Default margin</th>
-                <th className="px-4 py-3 font-semibold">Validity</th>
-                <th className="px-4 py-3 font-semibold">Status</th>
-                <th className="px-4 py-3 text-right font-semibold">Overrides</th>
+              <tr className="border-b border-[#EEF1F5] bg-[#FBFCFE] text-left text-[11px] uppercase tracking-[0.06em] text-[#A0A49C]">
+                <th className="px-4 py-3 font-medium">Name</th>
+                <th className="px-4 py-3 font-medium">Customer</th>
+                <th className="px-4 py-3 text-right font-medium">Default margin</th>
+                <th className="px-4 py-3 font-medium">Validity</th>
+                <th className="px-4 py-3 font-medium">Status</th>
+                <th className="px-4 py-3 text-right font-medium">Overrides</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
@@ -203,21 +203,21 @@ export function PriceListsDb({ data }: { data: CoreData }) {
                 const st = priceListStatus(l);
                 const style = PRICE_LIST_STATUS_STYLE[st];
                 return (
-                  <tr key={l.id} className="border-b border-[#F0F0EC] last:border-0 hover:bg-[#FBFBF9]">
-                    <td className="px-4 py-3">
-                      <div className="font-medium text-[#1A1C1E]">{l.name}</div>
-                      {l.notes ? <div className="max-w-[280px] truncate text-[11px] text-[#9A9DA1]">{l.notes}</div> : null}
+                  <tr key={l.id} className="border-b border-[#F4F5F7] last:border-0 hover:bg-[#F5F9FE]">
+                    <td className="px-4 py-3.5">
+                      <div className="font-semibold text-[#171A17]">{l.name}</div>
+                      {l.notes ? <div className="mt-0.5 max-w-[280px] truncate text-[12px] text-[#A0A49C]">{l.notes}</div> : null}
                     </td>
-                    <td className="px-4 py-3 text-[#5F6368]">{l.customer_id ? customerName.get(l.customer_id) ?? 'Unknown' : 'All customers'}</td>
-                    <td className="px-4 py-3 text-right tabular-nums text-[#1A1C1E]">{l.default_margin_pct != null ? `${l.default_margin_pct}%` : '—'}</td>
-                    <td className="px-4 py-3 text-[#5F6368]">
+                    <td className="px-4 py-3.5 text-[#6B6F68]">{l.customer_id ? customerName.get(l.customer_id) ?? 'Unknown' : 'All customers'}</td>
+                    <td className="of-num px-4 py-3.5 text-right text-[#171A17]">{l.default_margin_pct != null ? `${l.default_margin_pct}%` : '—'}</td>
+                    <td className="of-num px-4 py-3.5 text-[#6B6F68]">
                       {l.valid_from || l.valid_until ? `${fmtDate(l.valid_from)} → ${fmtDate(l.valid_until)}` : 'Always'}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-4 py-3.5">
                       <Pill label={style.label} bg={style.bg} fg={style.fg} />
                     </td>
-                    <td className="px-4 py-3 text-right tabular-nums text-[#5F6368]">{overridesByList.get(l.id) ?? 0}</td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="of-num px-4 py-3.5 text-right text-[#6B6F68]">{overridesByList.get(l.id) ?? 0}</td>
+                    <td className="px-4 py-3.5 text-right">
                       <RowActionsMenu
                         actions={[
                           { label: 'Edit list settings', onClick: () => startEdit(l) },
@@ -246,11 +246,11 @@ export function PriceListsDb({ data }: { data: CoreData }) {
           </>
         }
       >
-        <div className="space-y-3">
+        <div className="space-y-4">
           <Field label="Name">
             <input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} placeholder="e.g. Wholesale — Q3" className={inputClass} />
           </Field>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Customer" hint="(blank = all customers)">
               <select value={draft.customer_id} onChange={(e) => setDraft({ ...draft, customer_id: e.target.value })} className={inputClass}>
                 <option value="">All customers</option>
@@ -279,7 +279,7 @@ export function PriceListsDb({ data }: { data: CoreData }) {
           <Field label="Notes" hint="(optional)">
             <textarea value={draft.notes} onChange={(e) => setDraft({ ...draft, notes: e.target.value })} placeholder="Internal notes" className={`${inputClass} h-16 py-2`} />
           </Field>
-          {error ? <p className="text-[12px] text-[#A32D2D]">{error}</p> : null}
+          {error ? <p className="text-[13px] text-[#A32D2D]">{error}</p> : null}
         </div>
       </Modal>
     </div>

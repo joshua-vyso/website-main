@@ -43,7 +43,7 @@ export function ProductsTabs({
         right={
           <Link
             href="/app/orderflow/orders"
-            className="inline-flex items-center gap-1.5 rounded-lg border border-[#D7DAD8] bg-white px-3.5 py-2.5 text-[14px] font-medium text-[#5F6368] transition-colors hover:border-[#3E7BC4]/30"
+            className="inline-flex h-[42px] items-center gap-1.5 rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]"
           >
             Create order in OrderFlow
             <span aria-hidden>→</span>
@@ -51,7 +51,7 @@ export function ProductsTabs({
         }
       />
 
-      <div className="mt-5 inline-flex rounded-lg bg-[#ECECE8] p-[3px]">
+      <div className="mt-5 inline-flex rounded-[11px] bg-[#ECECE8] p-[3px]">
         {TABS.map((t) => (
           <button
             key={t.key}
@@ -59,8 +59,8 @@ export function ProductsTabs({
             onClick={() => setTab(t.key)}
             className={
               tab === t.key
-                ? 'rounded-md bg-white px-4 py-1.5 text-[13px] font-medium text-[#1A1C1E] shadow-sm'
-                : 'px-4 py-1.5 text-[13px] font-medium text-[#5F6368]'
+                ? 'rounded-[9px] bg-white px-4 py-1.5 text-[13px] font-semibold text-[#171A17] shadow-[0_1px_2px_rgba(20,24,20,0.06)]'
+                : 'px-4 py-1.5 text-[13px] font-medium text-[#6B6F68] transition-colors hover:text-[#171A17]'
             }
           >
             {t.label}

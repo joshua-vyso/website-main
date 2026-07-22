@@ -73,10 +73,10 @@ function SecondaryButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`inline-flex h-10 items-center rounded-xl border bg-white px-3.5 text-[13px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+      className={`inline-flex h-[42px] items-center rounded-[11px] border bg-white px-[18px] text-[14px] font-medium transition-all disabled:cursor-not-allowed disabled:opacity-50 ${
         danger
           ? 'border-[#F2C9C9] text-[#A32D2D] hover:bg-[#FCEBEB]'
-          : 'border-[#D7DAD8] text-[#1A1C1E] hover:border-[#5B53C0]/40'
+          : 'border-[#E2E6EC] text-[#3E4A57] hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]'
       }`}
     >
       {children}
@@ -314,16 +314,16 @@ export function LeadsView({
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <Kpi label="Active leads" value={String(counts.active)} />
-        <Kpi label="To review" value={String(counts.inbox)} accent="#5B53C0" sub="detected from Gmail" />
+        <Kpi label="To review" value={String(counts.inbox)} accent="#1F5FA8" sub="detected from Gmail" />
         <Kpi label="Follow-ups due" value={String(counts.due)} accent={counts.due ? '#A32D2D' : '#0F6E56'} />
         <Kpi label="Replied" value={String(counts.replied)} accent="#0F6E56" />
       </div>
 
       {!initialData.schemaReady ? (
-        <div className="rounded-2xl border border-[#F2C9C9] bg-[#FFF8F8] p-5">
-          <p className="text-[14px] font-semibold text-[#A32D2D]">ServiceDen lead tables are not installed yet</p>
-          <p className="mt-1 text-[13px] leading-relaxed text-[#5F6368]">
-            Re-run <code className="rounded bg-white px-1 py-0.5 text-[12px]">supabase/serviceden.sql</code> in the Supabase SQL editor before connecting Gmail.
+        <div className="rounded-2xl border border-[#F2C9C9] bg-[#FFF8F8] p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <p className="of-display text-[16px] font-semibold text-[#A32D2D]">ServiceDen lead tables are not installed yet</p>
+          <p className="mt-1.5 text-[13px] leading-relaxed text-[#6B6F68]">
+            Re-run <code className="rounded-[6px] bg-white px-1.5 py-0.5 text-[12px] text-[#3E4A57]">supabase/serviceden.sql</code> in the Supabase SQL editor before connecting Gmail.
           </p>
         </div>
       ) : (
@@ -338,7 +338,7 @@ export function LeadsView({
       )}
 
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex rounded-xl border border-[#E7E7E2] bg-white p-1">
+        <div className="flex rounded-[14px] border border-[#EAEDF2] bg-white p-1 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
           {([
             ['inbox', `Inbox${counts.inbox ? ` ${counts.inbox}` : ''}`],
             ['pipeline', 'Pipeline'],
@@ -349,8 +349,8 @@ export function LeadsView({
               key={key}
               type="button"
               onClick={() => setView(key)}
-              className={`rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors ${
-                view === key ? 'bg-[#E9E6FB] text-[#4C45A6]' : 'text-[#5F6368] hover:bg-[#F6F6F2]'
+              className={`rounded-[10px] px-3.5 py-2 text-[13px] font-semibold transition-colors ${
+                view === key ? 'bg-[#EAF2FC] text-[#174C87]' : 'text-[#6B6F68] hover:bg-[#F5F9FE] hover:text-[#171A17]'
               }`}
             >
               {label}
@@ -369,11 +369,11 @@ export function LeadsView({
       </div>
 
       {visible.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
-          <p className="text-[15px] font-medium text-[#1A1C1E]">
+        <div className="rounded-2xl border border-dashed border-[#D8DFE8] bg-white px-6 py-12 text-center">
+          <p className="of-display text-[18px] font-semibold text-[#171A17]">
             {view === 'inbox' ? 'No leads waiting for review' : view === 'followups' ? 'No follow-ups due' : 'No leads here yet'}
           </p>
-          <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">
+          <p className="mx-auto mt-2 max-w-md text-[14px] text-[#6B6F68]">
             {view === 'inbox'
               ? 'When Gmail finds a likely Vyso sales conversation, it will appear here for your approval.'
               : view === 'followups'
@@ -382,11 +382,11 @@ export function LeadsView({
           </p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
+        <div className="overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
           <div className="overflow-x-auto">
-            <table className="w-full text-[13px]">
+            <table className="w-full text-[14px]">
               <thead>
-                <tr className="border-b border-[#F0F0EC] bg-[#FBFBF9] text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+                <tr className="border-b border-[#EEF1F5] bg-[#FBFCFE] text-[11px] uppercase tracking-[0.06em] text-[#A0A49C]">
                   <th className="px-4 py-2.5 text-left font-medium">Contact</th>
                   <th className="px-3 py-2.5 text-left font-medium">Stage</th>
                   <th className="px-3 py-2.5 text-left font-medium">Last activity</th>
@@ -400,31 +400,31 @@ export function LeadsView({
                   const waiting = daysWaiting(lead);
                   const stage = LEAD_STAGE_META[lead.stage];
                   return (
-                    <tr key={lead.id} className="border-b border-[#F6F6F2] last:border-0 hover:bg-[#FAFAF8]">
-                      <td className="px-4 py-3">
-                        <button type="button" onClick={() => void openLead(lead)} className="block text-left font-medium text-[#1A1C1E] hover:text-[#5B53C0] hover:underline">
+                    <tr key={lead.id} className="border-b border-[#F4F5F7] last:border-0 hover:bg-[#F5F9FE]">
+                      <td className="px-4 py-3.5">
+                        <button type="button" onClick={() => void openLead(lead)} className="block text-left font-semibold text-[#171A17] transition-colors hover:text-[#1F5FA8] hover:underline">
                           {lead.contactName}
                         </button>
-                        <div className="mt-0.5 text-[12px] text-[#9A9DA1]">{lead.company ? `${lead.company} · ` : ''}{lead.email}</div>
+                        <div className="mt-0.5 text-[12px] text-[#A0A49C]">{lead.company ? `${lead.company} · ` : ''}{lead.email}</div>
                       </td>
-                      <td className="px-3 py-3">
+                      <td className="px-3 py-3.5">
                         {lead.reviewStatus === 'suggested' ? <Badge label="Review" tone="warning" /> : lead.reviewStatus === 'rejected' ? <Badge label="Dismissed" /> : <Badge label={stage.label} tone={stage.tone} />}
                       </td>
-                      <td className="px-3 py-3 text-[#5F6368]">
-                        <div>{displayDate(activityAt(lead))}</div>
-                        {waiting != null && waiting > 0 ? <div className="mt-0.5 text-[11px] text-[#9A9DA1]">waiting {waiting}d</div> : null}
+                      <td className="px-3 py-3.5 text-[#6B6F68]">
+                        <div className="of-num">{displayDate(activityAt(lead))}</div>
+                        {waiting != null && waiting > 0 ? <div className="of-num mt-0.5 text-[11px] text-[#A0A49C]">waiting {waiting}d</div> : null}
                       </td>
-                      <td className="px-3 py-3">
-                        {due(lead) ? <span className="font-medium text-[#A32D2D]">Due {displayDate(lead.nextFollowUpAt)}</span> : <span className="text-[#5F6368]">{displayDate(lead.nextFollowUpAt)}</span>}
+                      <td className="px-3 py-3.5">
+                        {due(lead) ? <span className="font-semibold text-[#A32D2D]">Due <span className="of-num">{displayDate(lead.nextFollowUpAt)}</span></span> : <span className="of-num text-[#6B6F68]">{displayDate(lead.nextFollowUpAt)}</span>}
                       </td>
-                      <td className="max-w-[280px] px-3 py-3 text-[#5F6368]">
+                      <td className="max-w-[280px] px-3 py-3.5 text-[13px] text-[#6B6F68]">
                         <p className="line-clamp-2">{lead.agentNextAction ?? lead.summary ?? '—'}</p>
                       </td>
-                      <td className="px-3 py-3 text-right">
+                      <td className="px-3 py-3.5 text-right">
                         {lead.reviewStatus === 'suggested' ? (
                           <div className="flex justify-end gap-1.5">
-                            <button type="button" disabled={actionBusy} onClick={() => void acceptLead(lead)} className="rounded-lg bg-[#5B53C0] px-2.5 py-1.5 text-[12px] font-medium text-white disabled:opacity-50">Accept</button>
-                            <button type="button" disabled={actionBusy} onClick={() => void rejectLead(lead)} className="rounded-lg px-2 py-1.5 text-[12px] text-[#5F6368] hover:bg-[#F0F0EC] disabled:opacity-50">Dismiss</button>
+                            <button type="button" disabled={actionBusy} onClick={() => void acceptLead(lead)} className="rounded-[9px] bg-[#1F5FA8] px-3 py-1.5 text-[12px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-50">Accept</button>
+                            <button type="button" disabled={actionBusy} onClick={() => void rejectLead(lead)} className="rounded-[9px] px-2.5 py-1.5 text-[12px] font-medium text-[#6B6F68] transition-colors hover:bg-[#EEF1F5] hover:text-[#171A17] disabled:opacity-50">Dismiss</button>
                           </div>
                         ) : (
                           <RowActionsMenu actions={[
@@ -458,7 +458,7 @@ export function LeadsView({
           <Field label="Phone" hint="(optional)"><input value={manualForm.phone} onChange={(event) => setManualForm({ ...manualForm, phone: event.target.value })} className={inputClass} /></Field>
         </div>
         <Field label="Notes" hint="(optional)"><textarea value={manualForm.notes} onChange={(event) => setManualForm({ ...manualForm, notes: event.target.value })} className={`${inputClass} h-20 py-2`} /></Field>
-        {manualError ? <p className="text-[12px] text-[#A32D2D]">{manualError}</p> : null}
+        {manualError ? <p className="text-[13px] text-[#A32D2D]">{manualError}</p> : null}
       </Modal>
 
       <Drawer
@@ -470,7 +470,7 @@ export function LeadsView({
         right={selectedLive ? <Badge label={selectedLive.reviewStatus === 'suggested' ? 'Review' : LEAD_STAGE_META[selectedLive.stage].label} tone={selectedLive.reviewStatus === 'suggested' ? 'warning' : LEAD_STAGE_META[selectedLive.stage].tone} /> : null}
         footer={selectedLive ? (
           <div className="flex flex-wrap items-center justify-between gap-2">
-            <a href={`mailto:${selectedLive.email}`} className="inline-flex h-10 items-center rounded-xl border border-[#D7DAD8] bg-white px-3.5 text-[13px] font-medium text-[#1A1C1E] hover:border-[#5B53C0]/40">Email contact</a>
+            <a href={`mailto:${selectedLive.email}`} className="inline-flex h-[42px] items-center rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]">Email contact</a>
             <div className="flex gap-2">
               {selectedLive.reviewStatus === 'suggested' ? <SecondaryButton onClick={() => void rejectLead(selectedLive)} disabled={actionBusy} danger>Dismiss</SecondaryButton> : null}
               {selectedLive.reviewStatus === 'suggested' ? <SdPrimary onClick={() => void acceptLead(selectedLive)} disabled={actionBusy}>Accept lead</SdPrimary> : null}
@@ -512,10 +512,10 @@ function GmailConnectionCard({
   const connection = data.gmailConnection;
   if (!data.gmailConfigured) {
     return (
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#E7E7E2] bg-white p-5">
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
         <div>
-          <p className="text-[14px] font-semibold text-[#1A1C1E]">Gmail setup required</p>
-          <p className="mt-1 max-w-2xl text-[13px] text-[#5F6368]">Add the Google OAuth client, secret, redirect URI and ServiceDen token-encryption key to the server environment before connecting an inbox.</p>
+          <p className="of-display text-[16px] font-semibold text-[#171A17]">Gmail setup required</p>
+          <p className="mt-1.5 max-w-2xl text-[13px] leading-relaxed text-[#6B6F68]">Add the Google OAuth client, secret, redirect URI and ServiceDen token-encryption key to the server environment before connecting an inbox.</p>
         </div>
         <Badge label="Not configured" tone="neutral" />
       </div>
@@ -523,35 +523,35 @@ function GmailConnectionCard({
   }
   if (!connection) {
     return (
-      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#E7E7E2] bg-white p-5">
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
         <div>
-          <p className="text-[14px] font-semibold text-[#1A1C1E]">Connect your Vyso Gmail inbox</p>
-          <p className="mt-1 max-w-2xl text-[13px] text-[#5F6368]">Read-only access finds likely Vyso sales conversations and analyzes selected candidates with Vyso&apos;s configured AI provider. Label any unusual thread <span className="font-medium text-[#1A1C1E]">VysoLead</span> to track it explicitly. ServiceDen never sends email automatically.</p>
+          <p className="of-display text-[16px] font-semibold text-[#171A17]">Connect your Vyso Gmail inbox</p>
+          <p className="mt-1.5 max-w-2xl text-[13px] leading-relaxed text-[#6B6F68]">Read-only access finds likely Vyso sales conversations and analyzes selected candidates with Vyso&apos;s configured AI provider. Label any unusual thread <span className="font-medium text-[#171A17]">VysoLead</span> to track it explicitly. ServiceDen never sends email automatically.</p>
         </div>
-        <a href="/api/serviceden/gmail/connect" className="inline-flex h-10 items-center rounded-xl bg-[#5B53C0] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#4C45A6]">Connect Gmail</a>
+        <a href="/api/serviceden/gmail/connect" className="inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87]">Connect Gmail</a>
       </div>
     );
   }
   const needsReconnect = connection.status === 'reauth_required';
   return (
-    <div className="rounded-2xl border border-[#E7E7E2] bg-white p-5">
+    <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div className="flex items-start gap-3">
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#E9E6FB] text-[18px]" aria-hidden>✉</div>
+          <div className="flex h-11 w-11 items-center justify-center rounded-[14px] bg-[#EAF2FC] text-[18px] text-[#1F5FA8]" aria-hidden>✉</div>
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <p className="text-[14px] font-semibold text-[#1A1C1E]">{connection.emailAddress}</p>
+              <p className="of-display text-[16px] font-semibold text-[#171A17]">{connection.emailAddress}</p>
               <Badge label={needsReconnect ? 'Reconnect required' : syncing || connection.status === 'syncing' ? 'Syncing' : connection.status === 'error' ? 'Sync error' : 'Connected'} tone={needsReconnect || connection.status === 'error' ? 'critical' : syncing || connection.status === 'syncing' ? 'warning' : 'positive'} />
             </div>
-            <p className="mt-1 text-[12px] text-[#9A9DA1]">Read-only · AI-assisted review · last synced {displayDate(connection.lastSyncedAt, true)} · label exceptions VysoLead</p>
+            <p className="mt-1 text-[12px] text-[#A0A49C]">Read-only · AI-assisted review · last synced <span className="of-num">{displayDate(connection.lastSyncedAt, true)}</span> · label exceptions VysoLead</p>
           </div>
         </div>
         <div className="flex flex-wrap gap-2">
-          {needsReconnect ? <a href="/api/serviceden/gmail/connect" className="inline-flex h-10 items-center rounded-xl bg-[#5B53C0] px-4 text-[13px] font-medium text-white">Reconnect Gmail</a> : <SecondaryButton onClick={onSync} disabled={syncing || actionBusy}>{syncing ? 'Syncing…' : 'Sync now'}</SecondaryButton>}
+          {needsReconnect ? <a href="/api/serviceden/gmail/connect" className="inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87]">Reconnect Gmail</a> : <SecondaryButton onClick={onSync} disabled={syncing || actionBusy}>{syncing ? 'Syncing…' : 'Sync now'}</SecondaryButton>}
           <SecondaryButton onClick={onDisconnect} disabled={syncing || actionBusy} danger>Disconnect</SecondaryButton>
         </div>
       </div>
-      {syncError || connection.lastError ? <p className="mt-3 rounded-lg bg-[#FCEBEB] px-3 py-2 text-[12px] text-[#A32D2D]">{syncError || connection.lastError}</p> : null}
+      {syncError || connection.lastError ? <p className="mt-3 rounded-[10px] bg-[#FCEBEB] px-3.5 py-2.5 text-[13px] text-[#A32D2D]">{syncError || connection.lastError}</p> : null}
     </div>
   );
 }
@@ -584,43 +584,43 @@ function LeadDrawerBody({
         </Field>
       </div>
 
-      <div className="rounded-xl border border-[#E9E6FB] bg-[#F8F7FE] p-4">
+      <div className="rounded-[14px] border border-[#DCE9F8] bg-[#F5F9FE] p-4">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-[12px] font-semibold uppercase tracking-wide text-[#5B53C0]">Agent readout</p>
-          {lead.source === 'gmail_agent' ? <span className="text-[11px] text-[#9A9DA1]">{lead.agentConfidence}% confidence</span> : null}
+          <p className="text-[12px] font-semibold uppercase tracking-[0.05em] text-[#1F5FA8]">Agent readout</p>
+          {lead.source === 'gmail_agent' ? <span className="of-num text-[11px] text-[#A0A49C]">{lead.agentConfidence}% confidence</span> : null}
         </div>
-        <p className="mt-2 text-[13px] leading-relaxed text-[#1A1C1E]">{lead.summary ?? 'No conversation summary yet.'}</p>
-        {lead.primaryPain ? <p className="mt-2 text-[12px] text-[#5F6368]"><span className="font-medium text-[#1A1C1E]">Possible pain:</span> {lead.primaryPain}</p> : null}
-        {lead.agentNextAction ? <p className="mt-2 text-[12px] text-[#5F6368]"><span className="font-medium text-[#1A1C1E]">Suggested next step:</span> {lead.agentNextAction}</p> : null}
+        <p className="mt-2 text-[13px] leading-relaxed text-[#171A17]">{lead.summary ?? 'No conversation summary yet.'}</p>
+        {lead.primaryPain ? <p className="mt-2 text-[12px] text-[#6B6F68]"><span className="font-semibold text-[#171A17]">Possible pain:</span> {lead.primaryPain}</p> : null}
+        {lead.agentNextAction ? <p className="mt-2 text-[12px] text-[#6B6F68]"><span className="font-semibold text-[#171A17]">Suggested next step:</span> {lead.agentNextAction}</p> : null}
       </div>
 
-      <div className="grid grid-cols-2 gap-3 text-[12px]">
-        <div className="rounded-xl border border-[#E7E7E2] p-3"><div className="text-[#9A9DA1]">Last outbound</div><div className="mt-1 font-medium text-[#1A1C1E]">{displayDate(lead.lastOutboundAt, true)}</div></div>
-        <div className="rounded-xl border border-[#E7E7E2] p-3"><div className="text-[#9A9DA1]">Last inbound</div><div className="mt-1 font-medium text-[#1A1C1E]">{displayDate(lead.lastInboundAt, true)}</div></div>
+      <div className="grid grid-cols-2 gap-3">
+        <div className="rounded-[14px] border border-[#EEF1F5] bg-white p-4"><div className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">Last outbound</div><div className="of-num mt-1.5 text-[14px] font-semibold text-[#171A17]">{displayDate(lead.lastOutboundAt, true)}</div></div>
+        <div className="rounded-[14px] border border-[#EEF1F5] bg-white p-4"><div className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">Last inbound</div><div className="of-num mt-1.5 text-[14px] font-semibold text-[#171A17]">{displayDate(lead.lastInboundAt, true)}</div></div>
       </div>
 
       <div>
         <div className="mb-3 flex items-center justify-between gap-2">
-          <h3 className="text-[14px] font-semibold text-[#1A1C1E]">Gmail conversation</h3>
-          <span className="text-[11px] text-[#9A9DA1]">Email content is displayed as plain text</span>
+          <h3 className="of-display text-[16px] font-semibold text-[#171A17]">Gmail conversation</h3>
+          <span className="text-[11px] text-[#A0A49C]">Email content is displayed as plain text</span>
         </div>
         {busy ? (
-          <div className="rounded-xl border border-[#E7E7E2] px-4 py-8 text-center text-[13px] text-[#9A9DA1]">Loading conversation…</div>
+          <div className="rounded-[14px] border border-[#EEF1F5] px-4 py-8 text-center text-[13px] text-[#A0A49C]">Loading conversation…</div>
         ) : !detail || detail.threads.length === 0 ? (
-          <div className="rounded-xl border border-dashed border-[#D7DAD8] px-4 py-8 text-center text-[13px] text-[#9A9DA1]">No Gmail conversation attached.</div>
+          <div className="rounded-[14px] border border-dashed border-[#D8DFE8] px-4 py-8 text-center text-[13px] text-[#A0A49C]">No Gmail conversation attached.</div>
         ) : (
           <div className="space-y-5">
             {detail.threads.map((thread) => (
               <div key={thread.id}>
-                <p className="mb-2 text-[12px] font-medium text-[#5F6368]">{thread.subject || '(No subject)'}</p>
+                <p className="mb-2 text-[12px] font-semibold text-[#6B6F68]">{thread.subject || '(No subject)'}</p>
                 <div className="space-y-2">
                   {thread.messages.map((message) => (
-                    <div key={message.id} className={`rounded-xl border p-3 ${message.direction === 'outbound' ? 'ml-6 border-[#DDD8F6] bg-[#F8F7FE]' : 'mr-6 border-[#E7E7E2] bg-white'}`}>
-                      <div className="flex items-center justify-between gap-3 text-[11px] text-[#9A9DA1]">
+                    <div key={message.id} className={`rounded-[14px] border p-3.5 ${message.direction === 'outbound' ? 'ml-6 border-[#DCE9F8] bg-[#F5F9FE]' : 'mr-6 border-[#EEF1F5] bg-white'}`}>
+                      <div className="flex items-center justify-between gap-3 text-[11px] text-[#A0A49C]">
                         <span>{message.direction === 'outbound' ? 'You' : message.fromAddress}</span>
-                        <span>{displayDate(message.sentAt, true)}</span>
+                        <span className="of-num">{displayDate(message.sentAt, true)}</span>
                       </div>
-                      <p className="mt-2 whitespace-pre-wrap break-words text-[12px] leading-relaxed text-[#1A1C1E]">{message.bodyText ?? message.snippet ?? '(No readable message body)'}</p>
+                      <p className="mt-2 whitespace-pre-wrap break-words text-[13px] leading-relaxed text-[#171A17]">{message.bodyText ?? message.snippet ?? '(No readable message body)'}</p>
                     </div>
                   ))}
                 </div>

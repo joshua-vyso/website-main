@@ -47,7 +47,7 @@ function monthLabel(key: string): string {
 function ExtractingRow({ doc }: { doc: DocumentWithSupplier }) {
   return (
     <div
-      className={`grid ${COLS} items-center border-b border-[#F0F0EC] px-6 py-3.5 text-[14px] last:border-b-0`}
+      className={`grid ${COLS} items-center border-b border-[#EEF1F5] px-6 py-3.5 text-[14px] last:border-b-0`}
       aria-busy="true"
     >
       <div className="flex min-w-0 items-center gap-3">
@@ -55,19 +55,19 @@ function ExtractingRow({ doc }: { doc: DocumentWithSupplier }) {
           <span className="absolute inset-0 m-auto h-2 w-2 animate-ping rounded-full bg-[#1F5FA8]/60" />
           <span className="absolute inset-0 m-auto h-2 w-2 rounded-full bg-[#1F5FA8]" />
         </span>
-        <span className="truncate text-[#5F6368]">{doc.filename}</span>
+        <span className="truncate text-[#6B6F68]">{doc.filename}</span>
       </div>
-      <span className="text-[#C9CCC8]">—</span>
-      <span className="text-[#5F6368]">{formatDate(doc.created_at)}</span>
-      <span className="text-[#C9CCC8]">—</span>
+      <span className="text-[#BFC5CC]">—</span>
+      <span className="of-num text-[#6B6F68]">{formatDate(doc.created_at)}</span>
+      <span className="text-[#BFC5CC]">—</span>
       <span>
         <span className="inline-flex items-center gap-1.5 rounded-full bg-[#E7EEF8] px-2.5 py-1 text-[12px] font-medium text-[#0F6E56]">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#0F6E56]" />
           <span className="animate-pulse">Extracting…</span>
         </span>
       </span>
-      <span className="text-[#C9CCC8]">—</span>
-      <span className="text-[#C9CCC8]">—</span>
+      <span className="text-[#BFC5CC]">—</span>
+      <span className="text-[#BFC5CC]">—</span>
     </div>
   );
 }
@@ -98,14 +98,14 @@ function DocRow({
       <button
         type="button"
         onClick={() => onToggle(doc.id)}
-        className={`grid ${COLS} w-full items-center border-b border-[#F0F0EC] px-6 py-3.5 text-left text-[14px] transition-colors last:border-b-0 ${
-          selected ? 'bg-[#E7EEF8]' : 'hover:bg-[#FAFAF8]'
+        className={`grid ${COLS} w-full items-center border-b border-[#EEF1F5] px-6 py-3.5 text-left text-[14px] transition-colors last:border-b-0 ${
+          selected ? 'bg-[#E7EEF8]' : 'hover:bg-[#F5F9FE]'
         }`}
       >
         <span className="flex min-w-0 items-center gap-3">
           <span
             className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-[5px] border transition-colors ${
-              selected ? 'border-[#3E7BC4] bg-[#1F5FA8] text-white' : 'border-[#C9CCC8] bg-white'
+              selected ? 'border-[#3E7BC4] bg-[#1F5FA8] text-white' : 'border-[#BFC5CC] bg-white'
             }`}
           >
             {selected ? (
@@ -114,11 +114,11 @@ function DocRow({
               </svg>
             ) : null}
           </span>
-          <span className="truncate text-[#1A1C1E]">{doc.filename}</span>
+          <span className="truncate text-[#171A17]">{doc.filename}</span>
         </span>
-        <span className="truncate text-[#5F6368]">{doc.supplier?.name ?? '—'}</span>
-        <span className="text-[#5F6368]">{formatDate(doc.created_at)}</span>
-        <span className="text-[#5F6368]">{documentTypeLabel(doc)}</span>
+        <span className="truncate text-[#6B6F68]">{doc.supplier?.name ?? '—'}</span>
+        <span className="of-num text-[#6B6F68]">{formatDate(doc.created_at)}</span>
+        <span className="text-[#6B6F68]">{documentTypeLabel(doc)}</span>
         <span>
           <StatusPill status={doc.status} />
         </span>
@@ -135,20 +135,20 @@ function DocRow({
   const cell = 'pointer-events-none relative z-10';
   return (
     <div
-      className={`group relative grid ${COLS} items-center border-b border-[#F0F0EC] px-6 py-3.5 text-[14px] transition-colors last:border-b-0 hover:bg-[#FAFAF8]`}
+      className={`group relative grid ${COLS} items-center border-b border-[#EEF1F5] px-6 py-3.5 text-[14px] transition-colors last:border-b-0 hover:bg-[#F5F9FE]`}
     >
       <Link href={`/app/docu/${doc.id}`} aria-label={`Open ${doc.filename}`} className="absolute inset-0 z-0" />
 
       <div className="pointer-events-none relative z-10 flex min-w-0 items-center gap-2.5">
-        <span className="h-7 w-7 shrink-0 rounded-md bg-[#F0F0EC]" aria-hidden />
-        <span className="truncate text-[#1A1C1E]">{doc.filename}</span>
+        <span className="h-7 w-7 shrink-0 rounded-md bg-[#EEF1F5]" aria-hidden />
+        <span className="truncate text-[#171A17]">{doc.filename}</span>
         <span className="pointer-events-auto shrink-0">
           <DocumentRowMenu id={doc.id} filename={doc.filename} />
         </span>
       </div>
-      <span className={`${cell} truncate text-[#5F6368]`}>{doc.supplier?.name ?? '—'}</span>
-      <span className={`${cell} text-[#5F6368]`}>{formatDate(doc.created_at)}</span>
-      <span className={`${cell} text-[#5F6368]`}>{documentTypeLabel(doc)}</span>
+      <span className={`${cell} truncate text-[#6B6F68]`}>{doc.supplier?.name ?? '—'}</span>
+      <span className={`${cell} of-num text-[#6B6F68]`}>{formatDate(doc.created_at)}</span>
+      <span className={`${cell} text-[#6B6F68]`}>{documentTypeLabel(doc)}</span>
       <span className={cell}>
         <StatusPill status={doc.status} />
       </span>
@@ -237,7 +237,7 @@ export function DocumentTable({
 
   if (groups.length === 0) {
     return (
-      <div className="rounded-2xl border border-[#E7E7E2] bg-white px-6 py-10 text-center text-[14px] text-[#9A9DA1]">
+      <div className="rounded-2xl border border-[#EAEDF2] bg-white px-6 py-12 text-center text-[14px] text-[#8A8E86] shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
         No documents match.
       </div>
     );
@@ -250,31 +250,31 @@ export function DocumentTable({
       {groups.map((g) => {
         const isOpen = isOpenFor(g.key);
         return (
-          <div key={g.key} className="overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
+          <div key={g.key} className="overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
             <button
               type="button"
               onClick={() => toggle(g.key)}
-              className="flex w-full items-center justify-between px-6 py-3.5 text-left transition-colors hover:bg-[#FAFAF8]"
+              className="flex w-full items-center justify-between px-6 py-3.5 text-left transition-colors hover:bg-[#F5F9FE]"
               aria-expanded={isOpen}
             >
               <span className="flex items-center gap-2">
                 <span
-                  className={`text-[#9A9DA1] transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                  className={`text-[#8A8E86] transition-transform ${isOpen ? 'rotate-180' : ''}`}
                   aria-hidden
                 >
                   ▾
                 </span>
-                <span className="text-[14px] font-semibold text-[#1A1C1E]">{g.label}</span>
+                <span className="of-display text-[16px] font-semibold text-[#171A17]">{g.label}</span>
               </span>
-              <span className="text-[12px] text-[#9A9DA1]">
-                {g.docs.length} document{g.docs.length === 1 ? '' : 's'}
+              <span className="text-[12px] text-[#A0A49C]">
+                <span className="of-num">{g.docs.length}</span> document{g.docs.length === 1 ? '' : 's'}
               </span>
             </button>
 
             {isOpen ? (
-              <div className="border-t border-[#E7E7E2]">
+              <div className="border-t border-[#EAEDF2]">
                 <div
-                  className={`grid ${COLS} items-center border-b border-[#F0F0EC] bg-[#FBFBF9] px-6 py-2.5 text-[12px] text-[#5F6368]`}
+                  className={`grid ${COLS} items-center border-b border-[#EEF1F5] bg-[#FBFCFE] px-6 py-2.5 text-[11px] font-medium uppercase tracking-[0.06em] text-[#A0A49C]`}
                 >
                   <span>Document</span>
                   <span>Supplier</span>

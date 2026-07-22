@@ -45,34 +45,34 @@ export function WasteOverview() {
       <SectionCard
         title="Waste cost timeline"
         right={
-          <div className="inline-flex rounded-lg bg-[#F2F2EF] p-0.5">
+          <div className="inline-flex rounded-[11px] border border-[#EEF1F5] bg-[#F7F8FA] p-1">
             {TIME_PERIODS.map((p) => (
-              <button key={p.key} type="button" onClick={() => setPeriod(p.key)} className={`rounded-[7px] px-2.5 py-1 text-[12px] font-medium transition-colors ${period === p.key ? 'bg-white text-[#1A1C1E] shadow-sm' : 'text-[#9A9DA1] hover:text-[#5F6368]'}`}>{p.label}</button>
+              <button key={p.key} type="button" onClick={() => setPeriod(p.key)} className={`rounded-[8px] px-3 py-1.5 text-[12px] font-medium transition-colors ${period === p.key ? 'bg-white text-[#171A17] shadow-[0_1px_2px_rgba(20,24,20,0.06)]' : 'text-[#8A8E86] hover:text-[#6B6F68]'}`}>{p.label}</button>
             ))}
           </div>
         }
       >
         <AreaChart data={COST_TIMELINE[period]} color="#A32D2D" fill="#FCEBEB" height={120} />
-        <p className="mt-2 text-[12px] text-[#9A9DA1]">Cost of waste over the selected period — ▲ 12% vs the previous one.</p>
+        <p className="mt-2.5 text-[12px] text-[#A0A49C]">Cost of waste over the selected period — ▲ 12% vs the previous one.</p>
       </SectionCard>
 
       {/* Top waste sources */}
       <div>
-        <h2 className="mb-2 text-[15px] font-semibold text-[#1A1C1E]">Top waste sources</h2>
+        <h2 className="of-display mb-2.5 text-[16px] font-semibold text-[#171A17]">Top waste sources</h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
           {visible.map((cat) => (
             <button
               key={cat.id}
               type="button"
               onClick={() => router.push(`/app/wastelog/log?category=${encodeURIComponent(cat.name)}`)}
-              className="rounded-2xl border border-[#E7E7E2] bg-white p-4 text-left transition-all hover:-translate-y-0.5 hover:shadow-sm"
+              className="rounded-[14px] border border-[#EEF1F5] bg-white p-4 text-left shadow-[0_1px_2px_rgba(20,24,20,0.03)] transition-all hover:-translate-y-0.5 hover:border-[#C9DEF7] hover:shadow-[0_6px_18px_-10px_rgba(20,24,20,0.28)]"
             >
               <div className="flex items-center gap-1.5">
                 <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: cat.color }} />
-                <span className="text-[12px] font-medium text-[#1A1C1E]">{cat.name}</span>
+                <span className="text-[12px] font-medium text-[#171A17]">{cat.name}</span>
               </div>
-              <CountUp value={cat.cost} format={(n) => zar(n)} className="mt-2 block text-[18px] font-bold leading-none text-[#1A1C1E]" />
-              <div className="mt-1 text-[12px] text-[#9A9DA1]">{pctOf(cat.cost)}% of waste</div>
+              <CountUp value={cat.cost} format={(n) => zar(n)} className="of-num mt-2.5 block text-[22px] font-semibold leading-none tracking-[-0.02em] text-[#171A17]" />
+              <div className="of-num mt-1.5 text-[12px] text-[#A0A49C]">{pctOf(cat.cost)}% of waste</div>
             </button>
           ))}
         </div>
@@ -84,7 +84,7 @@ export function WasteOverview() {
           {INSIGHTS.map((i) => (
             <div key={i.id} className="flex flex-wrap items-center gap-2.5 text-[14px]">
               <span className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1F5FA8]" />
-              <span className="min-w-0 flex-1 text-[#1A1C1E]">{i.text}</span>
+              <span className="min-w-0 flex-1 text-[#171A17]">{i.text}</span>
               {i.module ? (
                 <Link href={MODULE_META[i.module].route} className="shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium" style={{ backgroundColor: MODULE_META[i.module].accent.bg, color: MODULE_META[i.module].accent.fg }}>{MODULE_META[i.module].name} →</Link>
               ) : null}

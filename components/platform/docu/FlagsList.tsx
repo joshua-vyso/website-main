@@ -10,9 +10,9 @@ import type { DocumentFlag } from '@/lib/platform/docu/types';
 export function FlagsList({ flags, compact = false }: { flags: DocumentFlag[]; compact?: boolean }) {
   if (flags.length === 0) {
     return compact ? (
-      <span className="text-[12px] text-[#9A9DA1]">—</span>
+      <span className="text-[12px] text-[#A0A49C]">—</span>
     ) : (
-      <p className="text-[13px] text-[#9A9DA1]">No flags — this document looks clean.</p>
+      <p className="text-[13px] text-[#8A8E86]">No flags — this document looks clean.</p>
     );
   }
 
@@ -27,7 +27,7 @@ export function FlagsList({ flags, compact = false }: { flags: DocumentFlag[]; c
             style={{ backgroundColor: FLAG_SEVERITY_COLOR[f.severity].fg }}
           />
         ))}
-        {flags.length > 3 ? <span className="text-[11px] text-[#9A9DA1]">+{flags.length - 3}</span> : null}
+        {flags.length > 3 ? <span className="of-num text-[11px] text-[#A0A49C]">+{flags.length - 3}</span> : null}
       </span>
     );
   }
@@ -37,11 +37,11 @@ export function FlagsList({ flags, compact = false }: { flags: DocumentFlag[]; c
       {flags.map((f, i) => {
         const c = FLAG_SEVERITY_COLOR[f.severity];
         return (
-          <div key={i} className="flex items-start gap-2.5 rounded-xl border border-[#E7E7E2] bg-white p-3">
+          <div key={i} className="flex items-start gap-2.5 rounded-[14px] border border-[#EEF1F5] bg-white p-3.5">
             <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: c.fg }} />
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-[13px] font-medium text-[#1A1C1E]">{f.label}</span>
+                <span className="text-[13px] font-semibold text-[#171A17]">{f.label}</span>
                 <span
                   className="rounded-full px-2 py-0.5 text-[10px] font-medium capitalize"
                   style={{ backgroundColor: c.bg, color: c.fg }}
@@ -49,10 +49,10 @@ export function FlagsList({ flags, compact = false }: { flags: DocumentFlag[]; c
                   {f.severity}
                 </span>
                 {f.source === 'mock' ? (
-                  <span className="rounded-full bg-[#F0F0EC] px-1.5 py-0.5 text-[10px] text-[#9A9DA1]">demo</span>
+                  <span className="rounded-full bg-[#EEF1F5] px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.05em] text-[#A0A49C]">demo</span>
                 ) : null}
               </div>
-              <p className="mt-0.5 text-[12px] text-[#5F6368]">{f.detail}</p>
+              <p className="mt-0.5 text-[12px] text-[#A0A49C]">{f.detail}</p>
             </div>
           </div>
         );

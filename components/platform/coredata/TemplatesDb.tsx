@@ -172,28 +172,28 @@ export function TemplatesDb({ data }: { data: CoreData }) {
       ) : filtered.length === 0 ? (
         <EmptyState title="No matches" body="No templates match your search and filters." />
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-[#E7E7E2] bg-white">
-          <table className="w-full text-[13px]">
+        <div className="overflow-x-auto rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <table className="w-full text-[14px]">
             <thead>
-              <tr className="border-b border-[#E7E7E2] text-left text-[11px] uppercase tracking-wide text-[#9A9DA1]">
-                <th className="px-4 py-3 font-semibold">Name</th>
-                <th className="px-4 py-3 font-semibold">Type</th>
-                <th className="px-4 py-3 font-semibold">Logo</th>
-                <th className="px-4 py-3 font-semibold">Default</th>
+              <tr className="border-b border-[#EEF1F5] bg-[#FBFCFE] text-left text-[11px] uppercase tracking-[0.06em] text-[#A0A49C]">
+                <th className="px-4 py-3 font-medium">Name</th>
+                <th className="px-4 py-3 font-medium">Type</th>
+                <th className="px-4 py-3 font-medium">Logo</th>
+                <th className="px-4 py-3 font-medium">Default</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
             <tbody>
               {filtered.map((t) => (
-                <tr key={t.id} className="border-b border-[#F0F0EC] last:border-0 hover:bg-[#FBFBF9]">
-                  <td className="px-4 py-3">
-                    <div className="font-medium text-[#1A1C1E]">{t.name}</div>
-                    {t.footer_text ? <div className="max-w-[280px] truncate text-[11px] text-[#9A9DA1]">{t.footer_text}</div> : null}
+                <tr key={t.id} className="border-b border-[#F4F5F7] last:border-0 hover:bg-[#F5F9FE]">
+                  <td className="px-4 py-3.5">
+                    <div className="font-semibold text-[#171A17]">{t.name}</div>
+                    {t.footer_text ? <div className="mt-0.5 max-w-[280px] truncate text-[12px] text-[#A0A49C]">{t.footer_text}</div> : null}
                   </td>
-                  <td className="px-4 py-3 text-[#5F6368]">{TYPE_LABEL[t.template_type] ?? t.template_type}</td>
-                  <td className="px-4 py-3 capitalize text-[#5F6368]">{t.logo_placement}</td>
-                  <td className="px-4 py-3">{t.is_default ? <Pill label="Default" bg="#E1F5EE" fg="#0F6E56" /> : <span className="text-[#9A9DA1]">—</span>}</td>
-                  <td className="px-4 py-3 text-right">
+                  <td className="px-4 py-3.5 text-[#6B6F68]">{TYPE_LABEL[t.template_type] ?? t.template_type}</td>
+                  <td className="px-4 py-3.5 capitalize text-[#6B6F68]">{t.logo_placement}</td>
+                  <td className="px-4 py-3.5">{t.is_default ? <Pill label="Default" bg="#E1F5EE" fg="#0F6E56" /> : <span className="text-[#A0A49C]">—</span>}</td>
+                  <td className="px-4 py-3.5 text-right">
                     <RowActionsMenu
                       actions={[
                         { label: 'Edit', onClick: () => startEdit(t) },
@@ -221,8 +221,8 @@ export function TemplatesDb({ data }: { data: CoreData }) {
           </>
         }
       >
-        <div className="space-y-3">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Field label="Document type">
               <select value={draft.template_type} onChange={(e) => setDraft({ ...draft, template_type: e.target.value as DocTemplateType })} className={inputClass}>
                 {DOC_TEMPLATE_TYPES.map((t) => (
@@ -247,11 +247,11 @@ export function TemplatesDb({ data }: { data: CoreData }) {
           <Field label="Terms" hint="(optional)">
             <textarea value={draft.terms} onChange={(e) => setDraft({ ...draft, terms: e.target.value })} placeholder="Payment due within 30 days." className={`${inputClass} h-20 py-2`} />
           </Field>
-          <label className="flex items-center gap-2.5 text-[13px] text-[#1A1C1E]">
-            <input type="checkbox" checked={draft.is_default} onChange={(e) => setDraft({ ...draft, is_default: e.target.checked })} className="h-4 w-4 accent-[#3E7BC4]" />
+          <label className="flex items-center gap-2.5 text-[14px] text-[#171A17]">
+            <input type="checkbox" checked={draft.is_default} onChange={(e) => setDraft({ ...draft, is_default: e.target.checked })} className="h-4 w-4 accent-[#1F5FA8]" />
             Default template for {TYPE_LABEL[draft.template_type]?.toLowerCase() ?? draft.template_type} documents
           </label>
-          {error ? <p className="text-[12px] text-[#A32D2D]">{error}</p> : null}
+          {error ? <p className="text-[13px] text-[#A32D2D]">{error}</p> : null}
         </div>
       </Modal>
 

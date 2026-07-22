@@ -217,12 +217,12 @@ export function CsvImportModal({
       {/* Step 1 — upload */}
       {step === 'upload' ? (
         <div className="space-y-3">
-          <p className="text-[13px] text-[#5F6368]">
+          <p className="text-[13px] text-[#6B6F68]">
             Upload a CSV exported from QuickBooks, Excel or another system. The first row must be column headers.
           </p>
-          <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-10 text-center transition-colors hover:border-[#3E7BC4]/50 hover:bg-[#F5F7F6]">
-            <span className="text-[13px] font-medium text-[#1A1C1E]">Choose a CSV file</span>
-            <span className="text-[12px] text-[#9A9DA1]">or drop it into the Databases page</span>
+          <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-[#E2E6EC] bg-[#FBFCFE] px-6 py-10 text-center transition-colors hover:border-[#3E7BC4]/50 hover:bg-[#F5F7F6]">
+            <span className="text-[14px] font-semibold text-[#171A17]">Choose a CSV file</span>
+            <span className="text-[12px] text-[#A0A49C]">or drop it into the Databases page</span>
             <input
               ref={fileRef}
               type="file"
@@ -234,15 +234,15 @@ export function CsvImportModal({
               }}
             />
           </label>
-          {parseError ? <p className="text-[12px] text-[#A32D2D]">{parseError}</p> : null}
+          {parseError ? <p className="text-[13px] text-[#A32D2D]">{parseError}</p> : null}
         </div>
       ) : null}
 
       {/* Step 2 — preview + map */}
       {step === 'map' ? (
         <div className="space-y-4">
-          <p className="text-[13px] text-[#5F6368]">
-            <span className="font-medium text-[#1A1C1E]">{fileName}</span> · {nonEmptyRows.length} rows. Match each field to a
+          <p className="text-[13px] text-[#6B6F68]">
+            <span className="font-medium text-[#171A17]">{fileName}</span> · {nonEmptyRows.length} rows. Match each field to a
             column — we&rsquo;ve guessed where we can.
           </p>
 
@@ -269,19 +269,19 @@ export function CsvImportModal({
           </div>
 
           {missingRequired.length > 0 ? (
-            <p className="text-[12px] text-[#A32D2D]">
+            <p className="text-[13px] text-[#A32D2D]">
               Map every required field: {missingRequired.map((f) => f.label).join(', ')}.
             </p>
           ) : null}
 
           <div>
-            <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#9A9DA1]">Preview (first 5 rows)</div>
-            <div className="overflow-x-auto rounded-xl border border-[#E7E7E2]">
+            <div className="mb-2 text-[11px] font-medium uppercase tracking-[0.06em] text-[#A0A49C]">Preview (first 5 rows)</div>
+            <div className="overflow-x-auto rounded-xl border border-[#EAEDF2]">
               <table className="w-full text-[12px]">
                 <thead>
-                  <tr className="border-b border-[#E7E7E2] bg-[#FBFBF9]">
+                  <tr className="border-b border-[#EAEDF2] bg-[#FBFCFE]">
                     {headers.map((h, i) => (
-                      <th key={i} className="whitespace-nowrap px-2.5 py-2 text-left font-semibold text-[#5F6368]">
+                      <th key={i} className="whitespace-nowrap px-2.5 py-2 text-left text-[11px] font-medium uppercase tracking-[0.06em] text-[#A0A49C]">
                         {h || `Col ${i + 1}`}
                       </th>
                     ))}
@@ -289,10 +289,10 @@ export function CsvImportModal({
                 </thead>
                 <tbody>
                   {previewRows.map((r, ri) => (
-                    <tr key={ri} className="border-b border-[#F0F0EC] last:border-0">
+                    <tr key={ri} className="border-b border-[#F4F5F7] last:border-0">
                       {headers.map((_, ci) => (
-                        <td key={ci} className="whitespace-nowrap px-2.5 py-1.5 text-[#1A1C1E]">
-                          {r[ci] || <span className="text-[#C9CCCA]">—</span>}
+                        <td key={ci} className="whitespace-nowrap px-2.5 py-1.5 text-[#171A17]">
+                          {r[ci] || <span className="text-[#A0A49C]">—</span>}
                         </td>
                       ))}
                     </tr>
@@ -307,9 +307,9 @@ export function CsvImportModal({
       {/* Step 3 — duplicates */}
       {step === 'duplicates' ? (
         <div className="space-y-3">
-          <p className="text-[13px] text-[#5F6368]">
+          <p className="text-[13px] text-[#6B6F68]">
             {duplicateIdx.length} row{duplicateIdx.length === 1 ? '' : 's'} match an existing{' '}
-            <span className="font-medium text-[#1A1C1E]">{dupField?.label.toLowerCase()}</span>. Skipped rows won&rsquo;t be
+            <span className="font-medium text-[#171A17]">{dupField?.label.toLowerCase()}</span>. Skipped rows won&rsquo;t be
             imported — untick to import anyway (creates a duplicate).
           </p>
           <div className="flex items-center gap-3 text-[12px]">
@@ -323,28 +323,28 @@ export function CsvImportModal({
             <button
               type="button"
               onClick={() => setSkipped(Object.fromEntries(duplicateIdx.map((i) => [i, false])))}
-              className="text-[#5F6368] hover:underline"
+              className="text-[#6B6F68] hover:underline"
             >
               Import all
             </button>
           </div>
-          <div className="divide-y divide-[#F0F0EC] overflow-hidden rounded-xl border border-[#E7E7E2]">
+          <div className="divide-y divide-[#EEF1F5] overflow-hidden rounded-xl border border-[#EAEDF2]">
             {duplicateIdx.map((i) => {
               const raw = applyMapping(dataRows[i], mapping);
               const isSkipped = skipped[i] ?? true;
               return (
-                <label key={i} className="flex cursor-pointer items-center gap-3 px-3 py-2.5 hover:bg-[#FBFBF9]">
+                <label key={i} className="flex cursor-pointer items-center gap-3 px-3 py-2.5 hover:bg-[#FBFCFE]">
                   <input
                     type="checkbox"
                     checked={isSkipped}
                     onChange={(e) => setSkipped({ ...skipped, [i]: e.target.checked })}
-                    className="h-4 w-4 accent-[#3E7BC4]"
+                    className="h-4 w-4 accent-[#1F5FA8]"
                   />
                   <div className="min-w-0 flex-1">
-                    <div className="truncate text-[13px] font-medium text-[#1A1C1E]">
+                    <div className="truncate text-[13px] font-medium text-[#171A17]">
                       {dupField ? raw[dupField.key] || '—' : '—'}
                     </div>
-                    <div className="truncate text-[11px] text-[#9A9DA1]">
+                    <div className="truncate text-[12px] text-[#A0A49C]">
                       {fields
                         .filter((f) => f.key !== dupField?.key && raw[f.key])
                         .slice(0, 3)
@@ -352,7 +352,7 @@ export function CsvImportModal({
                         .join(' · ') || 'no other fields'}
                     </div>
                   </div>
-                  <span className="shrink-0 text-[11px] font-medium text-[#9A9DA1]">{isSkipped ? 'Skip' : 'Import'}</span>
+                  <span className="shrink-0 text-[12px] font-medium text-[#A0A49C]">{isSkipped ? 'Skip' : 'Import'}</span>
                 </label>
               );
             })}
@@ -363,26 +363,26 @@ export function CsvImportModal({
       {/* Step 4 — confirm */}
       {step === 'confirm' && willImport ? (
         <div className="space-y-4">
-          <p className="text-[13px] text-[#5F6368]">Ready to import. This writes new records to your Core Data.</p>
+          <p className="text-[13px] text-[#6B6F68]">Ready to import. This writes new records to your Core Data.</p>
           <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-xl border border-[#E7E7E2] bg-white p-4">
-              <div className="text-[12px] text-[#9A9DA1]">Will import</div>
-              <div className="mt-1 text-[22px] font-bold leading-none text-[#0F6E56]">{willImport.records.length}</div>
+            <div className="rounded-[14px] border border-[#EEF1F5] bg-white p-4">
+              <div className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">Will import</div>
+              <div className="of-num mt-2 text-[22px] font-semibold leading-none tracking-[-0.02em] text-[#0F6E56]">{willImport.records.length}</div>
             </div>
-            <div className="rounded-xl border border-[#E7E7E2] bg-white p-4">
-              <div className="text-[12px] text-[#9A9DA1]">Skipped</div>
-              <div className="mt-1 text-[22px] font-bold leading-none text-[#1A1C1E]">{willImport.skippedCount}</div>
+            <div className="rounded-[14px] border border-[#EEF1F5] bg-white p-4">
+              <div className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">Skipped</div>
+              <div className="of-num mt-2 text-[22px] font-semibold leading-none tracking-[-0.02em] text-[#171A17]">{willImport.skippedCount}</div>
             </div>
           </div>
-          <div className="rounded-xl border border-[#E7E7E2]">
-            <div className="border-b border-[#E7E7E2] bg-[#FBFBF9] px-3 py-2 text-[11px] font-semibold uppercase tracking-wide text-[#9A9DA1]">
+          <div className="rounded-xl border border-[#EAEDF2]">
+            <div className="border-b border-[#EEF1F5] bg-[#FBFCFE] px-3 py-2 text-[11px] font-medium uppercase tracking-[0.06em] text-[#A0A49C]">
               Fields
             </div>
             <div className="flex flex-wrap gap-1.5 p-3">
               {fields
                 .filter((f) => (mapping[f.key] ?? -1) >= 0)
                 .map((f) => (
-                  <span key={f.key} className="rounded-full bg-[#F0F0EC] px-2.5 py-1 text-[11px] text-[#5F6368]">
+                  <span key={f.key} className="rounded-full bg-[#EEF1F5] px-2.5 py-1 text-[11px] text-[#6B6F68]">
                     {f.label} ← {headers[mapping[f.key]] || `Col ${mapping[f.key] + 1}`}
                   </span>
                 ))}
@@ -397,7 +397,7 @@ export function CsvImportModal({
           {result.inserted === 0 ? (
             // Nothing landed — a genuine failure. Show the red box with the reason.
             <div className="rounded-xl border border-[#E7C9C9] bg-[#F9F0F0] p-4">
-              <div className="text-[13px] font-medium text-[#A32D2D]">Import problem</div>
+              <div className="of-display text-[14px] font-semibold text-[#A32D2D]">Import problem</div>
               <p className="mt-1 text-[12px] text-[#8A4A4A]">{result.error ?? 'No rows were imported.'}</p>
             </div>
           ) : (
@@ -405,27 +405,27 @@ export function CsvImportModal({
             // carrying the error string (e.g. "Skipped M unmatched…").
             <>
               <div className="rounded-xl border border-[#CDE9DF] bg-[#EAF6F1] p-4">
-                <div className="text-[13px] font-medium text-[#0F6E56]">Import complete</div>
+                <div className="of-display text-[14px] font-semibold text-[#0F6E56]">Import complete</div>
                 <p className="mt-1 text-[12px] text-[#3C7A66]">
                   {result.inserted} record{result.inserted === 1 ? '' : 's'} added to your Core Data.
                 </p>
               </div>
               {result.error ? (
                 <div className="rounded-xl border border-[#EFDDBB] bg-[#FBEEDA] p-4">
-                  <div className="text-[13px] font-medium text-[#854F0B]">Heads up</div>
+                  <div className="of-display text-[14px] font-semibold text-[#854F0B]">Heads up</div>
                   <p className="mt-1 text-[12px] text-[#8A6A2E]">{result.error}</p>
                 </div>
               ) : null}
             </>
           )}
           <div className="grid grid-cols-2 gap-3">
-            <div className="rounded-xl border border-[#E7E7E2] bg-white p-4">
-              <div className="text-[12px] text-[#9A9DA1]">Inserted</div>
-              <div className="mt-1 text-[22px] font-bold leading-none text-[#0F6E56]">{result.inserted}</div>
+            <div className="rounded-[14px] border border-[#EEF1F5] bg-white p-4">
+              <div className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">Inserted</div>
+              <div className="of-num mt-2 text-[22px] font-semibold leading-none tracking-[-0.02em] text-[#0F6E56]">{result.inserted}</div>
             </div>
-            <div className="rounded-xl border border-[#E7E7E2] bg-white p-4">
-              <div className="text-[12px] text-[#9A9DA1]">Skipped</div>
-              <div className="mt-1 text-[22px] font-bold leading-none text-[#1A1C1E]">{result.skipped}</div>
+            <div className="rounded-[14px] border border-[#EEF1F5] bg-white p-4">
+              <div className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">Skipped</div>
+              <div className="of-num mt-2 text-[22px] font-semibold leading-none tracking-[-0.02em] text-[#171A17]">{result.skipped}</div>
             </div>
           </div>
         </div>

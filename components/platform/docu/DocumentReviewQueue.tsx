@@ -51,9 +51,9 @@ export function DocumentReviewQueue({ docs, canReview }: { docs: DocumentWithSup
 
   if (visible.length === 0) {
     return (
-      <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
-        <p className="text-[15px] font-medium text-[#1A1C1E]">Nothing to review</p>
-        <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">
+      <div className="rounded-2xl border border-dashed border-[#E2E6EC] bg-[#FBFCFE] px-6 py-12 text-center">
+        <p className="of-display text-[16px] font-semibold text-[#171A17]">Nothing to review</p>
+        <p className="mx-auto mt-1.5 max-w-md text-[13px] text-[#6B6F68]">
           Forwarded documents land here for a quick check before they update your stock and orders.
         </p>
       </div>
@@ -98,7 +98,7 @@ export function DocumentReviewQueue({ docs, canReview }: { docs: DocumentWithSup
         const typeLabel = d.document_type ? TYPE_LABEL[d.document_type] ?? d.document_type : 'Document';
 
         return (
-          <div key={d.id} className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
+          <div key={d.id} className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
             <div className="flex flex-wrap items-start gap-3">
               <button
                 type="button"
@@ -106,16 +106,16 @@ export function DocumentReviewQueue({ docs, canReview }: { docs: DocumentWithSup
                 className="min-w-0 flex-1 text-left"
               >
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="rounded-full bg-[#F0F0EC] px-2 py-0.5 text-[11px] font-medium text-[#5F6368]">
+                  <span className="inline-flex items-center rounded-full bg-[#EEF1F5] px-2.5 py-1 text-[11px] font-medium text-[#6B6F68]">
                     {typeLabel}
                   </span>
-                  <span className="truncate text-[14px] font-medium text-[#1A1C1E]">{d.filename}</span>
+                  <span className="truncate text-[14px] font-semibold text-[#171A17]">{d.filename}</span>
                 </div>
-                <div className="mt-1 flex flex-wrap gap-x-3 text-[12px] text-[#9A9DA1]">
-                  {who ? <span className="text-[#5F6368]">{who}</span> : null}
-                  <span>{fmtWhen(d.created_at)}</span>
-                  {items.length > 0 ? <span>{items.length} line{items.length === 1 ? '' : 's'}</span> : null}
-                  {typeof d.confidence === 'number' ? <span>{d.confidence}% confident</span> : null}
+                <div className="mt-1.5 flex flex-wrap gap-x-3 text-[12px] text-[#A0A49C]">
+                  {who ? <span className="text-[#6B6F68]">{who}</span> : null}
+                  <span className="of-num">{fmtWhen(d.created_at)}</span>
+                  {items.length > 0 ? <span><span className="of-num">{items.length}</span> line{items.length === 1 ? '' : 's'}</span> : null}
+                  {typeof d.confidence === 'number' ? <span><span className="of-num">{d.confidence}%</span> confident</span> : null}
                 </div>
               </button>
 
@@ -125,7 +125,7 @@ export function DocumentReviewQueue({ docs, canReview }: { docs: DocumentWithSup
                     type="button"
                     disabled={busy === d.id}
                     onClick={() => void act(d.id, 'save')}
-                    className="h-9 rounded-lg bg-[#1F5FA8] px-3.5 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
+                    className="inline-flex h-[38px] items-center rounded-[11px] bg-[#1F5FA8] px-4 text-[13px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
                   >
                     {busy === d.id ? 'Saving…' : 'Save'}
                   </button>
@@ -133,13 +133,13 @@ export function DocumentReviewQueue({ docs, canReview }: { docs: DocumentWithSup
                     type="button"
                     disabled={busy === d.id}
                     onClick={() => void act(d.id, 'discard')}
-                    className="h-9 rounded-lg px-3 text-[13px] text-[#5F6368] transition-colors hover:bg-[#FAFAF8] disabled:opacity-40"
+                    className="inline-flex h-[38px] items-center rounded-[11px] border border-[#E2E6EC] bg-white px-4 text-[13px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87] disabled:opacity-40"
                   >
                     Discard
                   </button>
                 </div>
               ) : (
-                <span className="shrink-0 self-center text-[12px] text-[#9A9DA1]">Owner/admin reviews</span>
+                <span className="shrink-0 self-center text-[12px] text-[#8A8E86]">Owner/admin reviews</span>
               )}
             </div>
 
@@ -149,7 +149,7 @@ export function DocumentReviewQueue({ docs, canReview }: { docs: DocumentWithSup
                   <div className="overflow-x-auto">
                     <table className="w-full text-[13px]">
                       <thead>
-                        <tr className="text-left text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+                        <tr className="text-left text-[11px] uppercase tracking-[0.06em] text-[#A0A49C]">
                           <th className="pb-1.5 pr-3 font-medium">Item</th>
                           <th className="pb-1.5 pr-3 font-medium">Unit price</th>
                           <th className="pb-1.5 font-medium">Amount</th>
@@ -157,24 +157,24 @@ export function DocumentReviewQueue({ docs, canReview }: { docs: DocumentWithSup
                       </thead>
                       <tbody>
                         {items.slice(0, 100).map((it, i) => (
-                          <tr key={i} className="border-t border-[#F3F3EF]">
-                            <td className="py-1.5 pr-3 text-[#1A1C1E]">{lineLabel(it)}</td>
-                            <td className="py-1.5 pr-3 text-[#5F6368]">{it.unit_price || '—'}</td>
-                            <td className="py-1.5 text-[#5F6368]">{it.amount || '—'}</td>
+                          <tr key={i} className="border-t border-[#F4F5F7]">
+                            <td className="py-1.5 pr-3 text-[#171A17]">{lineLabel(it)}</td>
+                            <td className="of-num py-1.5 pr-3 text-[#6B6F68]">{it.unit_price || '—'}</td>
+                            <td className="of-num py-1.5 text-[#6B6F68]">{it.amount || '—'}</td>
                           </tr>
                         ))}
                       </tbody>
                     </table>
                   </div>
                 ) : (
-                  <p className="text-[13px] text-[#9A9DA1]">No line items were read from this document.</p>
+                  <p className="text-[13px] text-[#8A8E86]">No line items were read from this document.</p>
                 )}
 
                 <div className="flex flex-wrap items-center gap-4 text-[12px]">
                   <Link href={`/app/docu/${d.id}`} className="font-medium text-[#1F5FA8] hover:underline">
                     Open full document →
                   </Link>
-                  <span className="text-[#9A9DA1]">
+                  <span className="text-[#8A8E86]">
                     Saving {d.document_type === 'order' ? 'creates the OrderFlow order' : 'updates stock and supplier prices'}.
                   </span>
                 </div>

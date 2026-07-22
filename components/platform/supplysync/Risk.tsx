@@ -199,15 +199,15 @@ export function RiskTab() {
       r.supplierId ? (
         <SupplierNameButton id={r.supplierId} name={r.supplierName || 'Supplier'} />
       ) : (
-        <span className="text-[#5F6368]">{r.supplierName || 'General'}</span>
+        <span className="text-[#6B6F68]">{r.supplierName || 'General'}</span>
       ),
-      <span className="text-[#1A1C1E]">{r.riskType || '—'}</span>,
+      <span className="text-[#171A17]">{r.riskType || '—'}</span>,
       <SeverityBadge severity={r.severity} />,
-      <span className="text-[#5F6368]">{r.description || '—'}</span>,
-      <span className="text-[#5F6368]">{r.suggestedAction ?? '—'}</span>,
-      <span className="text-[#5F6368]">{r.owner ?? 'Unassigned'}</span>,
+      <span className="text-[#6B6F68]">{r.description || '—'}</span>,
+      <span className="text-[#6B6F68]">{r.suggestedAction ?? '—'}</span>,
+      <span className="text-[#6B6F68]">{r.owner ?? 'Unassigned'}</span>,
       <RiskStatusBadge status={status} />,
-      <span className="text-[#5F6368] tabular-nums">{fmtDate(r.dueDate)}</span>,
+      <span className="of-num text-[#6B6F68]">{fmtDate(r.dueDate)}</span>,
       <div className="flex justify-end">
         <RowActionsMenu actions={riskActions(r.id, status)} />
       </div>,
@@ -237,29 +237,29 @@ export function RiskTab() {
 
     return [
       <SupplierNameButton id={supplierId} name={supplierName} />,
-      <span className="text-[#1A1C1E]">{doc.label}</span>,
+      <span className="text-[#171A17]">{doc.label}</span>,
       <DocStatusBadge status={doc.status} />,
-      <span className="text-[#5F6368] tabular-nums">{fmtDate(doc.expiry)}</span>,
-      <span className="font-medium tabular-nums" style={{ color: drColor }}>{drText}</span>,
+      <span className="of-num text-[#6B6F68]">{fmtDate(doc.expiry)}</span>,
+      <span className="of-num font-medium" style={{ color: drColor }}>{drText}</span>,
       <div className="flex flex-wrap justify-end gap-1.5">
         <button
           type="button"
           onClick={() => show(`Document requested from ${supplierName} (demo)`)}
-          className="rounded-lg border border-[#E7E7E2] px-3 py-1.5 text-[12px] font-medium text-[#5F6368] transition-colors hover:bg-[#FBFBF9] hover:text-[#1A1C1E]"
+          className="inline-flex h-9 items-center rounded-[10px] border border-[#E2E6EC] bg-white px-3.5 text-[13px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]"
         >
           Request
         </button>
         <button
           type="button"
           onClick={() => show('Upload document (demo)')}
-          className="rounded-lg border border-[#E7E7E2] px-3 py-1.5 text-[12px] font-medium text-[#5F6368] transition-colors hover:bg-[#FBFBF9] hover:text-[#1A1C1E]"
+          className="inline-flex h-9 items-center rounded-[10px] border border-[#E2E6EC] bg-white px-3.5 text-[13px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]"
         >
           Upload
         </button>
         <button
           type="button"
           onClick={() => show('Marked reviewed (demo)')}
-          className="rounded-lg border border-[#E7E7E2] px-3 py-1.5 text-[12px] font-medium text-[#5F6368] transition-colors hover:bg-[#FBFBF9] hover:text-[#1A1C1E]"
+          className="inline-flex h-9 items-center rounded-[10px] border border-[#E2E6EC] bg-white px-3.5 text-[13px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]"
         >
           Mark reviewed
         </button>

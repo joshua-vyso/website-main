@@ -85,17 +85,17 @@ export function ServicesView() {
       </div>
 
       {services.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
-          <p className="text-[15px] font-medium text-[#1A1C1E]">No services yet</p>
-          <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">Add the services you offer and their prices. You&rsquo;ll pick from these when building an invoice.</p>
+        <div className="rounded-2xl border border-dashed border-[#D8DFE8] bg-white px-6 py-12 text-center">
+          <p className="of-display text-[18px] font-semibold text-[#171A17]">No services yet</p>
+          <p className="mx-auto mt-2 max-w-md text-[14px] text-[#6B6F68]">Add the services you offer and their prices. You&rsquo;ll pick from these when building an invoice.</p>
         </div>
       ) : (
         <DataTable
           columns={[{ label: 'Service' }, { label: 'Billing' }, { label: 'Price', align: 'right' }, { label: 'Status' }, { label: '', align: 'right' }]}
           rows={services.map((s) => [
             <div key="n">
-              <button type="button" onClick={() => openEdit(s)} className="text-left font-medium text-[#1A1C1E] transition-colors hover:text-[#5B53C0] hover:underline">{s.name}</button>
-              {s.description ? <div className="mt-0.5 text-[12px] text-[#9A9DA1]">{s.description}</div> : null}
+              <button type="button" onClick={() => openEdit(s)} className="text-left font-semibold text-[#171A17] transition-colors hover:text-[#1F5FA8] hover:underline">{s.name}</button>
+              {s.description ? <div className="mt-0.5 text-[12px] font-normal text-[#A0A49C]">{s.description}</div> : null}
             </div>,
             unitLabel(s.unit),
             zar(s.unitPrice),
@@ -130,11 +130,11 @@ export function ServicesView() {
             <input value={form.unitPrice} onChange={(e) => { setForm({ ...form, unitPrice: e.target.value }); if (error) setError(null); }} inputMode="decimal" placeholder="0.00" className={inputClass} />
           </Field>
         </div>
-        <label className="flex items-center gap-2 text-[13px] text-[#1A1C1E]">
-          <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} className="h-4 w-4 accent-[#5B53C0]" />
+        <label className="flex items-center gap-2 text-[13px] text-[#171A17]">
+          <input type="checkbox" checked={form.active} onChange={(e) => setForm({ ...form, active: e.target.checked })} className="h-4 w-4 accent-[#1F5FA8]" />
           Active (available to add to invoices)
         </label>
-        {error ? <p className="text-[12px] text-[#A32D2D]">{error}</p> : null}
+        {error ? <p className="text-[13px] text-[#A32D2D]">{error}</p> : null}
       </Modal>
     </div>
   );

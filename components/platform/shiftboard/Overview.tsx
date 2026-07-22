@@ -12,7 +12,7 @@ import { useShiftBoard } from './context';
 const M = MODULE_META.shiftboard;
 
 function cellTone(s: Shift) {
-  if (s.status === 'off') return { bg: '#F0F0EC', fg: '#9A9DA1' };
+  if (s.status === 'off') return { bg: '#EEF1F5', fg: '#8A8E86' };
   if (s.status === 'leave') return { bg: '#FBEEDA', fg: '#854F0B' };
   return { bg: '#EAF2FC', fg: '#1F5FA8' };
 }
@@ -28,9 +28,9 @@ export function ShiftBoardOverview() {
       <div className="space-y-5">
         {node}
         {header}
-        <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
-          <p className="text-[15px] font-medium text-[#1A1C1E]">No people set up yet</p>
-          <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">Add employees and departments to see who&rsquo;s on shift, staffing coverage and labour cost here.</p>
+        <div className="rounded-2xl border border-dashed border-[#E2E6EC] bg-[#FBFCFE] px-6 py-12 text-center">
+          <p className="of-display text-[16px] font-semibold text-[#171A17]">No people set up yet</p>
+          <p className="mx-auto mt-1.5 max-w-md text-[13px] text-[#6B6F68]">Add employees and departments to see who&rsquo;s on shift, staffing coverage and labour cost here.</p>
         </div>
       </div>
     );
@@ -55,26 +55,26 @@ export function ShiftBoardOverview() {
       </div>
 
       {/* Weekly roster */}
-      <SectionCard title="Weekly roster" right={<span className="text-[12px] text-[#9A9DA1]">{sb.roster.label}</span>}>
+      <SectionCard title="Weekly roster" right={<span className="of-num text-[12px] text-[#A0A49C]">{sb.roster.label}</span>}>
         <div className="overflow-x-auto">
           <table className="w-full text-[12px]">
             <thead>
-              <tr className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+              <tr className="text-[11px] uppercase tracking-[0.06em] text-[#A0A49C]">
                 <th className="px-2 py-2 text-left font-medium">Staff</th>
                 {DAYS.map((d) => (<th key={d} className="px-2 py-2 text-center font-medium">{d}</th>))}
               </tr>
             </thead>
             <tbody>
               {sb.roster.rows.map((r) => (
-                <tr key={r.employeeId} className="border-t border-[#F0F0EC]">
+                <tr key={r.employeeId} className="border-t border-[#EEF1F5]">
                   <td className="px-2 py-2.5">
-                    <span className="flex items-center gap-2 text-[13px] font-medium text-[#1A1C1E]"><span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: sb.deptColor(r.department) }} />{r.name}</span>
+                    <span className="flex items-center gap-2 text-[13px] font-semibold text-[#171A17]"><span className="h-2 w-2 shrink-0 rounded-full" style={{ backgroundColor: sb.deptColor(r.department) }} />{r.name}</span>
                   </td>
                   {r.days.map((sh, i) => {
                     const t = cellTone(sh);
                     return (
                       <td key={i} className="px-1.5 py-2 text-center">
-                        <span className="inline-flex w-full justify-center rounded-md px-1.5 py-1 text-[11px] font-medium" style={{ backgroundColor: t.bg, color: t.fg }}>{sh.status === 'off' ? 'Off' : sh.status === 'leave' ? 'Leave' : sh.time}</span>
+                        <span className="of-num inline-flex w-full justify-center rounded-[8px] px-1.5 py-1 text-[11px] font-medium" style={{ backgroundColor: t.bg, color: t.fg }}>{sh.status === 'off' ? 'Off' : sh.status === 'leave' ? 'Leave' : sh.time}</span>
                       </td>
                     );
                   })}
@@ -90,10 +90,10 @@ export function ShiftBoardOverview() {
           <DataTable
             columns={[{ label: 'Name' }, { label: 'Department' }, { label: 'Status' }, { label: 'Next shift' }, { label: 'Hours / wk', align: 'right' }]}
             rows={sb.employees.map((e) => [
-              <span key="n" className="font-medium text-[#1A1C1E]">{e.name}<span className="ml-1.5 text-[12px] font-normal text-[#9A9DA1]">{e.role}</span></span>,
+              <span key="n" className="font-semibold text-[#171A17]">{e.name}<span className="ml-1.5 text-[12px] font-normal text-[#A0A49C]">{e.role}</span></span>,
               <DeptBadge key="d" department={e.department} />,
               <StatusBadge key="s" status={e.status} />,
-              e.nextShift,
+              <span key="ns" className="of-num">{e.nextShift}</span>,
               String(e.hoursThisWeek),
             ])}
             empty="No staff yet."
@@ -106,9 +106,9 @@ export function ShiftBoardOverview() {
             <div className="flex flex-col gap-2">
               {snapshots.map((d) => (
                 <div key={d.name} className="flex items-center justify-between">
-                  <span className="flex items-center gap-2 text-[13px] text-[#1A1C1E]"><span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: d.color }} />{d.name}</span>
+                  <span className="flex items-center gap-2 text-[13px] text-[#171A17]"><span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: d.color }} />{d.name}</span>
                   <span className="flex items-center gap-2">
-                    <span className="text-[13px] tabular-nums text-[#5F6368]">{d.working}/{d.required}</span>
+                    <span className="of-num text-[13px] text-[#6B6F68]">{d.working}/{d.required}</span>
                     <CoverageBadge status={d.status} />
                   </span>
                 </div>
@@ -122,7 +122,7 @@ export function ShiftBoardOverview() {
               {alerts.map((a) => (
                 <div key={a.id} className="flex items-start gap-2.5 text-[13px]">
                   <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full" style={{ backgroundColor: a.tone === 'critical' ? '#A32D2D' : a.tone === 'warning' ? '#854F0B' : '#0C447C' }} />
-                  <span className="min-w-0 flex-1 text-[#1A1C1E]">{a.text}</span>
+                  <span className="min-w-0 flex-1 text-[#171A17]">{a.text}</span>
                   {a.module ? (
                     <Link href={MODULE_META[a.module].route} className="shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium" style={{ backgroundColor: MODULE_META[a.module].accent.bg, color: MODULE_META[a.module].accent.fg }}>{MODULE_META[a.module].name} →</Link>
                   ) : null}

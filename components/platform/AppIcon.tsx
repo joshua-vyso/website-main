@@ -8,7 +8,7 @@ const TINTS: Record<AppIconKey, { bg: string; fg: string }> = {
   waste: { bg: '#FBEFDD', fg: '#9A6314' },
   shift: { bg: '#ECEAFB', fg: '#5B53C0' },
   supplier: { bg: '#FBE9EE', fg: '#B0466A' },
-  dash: { bg: '#EDEFF1', fg: '#5F6368' },
+  dash: { bg: '#EDEFF1', fg: '#6B6F68' },
 };
 
 interface AppIconProps {

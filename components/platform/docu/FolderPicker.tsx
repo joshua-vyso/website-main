@@ -123,7 +123,7 @@ export function FolderPicker({
 
   const rowCls = (active: boolean) =>
     `flex w-full items-center gap-2 rounded-xl px-2.5 py-1.5 text-left text-[13px] transition-colors ${
-      active ? 'bg-[#E7EEF8] text-[#174C87]' : 'text-[#1A1C1E] hover:bg-[#FAFAF8]'
+      active ? 'bg-[#E7EEF8] text-[#174C87]' : 'text-[#171A17] hover:bg-[#F5F9FE]'
     }`;
 
   return (
@@ -132,15 +132,15 @@ export function FolderPicker({
         type="button"
         onClick={() => setOpen((o) => !o)}
         disabled={busy}
-        className="inline-flex h-8 items-center gap-1.5 rounded-full border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#5F6368] transition-colors hover:border-[#3E7BC4]/30 disabled:opacity-50"
+        className="inline-flex h-[38px] items-center gap-1.5 rounded-full border border-[#E2E6EC] bg-white px-4 text-[13px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87] disabled:opacity-50"
       >
         <span
           className="h-2.5 w-2.5 rounded-full"
-          style={{ backgroundColor: current?.color ?? '#C9CCC8' }}
+          style={{ backgroundColor: current?.color ?? '#BFC5CC' }}
           aria-hidden
         />
         <span className="max-w-[160px] truncate">{current ? current.name : 'No folder'}</span>
-        <span className="text-[#9A9DA1]">▾</span>
+        <span className="text-[#A0A49C]">▾</span>
       </button>
 
       {open ? (
@@ -151,10 +151,10 @@ export function FolderPicker({
             onClick={() => setOpen(false)}
             className="fixed inset-0 z-40 cursor-default"
           />
-          <div className="absolute right-0 top-full z-50 mt-2 max-h-[70vh] w-[260px] overflow-y-auto rounded-2xl border border-[#E7E7E2] bg-white p-1.5 shadow-[0_12px_40px_-12px_rgba(26,28,30,0.25)]">
+          <div className="absolute right-0 top-full z-50 mt-2 max-h-[70vh] w-[260px] overflow-y-auto rounded-2xl border border-[#EAEDF2] bg-white p-1.5 shadow-[0_12px_40px_-12px_rgba(26,28,30,0.25)]">
             {/* No folder */}
             <button type="button" onClick={() => writeFolder(null)} className={rowCls(currentFolderId === null)}>
-              <span className="h-2.5 w-2.5 rounded-full bg-[#C9CCC8]" />
+              <span className="h-2.5 w-2.5 rounded-full bg-[#BFC5CC]" />
               No folder
             </button>
 
@@ -162,7 +162,7 @@ export function FolderPicker({
             <button
               type="button"
               onClick={() => setExpanded((e) => (e === 'default' ? null : 'default'))}
-              className="mt-1 flex w-full items-center justify-between rounded-xl px-2.5 py-1.5 text-left text-[12px] font-medium uppercase tracking-wide text-[#9A9DA1] transition-colors hover:bg-[#FAFAF8]"
+              className="mt-1 flex w-full items-center justify-between rounded-xl px-2.5 py-1.5 text-left text-[11px] font-medium uppercase tracking-[0.06em] text-[#A0A49C] transition-colors hover:bg-[#F5F9FE]"
               aria-expanded={expanded === 'default'}
             >
               <span>Default</span>
@@ -187,7 +187,7 @@ export function FolderPicker({
             <button
               type="button"
               onClick={() => setExpanded((e) => (e === 'custom' ? null : 'custom'))}
-              className="mt-1 flex w-full items-center justify-between rounded-xl px-2.5 py-1.5 text-left text-[12px] font-medium uppercase tracking-wide text-[#9A9DA1] transition-colors hover:bg-[#FAFAF8]"
+              className="mt-1 flex w-full items-center justify-between rounded-xl px-2.5 py-1.5 text-left text-[11px] font-medium uppercase tracking-[0.06em] text-[#A0A49C] transition-colors hover:bg-[#F5F9FE]"
               aria-expanded={expanded === 'custom'}
             >
               <span>Custom</span>
@@ -197,7 +197,7 @@ export function FolderPicker({
               <div className="space-y-0.5">
                 {customFolders.map((f) => (
                   <button key={f.id} type="button" onClick={() => writeFolder(f.id)} className={rowCls(f.id === currentFolderId)}>
-                    <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: f.color ?? '#C9CCC8' }} />
+                    <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ backgroundColor: f.color ?? '#BFC5CC' }} />
                     <span className="truncate">{f.name}</span>
                   </button>
                 ))}
@@ -210,13 +210,13 @@ export function FolderPicker({
                       if (e.key === 'Enter') void createCustom();
                     }}
                     placeholder="New folder"
-                    className="h-7 flex-1 rounded-lg border border-[#E7E7E2] bg-white px-2 text-[12px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
+                    className="h-8 flex-1 rounded-[9px] border border-[#E4E9F0] bg-white px-2.5 text-[12px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]"
                   />
                   <button
                     type="button"
                     onClick={() => void createCustom()}
                     disabled={creating || !newName.trim()}
-                    className="h-7 shrink-0 rounded-lg bg-[#1F5FA8] px-2.5 text-[12px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
+                    className="h-8 shrink-0 rounded-[9px] bg-[#1F5FA8] px-3 text-[12px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
                   >
                     {creating ? '…' : 'Add'}
                   </button>

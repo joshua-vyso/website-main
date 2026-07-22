@@ -20,16 +20,16 @@ export function ConfidenceBreakdown({ doc }: { doc: Document }) {
   const lowCount = cats.filter((c) => c.isLow).length;
 
   return (
-    <div className="rounded-2xl border border-[#E7E7E2] bg-white px-5 py-4">
+    <div className="rounded-2xl border border-[#EAEDF2] bg-white px-5 py-4 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
         className="flex w-full items-center justify-between text-left"
         aria-expanded={open}
       >
-        <span className="text-[15px] font-semibold text-[#1A1C1E]">Confidence breakdown</span>
+        <span className="of-display text-[16px] font-semibold text-[#171A17]">Confidence breakdown</span>
         <span
-          className="text-[#9A9DA1] transition-transform"
+          className="text-[#8A8E86] transition-transform"
           style={{ transform: open ? 'rotate(180deg)' : 'none' }}
           aria-hidden
         >
@@ -47,11 +47,11 @@ export function ConfidenceBreakdown({ doc }: { doc: Document }) {
               <div key={cat.key} className="flex items-center gap-3">
                 <span
                   className="w-[140px] shrink-0 text-[13px]"
-                  style={cat.isLow ? { color: '#854F0B' } : { color: '#5F6368' }}
+                  style={cat.isLow ? { color: '#854F0B' } : { color: '#6B6F68' }}
                 >
                   {cat.label}
                 </span>
-                <span className="h-2 flex-1 overflow-hidden rounded-full bg-[#F0F0EC]">
+                <span className="h-2 flex-1 overflow-hidden rounded-full bg-[#EEF1F5]">
                   {hasValue ? (
                     <span
                       className="block h-full rounded-full"
@@ -62,11 +62,11 @@ export function ConfidenceBreakdown({ doc }: { doc: Document }) {
                     />
                   ) : null}
                 </span>
-                <span className="w-[44px] shrink-0 text-right text-[13px] tabular-nums text-[#1A1C1E]">
+                <span className="of-num w-[44px] shrink-0 text-right text-[13px] font-semibold text-[#171A17]">
                   {hasValue ? (
                     `${Math.round(cat.confidence as number)}%`
                   ) : (
-                    <span className="text-[#9A9DA1]">—</span>
+                    <span className="font-normal text-[#A0A49C]">—</span>
                   )}
                 </span>
               </div>
@@ -75,7 +75,8 @@ export function ConfidenceBreakdown({ doc }: { doc: Document }) {
 
           {lowCount > 0 ? (
             <p className="pt-1 text-[12px] text-[#854F0B]">
-              {lowCount} {lowCount === 1 ? 'field' : 'fields'} below 90% — worth a check
+              <span className="of-num font-semibold">{lowCount}</span> {lowCount === 1 ? 'field' : 'fields'} below{' '}
+              <span className="of-num">90%</span> — worth a check
             </p>
           ) : null}
         </div>

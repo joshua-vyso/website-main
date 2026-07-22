@@ -63,11 +63,11 @@ export function TypePicker({
         type="button"
         onClick={() => setOpen((o) => !o)}
         disabled={busy}
-        className="inline-flex h-8 items-center gap-1.5 rounded-full border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#5F6368] transition-colors hover:border-[#3E7BC4]/30 disabled:opacity-50"
+        className="inline-flex h-[38px] items-center gap-1.5 rounded-full border border-[#E2E6EC] bg-white px-4 text-[13px] text-[#6B6F68] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] disabled:opacity-50"
       >
-        <span className="text-[#9A9DA1]">Type:</span>
-        <span className="max-w-[140px] truncate font-medium text-[#1A1C1E]">{label}</span>
-        <span className="text-[#9A9DA1]">▾</span>
+        <span className="text-[#A0A49C]">Type:</span>
+        <span className="max-w-[140px] truncate font-semibold text-[#171A17]">{label}</span>
+        <span className="text-[#A0A49C]">▾</span>
       </button>
 
       {open ? (
@@ -78,7 +78,7 @@ export function TypePicker({
             onClick={() => setOpen(false)}
             className="fixed inset-0 z-40 cursor-default"
           />
-          <div className="absolute right-0 top-full z-50 mt-2 w-[240px] rounded-2xl border border-[#E7E7E2] bg-white p-1.5 shadow-[0_12px_40px_-12px_rgba(26,28,30,0.25)]">
+          <div className="absolute right-0 top-full z-50 mt-2 w-[240px] rounded-2xl border border-[#EAEDF2] bg-white p-1.5 shadow-[0_12px_40px_-12px_rgba(26,28,30,0.25)]">
             {builtins.map((t) => {
               const active = !customCurrent && documentType === t.key;
               return (
@@ -87,7 +87,7 @@ export function TypePicker({
                   type="button"
                   onClick={() => pickBuiltin(t.key)}
                   className={`flex w-full items-center justify-between rounded-xl px-2.5 py-1.5 text-left text-[13px] transition-colors ${
-                    active ? 'bg-[#E7EEF8] text-[#174C87]' : 'text-[#1A1C1E] hover:bg-[#FAFAF8]'
+                    active ? 'bg-[#E7EEF8] text-[#174C87]' : 'text-[#171A17] hover:bg-[#F5F9FE]'
                   }`}
                 >
                   {t.label}
@@ -96,8 +96,8 @@ export function TypePicker({
               );
             })}
 
-            <div className="mt-1.5 border-t border-[#F0F0EC] px-1 pt-2">
-              <div className="mb-1 text-[11px] font-medium uppercase tracking-wide text-[#9A9DA1]">
+            <div className="mt-1.5 border-t border-[#EEF1F5] px-1 pt-2">
+              <div className="mb-1.5 text-[11px] font-medium uppercase tracking-[0.06em] text-[#A0A49C]">
                 Custom type
               </div>
               <div className="flex items-center gap-1.5">
@@ -109,13 +109,13 @@ export function TypePicker({
                     if (e.key === 'Enter') setCustom();
                   }}
                   placeholder="e.g. Credit note"
-                  className="h-7 flex-1 rounded-lg border border-[#E7E7E2] bg-white px-2 text-[12px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
+                  className="h-8 flex-1 rounded-[9px] border border-[#E4E9F0] bg-white px-2.5 text-[12px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]"
                 />
                 <button
                   type="button"
                   onClick={setCustom}
                   disabled={busy || !customValue.trim() || customValue.trim() === customCurrent}
-                  className="h-7 shrink-0 rounded-lg bg-[#1F5FA8] px-2.5 text-[12px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
+                  className="h-8 shrink-0 rounded-[9px] bg-[#1F5FA8] px-3 text-[12px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
                 >
                   Set
                 </button>

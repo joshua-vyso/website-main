@@ -95,10 +95,10 @@ export function ModulesOverlay({
                 >
                   <AppIcon name={m.icon} size={30} />
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[14px] font-semibold text-[#9A9DA1]">{m.label}</span>
+                    <span className="block truncate text-[14px] font-semibold text-[#8A8E86]">{m.label}</span>
                     <span className="block truncate text-[12px] text-[#9BA0A8]">{m.description}</span>
                   </span>
-                  <span className="flex shrink-0 items-center gap-1 text-[11px] text-[#9A9DA1]">
+                  <span className="flex shrink-0 items-center gap-1 text-[11px] text-[#8A8E86]">
                     <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                       <rect x="3" y="11" width="18" height="11" rx="2" />
                       <path d="M7 11V7a5 5 0 0 1 10 0v4" />
@@ -114,10 +114,10 @@ export function ModulesOverlay({
                 <div key={m.key} className={`${card} cursor-default border-[#EEF1F5] bg-[#FBFBFA]`} aria-disabled>
                   <AppIcon name={m.icon} size={30} />
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-[14px] font-semibold text-[#9A9DA1]">{m.label}</span>
+                    <span className="block truncate text-[14px] font-semibold text-[#8A8E86]">{m.label}</span>
                     <span className="block truncate text-[12px] text-[#9BA0A8]">{m.description}</span>
                   </span>
-                  <span className="shrink-0 text-[11px] text-[#9A9DA1]">soon</span>
+                  <span className="shrink-0 text-[11px] text-[#8A8E86]">soon</span>
                 </div>
               );
             }
@@ -136,7 +136,7 @@ export function ModulesOverlay({
               >
                 <AppIcon name={m.icon} size={30} />
                 <span className="min-w-0 flex-1">
-                  <span className={`block truncate text-[14px] font-semibold ${active ? 'text-[#1F5FA8]' : 'text-[#1A1C1E]'}`}>
+                  <span className={`block truncate text-[14px] font-semibold ${active ? 'text-[#1F5FA8]' : 'text-[#171A17]'}`}>
                     {m.label}
                   </span>
                   <span className={`block truncate text-[12px] ${active ? 'text-[#5C7B9E]' : 'text-[#9BA0A8]'}`}>
@@ -159,7 +159,7 @@ export function ModulesOverlay({
                   : 'border-[#EEF1F5] hover:border-[#C9DEF7] hover:bg-[#EAF2FC]'
               }`}
             >
-              <span className="flex h-[30px] w-[30px] items-center justify-center text-[#5F6368]" aria-hidden>
+              <span className="flex h-[30px] w-[30px] items-center justify-center text-[#6B6F68]" aria-hidden>
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="2" y="7" width="20" height="14" rx="2" />
                   <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
@@ -167,7 +167,7 @@ export function ModulesOverlay({
                 </svg>
               </span>
               <span className="min-w-0 flex-1">
-                <span className={`block truncate text-[14px] font-semibold ${serviceDenActive ? 'text-[#1F5FA8]' : 'text-[#1A1C1E]'}`}>
+                <span className={`block truncate text-[14px] font-semibold ${serviceDenActive ? 'text-[#1F5FA8]' : 'text-[#171A17]'}`}>
                   ServiceDen
                 </span>
                 <span className={`block truncate text-[12px] ${serviceDenActive ? 'text-[#5C7B9E]' : 'text-[#9BA0A8]'}`}>

@@ -21,33 +21,33 @@ export default async function DocuSettings() {
     <div className="px-8 py-7">
       <DocuNav />
       <div className="mt-6">
-        <h1 className="text-[26px] font-bold text-[#1A1C1E]">Doc-U settings</h1>
-        <p className="mt-1 text-[14px] text-[#5F6368]">
+        <h1 className="of-display text-[28px] font-semibold leading-tight tracking-[-0.015em] text-[#171A17]">Doc-U settings</h1>
+        <p className="mt-1.5 text-[14px] text-[#8A8E86]">
           How documents are reviewed and routed
         </p>
 
         <div className="mt-6 max-w-[820px]">
-          <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
+          <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
             <div className="flex items-start justify-between gap-4">
               <div className="min-w-0">
-                <div className="text-[15px] font-medium text-[#1A1C1E]">Units of measurement</div>
-                <p className="mt-0.5 text-[13px] text-[#9A9DA1]">
+                <div className="of-display text-[16px] font-semibold text-[#171A17]">Units of measurement</div>
+                <p className="mt-1 text-[13px] text-[#6B6F68]">
                   These fill the unit dropdown when you review a document. Managed once for the whole
                   workspace.
                 </p>
               </div>
               <Link
                 href="/app/settings"
-                className="shrink-0 rounded-lg border border-[#D7DAD8] bg-white px-3.5 py-2 text-[13px] font-medium text-[#1F5FA8] transition-colors hover:border-[#3E7BC4]/40"
+                className="inline-flex h-[38px] shrink-0 items-center rounded-[11px] border border-[#E2E6EC] bg-white px-4 text-[13px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]"
               >
                 Manage units
               </Link>
             </div>
-            <div className="mt-3 flex flex-wrap gap-1.5 border-t border-[#EFEFEC] pt-3">
+            <div className="mt-3 flex flex-wrap gap-1.5 border-t border-[#EEF1F5] pt-3">
               {units.map((u) => (
                 <span
                   key={u}
-                  className="inline-flex items-center rounded-full bg-[#F2F2EF] px-2.5 py-1 text-[12px] text-[#5F6368]"
+                  className="inline-flex items-center rounded-full bg-[#EEF1F5] px-2.5 py-1 text-[12px] font-medium text-[#6B6F68]"
                 >
                   {u}
                 </span>

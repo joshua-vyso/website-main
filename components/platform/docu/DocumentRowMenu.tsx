@@ -77,7 +77,7 @@ export function DocumentRowMenu({ id, filename }: { id: string; filename: string
         type="button"
         aria-label="Document actions"
         onClick={openMenu}
-        className="flex h-7 w-7 items-center justify-center rounded-lg text-[#9A9DA1] transition-colors hover:bg-[#F0F0EC] hover:text-[#1A1C1E]"
+        className="flex h-7 w-7 items-center justify-center rounded-lg text-[#8A8E86] transition-colors hover:bg-[#EEF1F5] hover:text-[#171A17]"
       >
         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" aria-hidden>
           <circle cx="8" cy="3" r="1.4" />
@@ -96,15 +96,15 @@ export function DocumentRowMenu({ id, filename }: { id: string; filename: string
                 className="fixed inset-0 z-[9998] cursor-default"
               />
               <div
-                style={{ position: 'fixed', top: pos.top, left: pos.left, fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties}
-                className="z-[9999] w-[208px] rounded-2xl border border-[#E4E4DF] bg-white p-2 shadow-[0_18px_50px_-8px_rgba(26,28,30,0.28)] ring-1 ring-black/[0.04]"
+                style={{ position: 'fixed', top: pos.top, left: pos.left, fontFamily: 'var(--font-instrument)', ['--radius' as string]: '0.625rem' } as React.CSSProperties}
+                className="z-[9999] w-[208px] rounded-2xl border border-[#EAEDF2] bg-white p-2 shadow-[0_18px_50px_-8px_rgba(26,28,30,0.28)] ring-1 ring-black/[0.04]"
               >
                 {mode === 'menu' ? (
                   <>
                     <button
                       type="button"
                       onClick={() => setMode('rename')}
-                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-[14px] text-[#1A1C1E] transition-colors hover:bg-[#F4F4F1]"
+                      className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-[14px] text-[#171A17] transition-colors hover:bg-[#F5F9FE]"
                     >
                       Rename
                     </button>
@@ -127,13 +127,13 @@ export function DocumentRowMenu({ id, filename }: { id: string; filename: string
                         if (e.key === 'Escape') close();
                       }}
                       aria-label="New document name"
-                      className="h-9 w-full rounded-lg border border-[#3E7BC4]/40 bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:outline-none"
+                      className="h-9 w-full rounded-[10px] border border-[#3E7BC4] bg-white px-3 text-[13px] text-[#171A17] outline-none"
                     />
                     <div className="mt-2 flex justify-end gap-1.5">
                       <button
                         type="button"
                         onClick={close}
-                        className="rounded-lg px-3 py-1.5 text-[12px] text-[#5F6368] hover:bg-[#F4F4F1]"
+                        className="inline-flex h-8 items-center rounded-[9px] px-3.5 text-[12px] font-medium text-[#6B6F68] transition-colors hover:bg-[#EAF2FC] hover:text-[#174C87]"
                       >
                         Cancel
                       </button>
@@ -141,7 +141,7 @@ export function DocumentRowMenu({ id, filename }: { id: string; filename: string
                         type="button"
                         onClick={() => void rename()}
                         disabled={busy || !value.trim()}
-                        className="rounded-lg bg-[#1F5FA8] px-3 py-1.5 text-[12px] font-medium text-white hover:bg-[#174C87] disabled:opacity-40"
+                        className="inline-flex h-8 items-center rounded-[9px] bg-[#1F5FA8] px-3.5 text-[12px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
                       >
                         {busy ? '…' : 'Save'}
                       </button>
@@ -149,14 +149,14 @@ export function DocumentRowMenu({ id, filename }: { id: string; filename: string
                   </div>
                 ) : (
                   <div className="p-1.5">
-                    <p className="px-1 text-[12px] leading-snug text-[#5F6368]">
+                    <p className="px-1 text-[12px] leading-snug text-[#6B6F68]">
                       Delete this document? This can&apos;t be undone.
                     </p>
                     <div className="mt-2 flex justify-end gap-1.5">
                       <button
                         type="button"
                         onClick={() => setMode('menu')}
-                        className="rounded-lg px-3 py-1.5 text-[12px] text-[#5F6368] hover:bg-[#F4F4F1]"
+                        className="inline-flex h-8 items-center rounded-[9px] px-3.5 text-[12px] font-medium text-[#6B6F68] transition-colors hover:bg-[#EAF2FC] hover:text-[#174C87]"
                       >
                         Cancel
                       </button>
@@ -164,7 +164,7 @@ export function DocumentRowMenu({ id, filename }: { id: string; filename: string
                         type="button"
                         onClick={() => void remove()}
                         disabled={busy}
-                        className="rounded-lg bg-[#A32D2D] px-3 py-1.5 text-[12px] font-medium text-white hover:bg-[#8f2727] disabled:opacity-40"
+                        className="inline-flex h-8 items-center rounded-[9px] bg-[#A32D2D] px-3.5 text-[12px] font-semibold text-white transition-colors hover:bg-[#8f2727] disabled:opacity-40"
                       >
                         {busy ? '…' : 'Delete'}
                       </button>

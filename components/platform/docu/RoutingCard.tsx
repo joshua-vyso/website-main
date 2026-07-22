@@ -50,14 +50,14 @@ export function RoutingCard({
   }
 
   return (
-    <div className="rounded-2xl border border-[#E7E7E2] bg-white px-5 py-4">
-      <h3 className="text-[15px] font-semibold text-[#1A1C1E]">Route to modules</h3>
-      <p className="mt-0.5 text-[12px] text-[#9A9DA1]">
+    <div className="rounded-2xl border border-[#EAEDF2] bg-white px-5 py-4 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+      <h3 className="of-display text-[16px] font-semibold text-[#171A17]">Route to modules</h3>
+      <p className="mt-0.5 text-[12px] text-[#A0A49C]">
         Doc-U feeds extracted data into your live modules automatically.
       </p>
 
       {routes.length === 0 ? (
-        <p className="mt-3 text-[13px] text-[#9A9DA1]">No module routing for this type yet.</p>
+        <p className="mt-3 text-[13px] text-[#8A8E86]">No module routing for this type yet.</p>
       ) : (
         <div className="mt-3 space-y-2">
           {routes.map((route) => {
@@ -69,23 +69,23 @@ export function RoutingCard({
             return (
               <div
                 key={route.key}
-                className="flex items-center justify-between gap-3 rounded-xl border border-[#F0F0EC] px-3 py-2.5"
+                className="flex items-center justify-between gap-3 rounded-[14px] border border-[#EEF1F5] bg-white px-3.5 py-3"
               >
                 <div className="min-w-0">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className="text-[13px] font-medium text-[#1A1C1E]">{route.label}</span>
+                    <span className="text-[13px] font-semibold text-[#171A17]">{route.label}</span>
                     {route.recommended ? (
-                      <span className="rounded-full bg-[#EAF2FC] px-2 py-0.5 text-[10px] font-medium text-[#1F5FA8]">
+                      <span className="rounded-full bg-[#EAF2FC] px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.05em] text-[#1F5FA8]">
                         Recommended
                       </span>
                     ) : null}
                     {!isLive ? (
-                      <span className="rounded-full bg-[#F0F0EC] px-2 py-0.5 text-[10px] font-medium text-[#5F6368]">
+                      <span className="rounded-full bg-[#EEF1F5] px-2 py-0.5 text-[10px] font-medium uppercase tracking-[0.05em] text-[#6B6F68]">
                         Soon
                       </span>
                     ) : null}
                   </div>
-                  <p className="mt-0.5 text-[12px] text-[#9A9DA1]">{route.reason}</p>
+                  <p className="mt-0.5 text-[12px] text-[#A0A49C]">{route.reason}</p>
                 </div>
 
                 {/* Right control */}
@@ -94,15 +94,15 @@ export function RoutingCard({
                     <div className="flex shrink-0 flex-col items-end gap-0.5">
                       <Link
                         href={mod.screens.desktop}
-                        className="text-[13px] font-medium text-[#0F6E56] transition-opacity hover:opacity-80"
+                        className="text-[13px] font-semibold text-[#0F6E56] transition-opacity hover:opacity-80"
                       >
-                        Synced ✓ · {fedItemCount} item{fedItemCount === 1 ? '' : 's'}
+                        Synced ✓ · <span className="of-num">{fedItemCount}</span> item{fedItemCount === 1 ? '' : 's'}
                       </Link>
                       <button
                         type="button"
                         onClick={resync}
                         disabled={busy}
-                        className="text-[12px] text-[#9A9DA1] transition-colors hover:text-[#1A1C1E] disabled:opacity-50"
+                        className="text-[12px] font-medium text-[#1F5FA8] transition-colors hover:text-[#174C87] disabled:opacity-50"
                       >
                         {busy ? 'Syncing…' : 'Re-sync'}
                       </button>
@@ -112,13 +112,13 @@ export function RoutingCard({
                       type="button"
                       onClick={resync}
                       disabled={busy}
-                      className="shrink-0 rounded-lg bg-[#1F5FA8] px-3 py-1.5 text-[13px] font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                      className="inline-flex h-9 shrink-0 items-center rounded-[10px] bg-[#1F5FA8] px-3.5 text-[13px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-50"
                     >
                       {busy ? 'Syncing…' : 'Push'}
                     </button>
                   )
                 ) : (
-                  <span className="shrink-0 text-[12px] text-[#C9CCC8]">Not yet available</span>
+                  <span className="shrink-0 text-[12px] text-[#A0A49C]">Not yet available</span>
                 )}
               </div>
             );

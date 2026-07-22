@@ -306,12 +306,12 @@ export function CreditNoteBuilder({
       <div className="mx-auto max-w-[880px]">
         {toastNode}
         <div className="flex items-center gap-3">
-          <Link href="/app/orderflow/credit-notes" className="text-[13px] font-medium text-[#5F6368] transition-colors hover:text-[#1A1C1E]">
+          <Link href="/app/orderflow/credit-notes" className="text-[13px] font-medium text-[#6B6F68] transition-colors hover:text-[#171A17]">
             ← Credit notes
           </Link>
         </div>
-        <h1 className="mt-1 text-[26px] font-bold text-[#1A1C1E]">New credit note</h1>
-        <p className="mt-1 text-[14px] text-[#5F6368]">Pick the invoice to credit — only invoices with an outstanding balance are shown.</p>
+        <h1 className="mt-1 text-[26px] font-bold text-[#171A17]">New credit note</h1>
+        <p className="mt-1 text-[14px] text-[#6B6F68]">Pick the invoice to credit — only invoices with an outstanding balance are shown.</p>
 
         {outstanding.length === 0 ? (
           <div className="mt-6">
@@ -333,11 +333,11 @@ export function CreditNoteBuilder({
             <div className="mt-5">
               <SearchInput value={pickerSearch} onChange={setPickerSearch} placeholder="Search invoice # or customer…" />
             </div>
-            <div className="mt-4 overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
+            <div className="mt-4 overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white">
               <div className="overflow-x-auto">
                 <table className="w-full text-[13px]">
                   <thead>
-                    <tr className="border-b border-[#F0F0EC] bg-[#FBFBF9] text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+                    <tr className="border-b border-[#EEF1F5] bg-[#FBFCFE] text-[11px] uppercase tracking-wide text-[#8A8E86]">
                       <th className="px-4 py-2.5 text-left font-medium">Invoice #</th>
                       <th className="px-2 py-2.5 text-left font-medium">Customer</th>
                       <th className="px-2 py-2.5 text-left font-medium">Issued</th>
@@ -349,7 +349,7 @@ export function CreditNoteBuilder({
                   <tbody>
                     {rows.length === 0 ? (
                       <tr>
-                        <td colSpan={6} className="px-5 py-12 text-center text-[14px] text-[#9A9DA1]">
+                        <td colSpan={6} className="px-5 py-12 text-center text-[14px] text-[#8A8E86]">
                           No invoices match your search.
                         </td>
                       </tr>
@@ -358,12 +358,12 @@ export function CreditNoteBuilder({
                         <tr
                           key={r.inv.id}
                           onClick={() => setInvoiceId(r.inv.id)}
-                          className="cursor-pointer border-b border-[#F6F6F2] last:border-0 hover:bg-[#FAFAF8]"
+                          className="cursor-pointer border-b border-[#F5F9FE] last:border-0 hover:bg-[#F5F9FE]"
                         >
-                          <td className="px-4 py-3 font-medium text-[#1A1C1E]">{r.inv.invoice_number}</td>
-                          <td className="px-2 py-3 text-[#1A1C1E]">{r.name}</td>
-                          <td className="px-2 py-3 text-[#5F6368]">{fmtDate(r.inv.issue_date)}</td>
-                          <td className="px-2 py-3 text-right tabular-nums text-[#5F6368]">{zar2(r.total)}</td>
+                          <td className="px-4 py-3 font-medium text-[#171A17]">{r.inv.invoice_number}</td>
+                          <td className="px-2 py-3 text-[#171A17]">{r.name}</td>
+                          <td className="px-2 py-3 text-[#6B6F68]">{fmtDate(r.inv.issue_date)}</td>
+                          <td className="px-2 py-3 text-right tabular-nums text-[#6B6F68]">{zar2(r.total)}</td>
                           <td className="px-2 py-3 text-right tabular-nums font-medium text-[#854F0B]">{zar2(r.balance)}</td>
                           <td className="px-2 py-3 text-right">
                             <span className="text-[13px] font-medium text-[#1F5FA8]">Credit →</span>
@@ -385,28 +385,28 @@ export function CreditNoteBuilder({
   // Credit builder (an invoice is selected)
   // ---------------------------------------------------------------------------
   const numCell =
-    'h-8 w-full rounded-md border border-[#E7E7E2] px-1.5 text-right text-[13px] tabular-nums text-[#1A1C1E] focus:border-[#3E7BC4]/50 focus:outline-none disabled:bg-[#FBFBF9] disabled:text-[#9A9DA1]';
+    'h-8 w-full rounded-md border border-[#EAEDF2] px-1.5 text-right text-[13px] tabular-nums text-[#171A17] focus:border-[#3E7BC4]/50 focus:outline-none disabled:bg-[#FBFCFE] disabled:text-[#8A8E86]';
 
   return (
     <div className="mx-auto max-w-[880px]">
       {toastNode}
 
       <div className="flex items-center gap-3">
-        <Link href="/app/orderflow/credit-notes" className="text-[13px] font-medium text-[#5F6368] transition-colors hover:text-[#1A1C1E]">
+        <Link href="/app/orderflow/credit-notes" className="text-[13px] font-medium text-[#6B6F68] transition-colors hover:text-[#171A17]">
           ← Credit notes
         </Link>
       </div>
-      <h1 className="mt-1 text-[26px] font-bold text-[#1A1C1E]">New credit note</h1>
+      <h1 className="mt-1 text-[26px] font-bold text-[#171A17]">New credit note</h1>
 
-      <div className="mt-6 space-y-5 rounded-2xl border border-[#E7E7E2] bg-white p-6">
+      <div className="mt-6 space-y-5 rounded-2xl border border-[#EAEDF2] bg-white p-6">
         {/* Source invoice summary */}
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#E7E7E2] bg-[#FBFBF9] px-4 py-3">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-[#EAEDF2] bg-[#FBFCFE] px-4 py-3">
           <div className="text-[13px]">
-            <span className="text-[#9A9DA1]">Crediting invoice</span>{' '}
+            <span className="text-[#8A8E86]">Crediting invoice</span>{' '}
             <Link href={`/app/orderflow/invoices/${invoice!.id}`} className="font-medium text-[#1F5FA8] hover:underline">
               {invoice!.invoice_number}
             </Link>
-            {customer ? <span className="text-[#5F6368]"> · {customer.name}</span> : null}
+            {customer ? <span className="text-[#6B6F68]"> · {customer.name}</span> : null}
           </div>
           {!initialValid ? (
             <button
@@ -415,7 +415,7 @@ export function CreditNoteBuilder({
                 setInvoiceId(null);
                 setSelectedFor(null);
               }}
-              className="text-[13px] font-medium text-[#5F6368] transition-colors hover:text-[#1A1C1E]"
+              className="text-[13px] font-medium text-[#6B6F68] transition-colors hover:text-[#171A17]"
             >
               Change invoice
             </button>
@@ -423,34 +423,34 @@ export function CreditNoteBuilder({
         </div>
 
         {/* Credit everything toggle */}
-        <label className="flex cursor-pointer items-center gap-2.5 text-[13px] text-[#1A1C1E]">
+        <label className="flex cursor-pointer items-center gap-2.5 text-[13px] text-[#171A17]">
           <input
             type="checkbox"
             checked={creditEverything}
             onChange={(e) => toggleEverything(e.target.checked)}
-            className="h-4 w-4 rounded border-[#D7DAD8] text-[#1F5FA8] focus:ring-[#3E7BC4]/40"
+            className="h-4 w-4 rounded border-[#E2E6EC] text-[#1F5FA8] focus:ring-[#3E7BC4]/40"
           />
           <span className="font-medium">Credit everything on this invoice</span>
-          <span className="text-[#9A9DA1]">— check to credit every line in full</span>
+          <span className="text-[#8A8E86]">— check to credit every line in full</span>
         </label>
 
         {/* Lines to credit */}
         <div>
-          <div className="mb-2 text-[13px] font-medium text-[#1A1C1E]">Lines to credit</div>
+          <div className="mb-2 text-[13px] font-medium text-[#171A17]">Lines to credit</div>
           {discountFactor < 1 ? (
-            <p className="mb-2 text-[12px] text-[#9A9DA1]">
+            <p className="mb-2 text-[12px] text-[#8A8E86]">
               Unit prices reflect the invoice&apos;s {zar2(Number(invoice!.discount) || 0)} discount, so a full credit matches what was billed.
             </p>
           ) : null}
           {lines.length === 0 ? (
-            <p className="rounded-xl border border-dashed border-[#E7E7E2] bg-[#FBFBF9] px-4 py-6 text-center text-[13px] text-[#9A9DA1]">
+            <p className="rounded-xl border border-dashed border-[#EAEDF2] bg-[#FBFCFE] px-4 py-6 text-center text-[13px] text-[#8A8E86]">
               This invoice has no line items to credit.
             </p>
           ) : (
-            <div className="overflow-x-auto rounded-xl border border-[#E7E7E2]">
+            <div className="overflow-x-auto rounded-xl border border-[#EAEDF2]">
               <table className="w-full min-w-[560px] text-[13px]">
                 <thead>
-                  <tr className="border-b border-[#F0F0EC] bg-[#FBFBF9] text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+                  <tr className="border-b border-[#EEF1F5] bg-[#FBFCFE] text-[11px] uppercase tracking-wide text-[#8A8E86]">
                     <th className="w-[44px] px-3 py-2 text-left font-medium" />
                     <th className="px-3 py-2 text-left font-medium">Item</th>
                     <th className="w-[80px] px-2 py-2 text-right font-medium">Invoiced</th>
@@ -461,21 +461,21 @@ export function CreditNoteBuilder({
                 </thead>
                 <tbody>
                   {lines.map((l) => (
-                    <tr key={l.invoice_item_id} className={`border-b border-[#F6F6F2] last:border-0 ${l.checked ? '' : 'opacity-50'}`}>
+                    <tr key={l.invoice_item_id} className={`border-b border-[#F5F9FE] last:border-0 ${l.checked ? '' : 'opacity-50'}`}>
                       <td className="px-3 py-2.5">
                         <input
                           type="checkbox"
                           checked={l.checked}
                           onChange={(e) => updateLine(l.invoice_item_id, { checked: e.target.checked })}
-                          className="h-4 w-4 rounded border-[#D7DAD8] text-[#1F5FA8] focus:ring-[#3E7BC4]/40"
+                          className="h-4 w-4 rounded border-[#E2E6EC] text-[#1F5FA8] focus:ring-[#3E7BC4]/40"
                           aria-label={`Credit ${l.name}`}
                         />
                       </td>
                       <td className="px-3 py-2.5">
-                        <span className="block text-[#1A1C1E]">{l.name}</span>
-                        {l.unit ? <span className="block text-[11px] text-[#9A9DA1]">per {l.unit}</span> : null}
+                        <span className="block text-[#171A17]">{l.name}</span>
+                        {l.unit ? <span className="block text-[11px] text-[#8A8E86]">per {l.unit}</span> : null}
                       </td>
-                      <td className="px-2 py-2.5 text-right tabular-nums text-[#5F6368]">{l.invoicedQty}</td>
+                      <td className="px-2 py-2.5 text-right tabular-nums text-[#6B6F68]">{l.invoicedQty}</td>
                       <td className="px-2 py-2.5">
                         <input
                           value={String(l.creditQty)}
@@ -485,8 +485,8 @@ export function CreditNoteBuilder({
                           className={numCell}
                         />
                       </td>
-                      <td className="px-2 py-2.5 text-right tabular-nums text-[#5F6368]">{zar2(adjPrice(l.unit_price))}</td>
-                      <td className="px-3 py-2.5 text-right tabular-nums text-[#1A1C1E]">
+                      <td className="px-2 py-2.5 text-right tabular-nums text-[#6B6F68]">{zar2(adjPrice(l.unit_price))}</td>
+                      <td className="px-3 py-2.5 text-right tabular-nums text-[#171A17]">
                         {zar2((l.checked ? Number(l.creditQty) || 0 : 0) * adjPrice(l.unit_price))}
                       </td>
                     </tr>
@@ -504,8 +504,8 @@ export function CreditNoteBuilder({
               value={reason}
               onChange={(e) => setReason(e.target.value)}
               placeholder="e.g. Damaged goods returned"
-              className={`h-9 w-full rounded-lg border bg-white px-3 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:outline-none ${
-                reason.trim() ? 'border-[#D7DAD8] focus:border-[#3E7BC4]/50' : 'border-[#D9A441]'
+              className={`h-9 w-full rounded-lg border bg-white px-3 text-[13px] text-[#171A17] placeholder:text-[#8A8E86] focus:outline-none ${
+                reason.trim() ? 'border-[#E2E6EC] focus:border-[#3E7BC4]/50' : 'border-[#D9A441]'
               }`}
             />
           </Field>
@@ -515,25 +515,25 @@ export function CreditNoteBuilder({
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
               placeholder="Anything the customer should see"
-              className="w-full rounded-lg border border-[#D7DAD8] bg-white px-3 py-2 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/50 focus:outline-none"
+              className="w-full rounded-lg border border-[#E2E6EC] bg-white px-3 py-2 text-[13px] text-[#171A17] placeholder:text-[#8A8E86] focus:border-[#3E7BC4]/50 focus:outline-none"
             />
           </Field>
         </div>
 
         {/* Credit total */}
-        <div className="flex justify-end border-t border-[#F0F0EC] pt-4">
+        <div className="flex justify-end border-t border-[#EEF1F5] pt-4">
           <div className="w-full max-w-[280px] space-y-2 text-[13px]">
             <div className="flex justify-between">
-              <span className="text-[#5F6368]">Subtotal</span>
-              <span className="tabular-nums text-[#1A1C1E]">{zar2(totals.subtotal)}</span>
+              <span className="text-[#6B6F68]">Subtotal</span>
+              <span className="tabular-nums text-[#171A17]">{zar2(totals.subtotal)}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-[#5F6368]">VAT ({invoice!.vat_rate}%)</span>
-              <span className="tabular-nums text-[#1A1C1E]">{zar2(totals.vat)}</span>
+              <span className="text-[#6B6F68]">VAT ({invoice!.vat_rate}%)</span>
+              <span className="tabular-nums text-[#171A17]">{zar2(totals.vat)}</span>
             </div>
-            <div className="flex justify-between border-t border-[#E7E7E2] pt-2 text-[16px] font-bold">
-              <span className="text-[#1A1C1E]">Credit total</span>
-              <span className="tabular-nums text-[#1A1C1E]">{zar2(totals.total)}</span>
+            <div className="flex justify-between border-t border-[#EAEDF2] pt-2 text-[16px] font-bold">
+              <span className="text-[#171A17]">Credit total</span>
+              <span className="tabular-nums text-[#171A17]">{zar2(totals.total)}</span>
             </div>
           </div>
         </div>
@@ -543,7 +543,7 @@ export function CreditNoteBuilder({
       <div className="mt-4 flex flex-wrap items-center justify-end gap-2.5">
         <Link
           href="/app/orderflow/credit-notes"
-          className="inline-flex h-9 items-center justify-center rounded-lg border border-[#D7DAD8] bg-white px-4 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:bg-[#F0F0EC]"
+          className="inline-flex h-9 items-center justify-center rounded-lg border border-[#E2E6EC] bg-white px-4 text-[13px] font-medium text-[#171A17] transition-colors hover:bg-[#EEF1F5]"
         >
           Cancel
         </Link>

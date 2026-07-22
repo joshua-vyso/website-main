@@ -115,16 +115,16 @@ export function UploadBubble({ onClose }: { onClose: () => void }) {
       <div
         role="dialog"
         aria-label="Upload document"
-        className="absolute right-0 top-full z-50 mt-2 w-[340px] rounded-2xl border border-[#E7E7E2] bg-white p-4 shadow-[0_12px_40px_-12px_rgba(26,28,30,0.25)]"
+        className="absolute right-0 top-full z-50 mt-2 w-[340px] rounded-2xl border border-[#EAEDF2] bg-white p-4 shadow-[0_12px_40px_-12px_rgba(26,28,30,0.25)]"
       >
         <div className="mb-3 flex items-center justify-between">
-          <h3 className="text-[14px] font-semibold text-[#1A1C1E]">Upload document</h3>
+          <h3 className="of-display text-[16px] font-semibold text-[#171A17]">Upload document</h3>
           <button
             type="button"
             onClick={() => (busy ? null : onClose())}
             disabled={busy}
             aria-label="Close"
-            className="text-[#9A9DA1] transition-colors hover:text-[#1A1C1E] disabled:cursor-not-allowed disabled:opacity-40"
+            className="text-[#A0A49C] transition-colors hover:text-[#171A17] disabled:cursor-not-allowed disabled:opacity-40"
           >
             ✕
           </button>
@@ -145,16 +145,16 @@ export function UploadBubble({ onClose }: { onClose: () => void }) {
             if (!busy && e.dataTransfer.files.length) void handleFiles(e.dataTransfer.files);
           }}
           onClick={() => (busy ? null : inputRef.current?.click())}
-          className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-5 py-9 text-center transition-colors ${
+          className={`flex cursor-pointer flex-col items-center justify-center rounded-[14px] border-2 border-dashed px-5 py-9 text-center transition-colors ${
             dragging
               ? 'border-[#3E7BC4] bg-[#E7EEF8]'
-              : 'border-[#E7E7E2] bg-[#FAFAF8] hover:border-[#3E7BC4]/40'
+              : 'border-[#E2E6EC] bg-[#FBFCFE] hover:border-[#3E7BC4]/40 hover:bg-[#F5F9FE]'
           }`}
         >
-          <span className="text-[13px] font-medium text-[#1A1C1E]">
+          <span className="text-[13px] font-semibold text-[#171A17]">
             {busy ? `Uploading… (${done})` : dragging ? 'Drop to upload' : 'Drag a file here'}
           </span>
-          <span className="mt-1 text-[12px] text-[#9A9DA1]">
+          <span className="mt-1 text-[12px] text-[#A0A49C]">
             {busy ? 'Doc-U is ingesting your file' : `or click to browse · PDF, JPG, PNG · up to ${MAX_MB}MB`}
           </span>
           <input
@@ -172,7 +172,7 @@ export function UploadBubble({ onClose }: { onClose: () => void }) {
         </div>
 
         {error ? (
-          <p className="mt-3 rounded-lg bg-[#FCEBEB] px-3 py-2 text-[12px] text-[#A32D2D]">{error}</p>
+          <p className="mt-3 rounded-[10px] bg-[#FCEBEB] px-3 py-2 text-[12px] font-medium text-[#A32D2D]">{error}</p>
         ) : null}
       </div>
     </>

@@ -11,9 +11,9 @@ import { Field, PrimaryBtn, inputClass } from './ui';
 
 function Section({ title, right, children }: { title: string; right?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-[#E7E7E2] bg-white p-5">
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <h3 className="text-[14px] font-semibold text-[#1A1C1E]">{title}</h3>
+    <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <h3 className="of-display text-[16px] font-semibold text-[#171A17]">{title}</h3>
         {right}
       </div>
       {children}
@@ -145,8 +145,8 @@ export function CompanyProfileDb({ data }: { data: CoreData }) {
     <div className="max-w-[820px] space-y-5">
       {toastNode}
 
-      <Section title="Business details" right={<span className="text-[12px] text-[#9A9DA1]">The &ldquo;from&rdquo; identity on your documents</span>}>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <Section title="Business details" right={<span className="text-[13px] text-[#8A8E86]">The &ldquo;from&rdquo; identity on your documents</span>}>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Company name" hint={org?.name ? `(default: ${org.name})` : undefined}>
             <input value={form.company_name} onChange={set('company_name')} placeholder={org?.name ?? 'Your business'} className={inputClass} />
           </Field>
@@ -170,8 +170,8 @@ export function CompanyProfileDb({ data }: { data: CoreData }) {
         </div>
       </Section>
 
-      <Section title="Banking details" right={<span className="text-[12px] text-[#9A9DA1]">The &ldquo;pay to&rdquo; block on invoices</span>}>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <Section title="Banking details" right={<span className="text-[13px] text-[#8A8E86]">The &ldquo;pay to&rdquo; block on invoices</span>}>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Bank"><input value={form.bank_name} onChange={set('bank_name')} placeholder="e.g. FNB, Standard Bank" className={inputClass} /></Field>
           <Field label="Account name"><input value={form.account_name} onChange={set('account_name')} placeholder="Account holder" className={inputClass} /></Field>
           <Field label="Account number"><input value={form.account_number} onChange={set('account_number')} placeholder="62xxxxxxxxx" className={inputClass} /></Field>
@@ -180,8 +180,8 @@ export function CompanyProfileDb({ data }: { data: CoreData }) {
         </div>
       </Section>
 
-      <Section title="Document text" right={<span className="text-[12px] text-[#9A9DA1]">Footer & terms printed on documents</span>}>
-        <div className="space-y-3">
+      <Section title="Document text" right={<span className="text-[13px] text-[#8A8E86]">Footer & terms printed on documents</span>}>
+        <div className="space-y-4">
           <Field label="Invoice footer" hint="(shown at the bottom of documents)">
             <textarea value={form.invoice_footer} onChange={set('invoice_footer')} placeholder="Thank you for your business." className={`${inputClass} h-16 py-2`} />
           </Field>
@@ -191,35 +191,35 @@ export function CompanyProfileDb({ data }: { data: CoreData }) {
         </div>
       </Section>
 
-      <Section title="Logo" right={<span className="text-[12px] text-[#9A9DA1]">Appears on your documents</span>}>
+      <Section title="Logo" right={<span className="text-[13px] text-[#8A8E86]">Appears on your documents</span>}>
         <div className="flex flex-wrap items-center gap-4">
-          <div className="flex h-24 w-40 items-center justify-center overflow-hidden rounded-xl border border-[#E7E7E2] bg-[#FBFBF9]">
+          <div className="flex h-24 w-40 items-center justify-center overflow-hidden rounded-[14px] border border-[#EEF1F5] bg-[#FBFCFE]">
             {logo ? (
               /* eslint-disable-next-line @next/next/no-img-element */
               <img src={logo} alt="Logo preview" className="max-h-full max-w-full object-contain" />
             ) : (
-              <span className="text-[12px] text-[#9A9DA1]">No logo</span>
+              <span className="text-[13px] text-[#A0A49C]">No logo</span>
             )}
           </div>
           <div className="space-y-2">
             <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={(e) => onLogoFile(e.target.files?.[0] ?? null)} />
             <div className="flex gap-2">
-              <button type="button" onClick={() => fileRef.current?.click()} className="rounded-lg border border-[#D7DAD8] bg-white px-3.5 py-2 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:bg-[#F0F0EC]">
+              <button type="button" onClick={() => fileRef.current?.click()} className="inline-flex h-[42px] items-center rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]">
                 {logo ? 'Replace logo' : 'Upload logo'}
               </button>
               {logo ? (
-                <button type="button" onClick={() => setLogo(null)} className="rounded-lg px-3.5 py-2 text-[13px] font-medium text-[#A32D2D] transition-colors hover:bg-[#F3E7E7]">
+                <button type="button" onClick={() => setLogo(null)} className="inline-flex h-[42px] items-center rounded-[11px] px-[18px] text-[14px] font-medium text-[#A32D2D] transition-colors hover:bg-[#F3E7E7]">
                   Remove
                 </button>
               ) : null}
             </div>
-            <p className="text-[12px] text-[#9A9DA1]">PNG or JPG, under 4 MB. Auto-resized for documents.</p>
+            <p className="text-[12px] text-[#A0A49C]">PNG or JPG, under 4 MB. Auto-resized for documents.</p>
           </div>
         </div>
       </Section>
 
       <div className="flex items-center justify-end gap-3">
-        {error ? <span className="text-[12px] text-[#A32D2D]">{error}</span> : null}
+        {error ? <span className="text-[13px] text-[#A32D2D]">{error}</span> : null}
         <PrimaryBtn onClick={save} disabled={busy}>{busy ? 'Saving…' : 'Save profile'}</PrimaryBtn>
       </div>
     </div>

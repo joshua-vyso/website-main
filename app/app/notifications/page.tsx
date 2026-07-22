@@ -20,7 +20,7 @@ function NotifRow({ n }: { n: ModuleNotification }) {
   return (
     <div className="flex items-start gap-3.5 py-3.5">
       <div
-        className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-lg"
+        className="flex h-[38px] w-[38px] shrink-0 items-center justify-center rounded-[11px]"
         style={{ backgroundColor: n.bg }}
       >
         <span className="h-[15px] w-[15px] rounded-[3px]" style={{ backgroundColor: n.fg }} />
@@ -33,12 +33,12 @@ function NotifRow({ n }: { n: ModuleNotification }) {
           >
             {n.moduleLabel}
           </span>
-          <span className="text-[11px] text-[#9A9DA1]">{n.kindLabel}</span>
+          <span className="text-[11px] uppercase tracking-[0.05em] text-[#A0A49C]">{n.kindLabel}</span>
         </div>
-        <div className="truncate text-[14px] font-medium text-[#1A1C1E]">{n.title}</div>
-        {n.body ? <div className="mt-0.5 text-[12px] text-[#9A9DA1]">{n.body}</div> : null}
+        <div className="truncate text-[14px] font-semibold text-[#171A17]">{n.title}</div>
+        {n.body ? <div className="mt-0.5 text-[13px] text-[#6B6F68]">{n.body}</div> : null}
       </div>
-      <div className="shrink-0 pt-0.5 text-[12px] text-[#9A9DA1]">{timeLabel(n.created_at, new Date())}</div>
+      <div className="of-num shrink-0 pt-0.5 text-[12px] text-[#A0A49C]">{timeLabel(n.created_at, new Date())}</div>
     </div>
   );
 }
@@ -47,10 +47,10 @@ function Group({ label, notifs }: { label: string; notifs: ModuleNotification[] 
   if (notifs.length === 0) return null;
   return (
     <div>
-      <div className="mb-2 text-[11px] uppercase tracking-wide text-[#9A9DA1]">{label}</div>
-      <div className="rounded-2xl border border-[#E7E7E2] bg-white px-4 py-1">
+      <div className="mb-2 text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">{label}</div>
+      <div className="rounded-2xl border border-[#EAEDF2] bg-white px-5 py-1 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
         {notifs.map((n, i) => (
-          <div key={n.id} className={i > 0 ? 'border-t border-[#EFEFEC]' : ''}>
+          <div key={n.id} className={i > 0 ? 'border-t border-[#F4F5F7]' : ''}>
             <NotifRow n={n} />
           </div>
         ))}
@@ -84,13 +84,13 @@ export default async function NotificationsPage() {
   return (
     <div className="px-8 py-7">
       <div>
-        <h1 className="text-[26px] font-bold text-[#1A1C1E]">Notifications</h1>
-        <p className="mt-1 text-[14px] text-[#5F6368]">Everything happening across your modules, newest first</p>
+        <h1 className="of-display text-[28px] font-semibold leading-tight tracking-[-0.015em] text-[#171A17]">Notifications</h1>
+        <p className="mt-1.5 text-[14px] text-[#8A8E86]">Everything happening across your modules, newest first</p>
       </div>
 
       <div className="mt-6">
         {notifs.length === 0 ? (
-          <div className="rounded-2xl border border-[#E7E7E2] bg-white px-4 py-10 text-center text-[13px] text-[#9A9DA1]">
+          <div className="rounded-2xl border border-[#EAEDF2] bg-white px-5 py-12 text-center text-[14px] text-[#8A8E86] shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
             No notifications yet.
           </div>
         ) : (

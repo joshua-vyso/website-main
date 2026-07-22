@@ -95,8 +95,8 @@ async function writeDroppingMissing(
 // Section card (matches CustomerProfile's SectionCard)
 // ---------------------------------------------------------------------------
 
-const sectionCls = 'rounded-2xl border border-[#E7E7E2] bg-white p-5';
-const sectionTitle = 'text-[13px] font-semibold text-[#1A1C1E]';
+const sectionCls = 'rounded-2xl border border-[#EAEDF2] bg-white p-5';
+const sectionTitle = 'text-[13px] font-semibold text-[#171A17]';
 
 function SectionCard({ title, subtitle, action, children }: { title: string; subtitle?: string; action?: React.ReactNode; children: React.ReactNode }) {
   return (
@@ -104,7 +104,7 @@ function SectionCard({ title, subtitle, action, children }: { title: string; sub
       <div className="mb-3 flex items-start justify-between gap-3">
         <div className="min-w-0">
           <h3 className={sectionTitle}>{title}</h3>
-          {subtitle ? <p className="mt-0.5 text-[12px] text-[#9A9DA1]">{subtitle}</p> : null}
+          {subtitle ? <p className="mt-0.5 text-[12px] text-[#8A8E86]">{subtitle}</p> : null}
         </div>
         {action}
       </div>
@@ -118,8 +118,8 @@ function Toggle({ checked, onChange, label, hint }: { checked: boolean; onChange
     <label className="flex cursor-pointer items-start gap-2.5 text-[13px]">
       <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="mt-0.5 accent-[#3E7BC4]" />
       <span>
-        <span className="font-medium text-[#1A1C1E]">{label}</span>
-        {hint ? <span className="mt-0.5 block text-[12px] font-normal text-[#9A9DA1]">{hint}</span> : null}
+        <span className="font-medium text-[#171A17]">{label}</span>
+        {hint ? <span className="mt-0.5 block text-[12px] font-normal text-[#8A8E86]">{hint}</span> : null}
       </span>
     </label>
   );
@@ -315,7 +315,7 @@ function AiInvoicingParams({ customer }: { customer: OfCustomer }) {
           </select>
         </Field>
 
-        <div className="rounded-xl border border-[#F0F0EC] bg-[#FCFCFB] px-3.5 py-3">
+        <div className="rounded-xl border border-[#EEF1F5] bg-[#FCFCFB] px-3.5 py-3">
           <Toggle
             checked={draft.strip_order_prefixes}
             onChange={(v) => setDraft({ ...draft, strip_order_prefixes: v })}
@@ -325,8 +325,8 @@ function AiInvoicingParams({ customer }: { customer: OfCustomer }) {
         </div>
 
         {/* Automation */}
-        <div className="rounded-xl border border-[#F0F0EC] bg-[#FCFCFB] px-3.5 py-3">
-          <div className="mb-2.5 text-[11px] font-semibold uppercase tracking-wide text-[#9A9DA1]">Automation</div>
+        <div className="rounded-xl border border-[#EEF1F5] bg-[#FCFCFB] px-3.5 py-3">
+          <div className="mb-2.5 text-[11px] font-semibold uppercase tracking-wide text-[#8A8E86]">Automation</div>
           <div className="space-y-3">
             <Field label="Auto-invoice confidence" hint="0–100 · match ≥ this auto-invoices">
               <input
@@ -559,9 +559,9 @@ function OrderMappings({
     >
       {toastNode}
       {aliases.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-4 py-6 text-center">
-          <p className="text-[13px] font-medium text-[#1A1C1E]">No order mappings yet</p>
-          <p className="mx-auto mt-1 max-w-sm text-[12px] text-[#5F6368]">
+        <div className="rounded-xl border border-dashed border-[#E2E6EC] bg-[#FBFCFE] px-4 py-6 text-center">
+          <p className="text-[13px] font-medium text-[#171A17]">No order mappings yet</p>
+          <p className="mx-auto mt-1 max-w-sm text-[12px] text-[#6B6F68]">
             Map a customer&apos;s exact order name to your catalogue. E.g. Bakubung sends &ldquo;FF - NAARTJIES Box&rdquo; — map it to
             &ldquo;Naartjies&rdquo; billed per box, and every future order rectifies automatically.
           </p>
@@ -570,7 +570,7 @@ function OrderMappings({
         <div className="overflow-x-auto">
           <table className="w-full text-[13px]">
             <thead>
-              <tr className="border-b border-[#F0F0EC] text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+              <tr className="border-b border-[#EEF1F5] text-[11px] uppercase tracking-wide text-[#8A8E86]">
                 <th className="py-1.5 pr-2 text-left font-medium">Their name</th>
                 <th className="px-2 py-1.5 text-left font-medium">Catalogue item</th>
                 <th className="px-2 py-1.5 text-left font-medium">Invoice name</th>
@@ -586,17 +586,17 @@ function OrderMappings({
                     ? ALIAS_QUANTITY_BASES.find((q) => q.value === a.quantity_basis)?.label ?? a.quantity_basis
                     : null;
                 return (
-                  <tr key={a.id} className="border-b border-[#F6F6F2] last:border-0 align-top">
-                    <td className="py-2 pr-2 font-medium text-[#1A1C1E]">{a.raw_name}</td>
-                    <td className="px-2 py-2 text-[#5F6368]">{product ? product.name : a.stock_item_id ? 'Unknown item' : '—'}</td>
-                    <td className="px-2 py-2 text-[#5F6368]">
+                  <tr key={a.id} className="border-b border-[#F5F9FE] last:border-0 align-top">
+                    <td className="py-2 pr-2 font-medium text-[#171A17]">{a.raw_name}</td>
+                    <td className="px-2 py-2 text-[#6B6F68]">{product ? product.name : a.stock_item_id ? 'Unknown item' : '—'}</td>
+                    <td className="px-2 py-2 text-[#6B6F68]">
                       {a.invoice_name || '—'}
-                      {basisLabel ? <span className="ml-1 text-[11px] text-[#9A9DA1]">· {basisLabel}</span> : null}
+                      {basisLabel ? <span className="ml-1 text-[11px] text-[#8A8E86]">· {basisLabel}</span> : null}
                     </td>
-                    <td className="px-2 py-2 text-[#5F6368]">{a.unit || '—'}</td>
+                    <td className="px-2 py-2 text-[#6B6F68]">{a.unit || '—'}</td>
                     <td className="py-2 pl-2 text-right">
                       <div className="flex justify-end gap-2">
-                        <button type="button" onClick={() => startEdit(a)} className="text-[12px] text-[#5F6368] hover:text-[#1A1C1E]">
+                        <button type="button" onClick={() => startEdit(a)} className="text-[12px] text-[#6B6F68] hover:text-[#171A17]">
                           Edit
                         </button>
                         <button type="button" onClick={() => setConfirmDel(a.id)} className="text-[12px] text-[#A32D2D] hover:underline">
@@ -659,31 +659,31 @@ function OrderMappings({
                     setDraft((d) => ({ ...d, stock_item_id: '' }));
                     setProductQuery('');
                   }}
-                  className="text-[#9A9DA1] hover:text-[#1A1C1E]"
+                  className="text-[#8A8E86] hover:text-[#171A17]"
                 >
                   Clear
                 </button>
               </div>
             ) : (
-              <div className="mt-1.5 max-h-44 overflow-y-auto overflow-hidden rounded-xl border border-[#E7E7E2]">
+              <div className="mt-1.5 max-h-44 overflow-y-auto overflow-hidden rounded-xl border border-[#EAEDF2]">
                 {products.length === 0 ? (
-                  <div className="px-3 py-3 text-[12px] text-[#9A9DA1]">
+                  <div className="px-3 py-3 text-[12px] text-[#8A8E86]">
                     No products in the catalogue yet — add them in Databases → Products.
                   </div>
                 ) : matchingProducts.length === 0 ? (
-                  <div className="px-3 py-3 text-[12px] text-[#9A9DA1]">No matching products.</div>
+                  <div className="px-3 py-3 text-[12px] text-[#8A8E86]">No matching products.</div>
                 ) : (
                   matchingProducts.map((p) => (
                     <button
                       key={p.id}
                       type="button"
                       onClick={() => pickProduct(p)}
-                      className="flex w-full items-center justify-between gap-3 border-b border-[#F0F0EC] px-3 py-2 text-left last:border-0 transition-colors hover:bg-[#FBFBF9]"
+                      className="flex w-full items-center justify-between gap-3 border-b border-[#EEF1F5] px-3 py-2 text-left last:border-0 transition-colors hover:bg-[#FBFCFE]"
                     >
                       <span className="min-w-0">
-                        <span className="block truncate text-[13px] font-medium text-[#1A1C1E]">{p.name}</span>
+                        <span className="block truncate text-[13px] font-medium text-[#171A17]">{p.name}</span>
                         {p.category || p.unit ? (
-                          <span className="block truncate text-[11px] text-[#9A9DA1]">
+                          <span className="block truncate text-[11px] text-[#8A8E86]">
                             {[p.category, p.unit ? `per ${p.unit}` : null].filter(Boolean).join(' · ')}
                           </span>
                         ) : null}

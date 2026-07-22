@@ -19,10 +19,10 @@ function isMissingTable(msg: string): boolean {
 
 function Section({ title, subtitle, children }: { title: string; subtitle?: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-[#E7E7E2] bg-white p-5">
+    <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5">
       <div className="mb-4">
-        <h3 className="text-[14px] font-semibold text-[#1A1C1E]">{title}</h3>
-        {subtitle ? <p className="mt-0.5 text-[13px] text-[#5F6368]">{subtitle}</p> : null}
+        <h3 className="text-[14px] font-semibold text-[#171A17]">{title}</h3>
+        {subtitle ? <p className="mt-0.5 text-[13px] text-[#6B6F68]">{subtitle}</p> : null}
       </div>
       {children}
     </div>
@@ -43,17 +43,17 @@ const DOC_KINDS: { label: string; prefixKey: PrefixKey; nextKey: NextKey }[] = [
 
 function LinkRow({ title, body, links }: { title: string; body: string; links: { label: string; href: string }[] }) {
   return (
-    <div className="flex flex-col gap-2 rounded-xl border border-[#E7E7E2] bg-[#FBFBF9] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="flex flex-col gap-2 rounded-xl border border-[#EAEDF2] bg-[#FBFCFE] px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
       <div className="min-w-0">
-        <div className="text-[13px] font-medium text-[#1A1C1E]">{title}</div>
-        <p className="mt-0.5 text-[12px] text-[#5F6368]">{body}</p>
+        <div className="text-[13px] font-medium text-[#171A17]">{title}</div>
+        <p className="mt-0.5 text-[12px] text-[#6B6F68]">{body}</p>
       </div>
       <div className="flex shrink-0 flex-wrap gap-2">
         {links.map((l) => (
           <Link
             key={l.href}
             href={l.href}
-            className="inline-flex h-9 items-center justify-center rounded-lg border border-[#D7DAD8] bg-white px-3.5 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:bg-[#F0F0EC]"
+            className="inline-flex h-9 items-center justify-center rounded-lg border border-[#E2E6EC] bg-white px-3.5 text-[13px] font-medium text-[#171A17] transition-colors hover:bg-[#EEF1F5]"
           >
             {l.label}
           </Link>
@@ -205,8 +205,8 @@ export function OrderFlowSettingsView({
       {toastNode}
 
       <div>
-        <h2 className="text-[18px] font-semibold text-[#1A1C1E]">Settings</h2>
-        <p className="mt-0.5 text-[13px] text-[#5F6368]">
+        <h2 className="text-[18px] font-semibold text-[#171A17]">Settings</h2>
+        <p className="mt-0.5 text-[13px] text-[#6B6F68]">
           Document numbering and defaults for OrderFlow. Company details, templates, payment terms and VAT rates live in
           Core Data (Doc-U → Databases).
         </p>
@@ -230,8 +230,8 @@ export function OrderFlowSettingsView({
           </Field>
         </div>
 
-        <div className="overflow-hidden rounded-xl border border-[#E7E7E2]">
-          <div className="hidden grid-cols-[1.1fr_1.4fr_1fr_1.4fr] gap-3 border-b border-[#E7E7E2] bg-[#FBFBF9] px-4 py-2.5 text-[11px] font-medium uppercase tracking-wide text-[#9A9DA1] sm:grid">
+        <div className="overflow-hidden rounded-xl border border-[#EAEDF2]">
+          <div className="hidden grid-cols-[1.1fr_1.4fr_1fr_1.4fr] gap-3 border-b border-[#EAEDF2] bg-[#FBFCFE] px-4 py-2.5 text-[11px] font-medium uppercase tracking-wide text-[#8A8E86] sm:grid">
             <div>Document</div>
             <div>Prefix</div>
             <div>Next number</div>
@@ -244,10 +244,10 @@ export function OrderFlowSettingsView({
               <div
                 key={k.prefixKey}
                 className={`grid grid-cols-1 gap-3 px-4 py-3 sm:grid-cols-[1.1fr_1.4fr_1fr_1.4fr] sm:items-center ${
-                  i > 0 ? 'border-t border-[#F0F0EC]' : ''
+                  i > 0 ? 'border-t border-[#EEF1F5]' : ''
                 }`}
               >
-                <div className="text-[13px] font-medium text-[#1A1C1E]">{k.label}</div>
+                <div className="text-[13px] font-medium text-[#171A17]">{k.label}</div>
                 <input
                   value={prefixes[k.prefixKey]}
                   onChange={(e) => setPrefixes({ ...prefixes, [k.prefixKey]: e.target.value })}
@@ -261,7 +261,7 @@ export function OrderFlowSettingsView({
                   onChange={(e) => setNexts({ ...nexts, [k.nextKey]: e.target.value })}
                   className={inputClass}
                 />
-                <div className="truncate rounded-lg bg-[#FBFBF9] px-3 py-2 font-mono text-[13px] text-[#1A1C1E]">{preview}</div>
+                <div className="truncate rounded-lg bg-[#FBFCFE] px-3 py-2 font-mono text-[13px] text-[#171A17]">{preview}</div>
               </div>
             );
           })}
@@ -281,7 +281,7 @@ export function OrderFlowSettingsView({
               {numberBusy ? 'Saving…' : 'Save numbering'}
             </PrimaryBtn>
           ) : (
-            <span className="text-[12px] text-[#9A9DA1]">Only an owner or admin can change this.</span>
+            <span className="text-[12px] text-[#8A8E86]">Only an owner or admin can change this.</span>
           )}
         </div>
       </Section>
@@ -353,7 +353,7 @@ export function OrderFlowSettingsView({
         <div className="mt-4 flex items-center justify-end gap-3">
           {defaultsError ? <span className="text-[12px] text-[#A32D2D]">{defaultsError}</span> : null}
           {!isAdmin ? (
-            <span className="text-[12px] text-[#9A9DA1]">Only an owner or admin can change this.</span>
+            <span className="text-[12px] text-[#8A8E86]">Only an owner or admin can change this.</span>
           ) : (
           <PrimaryBtn onClick={saveDefaults} disabled={defaultsBusy}>
             {defaultsBusy ? 'Saving…' : 'Save defaults'}
@@ -392,19 +392,19 @@ export function OrderFlowSettingsView({
       {/* 4. Placeholders ------------------------------------------------- */}
       <Section title="More" subtitle="Coming to OrderFlow.">
         <div className="space-y-2.5">
-          <div className="flex items-center justify-between rounded-xl border border-[#E7E7E2] bg-[#FBFBF9] px-4 py-3">
+          <div className="flex items-center justify-between rounded-xl border border-[#EAEDF2] bg-[#FBFCFE] px-4 py-3">
             <div className="min-w-0">
-              <div className="text-[13px] font-medium text-[#1A1C1E]">Email sending</div>
-              <p className="mt-0.5 text-[12px] text-[#5F6368]">Send invoices and quotes to customers directly from OrderFlow.</p>
+              <div className="text-[13px] font-medium text-[#171A17]">Email sending</div>
+              <p className="mt-0.5 text-[12px] text-[#6B6F68]">Send invoices and quotes to customers directly from OrderFlow.</p>
             </div>
-            <span className="shrink-0 text-[12px] text-[#9A9DA1]">· soon</span>
+            <span className="shrink-0 text-[12px] text-[#8A8E86]">· soon</span>
           </div>
-          <div className="flex items-center justify-between rounded-xl border border-[#E7E7E2] bg-[#FBFBF9] px-4 py-3">
+          <div className="flex items-center justify-between rounded-xl border border-[#EAEDF2] bg-[#FBFCFE] px-4 py-3">
             <div className="min-w-0">
-              <div className="text-[13px] font-medium text-[#1A1C1E]">User permissions</div>
-              <p className="mt-0.5 text-[12px] text-[#5F6368]">Control who can issue, edit and void documents.</p>
+              <div className="text-[13px] font-medium text-[#171A17]">User permissions</div>
+              <p className="mt-0.5 text-[12px] text-[#6B6F68]">Control who can issue, edit and void documents.</p>
             </div>
-            <span className="shrink-0 text-[12px] text-[#9A9DA1]">· soon</span>
+            <span className="shrink-0 text-[12px] text-[#8A8E86]">· soon</span>
           </div>
         </div>
       </Section>

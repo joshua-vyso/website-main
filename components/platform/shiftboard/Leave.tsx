@@ -11,7 +11,7 @@ import { LEAVE_TYPE_TONE, type LeaveRequest, type LeaveStatus } from '@/lib/plat
 import { DeptBadge } from './shared';
 import { useShiftBoard } from './context';
 
-const MODAL_RADIUS = { fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties;
+const MODAL_RADIUS = { fontFamily: 'var(--font-instrument)', ['--radius' as string]: '0.625rem' } as React.CSSProperties;
 
 export function LeaveWorkspace() {
   const { node, show } = useToast();
@@ -59,8 +59,8 @@ export function LeaveWorkspace() {
     <div className="space-y-5">
       {node}
       <div>
-        <h1 className="text-[24px] font-bold leading-tight text-[#1A1C1E]">Leave</h1>
-        <p className="mt-0.5 text-[14px] text-[#5F6368]">Requests, balances and the coverage impact of time off</p>
+        <h1 className="of-display text-[28px] font-semibold leading-tight tracking-[-0.015em] text-[#171A17]">Leave</h1>
+        <p className="mt-1.5 text-[14px] text-[#8A8E86]">Requests, balances and the coverage impact of time off</p>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
@@ -72,35 +72,35 @@ export function LeaveWorkspace() {
       </div>
 
       {requests.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-10 text-center text-[13px] text-[#5F6368]">No leave requests right now.</div>
+        <div className="rounded-2xl border border-dashed border-[#E2E6EC] bg-[#FBFCFE] px-6 py-10 text-center text-[14px] text-[#8A8E86]">No leave requests right now.</div>
       ) : null}
       <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
         {requests.map((r) => (
-          <div key={r.id} className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
+          <div key={r.id} className="rounded-2xl border border-[#EAEDF2] bg-white p-4 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
             <div className="flex items-start justify-between gap-2">
               <div>
-                <div className="text-[14px] font-semibold text-[#1A1C1E]">{r.name}</div>
-                <div className="mt-0.5 flex items-center gap-2 text-[12px] text-[#9A9DA1]"><DeptBadge department={r.department} /></div>
+                <div className="of-display text-[15px] font-semibold text-[#171A17]">{r.name}</div>
+                <div className="mt-0.5 flex items-center gap-2 text-[12px] text-[#8A8E86]"><DeptBadge department={r.department} /></div>
               </div>
               <Badge label={r.type} tone={LEAVE_TYPE_TONE[r.type]} />
             </div>
-            <div className="mt-2 flex items-center gap-2 text-[13px] text-[#5F6368]">
-              <span className="tabular-nums">{r.start}{r.end !== r.start ? ` – ${r.end}` : ''}</span>
+            <div className="mt-2 flex items-center gap-2 text-[13px] text-[#6B6F68]">
+              <span className="of-num">{r.start}{r.end !== r.start ? ` – ${r.end}` : ''}</span>
               <span className="text-[#C4C7CA]">·</span>
-              <span>{r.days} day{r.days > 1 ? 's' : ''}</span>
+              <span><span className="of-num">{r.days}</span> day{r.days > 1 ? 's' : ''}</span>
             </div>
-            <div className="mt-2.5 flex items-start gap-2 rounded-lg px-3 py-2 text-[12px]" style={{ backgroundColor: r.coverageRisk === 'high' ? '#FCEBEB' : r.coverageRisk === 'low' ? '#FBF5E9' : '#F4F7F5', color: r.coverageRisk === 'high' ? '#A32D2D' : r.coverageRisk === 'low' ? '#854F0B' : '#0F6E56' }}>
+            <div className="mt-2.5 flex items-start gap-2 rounded-[10px] px-3 py-2 text-[12px]" style={{ backgroundColor: r.coverageRisk === 'high' ? '#FCEBEB' : r.coverageRisk === 'low' ? '#FBF5E9' : '#F4F7F5', color: r.coverageRisk === 'high' ? '#A32D2D' : r.coverageRisk === 'low' ? '#854F0B' : '#0F6E56' }}>
               <span className="mt-0.5 text-[10px]">{r.coverageRisk === 'none' ? '✓' : '▲'}</span>
               <span>{r.coverageImpact}</span>
             </div>
             <div className="mt-3 flex items-center justify-between">
               {r.status === 'Pending' ? (
                 <div className="flex gap-2">
-                  <button type="button" onClick={() => approve(r)} className="rounded-lg bg-[#1F5FA8] px-3 py-1.5 text-[12px] font-medium text-white hover:bg-[#174C87]">Approve</button>
-                  <button type="button" onClick={() => decline(r)} className="rounded-lg border border-[#D7DAD8] px-3 py-1.5 text-[12px] font-medium text-[#5F6368] hover:border-[#3E7BC4]/40">Decline</button>
+                  <button type="button" onClick={() => approve(r)} className="inline-flex h-9 items-center rounded-[10px] bg-[#1F5FA8] px-3.5 text-[13px] font-semibold text-white transition-colors hover:bg-[#174C87]">Approve</button>
+                  <button type="button" onClick={() => decline(r)} className="inline-flex h-9 items-center rounded-[10px] border border-[#E2E6EC] bg-white px-3.5 text-[13px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]">Decline</button>
                 </div>
               ) : (
-                <span className="text-[12px] text-[#9A9DA1]">No actions</span>
+                <span className="text-[12px] text-[#A0A49C]">No actions</span>
               )}
               <Badge label={r.status} tone={r.status === 'Approved' ? 'positive' : r.status === 'Declined' ? 'critical' : 'warning'} />
             </div>
@@ -132,17 +132,17 @@ function CoverageWarningModal({ request, onClose, onConfirm }: { request: LeaveR
   if (!mounted || !request) return null;
   return createPortal(
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" style={MODAL_RADIUS}>
-      <div className="absolute inset-0 bg-[#1A1C1E]/25 backdrop-blur-[1px]" onClick={onClose} />
-      <div role="dialog" aria-modal="true" className="relative w-full max-w-[420px] rounded-2xl border border-[#E7E7E2] bg-white p-5 shadow-[0_24px_70px_-20px_rgba(26,28,30,0.45)]">
+      <div className="absolute inset-0 bg-[#171A17]/25 backdrop-blur-[1px]" onClick={onClose} />
+      <div role="dialog" aria-modal="true" className="relative w-full max-w-[420px] rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_24px_70px_-20px_rgba(26,28,30,0.45)]">
         <div className="flex items-center gap-2">
           <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#FCEBEB] text-[#A32D2D]">▲</span>
-          <h2 className="text-[16px] font-semibold text-[#1A1C1E]">Coverage warning</h2>
+          <h2 className="of-display text-[18px] font-semibold text-[#171A17]">Coverage warning</h2>
         </div>
-        <p className="mt-3 text-[14px] text-[#1A1C1E]">{request.coverageImpact}</p>
-        <p className="mt-2 text-[13px] text-[#5F6368]">Approving {request.name}&rsquo;s {request.type.toLowerCase()} will reduce {request.department} cover. Make sure you can fill the gap before confirming.</p>
+        <p className="mt-3 text-[14px] text-[#171A17]">{request.coverageImpact}</p>
+        <p className="mt-2 text-[13px] text-[#6B6F68]">Approving {request.name}&rsquo;s {request.type.toLowerCase()} will reduce {request.department} cover. Make sure you can fill the gap before confirming.</p>
         <div className="mt-5 flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="rounded-lg px-3.5 py-2 text-[13px] text-[#5F6368] hover:bg-black/[0.03]">Cancel</button>
-          <button type="button" onClick={onConfirm} className="rounded-lg bg-[#A32D2D] px-4 py-2 text-[13px] font-medium text-white hover:bg-[#8a2626]">Approve anyway</button>
+          <button type="button" onClick={onClose} className="inline-flex h-[42px] items-center rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]">Cancel</button>
+          <button type="button" onClick={onConfirm} className="inline-flex h-[42px] items-center rounded-[11px] bg-[#A32D2D] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#8a2626]">Approve anyway</button>
         </div>
       </div>
     </div>,

@@ -144,12 +144,12 @@ export function TopBar() {
                 {initials(org?.name)}
               </span>
               <span className="hidden min-w-0 md:block">
-                <span className="block max-w-[150px] truncate text-[13px] font-medium text-[#1A1C1E]">
+                <span className="block max-w-[150px] truncate text-[13px] font-medium text-[#171A17]">
                   {org?.name ?? 'Your organisation'}
                 </span>
-                <span className="block max-w-[150px] truncate text-[11px] text-[#9A9DA1]">{email ?? '—'}</span>
+                <span className="block max-w-[150px] truncate text-[11px] text-[#8A8E86]">{email ?? '—'}</span>
               </span>
-              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#9A9DA1" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#8A8E86" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
                 <path d="m6 9 6 6 6-6" />
               </svg>
             </button>
@@ -159,15 +159,15 @@ export function TopBar() {
                 role="menu"
                 className="vyso-pop-in absolute right-0 top-full z-40 mt-2 w-[236px] overflow-hidden rounded-xl border border-[#E4E9F0] bg-white py-1 shadow-[0_16px_50px_-12px_rgba(20,30,50,0.28)]"
               >
-                <div className="border-b border-[#F0F0EC] px-3.5 pb-2 pt-2.5">
-                  <div className="truncate text-[13px] font-medium text-[#1A1C1E]">{org?.name ?? 'Your organisation'}</div>
-                  <div className="truncate text-[12px] text-[#9A9DA1]">{org?.location ?? '—'} · Founding client</div>
+                <div className="border-b border-[#EEF1F5] px-3.5 pb-2 pt-2.5">
+                  <div className="truncate text-[13px] font-medium text-[#171A17]">{org?.name ?? 'Your organisation'}</div>
+                  <div className="truncate text-[12px] text-[#8A8E86]">{org?.location ?? '—'} · Founding client</div>
                 </div>
                 <Link
                   href="/app/organisation"
                   role="menuitem"
                   onClick={() => setAccountOpen(false)}
-                  className="block px-3.5 py-2 text-[13px] text-[#1A1C1E] transition-colors hover:bg-[#EAF2FC]"
+                  className="block px-3.5 py-2 text-[13px] text-[#171A17] transition-colors hover:bg-[#EAF2FC]"
                 >
                   My Organisation
                 </Link>
@@ -175,7 +175,7 @@ export function TopBar() {
                   href="/app/settings"
                   role="menuitem"
                   onClick={() => setAccountOpen(false)}
-                  className="block px-3.5 py-2 text-[13px] text-[#1A1C1E] transition-colors hover:bg-[#EAF2FC]"
+                  className="block px-3.5 py-2 text-[13px] text-[#171A17] transition-colors hover:bg-[#EAF2FC]"
                 >
                   Settings
                 </Link>

@@ -74,14 +74,14 @@ export function InvoicesView() {
       </div>
 
       {!canBuild ? (
-        <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
-          <p className="text-[15px] font-medium text-[#1A1C1E]">Add a customer and a service first</p>
-          <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">Invoices are built from your customers and the services on your price book — add at least one of each, then create an invoice here.</p>
+        <div className="rounded-2xl border border-dashed border-[#D8DFE8] bg-white px-6 py-12 text-center">
+          <p className="of-display text-[18px] font-semibold text-[#171A17]">Add a customer and a service first</p>
+          <p className="mx-auto mt-2 max-w-md text-[14px] text-[#6B6F68]">Invoices are built from your customers and the services on your price book — add at least one of each, then create an invoice here.</p>
         </div>
       ) : invoices.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
-          <p className="text-[15px] font-medium text-[#1A1C1E]">No invoices yet</p>
-          <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">Create an invoice, pick the services on it, and export it to PDF.</p>
+        <div className="rounded-2xl border border-dashed border-[#D8DFE8] bg-white px-6 py-12 text-center">
+          <p className="of-display text-[18px] font-semibold text-[#171A17]">No invoices yet</p>
+          <p className="mx-auto mt-2 max-w-md text-[14px] text-[#6B6F68]">Create an invoice, pick the services on it, and export it to PDF.</p>
         </div>
       ) : (
         <DataTable
@@ -94,9 +94,9 @@ export function InvoicesView() {
             else actions.push({ label: 'Move to draft', onClick: () => void setStatus(inv, 'draft') });
             actions.push({ label: 'Delete', onClick: () => void remove(inv), danger: true });
             return [
-              <Link key="n" href={`/app/serviceden/invoices/${inv.id}`} className="font-medium text-[#1A1C1E] transition-colors hover:text-[#5B53C0] hover:underline">{inv.invoiceNumber}</Link>,
+              <Link key="n" href={`/app/serviceden/invoices/${inv.id}`} className="of-num font-semibold text-[#171A17] transition-colors hover:text-[#1F5FA8] hover:underline">{inv.invoiceNumber}</Link>,
               customerById(inv.customerId)?.name ?? '—',
-              inv.issueDate,
+              <span key="d" className="of-num text-[#6B6F68]">{inv.issueDate}</span>,
               <Badge key="st" label={m.label} tone={m.tone} />,
               zar(invoiceTotal(inv.items, inv.taxRate)),
               <RowActionsMenu key="a" actions={actions} />,
@@ -196,11 +196,11 @@ function InvoiceBuilder({ show, onClose, onCreated }: { show: (m: string) => voi
       width={720}
       footer={
         <div className="flex items-center justify-between gap-3">
-          <span className="text-[13px] text-[#5F6368]">Total <span className="font-semibold text-[#1A1C1E]">{zar(total)}</span></span>
-          <div className="flex items-center gap-2">
-            {error ? <span className="text-[12px] text-[#A32D2D]">{error}</span> : null}
-            <button type="button" onClick={onClose} disabled={busy} className="rounded-lg px-3.5 py-2 text-[13px] text-[#5F6368] hover:bg-black/[0.03] disabled:opacity-50">Cancel</button>
-            <button type="button" onClick={create} disabled={busy} className="rounded-lg bg-[#5B53C0] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#4c45a6] disabled:opacity-50">{busy ? 'Creating…' : 'Create & view'}</button>
+          <span className="text-[13px] text-[#6B6F68]">Total <span className="of-num text-[16px] font-semibold tracking-[-0.02em] text-[#171A17]">{zar(total)}</span></span>
+          <div className="flex items-center gap-2.5">
+            {error ? <span className="text-[13px] text-[#A32D2D]">{error}</span> : null}
+            <button type="button" onClick={onClose} disabled={busy} className="inline-flex h-[42px] items-center rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87] disabled:opacity-50">Cancel</button>
+            <button type="button" onClick={create} disabled={busy} className="inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-50">{busy ? 'Creating…' : 'Create & view'}</button>
           </div>
         </div>
       }
@@ -220,22 +220,22 @@ function InvoiceBuilder({ show, onClose, onCreated }: { show: (m: string) => voi
         </div>
 
         <div>
-          <div className="mb-1.5 text-[13px] font-medium text-[#1A1C1E]">Add services</div>
+          <div className="mb-2 text-[13px] font-medium text-[#3E4A57]">Add services</div>
           <div className="flex flex-wrap gap-2">
             {activeServices.map((s) => (
-              <button key={s.id} type="button" onClick={() => addService(s.id)} className="inline-flex items-center gap-1.5 rounded-lg border border-[#E7E7E2] bg-white px-3 py-1.5 text-[13px] text-[#1A1C1E] transition-colors hover:border-[#5B53C0]/50 hover:bg-[#F6F5FD]">
-                <span className="text-[#5B53C0]">+</span>{s.name} <span className="text-[#9A9DA1]">{zar(s.unitPrice)}</span>
+              <button key={s.id} type="button" onClick={() => addService(s.id)} className="inline-flex items-center gap-1.5 rounded-[11px] border border-[#E2E6EC] bg-white px-3.5 py-2 text-[13px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]">
+                <span className="text-[#1F5FA8]">+</span>{s.name} <span className="of-num text-[#A0A49C]">{zar(s.unitPrice)}</span>
               </button>
             ))}
-            <button type="button" onClick={addCustom} className="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-[#D7DAD8] bg-white px-3 py-1.5 text-[13px] text-[#5F6368] transition-colors hover:border-[#5B53C0]/50">+ Custom line</button>
+            <button type="button" onClick={addCustom} className="inline-flex items-center gap-1.5 rounded-[11px] border border-dashed border-[#D8DFE8] bg-white px-3.5 py-2 text-[13px] font-medium text-[#6B6F68] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]">+ Custom line</button>
           </div>
         </div>
 
         {lines.length > 0 ? (
-          <div className="overflow-x-auto rounded-xl border border-[#E7E7E2]">
-            <table className="w-full min-w-[440px] text-[13px]">
+          <div className="overflow-x-auto rounded-[14px] border border-[#EAEDF2]">
+            <table className="w-full min-w-[440px] text-[14px]">
               <thead>
-                <tr className="border-b border-[#F0F0EC] bg-[#FBFBF9] text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+                <tr className="border-b border-[#EEF1F5] bg-[#FBFCFE] text-[11px] uppercase tracking-[0.06em] text-[#A0A49C]">
                   <th className="px-3 py-2 text-left font-medium">Description</th>
                   <th className="w-[70px] px-2 py-2 text-right font-medium">Qty</th>
                   <th className="w-[110px] px-2 py-2 text-right font-medium">Unit price</th>
@@ -245,34 +245,34 @@ function InvoiceBuilder({ show, onClose, onCreated }: { show: (m: string) => voi
               </thead>
               <tbody>
                 {lines.map((l) => (
-                  <tr key={l.key} className="border-b border-[#F6F6F2] last:border-0">
-                    <td className="px-3 py-2"><input value={l.description} onChange={(e) => updateLine(l.key, { description: e.target.value })} placeholder="Description" className="h-8 w-full rounded-md border border-transparent bg-transparent px-1 text-[13px] text-[#1A1C1E] focus:border-[#E7E7E2] focus:outline-none" /></td>
-                    <td className="px-2 py-2"><input value={String(l.quantity)} onChange={(e) => updateLine(l.key, { quantity: Number(e.target.value) || 0 })} inputMode="decimal" className="h-8 w-full rounded-md border border-[#E7E7E2] px-1.5 text-right text-[13px] tabular-nums text-[#1A1C1E] focus:border-[#5B53C0]/50 focus:outline-none" /></td>
-                    <td className="px-2 py-2"><input value={String(l.unitPrice)} onChange={(e) => updateLine(l.key, { unitPrice: Number(e.target.value) || 0 })} inputMode="decimal" className="h-8 w-full rounded-md border border-[#E7E7E2] px-1.5 text-right text-[13px] tabular-nums text-[#1A1C1E] focus:border-[#5B53C0]/50 focus:outline-none" /></td>
-                    <td className="px-3 py-2 text-right tabular-nums text-[#1A1C1E]">{zar(lineAmount(l))}</td>
-                    <td className="px-2 py-2 text-right"><button type="button" onClick={() => removeLine(l.key)} aria-label="Remove line" className="text-[#9A9DA1] transition-colors hover:text-[#A32D2D]">✕</button></td>
+                  <tr key={l.key} className="border-b border-[#F4F5F7] last:border-0">
+                    <td className="px-3 py-2"><input value={l.description} onChange={(e) => updateLine(l.key, { description: e.target.value })} placeholder="Description" className="h-9 w-full rounded-[9px] border border-transparent bg-transparent px-1.5 text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]" /></td>
+                    <td className="px-2 py-2"><input value={String(l.quantity)} onChange={(e) => updateLine(l.key, { quantity: Number(e.target.value) || 0 })} inputMode="decimal" className="of-num h-9 w-full rounded-[9px] border border-[#E4E9F0] px-1.5 text-right text-[14px] text-[#171A17] outline-none focus:border-[#3E7BC4]" /></td>
+                    <td className="px-2 py-2"><input value={String(l.unitPrice)} onChange={(e) => updateLine(l.key, { unitPrice: Number(e.target.value) || 0 })} inputMode="decimal" className="of-num h-9 w-full rounded-[9px] border border-[#E4E9F0] px-1.5 text-right text-[14px] text-[#171A17] outline-none focus:border-[#3E7BC4]" /></td>
+                    <td className="of-num px-3 py-2 text-right font-semibold text-[#171A17]">{zar(lineAmount(l))}</td>
+                    <td className="px-2 py-2 text-right"><button type="button" onClick={() => removeLine(l.key)} aria-label="Remove line" className="text-[#A0A49C] transition-colors hover:text-[#A32D2D]">✕</button></td>
                   </tr>
                 ))}
               </tbody>
             </table>
           </div>
         ) : (
-          <p className="rounded-xl border border-dashed border-[#E7E7E2] bg-[#FBFBF9] px-4 py-6 text-center text-[13px] text-[#9A9DA1]">Click a service above to add it to the invoice.</p>
+          <p className="rounded-[14px] border border-dashed border-[#D8DFE8] bg-white px-4 py-6 text-center text-[13px] text-[#A0A49C]">Click a service above to add it to the invoice.</p>
         )}
 
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <Field label="Notes" hint="(optional)">
             <textarea value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Payment terms, thank-you note…" className={`${inputClass} h-24 py-2`} />
           </Field>
-          <div className="space-y-2 rounded-xl border border-[#E7E7E2] bg-[#FBFBF9] p-4 text-[13px]">
-            <div className="flex items-center justify-between"><span className="text-[#5F6368]">Subtotal</span><span className="tabular-nums text-[#1A1C1E]">{zar(sub)}</span></div>
+          <div className="space-y-2 rounded-[14px] border border-[#EEF1F5] bg-white p-4 text-[13px]">
+            <div className="flex items-center justify-between"><span className="text-[#6B6F68]">Subtotal</span><span className="of-num text-[14px] text-[#171A17]">{zar(sub)}</span></div>
             <div className="flex items-center justify-between gap-2">
-              <span className="flex items-center gap-1.5 text-[#5F6368]">VAT
-                <input value={taxRate} onChange={(e) => setTaxRate(e.target.value)} inputMode="decimal" className="h-7 w-14 rounded-md border border-[#E7E7E2] px-1.5 text-right text-[12px] tabular-nums focus:border-[#5B53C0]/50 focus:outline-none" />%
+              <span className="flex items-center gap-1.5 text-[#6B6F68]">VAT
+                <input value={taxRate} onChange={(e) => setTaxRate(e.target.value)} inputMode="decimal" className="of-num h-8 w-14 rounded-[9px] border border-[#E4E9F0] px-1.5 text-right text-[13px] outline-none focus:border-[#3E7BC4]" />%
               </span>
-              <span className="tabular-nums text-[#1A1C1E]">{zar(vat)}</span>
+              <span className="of-num text-[14px] text-[#171A17]">{zar(vat)}</span>
             </div>
-            <div className="flex items-center justify-between border-t border-[#E7E7E2] pt-2 text-[15px] font-semibold"><span className="text-[#1A1C1E]">Total</span><span className="tabular-nums text-[#1A1C1E]">{zar(total)}</span></div>
+            <div className="flex items-center justify-between border-t border-[#EEF1F5] pt-2.5"><span className="text-[14px] font-semibold text-[#171A17]">Total</span><span className="of-num text-[22px] font-semibold tracking-[-0.02em] text-[#171A17]">{zar(total)}</span></div>
           </div>
         </div>
       </div>

@@ -8,8 +8,10 @@ import { DOC_TYPES, isDefaultFolderName } from '@/lib/platform/documents';
 import type { DocumentFolder, DocumentType, DocumentWithSupplier } from '@/lib/platform/types';
 
 /** Palette offered when creating or recolouring a custom folder. */
+// Exempt from the platform palette sweeps: the colour a user picks for a
+// folder is persisted to document_folders.color, so these are data, not chrome.
 export const FOLDER_COLORS: readonly string[] = [
-  '#3E7BC4', // blue
+  '#1E5E54', // teal
   '#0C447C', // blue
   '#0F6E56', // green
   '#854F0B', // amber
@@ -56,7 +58,7 @@ export function buildFolderTiles(
     tiles.push({
       key: f.id,
       name: f.name,
-      color: f.color ?? '#C9CCC8',
+      color: f.color ?? '#BFC5CC',
       count: docs.filter((d) => d.folder_id === f.id).length,
       kind: 'custom',
     });

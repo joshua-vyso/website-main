@@ -44,7 +44,7 @@ function methodLabel(value: string): string {
 }
 
 const toolbarBtn =
-  'inline-flex h-9 items-center rounded-lg border border-[#D7DAD8] bg-white px-3.5 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/50 disabled:opacity-50';
+  'inline-flex h-9 items-center rounded-lg border border-[#E2E6EC] bg-white px-3.5 text-[13px] font-medium text-[#171A17] transition-colors hover:border-[#3E7BC4]/50 disabled:opacity-50';
 
 export function InvoiceDetailV2({ data, orgName }: { data: InvoiceDetailData; orgName: string | null }) {
   const router = useRouter();
@@ -82,9 +82,9 @@ export function InvoiceDetailV2({ data, orgName }: { data: InvoiceDetailData; or
 
   if (!invoice) {
     return (
-      <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
-        <p className="text-[15px] font-medium text-[#1A1C1E]">Invoice not found</p>
-        <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">It may have been deleted, or the link is stale.</p>
+      <div className="rounded-2xl border border-dashed border-[#E2E6EC] bg-[#FBFCFE] px-6 py-12 text-center">
+        <p className="text-[15px] font-medium text-[#171A17]">Invoice not found</p>
+        <p className="mx-auto mt-1 max-w-md text-[13px] text-[#6B6F68]">It may have been deleted, or the link is stale.</p>
         <Link href="/app/orderflow/invoices" className="mt-3 inline-block text-[13px] font-medium text-[#1F5FA8] hover:underline">
           ← Back to invoices
         </Link>
@@ -210,10 +210,10 @@ export function InvoiceDetailV2({ data, orgName }: { data: InvoiceDetailData; or
       {/* Toolbar (hidden in print via DocSheet's PRINT_CSS scoping) */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <Link href="/app/orderflow/invoices" className="text-[13px] font-medium text-[#5F6368] transition-colors hover:text-[#1A1C1E]">
+          <Link href="/app/orderflow/invoices" className="text-[13px] font-medium text-[#6B6F68] transition-colors hover:text-[#171A17]">
             ← Invoices
           </Link>
-          <span className="text-[13px] tabular-nums text-[#9A9DA1]">{zar2(totals.total)}</span>
+          <span className="text-[13px] tabular-nums text-[#8A8E86]">{zar2(totals.total)}</span>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {eff === 'draft' && isAdmin ? (
@@ -259,7 +259,7 @@ export function InvoiceDetailV2({ data, orgName }: { data: InvoiceDetailData; or
       {/* Linked-order banner */}
       {order ? (
         <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#D6E7DF] bg-[#F1F7F4] px-4 py-3 text-[13px]">
-          <span className="text-[#1A1C1E]">
+          <span className="text-[#171A17]">
             Created from order {order.order_number ?? `#${order.id.slice(0, 6).toUpperCase()}`}.
           </span>
           <Link href={`/app/orderflow/orders/${order.id}`} className="font-medium text-[#1F5FA8] hover:underline">
@@ -292,56 +292,56 @@ export function InvoiceDetailV2({ data, orgName }: { data: InvoiceDetailData; or
         {/* Side panels */}
         <div className="space-y-5">
           {/* Payments + balance summary */}
-          <div className="rounded-2xl border border-[#E7E7E2] bg-white p-5">
+          <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5">
             <div className="flex items-center justify-between gap-3">
-              <h3 className="text-[13px] font-semibold text-[#1A1C1E]">Payments</h3>
+              <h3 className="text-[13px] font-semibold text-[#171A17]">Payments</h3>
               {canPay ? (
                 <button
                   type="button"
                   onClick={() => setPayOpen(true)}
-                  className="inline-flex h-8 items-center rounded-lg border border-[#D7DAD8] bg-white px-3 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/40"
+                  className="inline-flex h-8 items-center rounded-lg border border-[#E2E6EC] bg-white px-3 text-[12px] font-medium text-[#171A17] transition-colors hover:border-[#3E7BC4]/40"
                 >
                   + Record
                 </button>
               ) : null}
             </div>
 
-            <div className="mt-3 space-y-1.5 rounded-xl border border-[#E7E7E2] bg-[#FBFBF9] p-3 text-[13px]">
+            <div className="mt-3 space-y-1.5 rounded-xl border border-[#EAEDF2] bg-[#FBFCFE] p-3 text-[13px]">
               {totals.rebate > 0 ? (
                 <div className="flex justify-between">
-                  <span className="text-[#5F6368]">Rebate ({inv.rebate_pct ?? 0}%)</span>
-                  <span className="tabular-nums text-[#1A1C1E]">−{zar2(totals.rebate)}</span>
+                  <span className="text-[#6B6F68]">Rebate ({inv.rebate_pct ?? 0}%)</span>
+                  <span className="tabular-nums text-[#171A17]">−{zar2(totals.rebate)}</span>
                 </div>
               ) : null}
               <div className="flex justify-between">
-                <span className="text-[#5F6368]">Total</span>
-                <span className="tabular-nums text-[#1A1C1E]">{zar2(totals.total)}</span>
+                <span className="text-[#6B6F68]">Total</span>
+                <span className="tabular-nums text-[#171A17]">{zar2(totals.total)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-[#5F6368]">Paid</span>
+                <span className="text-[#6B6F68]">Paid</span>
                 <span className="tabular-nums text-[#0F6E56]">{zar2(paid)}</span>
               </div>
               {credited > 0 ? (
                 <div className="flex justify-between">
-                  <span className="text-[#5F6368]">Credited</span>
+                  <span className="text-[#6B6F68]">Credited</span>
                   <span className="tabular-nums text-[#5B3FA8]">−{zar2(credited)}</span>
                 </div>
               ) : null}
-              <div className="flex justify-between border-t border-[#E7E7E2] pt-1.5 font-semibold">
-                <span className="text-[#1A1C1E]">Balance due</span>
+              <div className="flex justify-between border-t border-[#EAEDF2] pt-1.5 font-semibold">
+                <span className="text-[#171A17]">Balance due</span>
                 <span className={`tabular-nums ${balance > 0 ? 'text-[#854F0B]' : 'text-[#0F6E56]'}`}>{zar2(balance)}</span>
               </div>
             </div>
 
             {payments.length === 0 ? (
-              <p className="mt-3 text-[13px] text-[#9A9DA1]">No payments recorded yet.</p>
+              <p className="mt-3 text-[13px] text-[#8A8E86]">No payments recorded yet.</p>
             ) : (
-              <ul className="mt-3 divide-y divide-[#F0F0EC]">
+              <ul className="mt-3 divide-y divide-[#EEF1F5]">
                 {payments.map((p) => (
                   <li key={p.id} className="flex items-center justify-between gap-3 py-2.5">
                     <div className="min-w-0">
-                      <div className="text-[13px] font-medium text-[#1A1C1E]">{methodLabel(p.method)}</div>
-                      <div className="mt-0.5 truncate text-[11px] text-[#9A9DA1]">
+                      <div className="text-[13px] font-medium text-[#171A17]">{methodLabel(p.method)}</div>
+                      <div className="mt-0.5 truncate text-[11px] text-[#8A8E86]">
                         {fmtDate(p.paid_on)}
                         {p.reference ? ` · ${p.reference}` : ''}
                       </div>
@@ -354,22 +354,22 @@ export function InvoiceDetailV2({ data, orgName }: { data: InvoiceDetailData; or
           </div>
 
           {/* Credit notes */}
-          <div className="rounded-2xl border border-[#E7E7E2] bg-white p-5">
+          <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5">
             <div className="flex items-center justify-between gap-3">
-              <h3 className="text-[13px] font-semibold text-[#1A1C1E]">Credit notes</h3>
+              <h3 className="text-[13px] font-semibold text-[#171A17]">Credit notes</h3>
               {canCredit ? (
                 <Link
                   href={`/app/orderflow/credit-notes/new?invoice=${inv.id}`}
-                  className="inline-flex h-8 items-center rounded-lg border border-[#D7DAD8] bg-white px-3 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/40"
+                  className="inline-flex h-8 items-center rounded-lg border border-[#E2E6EC] bg-white px-3 text-[12px] font-medium text-[#171A17] transition-colors hover:border-[#3E7BC4]/40"
                 >
                   + Create
                 </Link>
               ) : null}
             </div>
             {creditNotes.length === 0 ? (
-              <p className="mt-3 text-[13px] text-[#9A9DA1]">No credit notes against this invoice.</p>
+              <p className="mt-3 text-[13px] text-[#8A8E86]">No credit notes against this invoice.</p>
             ) : (
-              <ul className="mt-3 divide-y divide-[#F0F0EC]">
+              <ul className="mt-3 divide-y divide-[#EEF1F5]">
                 {creditNotes.map((cn: OfCreditNote) => (
                   <li key={cn.id} className="flex items-center justify-between gap-3 py-2.5">
                     <div className="min-w-0">
@@ -379,7 +379,7 @@ export function InvoiceDetailV2({ data, orgName }: { data: InvoiceDetailData; or
                       >
                         {cn.credit_number}
                       </Link>
-                      <div className="mt-0.5 truncate text-[11px] text-[#9A9DA1]">
+                      <div className="mt-0.5 truncate text-[11px] text-[#8A8E86]">
                         {fmtDate(cn.issue_date)}
                         {cn.reason ? ` · ${cn.reason}` : ''}
                       </div>
@@ -392,13 +392,13 @@ export function InvoiceDetailV2({ data, orgName }: { data: InvoiceDetailData; or
           </div>
 
           {/* Documents */}
-          <div className="rounded-2xl border border-[#E7E7E2] bg-white p-5">
+          <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5">
             <AttachDocuments entityType="invoice" entityId={inv.id} customerId={inv.customer_id} documents={documents} documentType="invoice" />
           </div>
 
           {/* Activity */}
-          <div className="rounded-2xl border border-[#E7E7E2] bg-white p-5">
-            <h3 className="text-[13px] font-semibold text-[#1A1C1E]">Activity</h3>
+          <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5">
+            <h3 className="text-[13px] font-semibold text-[#171A17]">Activity</h3>
             <div className="mt-3">
               <ActivityFeed events={activity} emptyLabel="No activity on this invoice yet." />
             </div>

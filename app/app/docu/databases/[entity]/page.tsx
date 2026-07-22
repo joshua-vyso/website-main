@@ -59,14 +59,14 @@ export default async function DatabaseEntityPage(ctx: { params: Promise<{ entity
     <div className="px-8 py-7">
       <Link
         href="/app/docu/databases"
-        className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#5F6368] transition-colors hover:text-[#1A1C1E]"
+        className="inline-flex items-center gap-1.5 text-[13px] font-medium text-[#6B6F68] transition-colors hover:text-[#171A17]"
       >
         <span aria-hidden>&larr;</span> Databases
       </Link>
 
       <div className="mt-3">
-        <h1 className="text-[26px] font-bold leading-tight text-[#1A1C1E]">{meta.label}</h1>
-        <p className="mt-1 max-w-2xl text-[14px] text-[#5F6368]">{meta.description}</p>
+        <h1 className="of-display text-[28px] font-semibold leading-tight tracking-[-0.015em] text-[#171A17]">{meta.label}</h1>
+        <p className="mt-1.5 max-w-2xl text-[14px] text-[#8A8E86]">{meta.description}</p>
       </div>
 
       <div className="mt-6">{renderView(entity, data)}</div>

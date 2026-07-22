@@ -180,7 +180,7 @@ const CADENCES: { value: PriceCadence; label: string }[] = [
 ];
 
 const filterSel =
-  'h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#3E7BC4]';
+  'h-9 rounded-lg border border-[#E2E6EC] bg-white px-2.5 text-[13px] text-[#6B6F68] outline-none focus:border-[#3E7BC4]';
 
 interface ListDraft {
   name: string;
@@ -447,15 +447,15 @@ export function PriceListsView({
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-[26px] font-bold text-[#1A1C1E]">Price lists</h1>
-          <p className="mt-1 text-[14px] text-[#5F6368]">
+          <h1 className="text-[26px] font-bold text-[#171A17]">Price lists</h1>
+          <p className="mt-1 text-[14px] text-[#6B6F68]">
             Customer pricing with margins and custom prices — the source quotes, orders and invoices price from
           </p>
         </div>
         <div className="flex items-center gap-2">
           <Link
             href="/app/docu/databases/price-lists"
-            className="inline-flex h-10 items-center rounded-xl border border-[#D7DAD8] bg-white px-4 text-[14px] font-medium text-[#5F6368] transition-colors hover:bg-[#F0F0EC]"
+            className="inline-flex h-10 items-center rounded-xl border border-[#E2E6EC] bg-white px-4 text-[14px] font-medium text-[#6B6F68] transition-colors hover:bg-[#EEF1F5]"
           >
             Governance view
           </Link>
@@ -489,11 +489,11 @@ export function PriceListsView({
       </div>
 
       {/* Table */}
-      <div className="mt-4 overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
+      <div className="mt-4 overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white">
         <div className="overflow-x-auto">
           <table className="w-full text-[13px]">
             <thead>
-              <tr className="border-b border-[#F0F0EC] bg-[#FBFBF9] text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+              <tr className="border-b border-[#EEF1F5] bg-[#FBFCFE] text-[11px] uppercase tracking-wide text-[#8A8E86]">
                 <th className="px-4 py-2.5 text-left font-medium">Name</th>
                 <th className="px-2 py-2.5 text-left font-medium">Customer</th>
                 <th className="px-2 py-2.5 text-right font-medium">Default margin</th>
@@ -518,7 +518,7 @@ export function PriceListsView({
                 </tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-12 text-center text-[14px] text-[#9A9DA1]">
+                  <td colSpan={7} className="px-5 py-12 text-center text-[14px] text-[#8A8E86]">
                     No price lists match your search.
                   </td>
                 </tr>
@@ -530,25 +530,25 @@ export function PriceListsView({
                     <tr
                       key={l.id}
                       onClick={() => setOpenListId(l.id)}
-                      className="cursor-pointer border-b border-[#F6F6F2] last:border-0 hover:bg-[#FAFAF8]"
+                      className="cursor-pointer border-b border-[#F5F9FE] last:border-0 hover:bg-[#F5F9FE]"
                     >
                       <td className="px-4 py-3">
-                        <div className="font-medium text-[#1A1C1E]">{l.name}</div>
-                        {l.notes ? <div className="max-w-[260px] truncate text-[11px] text-[#9A9DA1]">{l.notes}</div> : null}
+                        <div className="font-medium text-[#171A17]">{l.name}</div>
+                        {l.notes ? <div className="max-w-[260px] truncate text-[11px] text-[#8A8E86]">{l.notes}</div> : null}
                       </td>
-                      <td className="px-2 py-3 text-[#5F6368]">
+                      <td className="px-2 py-3 text-[#6B6F68]">
                         {l.customer_id ? customerName.get(l.customer_id) ?? 'Unknown' : 'All customers'}
                       </td>
-                      <td className="px-2 py-3 text-right tabular-nums text-[#1A1C1E]">
+                      <td className="px-2 py-3 text-right tabular-nums text-[#171A17]">
                         {l.default_margin_pct != null ? `${l.default_margin_pct}%` : '—'}
                       </td>
-                      <td className="px-2 py-3 text-[#5F6368]">
+                      <td className="px-2 py-3 text-[#6B6F68]">
                         {l.valid_from || l.valid_until ? `${fmtDate(l.valid_from)} → ${fmtDate(l.valid_until)}` : 'Always'}
                       </td>
                       <td className="px-2 py-3">
                         <Pill label={style.label} bg={style.bg} fg={style.fg} />
                       </td>
-                      <td className="px-2 py-3 text-right tabular-nums text-[#5F6368]">{overrideCount.get(l.id) ?? 0}</td>
+                      <td className="px-2 py-3 text-right tabular-nums text-[#6B6F68]">{overrideCount.get(l.id) ?? 0}</td>
                       <td className="px-2 py-3 text-right" onClick={(e) => e.stopPropagation()}>
                         <RowActionsMenu
                           actions={[
@@ -1155,12 +1155,12 @@ function PriceListEditor({
 
       {/* Add products */}
       <div className="mb-4">
-        <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#9A9DA1]">Add products</div>
+        <div className="mb-1.5 text-[11px] font-semibold uppercase tracking-wide text-[#8A8E86]">Add products</div>
         <SearchInput value={addQuery} onChange={setAddQuery} placeholder="Search the catalogue to add a product…" />
         {addQuery.trim() ? (
-          <div className="mt-2 overflow-hidden rounded-xl border border-[#E7E7E2]">
+          <div className="mt-2 overflow-hidden rounded-xl border border-[#EAEDF2]">
             {addable.length === 0 ? (
-              <div className="px-3 py-3 text-[12px] text-[#9A9DA1]">
+              <div className="px-3 py-3 text-[12px] text-[#8A8E86]">
                 {products.length === 0 ? 'No products in the catalogue yet — add them in Databases → Products.' : 'No matching products (or all already on this list).'}
               </div>
             ) : (
@@ -1174,11 +1174,11 @@ function PriceListEditor({
                     type="button"
                     onClick={() => void addProduct(p)}
                     disabled={busyId === p.id}
-                    className="flex w-full items-center justify-between gap-3 border-b border-[#F0F0EC] px-3 py-2.5 text-left last:border-0 transition-colors hover:bg-[#FBFBF9] disabled:opacity-50"
+                    className="flex w-full items-center justify-between gap-3 border-b border-[#EEF1F5] px-3 py-2.5 text-left last:border-0 transition-colors hover:bg-[#FBFCFE] disabled:opacity-50"
                   >
                     <div className="min-w-0">
-                      <div className="truncate text-[13px] font-medium text-[#1A1C1E]">{p.name}</div>
-                      <div className="truncate text-[11px] text-[#9A9DA1]">
+                      <div className="truncate text-[13px] font-medium text-[#171A17]">{p.name}</div>
+                      <div className="truncate text-[11px] text-[#8A8E86]">
                         {p.category ? `${p.category} · ` : ''}base {cost != null ? zar2(cost) : '—'} → {sell != null ? zar2(sell) : '—'}
                       </div>
                     </div>
@@ -1193,9 +1193,9 @@ function PriceListEditor({
 
       {/* Bulk update bar */}
       {rows.length > 0 ? (
-        <div className="mb-4 flex flex-wrap items-end gap-3 rounded-xl border border-[#E7E7E2] bg-[#FBFBF9] px-3 py-3">
+        <div className="mb-4 flex flex-wrap items-end gap-3 rounded-xl border border-[#EAEDF2] bg-[#FBFCFE] px-3 py-3">
           <div className="min-w-[150px] flex-1">
-            <div className="mb-1 text-[11px] font-medium text-[#5F6368]">Set margin on all items</div>
+            <div className="mb-1 text-[11px] font-medium text-[#6B6F68]">Set margin on all items</div>
             <div className="flex items-center gap-2">
               <input
                 value={bulkMargin}
@@ -1210,7 +1210,7 @@ function PriceListEditor({
             </div>
           </div>
           <div className="min-w-[150px] flex-1">
-            <div className="mb-1 text-[11px] font-medium text-[#5F6368]">Bump all custom prices by %</div>
+            <div className="mb-1 text-[11px] font-medium text-[#6B6F68]">Bump all custom prices by %</div>
             <div className="flex items-center gap-2">
               <input
                 value={bulkIncrease}
@@ -1251,10 +1251,10 @@ function PriceListEditor({
           }
         />
       ) : (
-        <div className="overflow-hidden rounded-xl border border-[#E7E7E2]">
+        <div className="overflow-hidden rounded-xl border border-[#EAEDF2]">
           <table className="w-full text-[13px]">
             <thead>
-              <tr className="border-b border-[#F0F0EC] bg-[#FBFBF9] text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+              <tr className="border-b border-[#EEF1F5] bg-[#FBFCFE] text-[11px] uppercase tracking-wide text-[#8A8E86]">
                 <th className="px-3 py-2.5 text-left font-medium">Product</th>
                 <th className="px-2 py-2.5 text-right font-medium">Base cost</th>
                 <th className="px-2 py-2.5 text-right font-medium">Margin %</th>
@@ -1265,16 +1265,16 @@ function PriceListEditor({
             </thead>
             <tbody>
               {visibleRows.map(({ row, product, base, sell, isCustom }) => (
-                <tr key={row.id} className="border-b border-[#F6F6F2] last:border-0">
+                <tr key={row.id} className="border-b border-[#F5F9FE] last:border-0">
                   <td className="px-3 py-2.5">
-                    <div className="font-medium text-[#1A1C1E]">{product?.name ?? 'Unknown product'}</div>
-                    {product?.unit ? <div className="text-[11px] text-[#9A9DA1]">per {product.unit}</div> : null}
+                    <div className="font-medium text-[#171A17]">{product?.name ?? 'Unknown product'}</div>
+                    {product?.unit ? <div className="text-[11px] text-[#8A8E86]">per {product.unit}</div> : null}
                   </td>
                   <td className="px-2 py-2.5 text-right">
                     {base.cost != null ? (
-                      <div className="tabular-nums text-[#5F6368]">
+                      <div className="tabular-nums text-[#6B6F68]">
                         {zar2(base.cost)}
-                        {base.label ? <div className="text-[11px] font-normal text-[#9A9DA1]">{base.label}</div> : null}
+                        {base.label ? <div className="text-[11px] font-normal text-[#8A8E86]">{base.label}</div> : null}
                       </div>
                     ) : product ? (
                       <div className="flex items-center justify-end gap-1.5">
@@ -1290,11 +1290,11 @@ function PriceListEditor({
                           }}
                           disabled={busyId === product.id}
                           inputMode="decimal"
-                          className="h-8 w-[92px] rounded-lg border border-[#E7C9A0] bg-white px-2 text-right text-[13px] text-[#1A1C1E] tabular-nums placeholder:text-[#C9A876] focus:border-[#854F0B] focus:outline-none disabled:opacity-50"
+                          className="h-8 w-[92px] rounded-lg border border-[#E7C9A0] bg-white px-2 text-right text-[13px] text-[#171A17] tabular-nums placeholder:text-[#C9A876] focus:border-[#854F0B] focus:outline-none disabled:opacity-50"
                         />
                       </div>
                     ) : (
-                      <span className="tabular-nums text-[#9A9DA1]">—</span>
+                      <span className="tabular-nums text-[#8A8E86]">—</span>
                     )}
                   </td>
                   <td className="px-2 py-2.5 text-right">
@@ -1309,7 +1309,7 @@ function PriceListEditor({
                       }}
                       disabled={busyId === row.id}
                       inputMode="decimal"
-                      className="h-8 w-[68px] rounded-lg border border-[#D7DAD8] bg-white px-2 text-right text-[13px] text-[#1A1C1E] tabular-nums focus:border-[#3E7BC4]/50 focus:outline-none disabled:opacity-50"
+                      className="h-8 w-[68px] rounded-lg border border-[#E2E6EC] bg-white px-2 text-right text-[13px] text-[#171A17] tabular-nums focus:border-[#3E7BC4]/50 focus:outline-none disabled:opacity-50"
                     />
                   </td>
                   <td className="px-2 py-2.5 text-right">
@@ -1326,11 +1326,11 @@ function PriceListEditor({
                       }}
                       disabled={busyId === row.id}
                       inputMode="decimal"
-                      className="h-8 w-[90px] rounded-lg border border-[#D7DAD8] bg-white px-2 text-right text-[13px] text-[#1A1C1E] tabular-nums placeholder:text-[#C9CCCA] focus:border-[#3E7BC4]/50 focus:outline-none disabled:opacity-50"
+                      className="h-8 w-[90px] rounded-lg border border-[#E2E6EC] bg-white px-2 text-right text-[13px] text-[#171A17] tabular-nums placeholder:text-[#C9CCCA] focus:border-[#3E7BC4]/50 focus:outline-none disabled:opacity-50"
                     />
                   </td>
-                  <td className="px-2 py-2.5 text-right tabular-nums font-medium text-[#1A1C1E]">
-                    {sell != null ? zar2(sell) : <span className="font-normal text-[#9A9DA1]">—</span>}
+                  <td className="px-2 py-2.5 text-right tabular-nums font-medium text-[#171A17]">
+                    {sell != null ? zar2(sell) : <span className="font-normal text-[#8A8E86]">—</span>}
                     {sell != null && isCustom ? (
                       <span className="ml-1 text-[10px] font-normal text-[#854F0B]">custom</span>
                     ) : null}
@@ -1340,7 +1340,7 @@ function PriceListEditor({
                       type="button"
                       onClick={() => setRemoveId(row.id)}
                       aria-label="Remove"
-                      className="rounded-lg px-2 py-1 text-[12px] text-[#9A9DA1] transition-colors hover:bg-[#F3E7E7] hover:text-[#A32D2D]"
+                      className="rounded-lg px-2 py-1 text-[12px] text-[#8A8E86] transition-colors hover:bg-[#F3E7E7] hover:text-[#A32D2D]"
                     >
                       Remove
                     </button>
@@ -1349,7 +1349,7 @@ function PriceListEditor({
               ))}
               {visibleRows.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-3 py-8 text-center text-[13px] text-[#9A9DA1]">
+                  <td colSpan={6} className="px-3 py-8 text-center text-[13px] text-[#8A8E86]">
                     {rowSearch.trim()
                       ? `No products on this list match “${rowSearch.trim()}”.`
                       : 'No items need review — every product has a cost.'}
@@ -1361,7 +1361,7 @@ function PriceListEditor({
         </div>
       )}
 
-      <p className="mt-4 text-[11px] text-[#9A9DA1]">
+      <p className="mt-4 text-[11px] text-[#8A8E86]">
         Custom price wins over margin. Clear a custom price to fall back to the margin. Custom prices need
         supabase/core-data.sql to be run.
       </p>

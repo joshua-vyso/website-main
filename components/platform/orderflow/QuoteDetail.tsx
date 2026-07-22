@@ -75,9 +75,9 @@ export function QuoteDetail({
 
   if (!quote) {
     return (
-      <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
-        <p className="text-[15px] font-medium text-[#1A1C1E]">Quote not found</p>
-        <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">It may have been deleted.</p>
+      <div className="rounded-2xl border border-dashed border-[#E2E6EC] bg-[#FBFCFE] px-6 py-12 text-center">
+        <p className="text-[15px] font-medium text-[#171A17]">Quote not found</p>
+        <p className="mx-auto mt-1 max-w-md text-[13px] text-[#6B6F68]">It may have been deleted.</p>
         <Link href="/app/orderflow/quotes" className="mt-3 inline-block text-[13px] font-medium text-[#1F5FA8] hover:underline">
           ← Back to quotes
         </Link>
@@ -256,10 +256,10 @@ export function QuoteDetail({
       {/* Toolbar (hidden in print via DocSheet's PRINT_CSS scoping) */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <Link href="/app/orderflow/quotes" className="text-[13px] font-medium text-[#5F6368] transition-colors hover:text-[#1A1C1E]">
+          <Link href="/app/orderflow/quotes" className="text-[13px] font-medium text-[#6B6F68] transition-colors hover:text-[#171A17]">
             ← Quotes
           </Link>
-          <span className="text-[13px] tabular-nums text-[#9A9DA1]">{zar2(total)}</span>
+          <span className="text-[13px] tabular-nums text-[#8A8E86]">{zar2(total)}</span>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {eff === 'draft' ? (
@@ -267,7 +267,7 @@ export function QuoteDetail({
               type="button"
               onClick={() => void markSent()}
               disabled={!!busy}
-              className="inline-flex h-9 items-center rounded-lg border border-[#D7DAD8] bg-white px-3.5 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/50 disabled:opacity-50"
+              className="inline-flex h-9 items-center rounded-lg border border-[#E2E6EC] bg-white px-3.5 text-[13px] font-medium text-[#171A17] transition-colors hover:border-[#3E7BC4]/50 disabled:opacity-50"
             >
               {busy === 'sent' ? 'Sending…' : 'Mark sent'}
             </button>
@@ -278,7 +278,7 @@ export function QuoteDetail({
                 type="button"
                 onClick={() => void convertToOrder()}
                 disabled={!!busy}
-                className="inline-flex h-9 items-center rounded-lg border border-[#D7DAD8] bg-white px-3.5 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/50 disabled:opacity-50"
+                className="inline-flex h-9 items-center rounded-lg border border-[#E2E6EC] bg-white px-3.5 text-[13px] font-medium text-[#171A17] transition-colors hover:border-[#3E7BC4]/50 disabled:opacity-50"
               >
                 {busy === 'order' ? 'Converting…' : 'Convert to order'}
               </button>
@@ -286,7 +286,7 @@ export function QuoteDetail({
                 type="button"
                 onClick={() => void convertToInvoice()}
                 disabled={!!busy}
-                className="inline-flex h-9 items-center rounded-lg border border-[#D7DAD8] bg-white px-3.5 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/50 disabled:opacity-50"
+                className="inline-flex h-9 items-center rounded-lg border border-[#E2E6EC] bg-white px-3.5 text-[13px] font-medium text-[#171A17] transition-colors hover:border-[#3E7BC4]/50 disabled:opacity-50"
               >
                 {busy === 'invoice' ? 'Converting…' : 'Convert to invoice'}
               </button>
@@ -309,7 +309,7 @@ export function QuoteDetail({
       {/* Converted banners */}
       {q.converted_order_id ? (
         <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#D6E7DF] bg-[#F1F7F4] px-4 py-3 text-[13px]">
-          <span className="text-[#1A1C1E]">This quote was converted to an order.</span>
+          <span className="text-[#171A17]">This quote was converted to an order.</span>
           <Link href={`/app/orderflow/orders/${q.converted_order_id}`} className="font-medium text-[#1F5FA8] hover:underline">
             View order →
           </Link>
@@ -317,7 +317,7 @@ export function QuoteDetail({
       ) : null}
       {q.converted_invoice_id ? (
         <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[#D6E7DF] bg-[#F1F7F4] px-4 py-3 text-[13px]">
-          <span className="text-[#1A1C1E]">This quote was converted to an invoice.</span>
+          <span className="text-[#171A17]">This quote was converted to an invoice.</span>
           <Link href={`/app/orderflow/invoices/${q.converted_invoice_id}`} className="font-medium text-[#1F5FA8] hover:underline">
             View invoice →
           </Link>

@@ -146,14 +146,14 @@ export function VatDb({ data }: { data: CoreData }) {
       ) : filtered.length === 0 ? (
         <EmptyState title="No matches" body="No VAT rates match your search." />
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-[#E7E7E2] bg-white">
-          <table className="w-full text-[13px]">
+        <div className="overflow-x-auto rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <table className="w-full text-[14px]">
             <thead>
-              <tr className="border-b border-[#E7E7E2] text-left text-[11px] uppercase tracking-wide text-[#9A9DA1]">
-                <th className="px-4 py-3 font-semibold">Name</th>
-                <th className="px-4 py-3 text-right font-semibold">Rate</th>
-                <th className="px-4 py-3 font-semibold">Description</th>
-                <th className="px-4 py-3 font-semibold">Status</th>
+              <tr className="border-b border-[#EEF1F5] bg-[#FBFCFE] text-left text-[11px] uppercase tracking-[0.06em] text-[#A0A49C]">
+                <th className="px-4 py-3 font-medium">Name</th>
+                <th className="px-4 py-3 text-right font-medium">Rate</th>
+                <th className="px-4 py-3 font-medium">Description</th>
+                <th className="px-4 py-3 font-medium">Status</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
@@ -161,14 +161,14 @@ export function VatDb({ data }: { data: CoreData }) {
               {filtered.map((r) => {
                 const active = r.active !== false;
                 return (
-                  <tr key={r.id} className="border-b border-[#F0F0EC] last:border-0 hover:bg-[#FBFBF9]">
-                    <td className="px-4 py-3 font-medium text-[#1A1C1E]">{r.name}</td>
-                    <td className="px-4 py-3 text-right tabular-nums text-[#1A1C1E]">{r.rate}%</td>
-                    <td className="px-4 py-3 text-[#5F6368]">{r.description || '—'}</td>
-                    <td className="px-4 py-3">
-                      {active ? <Pill label="Active" bg="#E1F5EE" fg="#0F6E56" /> : <Pill label="Inactive" bg="#F0F0EC" fg="#5F6368" />}
+                  <tr key={r.id} className="border-b border-[#F4F5F7] last:border-0 hover:bg-[#F5F9FE]">
+                    <td className="px-4 py-3.5 font-semibold text-[#171A17]">{r.name}</td>
+                    <td className="of-num px-4 py-3.5 text-right text-[#171A17]">{r.rate}%</td>
+                    <td className="px-4 py-3.5 text-[#6B6F68]">{r.description || '—'}</td>
+                    <td className="px-4 py-3.5">
+                      {active ? <Pill label="Active" bg="#E1F5EE" fg="#0F6E56" /> : <Pill label="Inactive" bg="#EEF1F5" fg="#6B6F68" />}
                     </td>
-                    <td className="px-4 py-3 text-right">
+                    <td className="px-4 py-3.5 text-right">
                       <RowActionsMenu
                         actions={[
                           { label: 'Edit', onClick: () => startEdit(r) },
@@ -198,7 +198,7 @@ export function VatDb({ data }: { data: CoreData }) {
           </>
         }
       >
-        <div className="space-y-3">
+        <div className="space-y-4">
           <Field label="Name">
             <input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} placeholder="e.g. Standard, Zero-rated" className={inputClass} />
           </Field>
@@ -208,11 +208,11 @@ export function VatDb({ data }: { data: CoreData }) {
           <Field label="Description" hint="(optional)">
             <input value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} placeholder="Standard-rated supplies" className={inputClass} />
           </Field>
-          <label className="flex items-center gap-2.5 text-[13px] text-[#1A1C1E]">
-            <input type="checkbox" checked={draft.active} onChange={(e) => setDraft({ ...draft, active: e.target.checked })} className="h-4 w-4 accent-[#3E7BC4]" />
+          <label className="flex items-center gap-2.5 text-[14px] text-[#171A17]">
+            <input type="checkbox" checked={draft.active} onChange={(e) => setDraft({ ...draft, active: e.target.checked })} className="h-4 w-4 accent-[#1F5FA8]" />
             Active (available to select on documents)
           </label>
-          {error ? <p className="text-[12px] text-[#A32D2D]">{error}</p> : null}
+          {error ? <p className="text-[13px] text-[#A32D2D]">{error}</p> : null}
         </div>
       </Modal>
 

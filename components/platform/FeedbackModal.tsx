@@ -162,14 +162,14 @@ export function FeedbackModal({ open, onClose }: { open: boolean; onClose: () =>
       >
         <div className="space-y-4">
           <Field label="What kind of feedback?">
-            <div className="inline-flex rounded-lg border border-[#D7DAD8] bg-[#FBFBF9] p-0.5">
+            <div className="inline-flex rounded-lg border border-[#E2E6EC] bg-[#FBFCFE] p-0.5">
               {(['bug', 'feature'] as const).map((c) => (
                 <button
                   key={c}
                   type="button"
                   onClick={() => setCategory(c)}
                   className={`rounded-md px-3.5 py-1.5 text-[13px] font-medium transition-colors ${
-                    category === c ? 'bg-white text-[#1A1C1E] shadow-[0_1px_2px_rgba(26,28,30,0.08)]' : 'text-[#5F6368] hover:text-[#1A1C1E]'
+                    category === c ? 'bg-white text-[#171A17] shadow-[0_1px_2px_rgba(26,28,30,0.08)]' : 'text-[#6B6F68] hover:text-[#171A17]'
                   }`}
                 >
                   {c === 'bug' ? 'Bug' : 'Feature request'}
@@ -198,14 +198,14 @@ export function FeedbackModal({ open, onClose }: { open: boolean; onClose: () =>
             />
             <div className="flex flex-wrap items-center gap-2">
               {shots.map((src, i) => (
-                <div key={i} className="relative h-16 w-16 overflow-hidden rounded-lg border border-[#E7E7E2] bg-[#FBFBF9]">
+                <div key={i} className="relative h-16 w-16 overflow-hidden rounded-lg border border-[#EAEDF2] bg-[#FBFCFE]">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={src} alt={`Screenshot ${i + 1}`} className="h-full w-full object-cover" />
                   <button
                     type="button"
                     onClick={() => removeShot(i)}
                     aria-label="Remove screenshot"
-                    className="absolute right-0.5 top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#1A1C1E]/70 text-[11px] leading-none text-white transition-colors hover:bg-[#1A1C1E]"
+                    className="absolute right-0.5 top-0.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#171A17]/70 text-[11px] leading-none text-white transition-colors hover:bg-[#171A17]"
                   >
                     ✕
                   </button>
@@ -215,7 +215,7 @@ export function FeedbackModal({ open, onClose }: { open: boolean; onClose: () =>
                 <button
                   type="button"
                   onClick={() => fileRef.current?.click()}
-                  className="flex h-16 w-16 flex-col items-center justify-center gap-0.5 rounded-lg border border-dashed border-[#D7DAD8] bg-white text-[11px] text-[#5F6368] transition-colors hover:border-[#3E7BC4]/50 hover:text-[#1A1C1E]"
+                  className="flex h-16 w-16 flex-col items-center justify-center gap-0.5 rounded-lg border border-dashed border-[#E2E6EC] bg-white text-[11px] text-[#6B6F68] transition-colors hover:border-[#3E7BC4]/50 hover:text-[#171A17]"
                 >
                   <span className="text-[16px] leading-none">+</span>
                   Add

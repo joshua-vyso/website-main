@@ -138,25 +138,25 @@ export function PaymentTermsDb({ data }: { data: CoreData }) {
       ) : filtered.length === 0 ? (
         <EmptyState title="No matches" body="No payment terms match your search." />
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-[#E7E7E2] bg-white">
-          <table className="w-full text-[13px]">
+        <div className="overflow-x-auto rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <table className="w-full text-[14px]">
             <thead>
-              <tr className="border-b border-[#E7E7E2] text-left text-[11px] uppercase tracking-wide text-[#9A9DA1]">
-                <th className="px-4 py-3 font-semibold">Name</th>
-                <th className="px-4 py-3 text-right font-semibold">Days</th>
-                <th className="px-4 py-3 font-semibold">Description</th>
-                <th className="px-4 py-3 font-semibold">Default</th>
+              <tr className="border-b border-[#EEF1F5] bg-[#FBFCFE] text-left text-[11px] uppercase tracking-[0.06em] text-[#A0A49C]">
+                <th className="px-4 py-3 font-medium">Name</th>
+                <th className="px-4 py-3 text-right font-medium">Days</th>
+                <th className="px-4 py-3 font-medium">Description</th>
+                <th className="px-4 py-3 font-medium">Default</th>
                 <th className="px-4 py-3" />
               </tr>
             </thead>
             <tbody>
               {filtered.map((t) => (
-                <tr key={t.id} className="border-b border-[#F0F0EC] last:border-0 hover:bg-[#FBFBF9]">
-                  <td className="px-4 py-3 font-medium text-[#1A1C1E]">{t.name}</td>
-                  <td className="px-4 py-3 text-right tabular-nums text-[#1A1C1E]">{t.days === 0 ? 'COD' : `${t.days} days`}</td>
-                  <td className="px-4 py-3 text-[#5F6368]">{t.description || '—'}</td>
-                  <td className="px-4 py-3">{t.is_default ? <Pill label="Default" bg="#E1F5EE" fg="#0F6E56" /> : <span className="text-[#9A9DA1]">—</span>}</td>
-                  <td className="px-4 py-3 text-right">
+                <tr key={t.id} className="border-b border-[#F4F5F7] last:border-0 hover:bg-[#F5F9FE]">
+                  <td className="px-4 py-3.5 font-semibold text-[#171A17]">{t.name}</td>
+                  <td className="of-num px-4 py-3.5 text-right text-[#171A17]">{t.days === 0 ? 'COD' : `${t.days} days`}</td>
+                  <td className="px-4 py-3.5 text-[#6B6F68]">{t.description || '—'}</td>
+                  <td className="px-4 py-3.5">{t.is_default ? <Pill label="Default" bg="#E1F5EE" fg="#0F6E56" /> : <span className="text-[#A0A49C]">—</span>}</td>
+                  <td className="px-4 py-3.5 text-right">
                     <RowActionsMenu
                       actions={[
                         { label: 'Edit', onClick: () => startEdit(t) },
@@ -184,7 +184,7 @@ export function PaymentTermsDb({ data }: { data: CoreData }) {
           </>
         }
       >
-        <div className="space-y-3">
+        <div className="space-y-4">
           <Field label="Name">
             <input value={draft.name} onChange={(e) => setDraft({ ...draft, name: e.target.value })} placeholder="e.g. 30 days, COD" className={inputClass} />
           </Field>
@@ -194,11 +194,11 @@ export function PaymentTermsDb({ data }: { data: CoreData }) {
           <Field label="Description" hint="(optional)">
             <input value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} placeholder="Payment due within 30 days of invoice" className={inputClass} />
           </Field>
-          <label className="flex items-center gap-2.5 text-[13px] text-[#1A1C1E]">
-            <input type="checkbox" checked={draft.is_default} onChange={(e) => setDraft({ ...draft, is_default: e.target.checked })} className="h-4 w-4 accent-[#3E7BC4]" />
+          <label className="flex items-center gap-2.5 text-[14px] text-[#171A17]">
+            <input type="checkbox" checked={draft.is_default} onChange={(e) => setDraft({ ...draft, is_default: e.target.checked })} className="h-4 w-4 accent-[#1F5FA8]" />
             Use as the default term for new invoices
           </label>
-          {error ? <p className="text-[12px] text-[#A32D2D]">{error}</p> : null}
+          {error ? <p className="text-[13px] text-[#A32D2D]">{error}</p> : null}
         </div>
       </Modal>
 

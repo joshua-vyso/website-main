@@ -14,9 +14,9 @@ export function DocumentRelationshipFlow({ doc }: { doc: DocumentWithSupplier })
   const missing = stages.filter((s) => s.state === 'missing');
 
   return (
-    <div className="rounded-2xl border border-[#E7E7E2] bg-white px-5 py-4">
-      <h3 className="text-[15px] font-semibold text-[#1A1C1E]">Document flow</h3>
-      <p className="mt-0.5 text-[12px] text-[#9A9DA1]">Order → Delivery → Invoice → Statement</p>
+    <div className="rounded-2xl border border-[#EAEDF2] bg-white px-5 py-4 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+      <h3 className="of-display text-[16px] font-semibold text-[#171A17]">Document flow</h3>
+      <p className="mt-0.5 text-[12px] text-[#A0A49C]">Order → Delivery → Invoice → Statement</p>
 
       <div className="mt-4 flex flex-wrap items-center gap-y-3">
         {stages.map((stage, i) => {
@@ -29,7 +29,7 @@ export function DocumentRelationshipFlow({ doc }: { doc: DocumentWithSupplier })
                   aria-hidden
                   className="mx-2 h-px w-6 shrink-0 border-t"
                   style={{
-                    borderColor: '#E7E7E2',
+                    borderColor: '#EAEDF2',
                     borderStyle: connectorDashed ? 'dashed' : 'solid',
                   }}
                 />
@@ -41,7 +41,7 @@ export function DocumentRelationshipFlow({ doc }: { doc: DocumentWithSupplier })
       </div>
 
       {missing.length > 0 ? (
-        <p className="mt-3 text-[12px] text-[#5F6368]">{missingSummary(missing)}</p>
+        <p className="mt-3 text-[12px] text-[#6B6F68]">{missingSummary(missing)}</p>
       ) : null}
     </div>
   );
@@ -50,10 +50,10 @@ export function DocumentRelationshipFlow({ doc }: { doc: DocumentWithSupplier })
 function StageNode({ stage }: { stage: DocumentRelationship }) {
   const className =
     stage.state === 'current'
-      ? 'rounded-xl border border-[#3E7BC4]/30 bg-[#EAF2FC] px-3 py-2 text-[12px] font-medium text-[#1F5FA8]'
+      ? 'rounded-[14px] border border-[#3E7BC4]/40 bg-[#EAF2FC] px-3.5 py-2 text-[12px] font-semibold text-[#1F5FA8]'
       : stage.state === 'present'
-        ? 'rounded-xl border border-[#E7E7E2] bg-white px-3 py-2 text-[12px] text-[#1A1C1E]'
-        : 'rounded-xl border border-dashed border-[#E7E7E2] px-3 py-2 text-[12px] text-[#9A9DA1]';
+        ? 'rounded-[14px] border border-[#EEF1F5] bg-white px-3.5 py-2 text-[12px] font-medium text-[#171A17]'
+        : 'rounded-[14px] border border-dashed border-[#E2E6EC] px-3.5 py-2 text-[12px] text-[#A0A49C]';
 
   return <span className={className}>{stage.label}</span>;
 }

@@ -27,7 +27,7 @@ import { createClient } from '@/lib/platform/supabase-browser';
 // Wizard constants
 // ---------------------------------------------------------------------------
 
-const ACCENT = '#B0466A';
+const ACCENT = '#1F5FA8';
 
 const STEPS = [
   { n: 1, label: 'Supplier details' },
@@ -83,12 +83,12 @@ function emptyContact(key: number): DraftContact {
 // ---------------------------------------------------------------------------
 
 function fieldClass(): string {
-  return 'w-full rounded-xl border border-[#E7E7E2] bg-white px-3 py-2 text-[13px] text-[#1A1C1E] outline-none transition-colors placeholder:text-[#9A9DA1] focus:border-[#B0466A]';
+  return 'h-11 w-full rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] outline-none transition-colors placeholder:text-[#A0A49C] focus:border-[#3E7BC4]';
 }
 
 function Label({ children, required }: { children: React.ReactNode; required?: boolean }) {
   return (
-    <label className="mb-1 block text-[12px] font-medium text-[#5F6368]">
+    <label className="mb-1 block text-[12px] font-medium text-[#6B6F68]">
       {children}
       {required ? <span className="ml-0.5 text-[#A32D2D]">*</span> : null}
     </label>
@@ -147,13 +147,13 @@ function StepIndicator({ step }: { step: number }) {
                   ? { backgroundColor: ACCENT, color: '#fff' }
                   : done
                     ? { backgroundColor: `${ACCENT}1A`, color: ACCENT }
-                    : { backgroundColor: '#F0F0EC', color: FAINT }
+                    : { backgroundColor: '#EEF1F5', color: FAINT }
               }
             >
               {done ? '✓' : s.n}
             </span>
             {i < STEPS.length - 1 ? (
-              <span className="h-px w-4 shrink-0" style={{ backgroundColor: done ? ACCENT : '#F0F0EC' }} />
+              <span className="h-px w-4 shrink-0" style={{ backgroundColor: done ? ACCENT : '#EEF1F5' }} />
             ) : null}
           </div>
         );
@@ -337,24 +337,24 @@ export function AddSupplierWizard() {
       {createPortal(
         <div
           className="fixed inset-0 z-[95] flex items-start justify-center overflow-y-auto p-4 sm:items-center"
-          style={{ fontFamily: 'var(--font-inter)', ['--radius' as string]: '0.625rem' } as React.CSSProperties}
+          style={{ fontFamily: 'var(--font-instrument)', ['--radius' as string]: '0.625rem' } as React.CSSProperties}
         >
-          <div className="absolute inset-0 bg-[#1A1C1E]/25 backdrop-blur-[2px]" onClick={ss.closeAdd} />
+          <div className="absolute inset-0 bg-[#171A17]/25 backdrop-blur-[2px]" onClick={ss.closeAdd} />
 
-          <div className="relative my-auto w-full max-w-[560px] rounded-2xl border border-[#E7E7E2] bg-white p-5 shadow-[0_24px_70px_-20px_rgba(26,28,30,0.45)]">
+          <div className="relative my-auto w-full max-w-[560px] rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_24px_70px_-20px_rgba(26,28,30,0.45)]">
             {/* Header */}
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
-                <div className="text-[16px] font-semibold text-[#1A1C1E]">Add supplier</div>
-                <div className="mt-0.5 text-[13px] text-[#5F6368]">
-                  Step {step + 1} of {STEPS.length} · {STEPS[step].label}
+                <div className="of-display text-[18px] font-semibold tracking-[-0.015em] text-[#171A17]">Add supplier</div>
+                <div className="mt-0.5 text-[13px] text-[#6B6F68]">
+                  Step <span className="of-num">{step + 1}</span> of <span className="of-num">{STEPS.length}</span> · {STEPS[step].label}
                 </div>
               </div>
               <button
                 type="button"
                 onClick={ss.closeAdd}
                 aria-label="Close"
-                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[18px] text-[#9A9DA1] transition-colors hover:bg-[#F0F0EC] hover:text-[#1A1C1E]"
+                className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-[18px] text-[#8A8E86] transition-colors hover:bg-[#EEF1F5] hover:text-[#171A17]"
               >
                 ✕
               </button>
@@ -364,7 +364,7 @@ export function AddSupplierWizard() {
               <StepIndicator step={step} />
             </div>
 
-            <div className="my-4 h-px w-full bg-[#F0F0EC]" />
+            <div className="my-4 h-px w-full bg-[#EEF1F5]" />
 
             {/* Body */}
             <div className="min-h-[248px]">
@@ -394,20 +394,20 @@ export function AddSupplierWizard() {
 
               {step === 1 ? (
                 <div className="space-y-3">
-                  <p className="text-[12px] leading-snug text-[#5F6368]">
+                  <p className="text-[12px] leading-snug text-[#6B6F68]">
                     Add the people you deal with. These are saved against the supplier — the primary contact from step 1 is
                     kept separately.
                   </p>
                   {contacts.length === 0 ? (
-                    <div className="rounded-xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-4 py-6 text-center text-[13px] text-[#5F6368]">
+                    <div className="rounded-xl border border-dashed border-[#E2E6EC] bg-[#FBFCFE] px-4 py-6 text-center text-[13px] text-[#6B6F68]">
                       No extra contacts yet — optional.
                     </div>
                   ) : (
                     <div className="space-y-3">
                       {contacts.map((c) => (
-                        <div key={c.key} className="rounded-xl border border-[#E7E7E2] bg-[#FBFBF9] p-3">
+                        <div key={c.key} className="rounded-xl border border-[#EAEDF2] bg-[#FBFCFE] p-3">
                           <div className="mb-2 flex items-center justify-between">
-                            <span className="text-[12px] font-medium text-[#5F6368]">Contact</span>
+                            <span className="text-[12px] font-medium text-[#6B6F68]">Contact</span>
                             <button
                               type="button"
                               onClick={() => removeContact(c.key)}
@@ -467,7 +467,7 @@ export function AddSupplierWizard() {
                   <button
                     type="button"
                     onClick={addContact}
-                    className="w-full rounded-xl border border-dashed border-[#D7DAD8] px-3 py-2 text-[13px] font-medium text-[#5F6368] transition-colors hover:border-[#B0466A] hover:text-[#B0466A]"
+                    className="inline-flex h-[42px] w-full items-center justify-center rounded-[12px] border border-dashed border-[#E2E6EC] px-4 text-[14px] font-medium text-[#6B6F68] transition-colors hover:border-[#3E7BC4] hover:text-[#1F5FA8]"
                   >
                     + Add contact
                   </button>
@@ -495,7 +495,7 @@ export function AddSupplierWizard() {
                         type="button"
                         onClick={() => addCategory(categoryInput)}
                         disabled={!categoryInput.trim()}
-                        className="shrink-0 rounded-xl px-3.5 py-2 text-[13px] font-semibold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-40"
+                        className="inline-flex h-11 shrink-0 items-center rounded-[12px] px-[18px] text-[14px] font-semibold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-40"
                         style={{ backgroundColor: INK }}
                       >
                         Add
@@ -516,7 +516,7 @@ export function AddSupplierWizard() {
                             type="button"
                             onClick={() => removeCategory(c)}
                             aria-label={`Remove ${c}`}
-                            className="flex h-4 w-4 items-center justify-center rounded-full text-[11px] leading-none text-[#9A9DA1] transition-colors hover:bg-[#F0F0EC] hover:text-[#1A1C1E]"
+                            className="flex h-4 w-4 items-center justify-center rounded-full text-[11px] leading-none text-[#8A8E86] transition-colors hover:bg-[#EEF1F5] hover:text-[#171A17]"
                           >
                             ✕
                           </button>
@@ -524,11 +524,11 @@ export function AddSupplierWizard() {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-[12px] text-[#9A9DA1]">No categories added yet.</p>
+                    <p className="text-[12px] text-[#8A8E86]">No categories added yet.</p>
                   )}
 
                   <div>
-                    <div className="mb-1.5 text-[11px] uppercase tracking-wide text-[#9A9DA1]">Quick add</div>
+                    <div className="mb-2 text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">Quick add</div>
                     <div className="flex flex-wrap gap-1.5">
                       {COMMON_CATEGORIES.map((c) => {
                         const chosen = categories.some((x) => x.toLowerCase() === c.toLowerCase());
@@ -541,7 +541,7 @@ export function AddSupplierWizard() {
                             style={
                               chosen
                                 ? { borderColor: ACCENT, backgroundColor: `${ACCENT}12`, color: ACCENT }
-                                : { borderColor: '#E7E7E2', color: MUTE }
+                                : { borderColor: '#EAEDF2', color: MUTE }
                             }
                           >
                             {chosen ? '✓ ' : '+ '}
@@ -556,9 +556,9 @@ export function AddSupplierWizard() {
 
               {step === 3 ? (
                 <div className="space-y-3">
-                  <p className="text-[12px] leading-snug text-[#5F6368]">
+                  <p className="text-[12px] leading-snug text-[#6B6F68]">
                     Tick the compliance documents you already hold for this supplier. This is a checklist for now — once{' '}
-                    <span className="font-medium text-[#1A1C1E]">Doc-U</span> reads an uploaded document it will feed the
+                    <span className="font-medium text-[#171A17]">Doc-U</span> reads an uploaded document it will feed the
                     live document record and expiry tracking here.
                   </p>
                   <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -573,7 +573,7 @@ export function AddSupplierWizard() {
                           style={
                             on
                               ? { borderColor: GREEN, backgroundColor: `${GREEN}0F` }
-                              : { borderColor: '#E7E7E2', backgroundColor: '#fff' }
+                              : { borderColor: '#EAEDF2', backgroundColor: '#fff' }
                           }
                         >
                           <span
@@ -582,13 +582,13 @@ export function AddSupplierWizard() {
                           >
                             {on ? '✓' : ''}
                           </span>
-                          <span className="text-[#1A1C1E]">{doc}</span>
+                          <span className="text-[#171A17]">{doc}</span>
                         </button>
                       );
                     })}
                   </div>
-                  <p className="text-[11px] text-[#9A9DA1]">
-                    {docsOnFile.length} of {STANDARD_DOCS.length} marked on file · informational only, not required to save.
+                  <p className="text-[12px] text-[#A0A49C]">
+                    <span className="of-num">{docsOnFile.length}</span> of <span className="of-num">{STANDARD_DOCS.length}</span> marked on file · informational only, not required to save.
                   </p>
                 </div>
               ) : null}
@@ -643,7 +643,7 @@ export function AddSupplierWizard() {
                           </button>
                         ))}
                       </div>
-                      <span className="text-[13px] tabular-nums text-[#5F6368]">{rating}.0</span>
+                      <span className="of-num text-[14px] text-[#6B6F68]">{rating}.0</span>
                     </div>
                   </div>
 
@@ -652,12 +652,12 @@ export function AddSupplierWizard() {
                     style={
                       status === 'preferred'
                         ? { borderColor: GREEN, backgroundColor: `${GREEN}0D` }
-                        : { borderColor: '#E7E7E2', backgroundColor: '#FBFBF9' }
+                        : { borderColor: '#EAEDF2', backgroundColor: '#FBFCFE' }
                     }
                   >
                     <span>
-                      <span className="block text-[13px] font-medium text-[#1A1C1E]">Preferred supplier</span>
-                      <span className="mt-0.5 block text-[12px] text-[#5F6368]">
+                      <span className="block text-[13px] font-medium text-[#171A17]">Preferred supplier</span>
+                      <span className="mt-0.5 block text-[12px] text-[#6B6F68]">
                         Flag as a go-to supplier — sets status to preferred.
                       </span>
                     </span>
@@ -669,7 +669,7 @@ export function AddSupplierWizard() {
                         setStatus((prev) => (prev === 'preferred' ? 'active' : 'preferred'))
                       }
                       className="relative h-6 w-11 shrink-0 rounded-full transition-colors"
-                      style={{ backgroundColor: status === 'preferred' ? GREEN : '#D7DAD8' }}
+                      style={{ backgroundColor: status === 'preferred' ? GREEN : '#E2E6EC' }}
                     >
                       <span
                         className="absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-all"
@@ -678,15 +678,15 @@ export function AddSupplierWizard() {
                     </button>
                   </label>
 
-                  <div className="rounded-xl border border-[#E7E7E2] bg-[#FBFBF9] p-3">
-                    <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">Ready to add</div>
+                  <div className="rounded-[14px] border border-[#EEF1F5] bg-[#FBFCFE] p-3.5">
+                    <div className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">Ready to add</div>
                     <div className="mt-1 flex items-center gap-2">
-                      <span className="text-[14px] font-semibold text-[#1A1C1E]">
+                      <span className="of-display text-[15px] font-semibold text-[#171A17]">
                         {name.trim() || 'Unnamed supplier'}
                       </span>
                       <Stars rating={rating} />
                     </div>
-                    <div className="mt-1 text-[12px] text-[#5F6368]">
+                    <div className="mt-1 text-[12px] text-[#6B6F68]">
                       {SUPPLIER_STATUS_META[status].label} · {SUPPLIER_RISK_META[risk].label}
                       {categories.length > 0 ? ` · ${categories.length} categor${categories.length === 1 ? 'y' : 'ies'}` : ''}
                       {contacts.filter((c) => c.name.trim()).length > 0
@@ -706,12 +706,12 @@ export function AddSupplierWizard() {
             ) : null}
 
             {/* Footer */}
-            <div className="mt-4 flex items-center justify-between gap-3 border-t border-[#F0F0EC] pt-4">
+            <div className="mt-4 flex items-center justify-between gap-3 border-t border-[#EEF1F5] pt-4">
               <button
                 type="button"
                 onClick={() => (step === 0 ? ss.closeAdd() : setStep((s) => s - 1))}
                 disabled={saving}
-                className="rounded-lg border border-[#E7E7E2] px-3.5 py-2 text-[13px] font-medium text-[#5F6368] transition-colors hover:bg-[#F0F0EC] hover:text-[#1A1C1E] disabled:opacity-50"
+                className="inline-flex h-[42px] items-center rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87] disabled:opacity-50"
               >
                 {step === 0 ? 'Cancel' : 'Back'}
               </button>
@@ -721,7 +721,7 @@ export function AddSupplierWizard() {
                   type="button"
                   onClick={handleCreate}
                   disabled={!nameValid || saving}
-                  className="rounded-lg px-4 py-2 text-[13px] font-semibold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-45"
+                  className="inline-flex h-[42px] items-center rounded-[11px] px-[18px] text-[14px] font-semibold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-45"
                   style={{ backgroundColor: ACCENT }}
                 >
                   {saving ? 'Creating…' : 'Create supplier'}
@@ -731,8 +731,8 @@ export function AddSupplierWizard() {
                   type="button"
                   onClick={() => canAdvance && setStep((s) => s + 1)}
                   disabled={!canAdvance}
-                  className="rounded-lg px-4 py-2 text-[13px] font-semibold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-45"
-                  style={{ backgroundColor: INK }}
+                  className="inline-flex h-[42px] items-center rounded-[11px] px-[18px] text-[14px] font-semibold text-white transition-colors disabled:cursor-not-allowed disabled:opacity-45"
+                  style={{ backgroundColor: ACCENT }}
                 >
                   Next
                 </button>

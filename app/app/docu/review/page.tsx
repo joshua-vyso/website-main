@@ -21,9 +21,9 @@ export default async function DocuReviewPage() {
   if (!session.features.docu) {
     return (
       <div className="flex min-h-[60vh] items-center justify-center px-8 py-7">
-        <div className="max-w-sm rounded-2xl border border-[#E7E7E2] bg-white px-8 py-10 text-center">
-          <h1 className="text-[18px] font-bold text-[#1A1C1E]">Doc-U is not enabled for your plan</h1>
-          <p className="mt-2 text-[14px] text-[#5F6368]">Contact your administrator to add Doc-U to your subscription.</p>
+        <div className="max-w-sm rounded-2xl border border-[#EAEDF2] bg-white px-8 py-10 text-center shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <h1 className="of-display text-[18px] font-semibold text-[#171A17]">Doc-U is not enabled for your plan</h1>
+          <p className="mt-2 text-[14px] text-[#6B6F68]">Contact your administrator to add Doc-U to your subscription.</p>
         </div>
       </div>
     );
@@ -53,8 +53,8 @@ export default async function DocuReviewPage() {
     <div className="px-8 py-7">
       <DocuNav reviewCount={docs.length} />
       <div className="mb-5 mt-5">
-        <h1 className="text-[22px] font-bold text-[#1A1C1E]">Review queue</h1>
-        <p className="mt-1 text-[14px] text-[#5F6368]">
+        <h1 className="of-display text-[28px] font-semibold leading-tight tracking-[-0.015em] text-[#171A17]">Review queue</h1>
+        <p className="mt-1.5 text-[14px] text-[#8A8E86]">
           Forwarded documents, extracted and waiting for you. Nothing updates your stock, orders or invoices until
           you Save.
         </p>
@@ -62,8 +62,8 @@ export default async function DocuReviewPage() {
       {/* Never let a failed query masquerade as an empty queue — that hid a missing-column
           bug where documents were waiting but the filter errored. Surface it instead. */}
       {error ? (
-        <div className="rounded-2xl border border-[#F0D0C4] bg-[#FBF1EC] px-6 py-5">
-          <p className="text-[15px] font-semibold text-[#9A3412]">Couldn’t load the review queue</p>
+        <div className="rounded-2xl border border-[#F3D3D3] bg-[#FCEBEB] px-6 py-5">
+          <p className="of-display text-[16px] font-semibold text-[#9A3412]">Couldn’t load the review queue</p>
           <p className="mt-1 text-[13px] text-[#9A3412]/80">
             {error.message}. Your documents are safe — nothing has been actioned.
           </p>

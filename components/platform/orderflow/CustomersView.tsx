@@ -45,7 +45,7 @@ function fmtDate(iso: string | null | undefined): string {
 }
 
 const filterSel =
-  'h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#3E7BC4]';
+  'h-9 rounded-lg border border-[#E2E6EC] bg-white px-2.5 text-[13px] text-[#6B6F68] outline-none focus:border-[#3E7BC4]';
 
 const TERM_OPTIONS = [0, 7, 14, 30, 45, 60];
 
@@ -261,13 +261,13 @@ export function CustomersView({
       {/* Header */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-[22px] font-bold text-[#1A1C1E]">Customers</h1>
-          <p className="mt-0.5 text-[13px] text-[#5F6368]">Your customer book — terms, balances and account status</p>
+          <h1 className="text-[22px] font-bold text-[#171A17]">Customers</h1>
+          <p className="mt-0.5 text-[13px] text-[#6B6F68]">Your customer book — terms, balances and account status</p>
         </div>
         <div className="flex items-center gap-2">
           <Link
             href="/app/docu/databases/customers"
-            className="inline-flex h-9 items-center justify-center rounded-lg border border-[#D7DAD8] bg-white px-4 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:bg-[#F0F0EC]"
+            className="inline-flex h-9 items-center justify-center rounded-lg border border-[#E2E6EC] bg-white px-4 text-[13px] font-medium text-[#171A17] transition-colors hover:bg-[#EEF1F5]"
           >
             Import
           </Link>
@@ -308,18 +308,18 @@ export function CustomersView({
             </option>
           ))}
         </select>
-        <label className="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#5F6368]">
+        <label className="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-[#E2E6EC] bg-white px-3 text-[13px] text-[#6B6F68]">
           <input type="checkbox" checked={overdueOnly} onChange={(e) => setOverdueOnly(e.target.checked)} className="accent-[#3E7BC4]" />
           Has overdue
         </label>
       </div>
 
       {/* Table */}
-      <div className="mt-4 overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
+      <div className="mt-4 overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white">
         <div className="overflow-x-auto">
           <table className="w-full text-[13px]">
             <thead>
-              <tr className="border-b border-[#F0F0EC] bg-[#FBFBF9] text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+              <tr className="border-b border-[#EEF1F5] bg-[#FBFCFE] text-[11px] uppercase tracking-wide text-[#8A8E86]">
                 <th className="px-3 py-2.5 text-left font-medium">Customer</th>
                 <th className="px-2 py-2.5 text-left font-medium">Type</th>
                 <th className="px-2 py-2.5 text-left font-medium">Terms</th>
@@ -332,16 +332,16 @@ export function CustomersView({
             <tbody>
               {filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="px-5 py-12 text-center text-[14px] text-[#9A9DA1]">
+                  <td colSpan={7} className="px-5 py-12 text-center text-[14px] text-[#8A8E86]">
                     {customers.length === 0 ? (
                       <div className="space-y-2">
-                        <p className="text-[15px] font-medium text-[#1A1C1E]">No customers yet</p>
-                        <p className="text-[13px] text-[#5F6368]">Add your first customer, or import an existing book from Core Data.</p>
+                        <p className="text-[15px] font-medium text-[#171A17]">No customers yet</p>
+                        <p className="text-[13px] text-[#6B6F68]">Add your first customer, or import an existing book from Core Data.</p>
                         <div className="mt-3 flex justify-center gap-2">
                           <PrimaryBtn onClick={openAdd}>+ Add customer</PrimaryBtn>
                           <Link
                             href="/app/docu/databases/customers"
-                            className="inline-flex h-9 items-center justify-center rounded-lg border border-[#D7DAD8] bg-white px-4 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:bg-[#F0F0EC]"
+                            className="inline-flex h-9 items-center justify-center rounded-lg border border-[#E2E6EC] bg-white px-4 text-[13px] font-medium text-[#171A17] transition-colors hover:bg-[#EEF1F5]"
                           >
                             Import
                           </Link>
@@ -360,19 +360,19 @@ export function CustomersView({
                     <tr
                       key={r.c.id}
                       onClick={() => router.push(`/app/orderflow/customers/${r.c.id}`)}
-                      className="cursor-pointer border-b border-[#F6F6F2] last:border-0 hover:bg-[#FAFAF8]"
+                      className="cursor-pointer border-b border-[#F5F9FE] last:border-0 hover:bg-[#F5F9FE]"
                     >
                       <td className="px-3 py-3">
-                        <div className="font-medium text-[#1A1C1E]">{r.c.name}</div>
-                        {r.c.trading_name ? <div className="mt-0.5 text-[12px] text-[#9A9DA1]">t/a {r.c.trading_name}</div> : null}
+                        <div className="font-medium text-[#171A17]">{r.c.name}</div>
+                        {r.c.trading_name ? <div className="mt-0.5 text-[12px] text-[#8A8E86]">t/a {r.c.trading_name}</div> : null}
                       </td>
-                      <td className="px-2 py-3 text-[#5F6368]">{typeLabel}</td>
-                      <td className="px-2 py-3 text-[#5F6368]">{r.termsDays == null ? '—' : r.termsDays === 0 ? 'COD' : `${r.termsDays}d`}</td>
-                      <td className="px-2 py-3 text-right tabular-nums" style={{ color: r.outstanding > 0 ? '#A32D2D' : '#9A9DA1' }}>
+                      <td className="px-2 py-3 text-[#6B6F68]">{typeLabel}</td>
+                      <td className="px-2 py-3 text-[#6B6F68]">{r.termsDays == null ? '—' : r.termsDays === 0 ? 'COD' : `${r.termsDays}d`}</td>
+                      <td className="px-2 py-3 text-right tabular-nums" style={{ color: r.outstanding > 0 ? '#A32D2D' : '#8A8E86' }}>
                         {r.outstanding > 0 ? zar2(r.outstanding) : '—'}
                         {r.overdue ? <span className="ml-1.5 text-[10px] font-semibold uppercase text-[#A32D2D]">overdue</span> : null}
                       </td>
-                      <td className="px-2 py-3 text-[#5F6368]">{fmtDate(r.lastInvoice)}</td>
+                      <td className="px-2 py-3 text-[#6B6F68]">{fmtDate(r.lastInvoice)}</td>
                       <td className="px-2 py-3">
                         <Pill label={statusStyle.label} bg={statusStyle.bg} fg={statusStyle.fg} />
                       </td>

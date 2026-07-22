@@ -750,9 +750,9 @@ export function ImportWizard({ initialEntity }: { initialEntity: ImportEntity })
           <div className="min-w-0">
             {/* Grid toolbar */}
             <div className="mb-3 flex flex-wrap items-center gap-3">
-              <div className="text-[13px] text-[#5F6368]">
-                <span className="font-semibold text-[#1A1C1E]">{data.length}</span> rows ·{' '}
-                <span className="font-semibold text-[#1A1C1E]">{mappedFieldCount}</span> fields mapped
+              <div className="text-[13px] text-[#6B6F68]">
+                <span className="of-num font-semibold text-[#171A17]">{data.length}</span> rows ·{' '}
+                <span className="of-num font-semibold text-[#171A17]">{mappedFieldCount}</span> fields mapped
               </div>
               {flaggedRowIdx.length > 0 ? (
                 <button
@@ -777,7 +777,7 @@ export function ImportWizard({ initialEntity }: { initialEntity: ImportEntity })
                 <button
                   type="button"
                   onClick={() => setShowEmpty((v) => !v)}
-                  className="rounded-lg border border-[#D7DAD8] bg-white px-2.5 py-1 text-[12px] font-medium text-[#5F6368] transition-colors hover:bg-[#F0F0EC]"
+                  className="rounded-lg border border-[#E2E6EC] bg-white px-2.5 py-1 text-[12px] font-medium text-[#6B6F68] transition-colors hover:bg-[#EEF1F5]"
                 >
                   {showEmpty ? 'Hide' : 'Show'} {emptyHiddenCount} empty column{emptyHiddenCount === 1 ? '' : 's'}
                 </button>
@@ -800,7 +800,7 @@ export function ImportWizard({ initialEntity }: { initialEntity: ImportEntity })
 
             {/* Pagination */}
             {rowIndexes.length > PAGE_SIZE ? (
-              <div className="mt-3 flex items-center justify-between text-[12px] text-[#5F6368]">
+              <div className="mt-3 flex items-center justify-between text-[12px] text-[#6B6F68]">
                 <span>
                   Showing {clampedPage * PAGE_SIZE + 1}–{Math.min((clampedPage + 1) * PAGE_SIZE, rowIndexes.length)} of{' '}
                   {rowIndexes.length}
@@ -813,7 +813,7 @@ export function ImportWizard({ initialEntity }: { initialEntity: ImportEntity })
                   >
                     Prev
                   </SecondaryBtn>
-                  <span className="tabular-nums">
+                  <span className="of-num">
                     {clampedPage + 1} / {pageCount}
                   </span>
                   <SecondaryBtn
@@ -846,9 +846,9 @@ export function ImportWizard({ initialEntity }: { initialEntity: ImportEntity })
 
       {/* Sticky action bar (grid step) */}
       {step === 'grid' ? (
-        <div className="sticky bottom-0 mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-[#E7E7E2] bg-white/90 py-4 backdrop-blur">
-          <div className="text-[13px] text-[#5F6368]">
-            <span className="font-semibold text-[#1A1C1E]">{importable}</span> of {data.length} rows will import
+        <div className="sticky bottom-0 mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-[#EAEDF2] bg-white/90 py-4 backdrop-blur">
+          <div className="text-[13px] text-[#6B6F68]">
+            <span className="of-num font-semibold text-[#171A17]">{importable}</span> of {data.length} rows will import
             {counts.dup > 0 ? ` · ${counts.dup} skipped (already in ${def.label.toLowerCase()})` : ''}
             {counts.missing > 0 ? ` · ${counts.missing} skipped (missing a name)` : ''}
           </div>
@@ -885,12 +885,12 @@ function StepBar({ step }: { step: Step }) {
                 ? 'bg-[#1F5FA8] text-white'
                 : i < activeIndex
                   ? 'bg-[#E1F5EE] text-[#0F6E56]'
-                  : 'bg-[#F0F0EC] text-[#9A9DA1]'
+                  : 'bg-[#EEF1F5] text-[#8A8E86]'
             }`}
           >
             {s.label}
           </span>
-          {i < steps.length - 1 ? <span className="text-[#D7DAD8]">→</span> : null}
+          {i < steps.length - 1 ? <span className="text-[#E2E6EC]">→</span> : null}
         </div>
       ))}
     </div>
@@ -917,7 +917,7 @@ function SourceStep({
   return (
     <div className="mt-6 max-w-2xl space-y-5">
       <div>
-        <div className="mb-2 text-[13px] font-medium text-[#1A1C1E]">What are you importing?</div>
+        <div className="mb-2 text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">What are you importing?</div>
         <div className="grid grid-cols-2 gap-3">
           {(Object.values(IMPORT_ENTITIES) as ImportEntityDef[]).map((d) => (
             <button
@@ -927,21 +927,21 @@ function SourceStep({
               className={`rounded-2xl border px-4 py-4 text-left transition-colors ${
                 entity === d.entity
                   ? 'border-[#3E7BC4] bg-[#F3F8F6]'
-                  : 'border-[#E7E7E2] bg-white hover:border-[#3E7BC4]/40 hover:bg-[#FAFAF8]'
+                  : 'border-[#EAEDF2] bg-white hover:border-[#3E7BC4]/40 hover:bg-[#F5F9FE]'
               }`}
             >
-              <div className="text-[15px] font-semibold text-[#1A1C1E]">{d.label}</div>
-              <div className="mt-0.5 font-mono text-[11px] text-[#9A9DA1]">{d.table}</div>
+              <div className="of-display text-[15px] font-semibold text-[#171A17]">{d.label}</div>
+              <div className="mt-0.5 font-mono text-[11px] text-[#A0A49C]">{d.table}</div>
             </button>
           ))}
         </div>
       </div>
 
       <div>
-        <div className="mb-2 text-[13px] font-medium text-[#1A1C1E]">Upload the file</div>
+        <div className="mb-2 text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">Upload the file</div>
         <label
           className={`flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-10 text-center transition-colors ${
-            parsing ? 'border-[#D7DAD8] bg-[#FBFBF9]' : 'border-[#D7DAD8] bg-[#FBFBF9] hover:border-[#3E7BC4]/50 hover:bg-[#F3F8F6]'
+            parsing ? 'border-[#E2E6EC] bg-[#FBFCFE]' : 'border-[#E2E6EC] bg-[#FBFCFE] hover:border-[#3E7BC4]/50 hover:bg-[#F3F8F6]'
           }`}
         >
           <input
@@ -955,10 +955,10 @@ function SourceStep({
               if (f) onFile(f);
             }}
           />
-          <span className="text-[15px] font-medium text-[#1A1C1E]">
+          <span className="text-[15px] font-medium text-[#171A17]">
             {parsing ? 'Reading…' : fileName ? fileName : 'Choose an Excel (.xlsx) or CSV file'}
           </span>
-          <span className="mt-1 text-[12px] text-[#9A9DA1]">
+          <span className="mt-1 text-[12px] text-[#8A8E86]">
             QuickBooks and Excel exports welcome. The first row is treated as the headers.
           </span>
         </label>
@@ -998,12 +998,12 @@ function Grid({
   onRemoveRow: (ri: number) => void;
 }) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
+    <div className="overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white">
       <div className="max-h-[62vh] overflow-auto">
         <table className="w-full border-collapse text-[13px]">
           <thead className="sticky top-0 z-10">
-            <tr className="bg-[#FBFBF9]">
-              <th className="sticky left-0 z-20 border-b border-r border-[#E7E7E2] bg-[#FBFBF9] px-2 py-2 text-left text-[11px] font-medium uppercase tracking-wide text-[#9A9DA1]">
+            <tr className="bg-[#FBFCFE]">
+              <th className="sticky left-0 z-20 border-b border-r border-[#EAEDF2] bg-[#FBFCFE] px-2 py-2 text-left text-[11px] font-medium uppercase tracking-[0.06em] text-[#A0A49C]">
                 #
               </th>
               {visibleColumnIdx.map((ci) => {
@@ -1011,16 +1011,16 @@ function Grid({
                 return (
                   <th
                     key={ci}
-                    className={`min-w-[160px] border-b border-r border-[#E7E7E2] px-2 py-2 text-left align-top ${
-                      col.dropped ? 'bg-[#F6F6F2]' : 'bg-[#FBFBF9]'
+                    className={`min-w-[160px] border-b border-r border-[#EAEDF2] px-2 py-2 text-left align-top ${
+                      col.dropped ? 'bg-[#F5F9FE]' : 'bg-[#FBFCFE]'
                     }`}
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span
-                        className={`truncate text-[12px] font-semibold ${col.dropped ? 'text-[#9A9DA1] line-through' : 'text-[#1A1C1E]'}`}
+                        className={`truncate text-[12px] font-semibold ${col.dropped ? 'text-[#8A8E86] line-through' : 'text-[#171A17]'}`}
                         title={col.header}
                       >
-                        {col.header || <span className="italic text-[#9A9DA1]">(no header)</span>}
+                        {col.header || <span className="italic text-[#8A8E86]">(no header)</span>}
                       </span>
                       <button
                         type="button"
@@ -1030,7 +1030,7 @@ function Grid({
                         className={`shrink-0 rounded px-1.5 py-0.5 text-[11px] font-medium transition-colors ${
                           col.dropped
                             ? 'text-[#1F5FA8] hover:bg-[#EAF3F0]'
-                            : 'text-[#9A9DA1] hover:bg-[#F3E7E7] hover:text-[#A32D2D]'
+                            : 'text-[#8A8E86] hover:bg-[#F3E7E7] hover:text-[#A32D2D]'
                         }`}
                       >
                         {col.dropped ? 'keep' : 'drop'}
@@ -1039,7 +1039,7 @@ function Grid({
                     <select
                       value={col.field}
                       onChange={(e) => onFieldChange(ci, e.target.value)}
-                      className="mt-1.5 h-7 w-full rounded-md border border-[#D7DAD8] bg-white px-1.5 text-[12px] text-[#1A1C1E] focus:border-[#3E7BC4]/50 focus:outline-none"
+                      className="mt-1.5 h-7 w-full rounded-md border border-[#E2E6EC] bg-white px-1.5 text-[12px] text-[#171A17] focus:border-[#3E7BC4]/50 focus:outline-none"
                     >
                       <option value={DROP}>— (drop)</option>
                       {def.fields.map((f) => (
@@ -1052,17 +1052,17 @@ function Grid({
                   </th>
                 );
               })}
-              <th className="border-b border-[#E7E7E2] bg-[#FBFBF9] px-2 py-2" />
+              <th className="border-b border-[#EAEDF2] bg-[#FBFCFE] px-2 py-2" />
             </tr>
           </thead>
           <tbody>
             {pageRowIndexes.map((ri) => {
               const flagged = flags.missingReq[ri] || flags.duplicate[ri] || flags.badEmail[ri];
               return (
-                <tr key={ri} className={flagged ? 'bg-[#FDF9F0]' : 'hover:bg-[#FBFBF9]'}>
-                  <td className="sticky left-0 z-[5] border-b border-r border-[#F0F0EC] bg-inherit px-2 py-1 align-top">
+                <tr key={ri} className={flagged ? 'bg-[#FDF9F0]' : 'hover:bg-[#FBFCFE]'}>
+                  <td className="sticky left-0 z-[5] border-b border-r border-[#EEF1F5] bg-inherit px-2 py-1 align-top">
                     <div className="flex flex-col items-start gap-0.5">
-                      <span className="text-[11px] tabular-nums text-[#9A9DA1]">{ri + 1}</span>
+                      <span className="of-num text-[11px] text-[#A0A49C]">{ri + 1}</span>
                       {flags.missingReq[ri] ? <Tag color="#A32D2D" bg="#F9EDED" label="req" title="Missing a required field" /> : null}
                       {flags.duplicate[ri] ? <Tag color="#854F0B" bg="#FBF3E4" label="dup" title="Duplicate of an existing or earlier row" /> : null}
                       {flags.badEmail[ri] ? <Tag color="#854F0B" bg="#FBF3E4" label="email" title="Malformed email" /> : null}
@@ -1076,7 +1076,7 @@ function Grid({
                     return (
                       <td
                         key={ci}
-                        className={`border-b border-r border-[#F0F0EC] px-1 py-1 align-top ${col.dropped ? 'bg-[#FBFBF9]' : ''}`}
+                        className={`border-b border-r border-[#EEF1F5] px-1 py-1 align-top ${col.dropped ? 'bg-[#FBFCFE]' : ''}`}
                       >
                         <input
                           defaultValue={data[ri]?.[ci] ?? ''}
@@ -1087,22 +1087,22 @@ function Grid({
                           }}
                           className={`h-7 w-full min-w-[140px] rounded-md border px-1.5 text-[12px] focus:outline-none ${
                             col.dropped
-                              ? 'border-transparent bg-transparent text-[#9A9DA1]'
+                              ? 'border-transparent bg-transparent text-[#8A8E86]'
                               : cellBad
-                                ? 'border-[#E7C9A0] bg-[#FDF8EF] text-[#1A1C1E] focus:border-[#854F0B]'
-                                : 'border-transparent bg-transparent text-[#1A1C1E] hover:border-[#E7E7E2] focus:border-[#3E7BC4]/50'
+                                ? 'border-[#E7C9A0] bg-[#FDF8EF] text-[#171A17] focus:border-[#854F0B]'
+                                : 'border-transparent bg-transparent text-[#171A17] hover:border-[#EAEDF2] focus:border-[#3E7BC4]/50'
                           }`}
                         />
                       </td>
                     );
                   })}
-                  <td className="border-b border-[#F0F0EC] px-1 py-1 align-top">
+                  <td className="border-b border-[#EEF1F5] px-1 py-1 align-top">
                     <button
                       type="button"
                       onClick={() => onRemoveRow(ri)}
                       aria-label="Remove row"
                       title="Remove row"
-                      className="rounded px-1.5 py-1 text-[13px] text-[#9A9DA1] transition-colors hover:bg-[#F3E7E7] hover:text-[#A32D2D]"
+                      className="rounded px-1.5 py-1 text-[13px] text-[#8A8E86] transition-colors hover:bg-[#F3E7E7] hover:text-[#A32D2D]"
                     >
                       ✕
                     </button>
@@ -1112,7 +1112,7 @@ function Grid({
             })}
             {pageRowIndexes.length === 0 ? (
               <tr>
-                <td colSpan={visibleColumnIdx.length + 2} className="px-4 py-10 text-center text-[13px] text-[#9A9DA1]">
+                <td colSpan={visibleColumnIdx.length + 2} className="px-4 py-10 text-center text-[13px] text-[#8A8E86]">
                   No rows to show.
                 </td>
               </tr>
@@ -1156,9 +1156,9 @@ function AiPanel({
   onCommand: () => void;
 }) {
   return (
-    <aside className="h-fit rounded-2xl border border-[#E7E7E2] bg-[#FBFBF9] p-4 lg:sticky lg:top-4">
-      <div className="text-[13px] font-semibold text-[#1A1C1E]">AI assist</div>
-      <p className="mt-1 text-[12px] leading-relaxed text-[#5F6368]">
+    <aside className="h-fit rounded-2xl border border-[#EAEDF2] bg-[#FBFCFE] p-4 lg:sticky lg:top-4">
+      <div className="of-display text-[14px] font-semibold text-[#171A17]">AI assist</div>
+      <p className="mt-1 text-[12px] leading-relaxed text-[#6B6F68]">
         Let AI map the columns to your {entityLabel.toLowerCase()} fields, or tell it what to fix — it edits the grid,
         you still confirm.
       </p>
@@ -1168,12 +1168,12 @@ function AiPanel({
       </PrimaryBtn>
 
       <div className="mt-4">
-        <label className="mb-1 block text-[12px] font-medium text-[#1A1C1E]">Tell the AI what to change</label>
+        <label className="mb-1 block text-[12px] font-medium text-[#171A17]">Tell the AI what to change</label>
         <textarea
           value={instruction}
           onChange={(e) => setInstruction(e.target.value)}
           placeholder="e.g. Title-case the customer names, and map the Bill to columns to the billing address."
-          className="h-24 w-full rounded-lg border border-[#D7DAD8] bg-white px-2.5 py-2 text-[12px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/50 focus:outline-none"
+          className="h-24 w-full rounded-lg border border-[#E2E6EC] bg-white px-2.5 py-2 text-[12px] text-[#171A17] placeholder:text-[#8A8E86] focus:border-[#3E7BC4]/50 focus:outline-none"
         />
         <SecondaryBtn className="mt-2 w-full" onClick={onCommand} disabled={aiBusy !== null || instruction.trim() === ''}>
           {aiBusy === 'command' ? 'Applying…' : 'Apply'}
@@ -1207,7 +1207,7 @@ function SummaryStep({
 }) {
   const dbHref = `/app/docu/databases/${entity === 'customers' ? 'customers' : 'products'}`;
   if (!summary) {
-    return <div className="mt-6 text-[14px] text-[#5F6368]">No import run yet.</div>;
+    return <div className="mt-6 text-[14px] text-[#6B6F68]">No import run yet.</div>;
   }
   const ok = summary.inserted > 0 && summary.errors === 0;
   return (
@@ -1227,7 +1227,7 @@ function SummaryStep({
         }
       />
 
-      <div className="mt-4 overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
+      <div className="mt-4 overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white">
         <SummaryRow label="Inserted" value={summary.inserted} accent="#0F6E56" />
         <SummaryRow label="Skipped — duplicate" value={summary.skippedDuplicate} />
         <SummaryRow label="Skipped — missing required" value={summary.skippedMissing} />
@@ -1254,7 +1254,7 @@ function SummaryStep({
       <div className="mt-5 flex flex-wrap items-center gap-2">
         <Link
           href={dbHref}
-          className="inline-flex h-9 items-center justify-center rounded-lg bg-[#1F5FA8] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87]"
+          className="inline-flex h-[42px] items-center justify-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87]"
         >
           Done — view {def.label.toLowerCase()}
         </Link>
@@ -1266,9 +1266,9 @@ function SummaryStep({
 
 function SummaryRow({ label, value, accent, last }: { label: string; value: number; accent?: string; last?: boolean }) {
   return (
-    <div className={`flex items-center justify-between px-4 py-3 ${last ? '' : 'border-b border-[#F0F0EC]'}`}>
-      <span className="text-[13px] text-[#5F6368]">{label}</span>
-      <span className="text-[15px] font-semibold tabular-nums" style={{ color: accent ?? '#1A1C1E' }}>
+    <div className={`flex items-center justify-between px-4 py-3 ${last ? '' : 'border-b border-[#EEF1F5]'}`}>
+      <span className="text-[13px] text-[#6B6F68]">{label}</span>
+      <span className="of-num text-[17px] font-semibold" style={{ color: accent ?? '#171A17' }}>
         {value}
       </span>
     </div>

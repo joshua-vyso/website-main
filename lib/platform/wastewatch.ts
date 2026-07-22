@@ -166,7 +166,7 @@ export const DEVICE_TYPES: DeviceType[] = ['Bluetooth Scale', 'Bench Scale', 'Fl
 
 export const DEVICE_STATUS_STYLE: Record<DeviceStatus, { bg: string; fg: string; label: string }> = {
   online: { bg: '#E1F5EE', fg: '#0F6E56', label: 'Online' },
-  offline: { bg: '#F0F0EC', fg: '#5F6368', label: 'Offline' },
+  offline: { bg: '#EEF1F5', fg: '#6B6F68', label: 'Offline' },
   calibrating: { bg: '#E6F1FB', fg: '#0C447C', label: 'Calibrating' },
   attention: { bg: '#FCEBEB', fg: '#A32D2D', label: 'Needs attention' },
 };

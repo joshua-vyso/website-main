@@ -85,8 +85,8 @@ export default async function PricePilotNotificationsPage() {
   return (
     <div>
       <div>
-        <h1 className="text-[26px] font-bold text-[#1A1C1E]">Notifications</h1>
-        <p className="mt-1 text-[14px] text-[#5F6368]">
+        <h1 className="of-display text-[28px] font-semibold tracking-[-0.015em] text-[#171A17]">Notifications</h1>
+        <p className="mt-1 text-[14px] text-[#8A8E86]">
           {notifications.length === 0
             ? 'Pricing alerts across contracts, margins and costs'
             : `${notifications.length} alert${notifications.length === 1 ? '' : 's'}${high > 0 ? ` · ${high} need${high === 1 ? 's' : ''} action` : ''}`}

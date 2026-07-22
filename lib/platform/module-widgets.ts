@@ -79,7 +79,7 @@ export function widgetsFor(key: VysoModuleKey): ModuleWidget[] {
 }
 
 export const WIDGET_SEVERITY_STYLE: Record<WidgetSeverity, { dot: string; fg: string }> = {
-  neutral: { dot: '#9A9DA1', fg: '#1A1C1E' },
+  neutral: { dot: '#8A8E86', fg: '#171A17' },
   positive: { dot: '#0F6E56', fg: '#0F6E56' },
   warning: { dot: '#854F0B', fg: '#854F0B' },
   critical: { dot: '#A32D2D', fg: '#A32D2D' },

@@ -107,10 +107,10 @@ export function RecommendationsView({
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="min-w-0">
-          <h1 className="text-[26px] font-bold text-[#1A1C1E]">Recommendations</h1>
-          <p className="mt-1 text-[14px] text-[#5F6368]">
-            {visible.length} suggested price {visible.length === 1 ? 'change' : 'changes'} · up to{' '}
-            <span className="font-semibold text-[#0F6E56]">+{zar(totalImpact)}/mo</span> gross profit
+          <h1 className="of-display text-[28px] font-semibold tracking-[-0.015em] text-[#171A17]">Recommendations</h1>
+          <p className="mt-1 text-[14px] text-[#8A8E86]">
+            <span className="of-num">{visible.length}</span> suggested price {visible.length === 1 ? 'change' : 'changes'} · up to{' '}
+            <span className="of-num font-semibold text-[#0F6E56]">+{zar(totalImpact)}/mo</span> gross profit
           </p>
         </div>
         <button
@@ -123,7 +123,7 @@ export function RecommendationsView({
               'all',
             );
           }}
-          className="inline-flex items-center justify-center rounded-lg bg-[#1F5FA8] px-4 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-50"
+          className="inline-flex h-[42px] items-center justify-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-50"
         >
           {busy === 'all' ? 'Publishing…' : 'Accept all'}
         </button>
@@ -140,11 +140,11 @@ export function RecommendationsView({
           const newSell = sellPrice(cost, m);
           const impact = impactFor(o);
           return (
-            <div key={o.item.id} className="rounded-2xl border border-[#E7E7E2] bg-white p-5">
+            <div key={o.item.id} className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
-                    <span className="truncate text-[15px] font-semibold text-[#1A1C1E]">{o.item.name}</span>
+                    <span className="of-display truncate text-[16px] font-semibold text-[#171A17]">{o.item.name}</span>
                     <span
                       className="shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium"
                       style={{ backgroundColor: cs.bg, color: cs.fg }}
@@ -152,46 +152,46 @@ export function RecommendationsView({
                       {cs.label}
                     </span>
                   </div>
-                  <p className="mt-1.5 text-[13px] leading-relaxed text-[#5F6368]">{meta.reason}</p>
-                  <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-1.5 text-[13px]">
+                  <p className="mt-1.5 text-[13px] leading-relaxed text-[#6B6F68]">{meta.reason}</p>
+                  <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-1.5 text-[14px]">
                     <Stat label="Margin" from={`${Math.round(o.currentMargin)}%`} to={`${Math.round(m)}%`} />
                     <Stat label="Sell price" from={zar2(o.currentSell)} to={zar2(newSell)} />
-                    <span className="text-[#9A9DA1]">
+                    <span className="text-[#8A8E86]">
                       Impact{' '}
                       {impact >= 1 ? (
-                        <span className="font-semibold text-[#0F6E56]">+{zar(impact)}/mo</span>
+                        <span className="of-num font-semibold text-[#0F6E56]">+{zar(impact)}/mo</span>
                       ) : impact <= -1 ? (
-                        <span className="font-semibold text-[#A32D2D]">−{zar(Math.abs(impact))}/mo</span>
+                        <span className="of-num font-semibold text-[#A32D2D]">−{zar(Math.abs(impact))}/mo</span>
                       ) : (
                         <span>—</span>
                       )}
                     </span>
                   </div>
                   {m < o.currentMargin ? (
-                    <p className="mt-2 text-[12px] font-medium text-[#A32D2D]">
+                    <p className="of-num mt-2 text-[12px] font-medium text-[#A32D2D]">
                       ⚠ Below the current {Math.round(o.currentMargin)}% margin — this lowers the price.
                     </p>
                   ) : null}
                 </div>
 
                 <div className="flex shrink-0 items-end gap-2">
-                  <label className="text-[12px] text-[#9A9DA1]">
+                  <label className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">
                     <span className="mb-1 block">Target margin</span>
-                    <span className="flex items-center rounded-lg border border-[#D7DAD8] bg-white px-2.5 focus-within:border-[#3E7BC4]">
+                    <span className="flex h-11 items-center rounded-[12px] border border-[#E4E9F0] bg-white px-3 focus-within:border-[#3E7BC4]">
                       <input
                         inputMode="decimal"
                         value={edited[o.item.id] ?? String(Math.round(o.suggestedMargin))}
                         onChange={(e) => setEdited((v) => ({ ...v, [o.item.id]: e.target.value }))}
-                        className="w-14 bg-transparent py-2 text-right text-[14px] text-[#1A1C1E] outline-none"
+                        className="of-num w-14 bg-transparent text-right text-[14px] text-[#171A17] outline-none"
                       />
-                      <span className="ml-1 text-[14px] text-[#9A9DA1]">%</span>
+                      <span className="ml-1 text-[14px] text-[#A0A49C]">%</span>
                     </span>
                   </label>
                   <button
                     type="button"
                     disabled={busy !== null}
                     onClick={() => publish([{ id: o.item.id, margin: m }], o.item.id)}
-                    className="inline-flex h-[38px] items-center justify-center rounded-lg bg-[#1F5FA8] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-50"
+                    className="inline-flex h-[42px] items-center justify-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-50"
                   >
                     {busy === o.item.id ? '…' : 'Accept'}
                   </button>
@@ -207,10 +207,10 @@ export function RecommendationsView({
 
 function Stat({ label, from, to }: { label: string; from: string; to: string }) {
   return (
-    <span className="text-[#9A9DA1]">
+    <span className="text-[#8A8E86]">
       {label}{' '}
-      <span className="text-[#5F6368]">{from}</span> <span aria-hidden>→</span>{' '}
-      <span className="font-semibold text-[#0F6E56]">{to}</span>
+      <span className="of-num text-[#6B6F68]">{from}</span> <span aria-hidden>→</span>{' '}
+      <span className="of-num font-semibold text-[#0F6E56]">{to}</span>
     </span>
   );
 }
@@ -226,14 +226,14 @@ function EmptyState({
 }) {
   return (
     <div>
-      <h1 className="text-[26px] font-bold text-[#1A1C1E]">Recommendations</h1>
-      <div className="mt-6 rounded-2xl border border-[#E7E7E2] bg-white px-6 py-12 text-center">
-        <p className="text-[15px] font-semibold text-[#1A1C1E]">{title}</p>
-        <p className="mx-auto mt-2 max-w-md text-[13px] text-[#5F6368]">{body}</p>
+      <h1 className="of-display text-[28px] font-semibold tracking-[-0.015em] text-[#171A17]">Recommendations</h1>
+      <div className="mt-6 rounded-2xl border border-[#EAEDF2] bg-white px-6 py-12 text-center shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+        <p className="of-display text-[16px] font-semibold text-[#171A17]">{title}</p>
+        <p className="mx-auto mt-2 max-w-md text-[13px] text-[#6B6F68]">{body}</p>
         {cta ? (
           <Link
             href={cta.href}
-            className="mt-4 inline-flex items-center justify-center rounded-lg bg-[#1F5FA8] px-4 py-2.5 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87]"
+            className="mt-4 inline-flex h-[42px] items-center justify-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87]"
           >
             {cta.label}
           </Link>

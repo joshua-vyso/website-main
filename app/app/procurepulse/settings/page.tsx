@@ -58,17 +58,17 @@ export default async function ProcurePulseSettings() {
       <PageHead title="Settings" subtitle="Notifications, defaults and units · thresholds live on the Products tab" />
 
       <div className="mt-4 max-w-[820px] space-y-4">
-        <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
-          <div className="text-[15px] font-medium text-[#1A1C1E] mb-1">Notifications</div>
+        <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <div className="of-display mb-1 text-[16px] font-semibold text-[#171A17]">Notifications</div>
           <div>
             {notificationRows.map((row) => (
               <div
                 key={row.label}
-                className="flex items-center justify-between gap-4 border-t border-[#EFEFEC] py-3.5"
+                className="flex items-center justify-between gap-4 border-t border-[#EEF1F5] py-3.5"
               >
                 <div className="min-w-0">
-                  <div className="text-[14px] font-medium text-[#1A1C1E]">{row.label}</div>
-                  <div className="text-[12px] text-[#9A9DA1]">{row.sub}</div>
+                  <div className="text-[14px] font-medium text-[#171A17]">{row.label}</div>
+                  <div className="text-[12px] text-[#8A8E86]">{row.sub}</div>
                 </div>
                 <div className="shrink-0">
                   <Toggle on={row.on} />
@@ -78,18 +78,18 @@ export default async function ProcurePulseSettings() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
-          <div className="text-[15px] font-medium text-[#1A1C1E] mb-1">Defaults</div>
+        <div className="rounded-2xl border border-[#EAEDF2] bg-white p-5 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+          <div className="of-display mb-1 text-[16px] font-semibold text-[#171A17]">Defaults</div>
           <div>
             {defaultRows.map((row) => (
               <div
                 key={row.label}
-                className="flex items-center justify-between gap-4 border-t border-[#EFEFEC] py-3.5"
+                className="flex items-center justify-between gap-4 border-t border-[#EEF1F5] py-3.5"
               >
-                <div className="text-[14px] font-medium text-[#1A1C1E]">{row.label}</div>
+                <div className="text-[14px] font-medium text-[#171A17]">{row.label}</div>
                 <div className="flex shrink-0 items-center gap-2">
-                  <span className="text-[14px] text-[#5F6368]">{row.value}</span>
-                  <span className="text-[16px] text-[#9A9DA1]">›</span>
+                  <span className="text-[14px] text-[#6B6F68]">{row.value}</span>
+                  <span className="text-[16px] text-[#8A8E86]">›</span>
                 </div>
               </div>
             ))}

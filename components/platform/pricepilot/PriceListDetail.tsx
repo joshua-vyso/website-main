@@ -135,30 +135,30 @@ export function PriceListDetail({
   const rows = filtered.slice(safePage * PAGE, safePage * PAGE + PAGE);
 
   const COLS = 'grid grid-cols-[minmax(180px,1fr)_110px_96px_120px_40px] gap-2 items-center';
-  const cell = 'h-9 rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:border-[#3E7BC4]/40 focus:outline-none';
+  const cell = 'of-num h-9 rounded-[10px] border border-[#E4E9F0] bg-white px-2.5 text-[13px] text-[#171A17] outline-none focus:border-[#3E7BC4]';
 
   return (
     <div>
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex items-center gap-3">
-          <Link href="/app/pricepilot/price-lists" className="inline-flex h-8 items-center gap-1 rounded-full border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#5F6368] transition-colors hover:border-[#3E7BC4]/30 hover:text-[#1A1C1E]">
+          <Link href="/app/pricepilot/price-lists" className="inline-flex h-9 items-center gap-1 rounded-full border border-[#E2E6EC] bg-white px-3.5 text-[13px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]">
             <span aria-hidden>‹</span> Price lists
           </Link>
           <div>
-            <h1 className="text-[22px] font-bold text-[#1A1C1E]">{list.name}</h1>
-            <p className="text-[13px] text-[#5F6368]">
+            <h1 className="of-display text-[28px] font-semibold tracking-[-0.015em] text-[#171A17]">{list.name}</h1>
+            <p className="mt-1 text-[14px] text-[#8A8E86]">
               {customerName} · {CADENCE_LABEL[list.cadence]}
             </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <button type="button" onClick={exportCsv} className="rounded-lg border border-[#E7E7E2] bg-white px-3.5 py-2 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/30">
+          <button type="button" onClick={exportCsv} className="inline-flex h-[42px] items-center rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]">
             Export CSV
           </button>
-          <button type="button" onClick={() => setMsg('Price list queued to send (email delivery is a later step).')} className="rounded-lg border border-[#D7DAD8] bg-white px-3.5 py-2 text-[13px] font-medium text-[#5F6368] transition-colors hover:border-[#3E7BC4]/30">
+          <button type="button" onClick={() => setMsg('Price list queued to send (email delivery is a later step).')} className="inline-flex h-[42px] items-center rounded-[11px] border border-[#E2E6EC] bg-white px-[18px] text-[14px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]">
             Send
           </button>
-          <button type="button" onClick={() => void save()} disabled={busy || !dirty} className="rounded-lg bg-[#1F5FA8] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-40">
+          <button type="button" onClick={() => void save()} disabled={busy || !dirty} className="inline-flex h-[42px] items-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87] disabled:opacity-40">
             {busy ? 'Saving…' : dirty ? 'Save changes' : 'Saved'}
           </button>
         </div>
@@ -166,9 +166,9 @@ export function PriceListDetail({
 
       <div className="mt-5 flex flex-wrap items-center gap-3">
         <div className="flex items-center gap-2">
-          <span className="text-[13px] text-[#5F6368]">Default margin</span>
+          <span className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">Default margin</span>
           <input className={`${cell} w-20 text-right`} inputMode="decimal" value={defaultMargin} onChange={(e) => setDefaultMargin(e.target.value.replace(/[^0-9.]/g, ''))} />
-          <span className="text-[13px] text-[#5F6368]">%</span>
+          <span className="text-[13px] text-[#6B6F68]">%</span>
         </div>
         <div className="flex-1" />
         <input
@@ -176,12 +176,12 @@ export function PriceListDetail({
           value={search}
           onChange={(e) => { setSearch(e.target.value); setPage(0); }}
           placeholder="Search products…"
-          className="h-10 w-64 rounded-xl border border-[#E7E7E2] bg-white px-4 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
+          className="h-11 w-64 rounded-[12px] border border-[#E4E9F0] bg-white px-4 text-[14px] text-[#171A17] outline-none placeholder:text-[#A0A49C] focus:border-[#3E7BC4]"
         />
       </div>
 
-      <div className="mt-3 overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
-        <div className={`${COLS} border-b border-[#F0F0EC] bg-[#FBFBF9] px-4 py-2.5 text-[12px] text-[#5F6368]`}>
+      <div className="mt-3 overflow-hidden rounded-2xl border border-[#EAEDF2] bg-white shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+        <div className={`${COLS} border-b border-[#EEF1F5] bg-[#FBFCFE] px-4 py-2.5 text-[11px] font-medium uppercase tracking-[0.06em] text-[#A0A49C]`}>
           <span>Product</span>
           <span className="text-right">Base price</span>
           <span className="text-right">Margin %</span>
@@ -189,7 +189,7 @@ export function PriceListDetail({
           <span />
         </div>
         {rows.length === 0 ? (
-          <div className="px-4 py-12 text-center text-[14px] text-[#9A9DA1]">
+          <div className="px-4 py-12 text-center text-[14px] text-[#8A8E86]">
             {products.length === 0 ? 'No products in your catalogue yet.' : 'No products match your search.'}
           </div>
         ) : (
@@ -197,13 +197,13 @@ export function PriceListDetail({
             const m = effective(p.id);
             const overridden = p.id in overrides && overrides[p.id] !== def;
             return (
-              <div key={p.id} className={`${COLS} border-b border-[#F0F0EC] px-4 py-2 last:border-b-0`}>
-                <span className="truncate text-[13px] text-[#1A1C1E]">{p.name}</span>
-                <span className="text-right text-[13px] text-[#5F6368]">{zar2(p.avg_unit_price)}</span>
+              <div key={p.id} className={`${COLS} border-b border-[#F4F5F7] px-4 py-2 transition-colors last:border-b-0 hover:bg-[#F5F9FE]`}>
+                <span className="truncate text-[14px] font-semibold text-[#171A17]">{p.name}</span>
+                <span className="of-num text-right text-[14px] text-[#6B6F68]">{zar2(p.avg_unit_price)}</span>
                 <input className={`${cell} text-right`} inputMode="decimal" value={String(m)} onChange={(e) => setMargin(p.id, e.target.value)} />
-                <span className="text-right text-[13px] font-medium text-[#1A1C1E]">{zar2(sellPrice(p.avg_unit_price, m))}</span>
+                <span className="of-num text-right text-[14px] font-semibold text-[#171A17]">{zar2(sellPrice(p.avg_unit_price, m))}</span>
                 {overridden ? (
-                  <button type="button" onClick={() => resetRow(p.id)} title="Reset to default margin" className="flex h-9 w-9 items-center justify-center rounded-lg text-[#9A9DA1] hover:bg-[#F0F0EC] hover:text-[#1A1C1E]">
+                  <button type="button" onClick={() => resetRow(p.id)} title="Reset to default margin" className="flex h-9 w-9 items-center justify-center rounded-[10px] text-[#A0A49C] transition-colors hover:bg-[#EEF1F5] hover:text-[#171A17]">
                     ↺
                   </button>
                 ) : (
@@ -216,10 +216,10 @@ export function PriceListDetail({
       </div>
 
       {pageCount > 1 ? (
-        <div className="mt-3 flex items-center justify-center gap-3 text-[13px] text-[#5F6368]">
-          <button type="button" onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={safePage === 0} className="rounded-lg border border-[#E7E7E2] bg-white px-3 py-1.5 disabled:opacity-40">‹ Prev</button>
-          <span>Page {safePage + 1} of {pageCount}</span>
-          <button type="button" onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))} disabled={safePage >= pageCount - 1} className="rounded-lg border border-[#E7E7E2] bg-white px-3 py-1.5 disabled:opacity-40">Next ›</button>
+        <div className="mt-3 flex items-center justify-center gap-3 text-[13px] text-[#6B6F68]">
+          <button type="button" onClick={() => setPage((p) => Math.max(0, p - 1))} disabled={safePage === 0} className="inline-flex h-9 items-center rounded-[10px] border border-[#E2E6EC] bg-white px-3 font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87] disabled:opacity-40">‹ Prev</button>
+          <span className="of-num">Page {safePage + 1} of {pageCount}</span>
+          <button type="button" onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))} disabled={safePage >= pageCount - 1} className="inline-flex h-9 items-center rounded-[10px] border border-[#E2E6EC] bg-white px-3 font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87] disabled:opacity-40">Next ›</button>
         </div>
       ) : null}
 

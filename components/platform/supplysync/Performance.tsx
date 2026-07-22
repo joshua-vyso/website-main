@@ -93,7 +93,7 @@ const CAPTION = 'Illustrative — from live supplier data';
 // ---------------------------------------------------------------------------
 
 function ChartCaption() {
-  return <p className="mt-2 text-[11px] text-[#9A9DA1]">{CAPTION}</p>;
+  return <p className="mt-2.5 text-[12px] text-[#A0A49C]">{CAPTION}</p>;
 }
 
 /** One highlight card (Best / Most improved / …). Guards a missing supplier. */
@@ -109,21 +109,21 @@ function HighlightCard({
   color: string;
 }) {
   return (
-    <div className="rounded-2xl border border-[#E7E7E2] bg-white p-4">
-      <div className="text-[11px] uppercase tracking-wide text-[#9A9DA1]">{label}</div>
+    <div className="rounded-[14px] border border-[#EEF1F5] bg-white p-4 shadow-[0_1px_2px_rgba(20,24,20,0.03)]">
+      <div className="text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">{label}</div>
       {supplier ? (
         <>
           <SupplierNameButton
             id={supplier.id}
             name={supplier.name}
-            className="mt-1.5 block max-w-full truncate text-left text-[14px] font-semibold"
+            className="mt-2 block max-w-full truncate text-left text-[14px] font-semibold"
           />
-          <div className="mt-1 text-[20px] font-bold leading-none tabular-nums" style={{ color }}>
+          <div className="of-num mt-1 text-[22px] font-semibold leading-none tracking-[-0.02em]" style={{ color }}>
             {metric}
           </div>
         </>
       ) : (
-        <p className="mt-1.5 text-[13px] text-[#9A9DA1]">No data yet</p>
+        <p className="mt-2 text-[13px] text-[#A0A49C]">No data yet</p>
       )}
     </div>
   );
@@ -164,7 +164,7 @@ export function PerformanceTab() {
           <Sparkline data={trend} color={scoreColor(sc.overall)} width={96} height={32} />
         </div>
       ) : (
-        <span key="trend" className="text-[#9A9DA1]">
+        <span key="trend" className="text-[#8A8E86]">
           —
         </span>
       ),
@@ -227,7 +227,7 @@ export function PerformanceTab() {
               <ChartCaption />
             </>
           ) : (
-            <p className="text-[13px] text-[#9A9DA1]">No reliability history yet.</p>
+            <p className="text-[13px] text-[#8A8E86]">No reliability history yet.</p>
           )}
         </SectionCard>
 
@@ -238,7 +238,7 @@ export function PerformanceTab() {
               <ChartCaption />
             </>
           ) : (
-            <p className="text-[13px] text-[#9A9DA1]">No delivery history yet.</p>
+            <p className="text-[13px] text-[#8A8E86]">No delivery history yet.</p>
           )}
         </SectionCard>
 
@@ -254,8 +254,8 @@ export function PerformanceTab() {
                 thickness={26}
                 center={
                   <div className="text-center">
-                    <div className="text-[22px] font-bold tabular-nums text-[#1A1C1E]">{suppliers.length}</div>
-                    <div className="text-[11px] text-[#9A9DA1]">suppliers</div>
+                    <div className="of-num text-[26px] font-semibold tracking-[-0.02em] text-[#171A17]">{suppliers.length}</div>
+                    <div className="text-[12px] text-[#8A8E86]">suppliers</div>
                   </div>
                 }
               />
@@ -266,14 +266,14 @@ export function PerformanceTab() {
                   key={b.key}
                   onMouseEnter={() => setActiveBand(b.key)}
                   onMouseLeave={() => setActiveBand(null)}
-                  className="flex items-center justify-between gap-3 rounded-lg px-2 py-1.5"
-                  style={{ backgroundColor: activeBand === b.key ? '#FBFBF9' : 'transparent' }}
+                  className="flex items-center justify-between gap-3 rounded-[11px] px-2.5 py-1.5"
+                  style={{ backgroundColor: activeBand === b.key ? '#F5F9FE' : 'transparent' }}
                 >
-                  <span className="flex items-center gap-2 text-[13px] text-[#5F6368]">
+                  <span className="flex items-center gap-2 text-[14px] text-[#6B6F68]">
                     <span className="inline-block h-2.5 w-2.5 rounded-full" style={{ backgroundColor: b.color }} />
-                    Overall {b.label}
+                    Overall <span className="of-num">{b.label}</span>
                   </span>
-                  <span className="text-[13px] font-semibold tabular-nums" style={{ color: b.color }}>
+                  <span className="of-num text-[14px] font-semibold" style={{ color: b.color }}>
                     {b.count}
                   </span>
                 </li>
@@ -290,7 +290,7 @@ export function PerformanceTab() {
               <ChartCaption />
             </>
           ) : (
-            <p className="text-[13px] text-[#9A9DA1]">No quality issues logged.</p>
+            <p className="text-[13px] text-[#8A8E86]">No quality issues logged.</p>
           )}
         </SectionCard>
       </div>

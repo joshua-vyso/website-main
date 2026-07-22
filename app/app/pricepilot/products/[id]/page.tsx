@@ -50,9 +50,9 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
   if (!product) {
     return (
       <div className="flex min-h-[50vh] items-center justify-center">
-        <div className="max-w-sm rounded-2xl border border-[#E7E7E2] bg-white px-8 py-10 text-center">
-          <h1 className="text-[18px] font-bold text-[#1A1C1E]">Product not found</h1>
-          <Link href="/app/pricepilot/products" className="mt-4 inline-flex h-9 items-center rounded-lg bg-[#1A1C1E] px-4 text-[13px] font-medium text-white">
+        <div className="max-w-sm rounded-2xl border border-[#EAEDF2] bg-white px-8 py-10 text-center">
+          <h1 className="text-[18px] font-bold text-[#171A17]">Product not found</h1>
+          <Link href="/app/pricepilot/products" className="mt-4 inline-flex h-9 items-center rounded-lg bg-[#171A17] px-4 text-[13px] font-medium text-white">
             Back to products
           </Link>
         </div>
@@ -152,13 +152,13 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
         <div className="flex min-w-0 items-center gap-3">
           <Link
             href="/app/pricepilot/products"
-            className="inline-flex h-8 shrink-0 items-center gap-1 rounded-full border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#5F6368] transition-colors hover:border-[#3E7BC4]/30 hover:text-[#1A1C1E]"
+            className="inline-flex h-9 shrink-0 items-center gap-1 rounded-full border border-[#E2E6EC] bg-white px-3.5 text-[13px] font-medium text-[#3E4A57] transition-all hover:border-[#C9DEF7] hover:bg-[#EAF2FC] hover:text-[#174C87]"
           >
             <span aria-hidden>‹</span> Products
           </Link>
           <div className="min-w-0">
-            <h1 className="truncate text-[24px] font-bold text-[#1A1C1E]">{product.name}</h1>
-            <p className="mt-0.5 text-[13px] text-[#9A9DA1]">
+            <h1 className="of-display truncate text-[28px] font-semibold tracking-[-0.015em] text-[#171A17]">{product.name}</h1>
+            <p className="mt-1 text-[14px] text-[#8A8E86]">
               {product.category ?? 'Uncategorised'}
               {product.unit ? ` · per ${product.unit}` : ''}
             </p>
@@ -169,7 +169,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             className="inline-flex items-center rounded-full px-3 py-1 text-[12px] font-medium"
             style={belowTarget ? { backgroundColor: '#FCEBEB', color: '#A32D2D' } : { backgroundColor: '#E1F5EE', color: '#0F6E56' }}
           >
-            {belowTarget ? 'Below target' : 'On target'} · {Math.round(catalogueMargin)}% vs {Math.round(target)}%
+            {belowTarget ? 'Below target' : 'On target'} · <span className="of-num">{Math.round(catalogueMargin)}% vs {Math.round(target)}%</span>
           </span>
         ) : null}
       </div>
@@ -181,49 +181,49 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
         <KpiCard label="Projected annual profit" value={projectedAnnualProfit != null ? zar(projectedAnnualProfit) : '—'} accent="#0F6E56" />
       </div>
       {projectedAnnualProfit != null ? (
-        <p className="mt-2 text-[12px] text-[#9A9DA1]">
+        <p className="mt-2 text-[12px] text-[#A0A49C]">
           Projection = last 30 days&rsquo; gross profit on this product × 12 (estimate).
         </p>
       ) : null}
 
       <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-2">
-        <Panel title="Realized margin" right={<span className="text-[12px] text-[#9A9DA1]">last 6 months</span>}>
+        <Panel title="Realized margin" right={<span className="text-[12px] text-[#A0A49C]">last 6 months</span>}>
           {hasSalesHistory ? (
             <>
-              <div className="text-[24px] font-bold text-[#1A1C1E]">{marginSeries[marginSeries.length - 1]}%</div>
+              <div className="of-num text-[30px] font-semibold leading-none tracking-[-0.02em] text-[#171A17]">{marginSeries[marginSeries.length - 1]}%</div>
               <div className="mt-3"><AreaChart data={marginSeries} height={100} /></div>
-              <div className="mt-1 flex justify-between text-[11px] text-[#9A9DA1]">
+              <div className="of-num mt-1 flex justify-between text-[11px] text-[#A0A49C]">
                 <span>{monthBuckets[0].label}</span>
                 <span>{monthBuckets[monthBuckets.length - 1].label}</span>
               </div>
             </>
           ) : (
-            <p className="py-8 text-center text-[13px] text-[#9A9DA1]">No sales of this product yet.</p>
+            <p className="py-8 text-center text-[13px] text-[#8A8E86]">No sales of this product yet.</p>
           )}
         </Panel>
-        <Panel title="Cost history" right={<span className="text-[12px] text-[#9A9DA1]">from Doc-U</span>}>
+        <Panel title="Cost history" right={<span className="text-[12px] text-[#A0A49C]">from Doc-U</span>}>
           {costHistory.length > 1 ? (
             <>
-              <div className="text-[24px] font-bold text-[#1A1C1E]">{cost != null ? zar2(cost) : '—'}</div>
+              <div className="of-num text-[30px] font-semibold leading-none tracking-[-0.02em] text-[#171A17]">{cost != null ? zar2(cost) : '—'}</div>
               <div className="mt-3"><AreaChart data={costHistory} height={100} color="#D9730D" fill="#FBEEDA" /></div>
             </>
           ) : (
-            <p className="py-8 text-center text-[13px] text-[#9A9DA1]">Not enough cost history yet.</p>
+            <p className="py-8 text-center text-[13px] text-[#8A8E86]">Not enough cost history yet.</p>
           )}
         </Panel>
       </div>
 
       <div className="mt-5">
-        <Panel title="Customer pricing" right={<span className="text-[12px] text-[#9A9DA1]">{customerPrices.length} contract{customerPrices.length === 1 ? '' : 's'}</span>}>
+        <Panel title="Customer pricing" right={<span className="text-[12px] text-[#A0A49C]"><span className="of-num">{customerPrices.length}</span> contract{customerPrices.length === 1 ? '' : 's'}</span>}>
           {customerPrices.length === 0 ? (
-            <p className="py-6 text-center text-[13px] text-[#9A9DA1]">
+            <p className="py-6 text-center text-[13px] text-[#8A8E86]">
               No customer-specific pricing for this product. It sells at the standard {catalogueMargin != null ? `${Math.round(catalogueMargin)}% margin` : 'price'}.
             </p>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-[13px]">
+              <table className="w-full text-[14px]">
                 <thead>
-                  <tr className="border-b border-[#F0F0EC] text-[11px] uppercase tracking-wide text-[#9A9DA1]">
+                  <tr className="border-b border-[#EEF1F5] text-[11px] uppercase tracking-[0.06em] text-[#A0A49C]">
                     <th className="py-2 pr-3 text-left font-medium">Customer</th>
                     <th className="px-3 py-2 text-left font-medium">Price list</th>
                     <th className="px-3 py-2 text-right font-medium">Margin</th>
@@ -235,16 +235,16 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                   {customerPrices.map((cp) => {
                     const vs = VALIDITY_STYLE[cp.validity.status];
                     return (
-                      <tr key={cp.listId} className="border-b border-[#F6F6F2] last:border-0">
-                        <td className="py-2.5 pr-3 font-medium text-[#1A1C1E]">{cp.customer}</td>
-                        <td className="px-3 py-2.5 text-[#5F6368]">
+                      <tr key={cp.listId} className="border-b border-[#F4F5F7] last:border-0 hover:bg-[#F5F9FE]">
+                        <td className="py-3 pr-3 font-semibold text-[#171A17]">{cp.customer}</td>
+                        <td className="px-3 py-3 text-[#6B6F68]">
                           <Link href={`/app/pricepilot/price-lists/${cp.listId}`} className="hover:text-[#174C87]">
-                            {cp.listName} <span className="text-[#9A9DA1]">· {CADENCE_LABEL[cp.cadence]}</span>
+                            {cp.listName} <span className="text-[#A0A49C]">· {CADENCE_LABEL[cp.cadence]}</span>
                           </Link>
                         </td>
-                        <td className="px-3 py-2.5 text-right tabular-nums text-[#5F6368]">{Math.round(cp.margin)}%</td>
-                        <td className="px-3 py-2.5 text-right font-medium tabular-nums text-[#1A1C1E]">{cp.sell != null ? zar2(cp.sell) : '—'}</td>
-                        <td className="py-2.5 pl-3 text-right">
+                        <td className="of-num px-3 py-3 text-right text-[#6B6F68]">{Math.round(cp.margin)}%</td>
+                        <td className="of-num px-3 py-3 text-right font-semibold text-[#171A17]">{cp.sell != null ? zar2(cp.sell) : '—'}</td>
+                        <td className="py-3 pl-3 text-right">
                           <span className="inline-flex rounded-full px-2 py-0.5 text-[11px] font-medium" style={{ backgroundColor: vs.bg, color: vs.fg }}>
                             {cp.validity.label}
                           </span>
@@ -262,21 +262,21 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
       <div className="mt-5 grid grid-cols-1 gap-5 lg:grid-cols-2">
         <Panel title="Recent sales">
           {recent.length === 0 ? (
-            <p className="py-6 text-center text-[13px] text-[#9A9DA1]">No sales yet.</p>
+            <p className="py-6 text-center text-[13px] text-[#8A8E86]">No sales yet.</p>
           ) : (
             <div className="-my-1">
               {recent.map((l, i) => (
                 <Link
                   key={l.orderId + i}
                   href={`/app/orderflow/orders/${l.orderId}`}
-                  className={`flex items-center justify-between py-2.5 text-[13px] transition-colors hover:bg-[#FAFAF8] ${i > 0 ? 'border-t border-[#F0F0EC]' : ''}`}
+                  className={`flex items-center justify-between py-3 text-[14px] transition-colors hover:bg-[#F5F9FE] ${i > 0 ? 'border-t border-[#F4F5F7]' : ''}`}
                 >
-                  <span className="min-w-0 truncate text-[#1A1C1E]">
-                    <span className="text-[#9A9DA1]">{new Date(l.ts).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short' })}</span>{' '}
+                  <span className="min-w-0 truncate text-[#171A17]">
+                    <span className="of-num text-[#A0A49C]">{new Date(l.ts).toLocaleDateString('en-ZA', { day: 'numeric', month: 'short' })}</span>{' '}
                     {(l.customerId && custName.get(l.customerId)) || 'No customer'}
                   </span>
-                  <span className="shrink-0 tabular-nums text-[#5F6368]">
-                    {Math.round(l.qty)} × {zar2(l.price)} <span className="font-medium text-[#1A1C1E]">= {zar(l.revenue)}</span>
+                  <span className="of-num shrink-0 text-[#6B6F68]">
+                    {Math.round(l.qty)} × {zar2(l.price)} <span className="font-semibold text-[#171A17]">= {zar(l.revenue)}</span>
                   </span>
                 </Link>
               ))}
@@ -285,15 +285,15 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
         </Panel>
         <Panel title="Linked document">
           {linkedDoc ? (
-            <Link href={`/app/docu/${linkedDoc.id}`} className="flex items-center gap-3 rounded-xl border border-[#F0F0EC] p-3 transition-colors hover:border-[#3E7BC4]/30">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[#EAF2FC] text-[#1F5FA8]">▦</span>
+            <Link href={`/app/docu/${linkedDoc.id}`} className="flex items-center gap-3 rounded-[14px] border border-[#EEF1F5] p-3 transition-all hover:border-[#C9DEF7] hover:bg-[#F5F9FE]">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-[#EAF2FC] text-[#1F5FA8]">▦</span>
               <span className="min-w-0">
-                <span className="block truncate text-[13px] font-medium text-[#1A1C1E]">{linkedDoc.filename}</span>
-                <span className="block text-[12px] text-[#9A9DA1]">Source document in Doc-U →</span>
+                <span className="block truncate text-[14px] font-semibold text-[#171A17]">{linkedDoc.filename}</span>
+                <span className="block text-[12px] text-[#A0A49C]">Source document in Doc-U →</span>
               </span>
             </Link>
           ) : (
-            <p className="py-6 text-center text-[13px] text-[#9A9DA1]">No linked source document.</p>
+            <p className="py-6 text-center text-[13px] text-[#8A8E86]">No linked source document.</p>
           )}
         </Panel>
       </div>

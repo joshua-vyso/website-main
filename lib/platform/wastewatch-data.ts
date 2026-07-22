@@ -29,7 +29,7 @@ export async function getWasteWatchData(orgId: string): Promise<WasteWatchData> 
   const categories: WasteCategoryRow[] = ((cat.data as any[]) ?? []).map((r) => ({
     id: r.id,
     name: r.name,
-    color: r.color ?? '#9A9DA1',
+    color: r.color ?? '#8A8E86',
     cost: num(r.cost),
     pct: num(r.pct),
     trend: arr<number>(r.trend).map((n) => num(n)),
