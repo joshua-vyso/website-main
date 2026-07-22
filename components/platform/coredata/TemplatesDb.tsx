@@ -248,7 +248,7 @@ export function TemplatesDb({ data }: { data: CoreData }) {
             <textarea value={draft.terms} onChange={(e) => setDraft({ ...draft, terms: e.target.value })} placeholder="Payment due within 30 days." className={`${inputClass} h-20 py-2`} />
           </Field>
           <label className="flex items-center gap-2.5 text-[13px] text-[#1A1C1E]">
-            <input type="checkbox" checked={draft.is_default} onChange={(e) => setDraft({ ...draft, is_default: e.target.checked })} className="h-4 w-4 accent-[#1E5E54]" />
+            <input type="checkbox" checked={draft.is_default} onChange={(e) => setDraft({ ...draft, is_default: e.target.checked })} className="h-4 w-4 accent-[#3E7BC4]" />
             Default template for {TYPE_LABEL[draft.template_type]?.toLowerCase() ?? draft.template_type} documents
           </label>
           {error ? <p className="text-[12px] text-[#A32D2D]">{error}</p> : null}

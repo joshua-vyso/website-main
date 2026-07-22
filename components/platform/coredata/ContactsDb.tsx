@@ -277,7 +277,7 @@ export function ContactsDb({ data }: { data: CoreData }) {
         <select
           value={customerFilter}
           onChange={(e) => setCustomerFilter(e.target.value)}
-          className="h-9 max-w-[220px] rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] focus:border-[#1E5E54]/50 focus:outline-none"
+          className="h-9 max-w-[220px] rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] focus:border-[#3E7BC4]/50 focus:outline-none"
         >
           <option value="all">All customers</option>
           {customers.map((c) => (
@@ -333,7 +333,7 @@ export function ContactsDb({ data }: { data: CoreData }) {
                     <button
                       type="button"
                       onClick={() => openEdit(c)}
-                      className="inline-flex items-center gap-2 text-left font-medium text-[#1A1C1E] transition-colors hover:text-[#1E5E54] hover:underline"
+                      className="inline-flex items-center gap-2 text-left font-medium text-[#1A1C1E] transition-colors hover:text-[#174C87] hover:underline"
                     >
                       {c.name}
                       {c.is_primary ? <Pill label="Primary" bg="#E1F5EE" fg="#0F6E56" /> : null}
@@ -349,7 +349,7 @@ export function ContactsDb({ data }: { data: CoreData }) {
                       <button
                         type="button"
                         onClick={() => openEdit(c)}
-                        className="rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-[#1E5E54] transition-colors hover:bg-[#EAF3F0]"
+                        className="rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-[#1F5FA8] transition-colors hover:bg-[#EAF3F0]"
                       >
                         Edit
                       </button>
@@ -461,7 +461,7 @@ export function ContactsDb({ data }: { data: CoreData }) {
               type="checkbox"
               checked={form.is_primary}
               onChange={(e) => setForm({ ...form, is_primary: e.target.checked })}
-              className="h-4 w-4 accent-[#1E5E54]"
+              className="h-4 w-4 accent-[#3E7BC4]"
             />
             <span className="text-[13px] text-[#1A1C1E]">
               Primary contact

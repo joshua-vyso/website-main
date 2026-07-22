@@ -79,11 +79,11 @@ export function WasteOverview() {
       </div>
 
       {/* AI recommendations */}
-      <SectionCard title="AI recommendations" right={<span className="inline-flex items-center gap-1 text-[11px] font-medium text-[#1E5E54]">✦ auto-generated soon</span>}>
+      <SectionCard title="AI recommendations" right={<span className="inline-flex items-center gap-1 text-[11px] font-medium text-[#1F5FA8]">✦ auto-generated soon</span>}>
         <div className="flex flex-col gap-2.5">
           {INSIGHTS.map((i) => (
             <div key={i.id} className="flex flex-wrap items-center gap-2.5 text-[14px]">
-              <span className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1E5E54]" />
+              <span className="mt-0.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1F5FA8]" />
               <span className="min-w-0 flex-1 text-[#1A1C1E]">{i.text}</span>
               {i.module ? (
                 <Link href={MODULE_META[i.module].route} className="shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium" style={{ backgroundColor: MODULE_META[i.module].accent.bg, color: MODULE_META[i.module].accent.fg }}>{MODULE_META[i.module].name} →</Link>

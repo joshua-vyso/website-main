@@ -87,7 +87,7 @@ export function ProductsPricingView({
           </p>
           <Link
             href="/app/pricepilot/price-lists"
-            className="mt-4 inline-flex items-center justify-center rounded-lg bg-[#1E5E54] px-4 py-2.5 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45]"
+            className="mt-4 inline-flex items-center justify-center rounded-lg bg-[#1F5FA8] px-4 py-2.5 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87]"
           >
             Create a price list →
           </Link>
@@ -114,7 +114,7 @@ export function ProductsPricingView({
         </div>
         <Link
           href="/app/pricepilot/recommendations"
-          className="inline-flex items-center justify-center rounded-lg border border-[#D7DAD8] bg-white px-4 py-2.5 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/40"
+          className="inline-flex items-center justify-center rounded-lg border border-[#D7DAD8] bg-white px-4 py-2.5 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/40"
         >
           {belowCount > 0 ? `Review ${belowCount} below target →` : 'Recommendations →'}
         </Link>
@@ -125,7 +125,7 @@ export function ProductsPricingView({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search products…"
-          className="h-9 w-56 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] outline-none placeholder:text-[#9A9DA1] focus:border-[#1E5E54]"
+          className="h-9 w-56 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] outline-none placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]"
         />
         <div className="flex flex-wrap gap-1.5">
           {filters.map((f) => (
@@ -134,7 +134,7 @@ export function ProductsPricingView({
               type="button"
               onClick={() => setFilter(f.key)}
               className={`rounded-full px-3 py-1.5 text-[12px] font-medium transition-colors ${
-                filter === f.key ? 'bg-[#1E5E54] text-white' : 'border border-[#E7E7E2] bg-white text-[#5F6368] hover:border-[#1E5E54]/30'
+                filter === f.key ? 'bg-[#1F5FA8] text-white' : 'border border-[#E7E7E2] bg-white text-[#5F6368] hover:border-[#3E7BC4]/30'
               }`}
             >
               {f.label}
@@ -144,7 +144,7 @@ export function ProductsPricingView({
         <select
           value={sort}
           onChange={(e) => setSort(e.target.value as Sort)}
-          className="ml-auto h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#1E5E54]"
+          className="ml-auto h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#3E7BC4]"
         >
           <option value="margin-asc">Lowest margin first</option>
           <option value="margin-desc">Highest margin first</option>
@@ -182,7 +182,7 @@ export function ProductsPricingView({
                   return (
                     <tr key={r.id} className="border-b border-[#F6F6F2] last:border-0 hover:bg-[#FAFAF8]">
                       <td className="px-5 py-3 font-medium text-[#1A1C1E]">
-                        <Link href={`/app/pricepilot/products/${r.id}`} className="hover:text-[#1E5E54]">
+                        <Link href={`/app/pricepilot/products/${r.id}`} className="hover:text-[#174C87]">
                           {r.name}
                         </Link>
                       </td>

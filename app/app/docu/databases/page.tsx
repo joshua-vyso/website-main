@@ -58,7 +58,7 @@ export default async function DatabasesIndexPage() {
         </div>
         <Link
           href="/app/docu/databases/import"
-          className="inline-flex h-10 shrink-0 items-center rounded-xl bg-[#1E5E54] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#174A42]"
+          className="inline-flex h-10 shrink-0 items-center rounded-xl bg-[#1F5FA8] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87]"
         >
           Import Excel / CSV
         </Link>
@@ -71,10 +71,10 @@ export default async function DatabasesIndexPage() {
             <Link
               key={e.key}
               href={`/app/docu/databases/${e.key}`}
-              className="group flex flex-col rounded-2xl border border-[#E7E7E2] bg-white p-5 transition-colors hover:border-[#1E5E54]/40 hover:bg-[#FAFAF8]"
+              className="group flex flex-col rounded-2xl border border-[#E7E7E2] bg-white p-5 transition-colors hover:border-[#3E7BC4]/40 hover:bg-[#FAFAF8]"
             >
               <div className="flex items-start justify-between gap-3">
-                <h2 className="text-[15px] font-semibold text-[#1A1C1E] transition-colors group-hover:text-[#1E5E54]">
+                <h2 className="text-[15px] font-semibold text-[#1A1C1E] transition-colors group-hover:text-[#174C87]">
                   {e.label}
                 </h2>
                 <span className="shrink-0 text-[20px] font-bold leading-none text-[#1A1C1E]">{count}</span>

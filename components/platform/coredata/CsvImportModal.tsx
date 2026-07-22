@@ -220,7 +220,7 @@ export function CsvImportModal({
           <p className="text-[13px] text-[#5F6368]">
             Upload a CSV exported from QuickBooks, Excel or another system. The first row must be column headers.
           </p>
-          <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-10 text-center transition-colors hover:border-[#1E5E54]/50 hover:bg-[#F5F7F6]">
+          <label className="flex cursor-pointer flex-col items-center justify-center gap-2 rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-10 text-center transition-colors hover:border-[#3E7BC4]/50 hover:bg-[#F5F7F6]">
             <span className="text-[13px] font-medium text-[#1A1C1E]">Choose a CSV file</span>
             <span className="text-[12px] text-[#9A9DA1]">or drop it into the Databases page</span>
             <input
@@ -316,7 +316,7 @@ export function CsvImportModal({
             <button
               type="button"
               onClick={() => setSkipped(Object.fromEntries(duplicateIdx.map((i) => [i, true])))}
-              className="text-[#1E5E54] hover:underline"
+              className="text-[#1F5FA8] hover:underline"
             >
               Skip all
             </button>
@@ -338,7 +338,7 @@ export function CsvImportModal({
                     type="checkbox"
                     checked={isSkipped}
                     onChange={(e) => setSkipped({ ...skipped, [i]: e.target.checked })}
-                    className="h-4 w-4 accent-[#1E5E54]"
+                    className="h-4 w-4 accent-[#3E7BC4]"
                   />
                   <div className="min-w-0 flex-1">
                     <div className="truncate text-[13px] font-medium text-[#1A1C1E]">

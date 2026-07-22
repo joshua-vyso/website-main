@@ -474,3 +474,32 @@ html, body {
   .vyso-ai-gradient { animation: none; }
   .vyso-ai-dot { animation: none; }
 }
+
+/* ── OrderFlow ────────────────────────────────────────────────────────────────
+   The module pairs Instrument Sans for UI text with Space Grotesk for figures.
+   `.of-num` is for anything that should line up in a column — money, counts,
+   dates — so tabular figures matter as much as the face itself. `.of-display`
+   is the same face without tnum, for headings.                                */
+.of-num {
+  font-family: var(--font-grotesk), 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  font-feature-settings: 'tnum' 1;
+}
+.of-display {
+  font-family: var(--font-grotesk), 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+}
+
+/* ── Platform chrome: modules overlay + account menu ─────────────────────── */
+@keyframes vyso-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes vyso-pop-in {
+  from { opacity: 0; transform: translateY(-6px) scale(0.985); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+.vyso-fade-in { animation: vyso-fade-in 0.18s ease; }
+.vyso-pop-in  { animation: vyso-pop-in 0.2s cubic-bezier(0.2, 0.8, 0.3, 1); }
+@media (prefers-reduced-motion: reduce) {
+  .vyso-fade-in,
+  .vyso-pop-in { animation: none; }
+}

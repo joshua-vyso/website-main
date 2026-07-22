@@ -98,7 +98,7 @@ export function ComplaintsManager({
     router.refresh();
   }
 
-  const field = 'h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none';
+  const field = 'h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none';
 
   return (
     <div>
@@ -108,7 +108,7 @@ export function ComplaintsManager({
           <p className="mt-1 text-[14px] text-[#5F6368]">Issues raised about orders — notes, photos and status</p>
         </div>
         {!open ? (
-          <button type="button" onClick={() => setOpen(true)} className="inline-flex h-10 items-center rounded-xl bg-[#1E5E54] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#184D45]">
+          <button type="button" onClick={() => setOpen(true)} className="inline-flex h-10 items-center rounded-xl bg-[#1F5FA8] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87]">
             + Log complaint
           </button>
         ) : null}
@@ -116,7 +116,7 @@ export function ComplaintsManager({
 
       <div className="mt-6 space-y-3">
         {open ? (
-          <div className="rounded-2xl border border-[#1E5E54]/30 bg-[#FBFBF9] p-4">
+          <div className="rounded-2xl border border-[#3E7BC4]/30 bg-[#FBFBF9] p-4">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <input className={field} placeholder="What went wrong? (title)" value={title} onChange={(e) => setTitle(e.target.value)} />
               <select className={field} value={customerId} onChange={(e) => setCustomerId(e.target.value)}>
@@ -132,7 +132,7 @@ export function ComplaintsManager({
             </div>
             <div className="mt-3 flex justify-end gap-2">
               <button type="button" onClick={reset} className="rounded-lg px-3.5 py-2 text-[13px] text-[#5F6368] hover:bg-black/[0.03]">Cancel</button>
-              <button type="button" onClick={() => void create()} disabled={busy || !title.trim()} className="rounded-lg bg-[#1E5E54] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:opacity-40">
+              <button type="button" onClick={() => void create()} disabled={busy || !title.trim()} className="rounded-lg bg-[#1F5FA8] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-40">
                 {busy ? 'Saving…' : 'Log complaint'}
               </button>
             </div>
@@ -161,7 +161,7 @@ export function ComplaintsManager({
                       {c.order_invoice ? (
                         <>
                           {' · '}
-                          <Link href={`/app/orderflow/orders/${c.order_id}`} className="text-[#1E5E54] hover:underline">{c.order_invoice}</Link>
+                          <Link href={`/app/orderflow/orders/${c.order_id}`} className="text-[#1F5FA8] hover:underline">{c.order_invoice}</Link>
                         </>
                       ) : null}
                       {' · '}
@@ -169,7 +169,7 @@ export function ComplaintsManager({
                     </div>
                     {c.body ? <p className="mt-2 text-[13px] text-[#3C3F43]">{c.body}</p> : null}
                     {c.image_url ? (
-                      <a href={c.image_url} target="_blank" rel="noreferrer" className="mt-2 inline-block text-[12px] text-[#1E5E54] hover:underline">
+                      <a href={c.image_url} target="_blank" rel="noreferrer" className="mt-2 inline-block text-[12px] text-[#1F5FA8] hover:underline">
                         View attached image →
                       </a>
                     ) : null}

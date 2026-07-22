@@ -48,10 +48,10 @@ export function GoalsDashboard() {
       <SectionCard title="Goal timeline" right={<span className="text-[12px] font-medium" style={{ color: GOAL_TIMELINE.forecastFinish >= 100 ? '#0F6E56' : '#854F0B' }}>{GOAL_TIMELINE.forecastFinish >= 100 ? 'On track' : `Tracking to ${GOAL_TIMELINE.forecastFinish}% — behind by ${100 - GOAL_TIMELINE.forecastFinish}%`}</span>}>
         <div className="relative pb-6 pt-8">
           <div className="h-2 w-full rounded-full bg-[#F0F0EC]">
-            <div className="h-full rounded-full bg-[#1E5E54]" style={{ width: `${GOAL_TIMELINE.monthProgress}%`, transition: 'width 0.7s ease' }} />
+            <div className="h-full rounded-full bg-[#1F5FA8]" style={{ width: `${GOAL_TIMELINE.monthProgress}%`, transition: 'width 0.7s ease' }} />
           </div>
           <Marker pos={0} label="Month start" />
-          <Marker pos={GOAL_TIMELINE.monthProgress} label="Today" color="#1E5E54" big />
+          <Marker pos={GOAL_TIMELINE.monthProgress} label="Today" color="#3E7BC4" big />
           <Marker pos={GOAL_TIMELINE.forecastFinish} label="Forecast finish" color="#854F0B" big />
           <Marker pos={100} label="Goal" color="#0F6E56" />
         </div>
@@ -62,7 +62,7 @@ export function GoalsDashboard() {
         <div className="flex flex-wrap items-center gap-2">
           {GOAL_CHAIN.map((c, i) => {
             const chip = (
-              <span className="rounded-xl border border-[#E7E7E2] bg-white px-3.5 py-2 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/40">
+              <span className="rounded-xl border border-[#E7E7E2] bg-white px-3.5 py-2 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/40">
                 {c.label}
                 {c.module ? <span className="ml-1.5 text-[10px] font-medium" style={{ color: MODULE_META[c.module].accent.fg }}>{MODULE_META[c.module].name} →</span> : null}
               </span>

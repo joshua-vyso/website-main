@@ -287,7 +287,7 @@ export function InvoicesViewV2({ data }: { data: InvoicesData }) {
         </div>
         <Link
           href="/app/orderflow/invoices/new"
-          className="inline-flex h-9 items-center justify-center rounded-lg bg-[#1E5E54] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174A42]"
+          className="inline-flex h-9 items-center justify-center rounded-lg bg-[#1F5FA8] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87]"
         >
           + New invoice
         </Link>
@@ -323,8 +323,8 @@ export function InvoicesViewV2({ data }: { data: InvoicesData }) {
                 onClick={() => setTab(t.key)}
                 className={`h-8 rounded-lg border px-3 text-[12px] font-medium transition-colors ${
                   tab === t.key
-                    ? 'border-[#1E5E54] bg-[#1E5E54] text-white'
-                    : 'border-[#D7DAD8] bg-white text-[#5F6368] hover:border-[#1E5E54]/40'
+                    ? 'border-[#3E7BC4] bg-[#1F5FA8] text-white'
+                    : 'border-[#D7DAD8] bg-white text-[#5F6368] hover:border-[#3E7BC4]/40'
                 }`}
               >
                 {t.label}
@@ -350,7 +350,7 @@ export function InvoicesViewV2({ data }: { data: InvoicesData }) {
             action={
               <Link
                 href="/app/orderflow/invoices/new"
-                className="inline-flex h-9 items-center justify-center rounded-lg bg-[#1E5E54] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174A42]"
+                className="inline-flex h-9 items-center justify-center rounded-lg bg-[#1F5FA8] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87]"
               >
                 + New invoice
               </Link>
@@ -386,7 +386,7 @@ export function InvoicesViewV2({ data }: { data: InvoicesData }) {
                       }`}
                     >
                       <td className="px-4 py-3">
-                        <span className="font-medium text-[#1E5E54]">{r.inv.invoice_number}</span>
+                        <span className="font-medium text-[#1F5FA8]">{r.inv.invoice_number}</span>
                         {r.inv.customer_po ? <span className="mt-0.5 block text-[11px] text-[#9A9DA1]">PO {r.inv.customer_po}</span> : null}
                       </td>
                       <td className="max-w-[220px] truncate px-4 py-3 text-[#1A1C1E]">{r.customerName}</td>

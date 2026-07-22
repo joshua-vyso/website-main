@@ -147,8 +147,8 @@ export function UploadBubble({ onClose }: { onClose: () => void }) {
           onClick={() => (busy ? null : inputRef.current?.click())}
           className={`flex cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed px-5 py-9 text-center transition-colors ${
             dragging
-              ? 'border-[#1E5E54] bg-[#E9EFEC]'
-              : 'border-[#E7E7E2] bg-[#FAFAF8] hover:border-[#1E5E54]/40'
+              ? 'border-[#3E7BC4] bg-[#E7EEF8]'
+              : 'border-[#E7E7E2] bg-[#FAFAF8] hover:border-[#3E7BC4]/40'
           }`}
         >
           <span className="text-[13px] font-medium text-[#1A1C1E]">

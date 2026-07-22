@@ -29,7 +29,7 @@ export function DecisionsPanel() {
                 <div className="mt-1.5 text-[14px] font-medium text-[#1A1C1E]">{r.action}</div>
                 <div className="mt-0.5 text-[13px] font-semibold" style={{ color: r.impactValue > 0 ? '#0F6E56' : '#5F6368' }}>{r.impact} impact</div>
               </div>
-              <Link href={m.route} className="shrink-0 rounded-lg bg-[#1E5E54] px-3.5 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45]">Review →</Link>
+              <Link href={m.route} className="shrink-0 rounded-lg bg-[#1F5FA8] px-3.5 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87]">Review →</Link>
             </div>
           );
         })}

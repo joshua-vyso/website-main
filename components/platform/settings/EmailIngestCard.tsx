@@ -23,7 +23,7 @@ export interface IngestEvent {
 }
 
 const STATUS_STYLE: Record<string, { bg: string; fg: string; label: string }> = {
-  done: { bg: '#E9EFEC', fg: '#0F4C44', label: 'Filed' },
+  done: { bg: '#E7EEF8', fg: '#174C87', label: 'Filed' },
   queued: { bg: '#E6F1FB', fg: '#0C447C', label: 'Queued' },
   processing: { bg: '#E6F1FB', fg: '#0C447C', label: 'Working' },
   quarantined: { bg: '#FBEEDA', fg: '#854F0B', label: 'Held' },
@@ -136,7 +136,7 @@ export function EmailIngestCard({
                 <button
                   type="button"
                   onClick={() => void copy(address)}
-                  className="h-9 shrink-0 rounded-lg border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/30"
+                  className="h-9 shrink-0 rounded-lg border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/30"
                 >
                   {copied === address ? 'Copied' : 'Copy'}
                 </button>
@@ -181,7 +181,7 @@ export function EmailIngestCard({
                     <button
                       type="button"
                       onClick={() => void copy(quotesAddress)}
-                      className="h-9 shrink-0 rounded-lg border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/30"
+                      className="h-9 shrink-0 rounded-lg border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/30"
                     >
                       {copied === quotesAddress ? 'Copied' : 'Copy'}
                     </button>
@@ -211,7 +211,7 @@ export function EmailIngestCard({
                     type="button"
                     disabled={busy}
                     onClick={() => void post('/api/email/address', { purpose: 'quotes' })}
-                    className="h-9 rounded-lg border border-[#E7E7E2] bg-white px-3.5 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/30 disabled:opacity-40"
+                    className="h-9 rounded-lg border border-[#E7E7E2] bg-white px-3.5 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/30 disabled:opacity-40"
                   >
                     {busy ? 'Creating…' : 'Create enquiry address'}
                   </button>
@@ -230,7 +230,7 @@ export function EmailIngestCard({
             type="button"
             disabled={busy}
             onClick={() => void post('/api/email/address', { purpose: 'documents' })}
-            className="h-9 rounded-lg bg-[#1E5E54] px-3.5 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:opacity-40"
+            className="h-9 rounded-lg bg-[#1F5FA8] px-3.5 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
           >
             {busy ? 'Creating…' : 'Create ingestion address'}
           </button>
@@ -258,7 +258,7 @@ export function EmailIngestCard({
                       type="button"
                       disabled={busy}
                       onClick={() => void post('/api/email/senders', { email: s.email, action: 'approve' })}
-                      className="h-7 shrink-0 rounded-lg bg-[#1E5E54] px-2.5 text-[12px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:opacity-40"
+                      className="h-7 shrink-0 rounded-lg bg-[#1F5FA8] px-2.5 text-[12px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
                     >
                       Approve
                     </button>
@@ -291,7 +291,7 @@ export function EmailIngestCard({
               {approved.map((s) => (
                 <span
                   key={s.id}
-                  className="inline-flex items-center gap-1.5 rounded-full bg-[#E9EFEC] px-2.5 py-1 text-[12px] text-[#0F4C44]"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-[#E7EEF8] px-2.5 py-1 text-[12px] text-[#174C87]"
                 >
                   {s.email}
                   {canManage ? (
@@ -300,7 +300,7 @@ export function EmailIngestCard({
                       disabled={busy}
                       onClick={() => void post('/api/email/senders', { email: s.email, action: 'block' })}
                       aria-label={`Block ${s.email}`}
-                      className="text-[#0F4C44]/60 transition-colors hover:text-[#A32D2D] disabled:opacity-40"
+                      className="text-[#174C87]/60 transition-colors hover:text-[#A32D2D] disabled:opacity-40"
                     >
                       ×
                     </button>
@@ -324,7 +324,7 @@ export function EmailIngestCard({
                   }
                 }}
                 placeholder="Approve a sender by email…"
-                className="h-9 w-full max-w-[280px] rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none"
+                className="h-9 w-full max-w-[280px] rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
               />
               <button
                 type="button"
@@ -334,7 +334,7 @@ export function EmailIngestCard({
                     if (ok) setNewSender('');
                   })
                 }
-                className="h-9 shrink-0 rounded-lg border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/30 disabled:opacity-40"
+                className="h-9 shrink-0 rounded-lg border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/30 disabled:opacity-40"
               >
                 Add
               </button>

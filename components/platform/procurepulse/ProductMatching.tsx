@@ -122,7 +122,7 @@ export function ProductMatching({
               type="button"
               onClick={() => void runAiScan()}
               disabled={scanning}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[13px] font-medium text-[#1E5E54] transition-colors hover:border-[#1E5E54]/40 disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[13px] font-medium text-[#1F5FA8] transition-colors hover:border-[#3E7BC4]/40 disabled:opacity-50"
             >
               {scanning ? 'Scanning…' : '✦ Find matches with AI'}
             </button>
@@ -170,7 +170,7 @@ export function ProductMatching({
                 <input
                   value={custom[c.itemId] ?? ''}
                   onChange={(e) => setCustom((m) => ({ ...m, [c.itemId]: e.target.value }))}
-                  className="h-9 w-full rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:border-[#1E5E54]/40 focus:outline-none"
+                  className="h-9 w-full rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:border-[#3E7BC4]/40 focus:outline-none"
                 />
               </div>
               <div className="flex w-[150px] items-center justify-end gap-1.5">
@@ -178,7 +178,7 @@ export function ProductMatching({
                   type="button"
                   onClick={() => confirm(c)}
                   disabled={busy === c.itemId || !(custom[c.itemId] ?? '').trim()}
-                  className="rounded-lg bg-[#1E5E54] px-3 py-1.5 text-[12px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:opacity-40"
+                  className="rounded-lg bg-[#1F5FA8] px-3 py-1.5 text-[12px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
                 >
                   {busy === c.itemId ? '…' : 'Confirm'}
                 </button>

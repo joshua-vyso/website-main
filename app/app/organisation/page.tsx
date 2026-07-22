@@ -3,7 +3,7 @@ import { getPlatformSession, createServerSupabase } from '@/lib/platform/supabas
 import type { UserRole } from '@/lib/platform/types';
 
 const ROLE_STYLE: Record<UserRole, { bg: string; fg: string; label: string }> = {
-  owner: { bg: '#E3F0ED', fg: '#1E5E54', label: 'Owner' },
+  owner: { bg: '#EAF2FC', fg: '#1F5FA8', label: 'Owner' },
   admin: { bg: '#E6F1FB', fg: '#0C447C', label: 'Admin' },
   member: { bg: '#F0F0EC', fg: '#5F6368', label: 'Member' },
 };
@@ -163,7 +163,7 @@ export default async function OrganisationPage() {
             ) : (
               activity.map((a, i) => (
                 <div key={a.id} className={`flex items-start gap-3 py-3 ${i > 0 ? 'border-t border-[#F0F0EC]' : ''}`}>
-                  <div className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1E5E54]" aria-hidden />
+                  <div className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1F5FA8]" aria-hidden />
                   <div className="min-w-0 flex-1">
                     <p className="text-[13px] text-[#1A1C1E]">
                       <span className="font-medium">{a.who}</span> {a.action}{' '}

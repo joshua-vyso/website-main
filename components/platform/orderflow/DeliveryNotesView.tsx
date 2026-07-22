@@ -102,8 +102,8 @@ export function DeliveryNotesView({ data }: { data: DeliveryNotesData }) {
               onClick={() => setStatus(f.value)}
               className={`h-8 rounded-lg border px-3 text-[12px] font-medium transition-colors ${
                 status === f.value
-                  ? 'border-[#1E5E54] bg-[#1E5E54] text-white'
-                  : 'border-[#D7DAD8] bg-white text-[#5F6368] hover:border-[#1E5E54]/40'
+                  ? 'border-[#3E7BC4] bg-[#1F5FA8] text-white'
+                  : 'border-[#D7DAD8] bg-white text-[#5F6368] hover:border-[#3E7BC4]/40'
               }`}
             >
               {f.label}
@@ -149,7 +149,7 @@ export function DeliveryNotesView({ data }: { data: DeliveryNotesData }) {
                   return (
                     <tr key={dn.id} className="border-b border-[#F0F0EC] transition-colors last:border-0 hover:bg-[#FAFAF8]">
                       <td className="px-4 py-3">
-                        <Link href={`/app/orderflow/delivery-notes/${dn.id}`} className="font-medium text-[#1E5E54] hover:text-[#174A42]">
+                        <Link href={`/app/orderflow/delivery-notes/${dn.id}`} className="font-medium text-[#1F5FA8] hover:text-[#174C87]">
                           {dn.dn_number}
                         </Link>
                       </td>
@@ -158,7 +158,7 @@ export function DeliveryNotesView({ data }: { data: DeliveryNotesData }) {
                       </td>
                       <td className="px-4 py-3">
                         {src && srcHref ? (
-                          <Link href={srcHref} className="text-[#1E5E54] hover:text-[#174A42]">
+                          <Link href={srcHref} className="text-[#1F5FA8] hover:text-[#174C87]">
                             {src}
                           </Link>
                         ) : (
@@ -389,8 +389,8 @@ function NewDeliveryNoteModal({
               }}
               className={`h-8 rounded-lg border px-3 text-[12px] font-medium capitalize transition-colors ${
                 kind === k
-                  ? 'border-[#1E5E54] bg-[#1E5E54] text-white'
-                  : 'border-[#D7DAD8] bg-white text-[#5F6368] hover:border-[#1E5E54]/40'
+                  ? 'border-[#3E7BC4] bg-[#1F5FA8] text-white'
+                  : 'border-[#D7DAD8] bg-white text-[#5F6368] hover:border-[#3E7BC4]/40'
               }`}
             >
               From {k}
@@ -426,7 +426,7 @@ function NewDeliveryNoteModal({
                       <div className="truncate text-[13px] font-medium text-[#1A1C1E]">{r.number}</div>
                       <div className="truncate text-[12px] text-[#5F6368]">{r.customerName}</div>
                     </div>
-                    {selected === r.id ? <span className="shrink-0 text-[13px] text-[#1E5E54]">✓</span> : null}
+                    {selected === r.id ? <span className="shrink-0 text-[13px] text-[#1F5FA8]">✓</span> : null}
                   </button>
                 </li>
               ))}

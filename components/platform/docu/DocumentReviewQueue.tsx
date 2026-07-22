@@ -125,7 +125,7 @@ export function DocumentReviewQueue({ docs, canReview }: { docs: DocumentWithSup
                     type="button"
                     disabled={busy === d.id}
                     onClick={() => void act(d.id, 'save')}
-                    className="h-9 rounded-lg bg-[#1E5E54] px-3.5 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:opacity-40"
+                    className="h-9 rounded-lg bg-[#1F5FA8] px-3.5 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
                   >
                     {busy === d.id ? 'Saving…' : 'Save'}
                   </button>
@@ -171,7 +171,7 @@ export function DocumentReviewQueue({ docs, canReview }: { docs: DocumentWithSup
                 )}
 
                 <div className="flex flex-wrap items-center gap-4 text-[12px]">
-                  <Link href={`/app/docu/${d.id}`} className="font-medium text-[#1E5E54] hover:underline">
+                  <Link href={`/app/docu/${d.id}`} className="font-medium text-[#1F5FA8] hover:underline">
                     Open full document →
                   </Link>
                   <span className="text-[#9A9DA1]">

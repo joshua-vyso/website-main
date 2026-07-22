@@ -226,7 +226,7 @@ export default async function StockDetailPage({
             </div>
             <Link
               href="/app/procurepulse/reorder"
-              className="mt-2 inline-flex w-full items-center justify-center rounded-lg bg-[#1E5E54] px-4 py-2.5 text-[14px] font-medium text-white"
+              className="mt-2 inline-flex w-full items-center justify-center rounded-lg bg-[#1F5FA8] px-4 py-2.5 text-[14px] font-medium text-white"
             >
               Add to order
             </Link>

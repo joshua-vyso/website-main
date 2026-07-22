@@ -73,7 +73,7 @@ export default async function WorkspaceSettings() {
 
         <Link
           href="/app/organisation"
-          className="flex items-center justify-between gap-4 rounded-2xl border border-[#E7E7E2] bg-white p-4 transition-colors hover:border-[#1E5E54]/30"
+          className="flex items-center justify-between gap-4 rounded-2xl border border-[#E7E7E2] bg-white p-4 transition-colors hover:border-[#3E7BC4]/30"
         >
           <div className="min-w-0">
             <div className="text-[15px] font-medium text-[#1A1C1E]">My Organisation</div>

@@ -15,7 +15,7 @@ export default async function OrderDetailPage(ctx: { params: Promise<{ id: strin
         <div className="max-w-sm rounded-2xl border border-[#E7E7E2] bg-white px-8 py-10 text-center">
           <h1 className="text-[18px] font-bold text-[#1A1C1E]">Order not found</h1>
           <p className="mt-2 text-[13px] text-[#5F6368]">It may have been deleted, or you may not have access.</p>
-          <Link href="/app/orderflow/orders" className="mt-4 inline-flex h-9 items-center rounded-lg bg-[#1E5E54] px-4 text-[13px] font-medium text-white hover:bg-[#174A42]">
+          <Link href="/app/orderflow/orders" className="mt-4 inline-flex h-9 items-center rounded-lg bg-[#1F5FA8] px-4 text-[13px] font-medium text-white hover:bg-[#174C87]">
             Back to Orders
           </Link>
         </div>

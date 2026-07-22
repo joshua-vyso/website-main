@@ -274,7 +274,7 @@ export function PaymentsView({
                 setFromDate('');
                 setToDate('');
               }}
-              className="text-[12px] font-medium text-[#1E5E54] hover:text-[#174A42]"
+              className="text-[12px] font-medium text-[#1F5FA8] hover:text-[#174C87]"
             >
               Clear
             </button>
@@ -317,7 +317,7 @@ export function PaymentsView({
                         {inv ? (
                           <Link
                             href={`/app/orderflow/invoices/${inv.id}`}
-                            className="font-medium text-[#1E5E54] hover:text-[#174A42]"
+                            className="font-medium text-[#1F5FA8] hover:text-[#174C87]"
                           >
                             {inv.invoice_number}
                           </Link>
@@ -552,7 +552,7 @@ function ReceiptCell({ payment, invoiceNumber }: { payment: OfPayment; invoiceNu
           type="button"
           onClick={() => inputRef.current?.click()}
           disabled={busy}
-          className="inline-flex h-7 items-center gap-1 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/40 disabled:opacity-60"
+          className="inline-flex h-7 items-center gap-1 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/40 disabled:opacity-60"
         >
           {busy ? 'Uploading…' : '↑ Attach receipt'}
         </button>

@@ -60,7 +60,7 @@ export function PushToButton({
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-[#1E5E54] px-3.5 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45]"
+        className="inline-flex h-9 items-center gap-1.5 rounded-xl bg-[#1F5FA8] px-3.5 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87]"
         aria-expanded={open}
       >
         Push to…
@@ -108,7 +108,7 @@ export function PushToButton({
                       ) : isDone ? (
                         <span className="font-medium text-[#0F6E56]">Pushed ✓</span>
                       ) : (
-                        <span className="font-medium text-[#1E5E54]">Push</span>
+                        <span className="font-medium text-[#1F5FA8]">Push</span>
                       )}
                     </span>
                   </button>

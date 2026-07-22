@@ -93,7 +93,7 @@ export function DocSheet({
             ) : null}
             <div className="text-[26px] font-bold tracking-tight text-[#1A1C1E]">{title}</div>
             <div className="mt-1 flex items-center gap-2">
-              <span className="text-[14px] font-medium text-[#1E5E54]">{number}</span>
+              <span className="text-[14px] font-medium text-[#1F5FA8]">{number}</span>
               {statusPill ? (
                 <span className="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-medium" style={{ backgroundColor: statusPill.bg, color: statusPill.fg }}>
                   {statusPill.label}
@@ -246,13 +246,13 @@ export function DocSheet({
   );
 }
 
-/** Teal "Download PDF" button — triggers the browser print dialog. Callers place it in their own toolbar. */
+/** Accent "Download PDF" button — triggers the browser print dialog. Callers place it in their own toolbar. */
 export function PrintButton({ label }: { label?: string }) {
   return (
     <button
       type="button"
       onClick={() => window.print()}
-      className="inline-flex h-9 items-center rounded-lg bg-[#1E5E54] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174A42]"
+      className="inline-flex h-9 items-center rounded-lg bg-[#1F5FA8] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87]"
     >
       {label ?? 'Download PDF'}
     </button>

@@ -119,7 +119,7 @@ export function ExtractionEditor({
   };
 
   const cellCls =
-    'h-9 w-full rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:border-[#1E5E54]/40 focus:outline-none';
+    'h-9 w-full rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:border-[#3E7BC4]/40 focus:outline-none';
 
   return (
     <div className="flex flex-col rounded-2xl border border-[#E7E7E2] bg-white">
@@ -142,7 +142,7 @@ export function ExtractionEditor({
             value={supplier}
             onChange={(e) => setSupplier(e.target.value)}
             placeholder="e.g. Bacca Valley (Pty) Ltd — or the market agent"
-            className="h-10 w-full max-w-md rounded-xl border border-[#E7E7E2] bg-white px-3.5 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none"
+            className="h-10 w-full max-w-md rounded-xl border border-[#E7E7E2] bg-white px-3.5 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
           />
         </div>
 
@@ -169,7 +169,7 @@ export function ExtractionEditor({
                     className={`h-10 w-full rounded-xl border px-3.5 text-[14px] text-[#1A1C1E] focus:outline-none ${
                       low
                         ? 'border-[#E7B97A] bg-[#FDF6EC] focus:border-[#D9730D]'
-                        : 'border-[#E7E7E2] bg-white focus:border-[#1E5E54]/40'
+                        : 'border-[#E7E7E2] bg-white focus:border-[#3E7BC4]/40'
                     }`}
                   />
                 </div>

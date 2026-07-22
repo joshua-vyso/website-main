@@ -669,8 +669,8 @@ export function OrdersView({
 
   const drawerOrder = drawerId ? orders.find((o) => o.id === drawerId) ?? null : null;
 
-  const cell = 'h-9 rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:border-[#1E5E54]/40 focus:outline-none';
-  const filterSel = 'h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#1E5E54]';
+  const cell = 'h-9 rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:border-[#3E7BC4]/40 focus:outline-none';
+  const filterSel = 'h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#3E7BC4]';
 
   return (
     <div>
@@ -685,13 +685,13 @@ export function OrdersView({
           <button
             type="button"
             onClick={() => setOpen(true)}
-            className="inline-flex h-10 items-center rounded-xl border border-[#D7DAD8] bg-white px-4 text-[14px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/40"
+            className="inline-flex h-10 items-center rounded-xl border border-[#D7DAD8] bg-white px-4 text-[14px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/40"
           >
             Quick order
           </button>
           <Link
             href="/app/orderflow/orders/new"
-            className="inline-flex h-10 items-center rounded-xl bg-[#1E5E54] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#184D45]"
+            className="inline-flex h-10 items-center rounded-xl bg-[#1F5FA8] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87]"
           >
             + New order
           </Link>
@@ -714,7 +714,7 @@ export function OrdersView({
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search customer, order #, invoice #, or product…"
-          className="h-9 min-w-[260px] flex-1 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] outline-none placeholder:text-[#9A9DA1] focus:border-[#1E5E54]"
+          className="h-9 min-w-[260px] flex-1 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] outline-none placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]"
         />
         <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as 'all' | OrderStatus)} className={filterSel}>
           <option value="all">All statuses</option>
@@ -742,7 +742,7 @@ export function OrdersView({
         {/* Orders table */}
         <div className="overflow-hidden rounded-2xl border border-[#E7E7E2] bg-white">
           {selected.size > 0 ? (
-            <div className="flex flex-wrap items-center gap-2 border-b border-[#F0F0EC] bg-[#F6FAF8] px-4 py-2.5 text-[13px]">
+            <div className="flex flex-wrap items-center gap-2 border-b border-[#F0F0EC] bg-[#F5F9FE] px-4 py-2.5 text-[13px]">
               <span className="font-medium text-[#1A1C1E]">{selected.size} selected</span>
               <span className="flex-1" />
               <BulkBtn onClick={() => void invoiceSelected()} disabled={actionBusy}>Generate invoices</BulkBtn>
@@ -758,7 +758,7 @@ export function OrdersView({
               <thead>
                 <tr className="border-b border-[#F0F0EC] bg-[#FBFBF9] text-[11px] uppercase tracking-wide text-[#9A9DA1]">
                   <th className="w-9 px-3 py-2.5">
-                    <input type="checkbox" checked={allFilteredSelected} onChange={toggleAll} aria-label="Select all" className="accent-[#1E5E54]" />
+                    <input type="checkbox" checked={allFilteredSelected} onChange={toggleAll} aria-label="Select all" className="accent-[#3E7BC4]" />
                   </th>
                   <th className="px-2 py-2.5 text-left font-medium">Order #</th>
                   <th className="px-2 py-2.5 text-left font-medium">Customer</th>
@@ -786,7 +786,7 @@ export function OrdersView({
                       className="cursor-pointer border-b border-[#F6F6F2] last:border-0 hover:bg-[#FAFAF8]"
                     >
                       <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
-                        <input type="checkbox" checked={selected.has(o.id)} onChange={() => toggleOne(o.id)} aria-label="Select" className="accent-[#1E5E54]" />
+                        <input type="checkbox" checked={selected.has(o.id)} onChange={() => toggleOne(o.id)} aria-label="Select" className="accent-[#3E7BC4]" />
                       </td>
                       <td className="px-2 py-3 font-medium text-[#1A1C1E]">{orderRef(o)}</td>
                       <td className="px-2 py-3 text-[#1A1C1E]">{o.customer_name}</td>
@@ -861,7 +861,7 @@ export function OrdersView({
         footer={
           drawerOrder ? (
             <div className="flex items-center justify-end gap-2">
-              <Link href={`/app/orderflow/orders/${drawerOrder.id}`} className="rounded-lg border border-[#D7DAD8] bg-white px-3.5 py-2 text-[13px] font-medium text-[#1A1C1E] hover:border-[#1E5E54]/40">
+              <Link href={`/app/orderflow/orders/${drawerOrder.id}`} className="rounded-lg border border-[#D7DAD8] bg-white px-3.5 py-2 text-[13px] font-medium text-[#1A1C1E] hover:border-[#3E7BC4]/40">
                 Open full page
               </Link>
               {canInvoice(drawerOrder) ? (
@@ -869,7 +869,7 @@ export function OrdersView({
                   type="button"
                   onClick={() => void invoiceOne(drawerOrder)}
                   disabled={actionBusy}
-                  className="rounded-lg bg-[#1E5E54] px-3.5 py-2 text-[13px] font-medium text-white hover:bg-[#184D45] disabled:opacity-40"
+                  className="rounded-lg bg-[#1F5FA8] px-3.5 py-2 text-[13px] font-medium text-white hover:bg-[#174C87] disabled:opacity-40"
                 >
                   Generate invoice
                 </button>
@@ -920,7 +920,7 @@ export function OrdersView({
                     </button>
                   ))}
                   {customerQuery.trim() && !custExact ? (
-                    <button type="button" onMouseDown={(e) => { e.preventDefault(); void createCustomer(customerQuery); }} disabled={creatingCustomer} className="block w-full truncate border-t border-[#F0F0EC] px-3 py-2 text-left text-[13px] font-medium text-[#1E5E54] transition-colors hover:bg-[#FAFAF8] disabled:opacity-50">
+                    <button type="button" onMouseDown={(e) => { e.preventDefault(); void createCustomer(customerQuery); }} disabled={creatingCustomer} className="block w-full truncate border-t border-[#F0F0EC] px-3 py-2 text-left text-[13px] font-medium text-[#1F5FA8] transition-colors hover:bg-[#FAFAF8] disabled:opacity-50">
                       {creatingCustomer ? 'Creating…' : `+ Create “${customerQuery.trim()}”`}
                     </button>
                   ) : null}
@@ -990,7 +990,7 @@ export function OrdersView({
               <span className="text-[14px] font-semibold text-[#1A1C1E]">Total {zar(builderTotal)}</span>
               <div className="flex gap-2">
                 <button type="button" onClick={resetBuilder} className="rounded-lg px-3.5 py-2 text-[13px] text-[#5F6368] hover:bg-black/[0.03]">Cancel</button>
-                <button type="button" onClick={() => void saveOrder()} disabled={!canSave || busy} className="rounded-lg bg-[#1E5E54] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:opacity-40">
+                <button type="button" onClick={() => void saveOrder()} disabled={!canSave || busy} className="rounded-lg bg-[#1F5FA8] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-40">
                   {busy ? 'Creating…' : 'Create order'}
                 </button>
               </div>
@@ -1009,7 +1009,7 @@ function BulkBtn({ children, onClick, danger, disabled }: { children: React.Reac
       onClick={onClick}
       disabled={disabled}
       className={`rounded-lg border bg-white px-3 py-1.5 text-[12px] font-medium transition-colors disabled:opacity-50 ${
-        danger ? 'border-[#F0D9D9] text-[#A32D2D] hover:bg-[#FCEBEB]' : 'border-[#D7DAD8] text-[#1A1C1E] hover:border-[#1E5E54]/40'
+        danger ? 'border-[#F0D9D9] text-[#A32D2D] hover:bg-[#FCEBEB]' : 'border-[#D7DAD8] text-[#1A1C1E] hover:border-[#3E7BC4]/40'
       }`}
     >
       {children}
@@ -1019,7 +1019,7 @@ function BulkBtn({ children, onClick, danger, disabled }: { children: React.Reac
 
 function QuickStart({ children, onClick }: { children: React.ReactNode; onClick: () => void }) {
   return (
-    <button type="button" onClick={onClick} className="rounded-full border border-[#E7E7E2] bg-white px-3 py-1.5 text-[12px] font-medium text-[#5F6368] transition-colors hover:border-[#1E5E54]/40 hover:text-[#1A1C1E]">
+    <button type="button" onClick={onClick} className="rounded-full border border-[#E7E7E2] bg-white px-3 py-1.5 text-[12px] font-medium text-[#5F6368] transition-colors hover:border-[#3E7BC4]/40 hover:text-[#1A1C1E]">
       {children}
     </button>
   );
@@ -1332,7 +1332,7 @@ export function NewOrderBuilder({ context, defaultCustomerId }: { context: Build
         <div className="flex items-center gap-3">
           <Link
             href="/app/orderflow/orders"
-            className="inline-flex h-8 items-center gap-1 rounded-full border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#5F6368] transition-colors hover:border-[#1E5E54]/30 hover:text-[#1A1C1E]"
+            className="inline-flex h-8 items-center gap-1 rounded-full border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#5F6368] transition-colors hover:border-[#3E7BC4]/30 hover:text-[#1A1C1E]"
           >
             <span aria-hidden>‹</span> Orders
           </Link>
@@ -1398,7 +1398,7 @@ export function NewOrderBuilder({ context, defaultCustomerId }: { context: Build
                   onChange={(e) => setCustomAddress(e.target.value)}
                   rows={2}
                   placeholder="Street, suburb, city…"
-                  className="w-full rounded-lg border border-[#D7DAD8] bg-white px-3 py-2 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/50 focus:outline-none"
+                  className="w-full rounded-lg border border-[#D7DAD8] bg-white px-3 py-2 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/50 focus:outline-none"
                 />
               </FormField>
             ) : chosenAddress ? (
@@ -1419,7 +1419,7 @@ export function NewOrderBuilder({ context, defaultCustomerId }: { context: Build
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
               placeholder="Internal order notes…"
-              className="w-full rounded-lg border border-[#D7DAD8] bg-white px-3 py-2 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/50 focus:outline-none"
+              className="w-full rounded-lg border border-[#D7DAD8] bg-white px-3 py-2 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/50 focus:outline-none"
             />
           </div>
         </div>

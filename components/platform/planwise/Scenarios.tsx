@@ -36,7 +36,7 @@ export function ScenariosWorkspace() {
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_1fr]">
         <SectionCard
           title="Scenario builder"
-          right={dirty ? <button type="button" onClick={() => { setValues(ZERO); setAiShown(false); }} className="text-[12px] font-medium text-[#1E5E54] hover:underline">Reset</button> : <span className="text-[12px] text-[#9A9DA1]">Drag to explore</span>}
+          right={dirty ? <button type="button" onClick={() => { setValues(ZERO); setAiShown(false); }} className="text-[12px] font-medium text-[#1F5FA8] hover:underline">Reset</button> : <span className="text-[12px] text-[#9A9DA1]">Drag to explore</span>}
         >
           <div className="flex flex-col gap-4">
             {SCENARIO_SLIDERS.map((s) => (
@@ -46,7 +46,7 @@ export function ScenariosWorkspace() {
                     {s.label}
                     {s.module ? <span className="ml-1.5 text-[10px] font-medium" style={{ color: MODULE_META[s.module].accent.fg }}>{MODULE_META[s.module].name}</span> : null}
                   </span>
-                  <span className="text-[13px] font-semibold tabular-nums text-[#1E5E54]">{values[s.id]}{s.unit}</span>
+                  <span className="text-[13px] font-semibold tabular-nums text-[#1F5FA8]">{values[s.id]}{s.unit}</span>
                 </div>
                 <input
                   type="range"
@@ -54,16 +54,16 @@ export function ScenariosWorkspace() {
                   max={s.max}
                   value={values[s.id]}
                   onChange={(e) => setSlider(s.id, Number(e.target.value))}
-                  className="w-full accent-[#1E5E54]"
+                  className="w-full accent-[#3E7BC4]"
                 />
               </div>
             ))}
           </div>
           <div className="mt-4 flex items-center gap-2 border-t border-[#F0F0EC] pt-4">
-            <button type="button" onClick={() => { setValues(AI_SCENARIO.sliders); setAiShown(true); show('Generated best scenario (demo)'); }} className="inline-flex items-center rounded-lg bg-[#1E5E54] px-3.5 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45]">
+            <button type="button" onClick={() => { setValues(AI_SCENARIO.sliders); setAiShown(true); show('Generated best scenario (demo)'); }} className="inline-flex items-center rounded-lg bg-[#1F5FA8] px-3.5 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87]">
               ✦ Generate best scenario
             </button>
-            <button type="button" onClick={() => show('Scenario saved (demo)')} className="rounded-lg border border-[#D7DAD8] bg-white px-3.5 py-2 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/40">Save scenario</button>
+            <button type="button" onClick={() => show('Scenario saved (demo)')} className="rounded-lg border border-[#D7DAD8] bg-white px-3.5 py-2 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/40">Save scenario</button>
           </div>
         </SectionCard>
 
@@ -81,14 +81,14 @@ export function ScenariosWorkspace() {
 
       {/* AI scenario card */}
       {aiShown ? (
-        <div className="rounded-2xl border border-[#1E5E54]/30 bg-gradient-to-br from-white to-[#F6FAF8] p-5">
+        <div className="rounded-2xl border border-[#3E7BC4]/30 bg-gradient-to-br from-white to-[#F5F9FE] p-5">
           <div className="flex items-center gap-2">
-            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#E3F0ED] text-[14px] text-[#1E5E54]">✦</span>
-            <span className="text-[13px] font-semibold text-[#1E5E54]">Best scenario</span>
+            <span className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[#EAF2FC] text-[14px] text-[#1F5FA8]">✦</span>
+            <span className="text-[13px] font-semibold text-[#1F5FA8]">Best scenario</span>
           </div>
           <ul className="mt-3 flex flex-col gap-1.5">
             {AI_SCENARIO.steps.map((s, i) => (
-              <li key={i} className="flex items-start gap-2.5 text-[14px] text-[#1A1C1E]"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1E5E54]" />{s}</li>
+              <li key={i} className="flex items-start gap-2.5 text-[14px] text-[#1A1C1E]"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1F5FA8]" />{s}</li>
             ))}
           </ul>
           <p className="mt-3 text-[14px]">Projected additional monthly profit: <span className="text-[18px] font-bold text-[#0F6E56]">+{zar(projectScenario(AI_SCENARIO.sliders, scenarioBase).diffVsCurrent)}</span></p>

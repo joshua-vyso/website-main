@@ -49,7 +49,7 @@ export function AlertRowActions({
         onClick={() => void reorder()}
         disabled={state === 'busy' || state === 'added'}
         className={`rounded-lg px-3.5 py-1.5 text-[12px] font-medium text-white transition-colors disabled:opacity-70 ${
-          state === 'added' ? 'bg-[#0F6E56]' : state === 'error' ? 'bg-[#A32D2D] hover:bg-[#8f2727]' : 'bg-[#1E5E54] hover:bg-[#184D45]'
+          state === 'added' ? 'bg-[#0F6E56]' : state === 'error' ? 'bg-[#A32D2D] hover:bg-[#8f2727]' : 'bg-[#1F5FA8] hover:bg-[#174C87]'
         }`}
       >
         {state === 'added' ? 'Added ✓' : state === 'busy' ? '…' : state === 'error' ? 'Retry' : 'Reorder'}

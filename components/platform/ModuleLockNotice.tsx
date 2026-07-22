@@ -27,7 +27,7 @@ export function ModuleLockNotice({
           <SecondaryBtn onClick={onClose}>Close</SecondaryBtn>
           <a
             href={mailto}
-            className="inline-flex h-9 items-center justify-center rounded-lg bg-[#1E5E54] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174A42]"
+            className="inline-flex h-9 items-center justify-center rounded-lg bg-[#1F5FA8] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87]"
           >
             Email Joshua
           </a>

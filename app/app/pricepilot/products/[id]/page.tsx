@@ -152,7 +152,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
         <div className="flex min-w-0 items-center gap-3">
           <Link
             href="/app/pricepilot/products"
-            className="inline-flex h-8 shrink-0 items-center gap-1 rounded-full border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#5F6368] transition-colors hover:border-[#1E5E54]/30 hover:text-[#1A1C1E]"
+            className="inline-flex h-8 shrink-0 items-center gap-1 rounded-full border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#5F6368] transition-colors hover:border-[#3E7BC4]/30 hover:text-[#1A1C1E]"
           >
             <span aria-hidden>‹</span> Products
           </Link>
@@ -176,7 +176,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
 
       <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <KpiCard label="Latest cost" value={cost != null ? zar2(cost) : '—'} />
-        <KpiCard label="Sell price" value={catalogueSell != null ? zar2(catalogueSell) : '—'} accent="#1E5E54" />
+        <KpiCard label="Sell price" value={catalogueSell != null ? zar2(catalogueSell) : '—'} accent="#3E7BC4" />
         <KpiCard label="Sold (30 days)" value={units30 > 0 ? String(Math.round(units30)) : '—'} />
         <KpiCard label="Projected annual profit" value={projectedAnnualProfit != null ? zar(projectedAnnualProfit) : '—'} accent="#0F6E56" />
       </div>
@@ -238,7 +238,7 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
                       <tr key={cp.listId} className="border-b border-[#F6F6F2] last:border-0">
                         <td className="py-2.5 pr-3 font-medium text-[#1A1C1E]">{cp.customer}</td>
                         <td className="px-3 py-2.5 text-[#5F6368]">
-                          <Link href={`/app/pricepilot/price-lists/${cp.listId}`} className="hover:text-[#1E5E54]">
+                          <Link href={`/app/pricepilot/price-lists/${cp.listId}`} className="hover:text-[#174C87]">
                             {cp.listName} <span className="text-[#9A9DA1]">· {CADENCE_LABEL[cp.cadence]}</span>
                           </Link>
                         </td>
@@ -285,8 +285,8 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
         </Panel>
         <Panel title="Linked document">
           {linkedDoc ? (
-            <Link href={`/app/docu/${linkedDoc.id}`} className="flex items-center gap-3 rounded-xl border border-[#F0F0EC] p-3 transition-colors hover:border-[#1E5E54]/30">
-              <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[#E3F0ED] text-[#1E5E54]">▦</span>
+            <Link href={`/app/docu/${linkedDoc.id}`} className="flex items-center gap-3 rounded-xl border border-[#F0F0EC] p-3 transition-colors hover:border-[#3E7BC4]/30">
+              <span className="inline-flex h-9 w-9 items-center justify-center rounded-lg bg-[#EAF2FC] text-[#1F5FA8]">▦</span>
               <span className="min-w-0">
                 <span className="block truncate text-[13px] font-medium text-[#1A1C1E]">{linkedDoc.filename}</span>
                 <span className="block text-[12px] text-[#9A9DA1]">Source document in Doc-U →</span>

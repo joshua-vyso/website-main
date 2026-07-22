@@ -51,7 +51,7 @@ export function WasteLog({ initialCategory }: { initialCategory?: string }) {
   }, [events, search, category, employee, device, recipe, reason]);
 
   const open = openId ? events.find((e) => e.id === openId) ?? null : null;
-  const sel = 'h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#1E5E54]';
+  const sel = 'h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#3E7BC4]';
 
   return (
     <div className="space-y-5">
@@ -61,11 +61,11 @@ export function WasteLog({ initialCategory }: { initialCategory?: string }) {
           <h1 className="text-[24px] font-bold leading-tight text-[#1A1C1E]">Waste log</h1>
           <p className="mt-0.5 text-[14px] text-[#5F6368]">Every waste event — item, recipe, employee and the device that measured it</p>
         </div>
-        <button type="button" onClick={() => setLogOpen(true)} className="inline-flex h-10 items-center rounded-xl bg-[#1E5E54] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#184D45]">+ Log waste</button>
+        <button type="button" onClick={() => setLogOpen(true)} className="inline-flex h-10 items-center rounded-xl bg-[#1F5FA8] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87]">+ Log waste</button>
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search item, recipe, employee…" className="h-9 min-w-[220px] flex-1 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] outline-none placeholder:text-[#9A9DA1] focus:border-[#1E5E54]" />
+        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search item, recipe, employee…" className="h-9 min-w-[220px] flex-1 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] outline-none placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]" />
         <select value={category} onChange={(e) => setCategory(e.target.value)} className={sel}><option value="all">All categories</option>{categories.map((c) => <option key={c.id} value={c.name}>{c.name}</option>)}</select>
         <select value={employee} onChange={(e) => setEmployee(e.target.value)} className={sel}><option value="all">All employees</option>{employees.map((c) => <option key={c} value={c}>{c}</option>)}</select>
         <select value={device} onChange={(e) => setDevice(e.target.value)} className={sel}><option value="all">All devices</option>{devices.map((c) => <option key={c} value={c}>{c}</option>)}</select>
@@ -163,7 +163,7 @@ function WasteDetail({ e }: { e: WasteEvent }) {
       <Section title="AI suggestions">
         <div className="flex flex-col gap-2">
           {suggestions.map((s, i) => (
-            <div key={i} className="flex items-start gap-2.5 text-[13px]"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1E5E54]" /><span className="text-[#5F6368]">{s}</span></div>
+            <div key={i} className="flex items-start gap-2.5 text-[13px]"><span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[#1F5FA8]" /><span className="text-[#5F6368]">{s}</span></div>
           ))}
         </div>
       </Section>

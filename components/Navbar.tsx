@@ -7,6 +7,7 @@ import {
   ChevronDown,
   ChevronRight,
   LayoutGrid,
+  MapPinned,
   Menu,
   Rocket,
   Sparkles,
@@ -68,6 +69,12 @@ const AUDIENCE_LINKS = [
     description: "Practical systems for growing South African teams.",
     href:        "/platform/vyso-for-smes",
     Icon:        Building2,
+  },
+  {
+    label:       "Vyso in South Africa",
+    description: "ZAR, VAT-aware documents and local operating workflows.",
+    href:        "/south-africa",
+    Icon:        MapPinned,
   },
 ];
 

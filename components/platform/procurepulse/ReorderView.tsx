@@ -248,7 +248,7 @@ export function ReorderView({
   }
 
   const field =
-    'h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none';
+    'h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none';
 
   return (
     <div className="mt-4 space-y-6">
@@ -266,7 +266,7 @@ export function ReorderView({
                   type="button"
                   onClick={() => void reorderAllSuggested()}
                   disabled={reordering}
-                  className="rounded-lg bg-[#1E5E54] px-3 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:opacity-50"
+                  className="rounded-lg bg-[#1F5FA8] px-3 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-50"
                 >
                   {reordering ? 'Adding…' : `Reorder all · ${order.itemCount}`}
                 </button>
@@ -319,7 +319,7 @@ export function ReorderView({
               <button
                 type="button"
                 onClick={() => setOpen(true)}
-                className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[13px] font-medium text-[#1E5E54] transition-colors hover:border-[#1E5E54]/40"
+                className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[13px] font-medium text-[#1F5FA8] transition-colors hover:border-[#3E7BC4]/40"
               >
                 + Add request
               </button>
@@ -369,7 +369,7 @@ export function ReorderView({
                   type="button"
                   onClick={() => void submit()}
                   disabled={busy || !query.trim()}
-                  className="rounded-lg bg-[#1E5E54] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:opacity-40"
+                  className="rounded-lg bg-[#1F5FA8] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
                 >
                   {busy ? 'Adding…' : 'Add request'}
                 </button>
@@ -395,7 +395,7 @@ export function ReorderView({
                 <button
                   type="button"
                   onClick={() => void patch(r.id, { status: 'ordered' })}
-                  className="shrink-0 rounded-lg border border-[#D7DAD8] bg-white px-2.5 py-1.5 text-[12px] font-medium text-[#1E5E54] transition-colors hover:border-[#1E5E54]/40"
+                  className="shrink-0 rounded-lg border border-[#D7DAD8] bg-white px-2.5 py-1.5 text-[12px] font-medium text-[#1F5FA8] transition-colors hover:border-[#3E7BC4]/40"
                 >
                   Mark ordered
                 </button>
@@ -453,11 +453,11 @@ export function ReorderView({
             type="button"
             onClick={() => void sendToTeam()}
             disabled={sending}
-            className="inline-flex items-center justify-center rounded-lg bg-[#1E5E54] px-4 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:opacity-50"
+            className="inline-flex items-center justify-center rounded-lg bg-[#1F5FA8] px-4 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-50"
           >
             {sending ? 'Sending…' : 'Send to team'}
           </button>
-          {msg ? <p className="text-center text-[12px] text-[#0F4C44]">{msg}</p> : null}
+          {msg ? <p className="text-center text-[12px] text-[#174C87]">{msg}</p> : null}
         </div>
       </div>
       </div>
@@ -512,7 +512,7 @@ export function ReorderView({
                           </div>
                         </div>
                         <div className="flex items-center gap-3">
-                          <span className="rounded-full bg-[#E3F0ED] px-2.5 py-0.5 text-[11px] font-medium capitalize text-[#1E5E54]">
+                          <span className="rounded-full bg-[#EAF2FC] px-2.5 py-0.5 text-[11px] font-medium capitalize text-[#1F5FA8]">
                             {o.status}
                           </span>
                           <span className="font-medium text-[#1A1C1E]">{rand(o.total)}</span>

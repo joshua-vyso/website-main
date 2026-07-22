@@ -50,7 +50,7 @@ export function DocumentRelationshipFlow({ doc }: { doc: DocumentWithSupplier })
 function StageNode({ stage }: { stage: DocumentRelationship }) {
   const className =
     stage.state === 'current'
-      ? 'rounded-xl border border-[#1E5E54]/30 bg-[#E3F0ED] px-3 py-2 text-[12px] font-medium text-[#1E5E54]'
+      ? 'rounded-xl border border-[#3E7BC4]/30 bg-[#EAF2FC] px-3 py-2 text-[12px] font-medium text-[#1F5FA8]'
       : stage.state === 'present'
         ? 'rounded-xl border border-[#E7E7E2] bg-white px-3 py-2 text-[12px] text-[#1A1C1E]'
         : 'rounded-xl border border-dashed border-[#E7E7E2] px-3 py-2 text-[12px] text-[#9A9DA1]';

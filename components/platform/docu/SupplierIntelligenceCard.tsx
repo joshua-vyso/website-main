@@ -51,7 +51,7 @@ export function SupplierIntelligenceCard({ intel }: { intel: SupplierIntelligenc
   return (
     <div className="rounded-2xl border border-[#E7E7E2] bg-white px-5 py-4">
       <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#E3F0ED] text-[13px] font-semibold text-[#1E5E54]">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EAF2FC] text-[13px] font-semibold text-[#1F5FA8]">
           {initials(intel.name)}
         </div>
         <div className="min-w-0">

@@ -38,7 +38,7 @@ export function PpSubnav() {
             href={t.href}
             className={`-mb-px shrink-0 border-b-2 pb-2.5 pt-1 text-[14px] transition-colors ${
               active
-                ? 'border-[#1E5E54] font-medium text-[#1A1C1E]'
+                ? 'border-[#3E7BC4] font-medium text-[#1A1C1E]'
                 : 'border-transparent text-[#5F6368] hover:text-[#1A1C1E]'
             }`}
           >
@@ -101,7 +101,7 @@ export function TrendText({ pct }: { pct: number | null }) {
 
 export function DocBadge({ label = 'Doc-U' }: { label?: string }) {
   return (
-    <span className="inline-flex items-center rounded-full bg-[#E3F0ED] px-2.5 py-1 text-[11px] font-medium text-[#1E5E54]">
+    <span className="inline-flex items-center rounded-full bg-[#EAF2FC] px-2.5 py-1 text-[11px] font-medium text-[#1F5FA8]">
       {label}
     </span>
   );
@@ -129,7 +129,7 @@ export function KpiCard({
   );
 }
 
-/** Teal accent button (primary CTA). */
+/** Accent button (primary CTA). */
 export function PpButton({
   children,
   href,
@@ -141,7 +141,7 @@ export function PpButton({
 }) {
   const cls =
     variant === 'solid'
-      ? 'bg-[#1E5E54] text-white'
+      ? 'bg-[#1F5FA8] text-white'
       : 'border border-[#D7DAD8] bg-white text-[#5F6368]';
   const base = `inline-flex items-center justify-center rounded-lg px-4 py-2.5 text-[14px] font-medium ${cls}`;
   return href ? (
@@ -202,8 +202,8 @@ function chartPaths(data: number[], w: number, h: number, pad = 6) {
 
 export function AreaChart({
   data,
-  color = '#1E5E54',
-  fill = '#E3F0ED',
+  color = '#3E7BC4',
+  fill = '#EAF2FC',
   height = 120,
 }: {
   data: number[];
@@ -303,7 +303,7 @@ export function Toggle({ on }: { on: boolean }) {
   return (
     <span
       className={`inline-flex h-[26px] w-[46px] items-center rounded-full px-[3px] ${
-        on ? 'justify-end bg-[#1E5E54]' : 'justify-start bg-[#D7DAD8]'
+        on ? 'justify-end bg-[#1F5FA8]' : 'justify-start bg-[#D7DAD8]'
       }`}
     >
       <span className="h-5 w-5 rounded-full bg-white" />
@@ -316,7 +316,7 @@ export function Stepper({ value }: { value: number | string }) {
     <span className="inline-flex items-center rounded-lg bg-[#F2F2EF] text-[14px]">
       <span className="px-3 py-1.5 font-medium text-[#5F6368]">−</span>
       <span className="min-w-[28px] px-1 text-center font-medium text-[#1A1C1E]">{value}</span>
-      <span className="px-3 py-1.5 font-medium text-[#1E5E54]">+</span>
+      <span className="px-3 py-1.5 font-medium text-[#1F5FA8]">+</span>
     </span>
   );
 }

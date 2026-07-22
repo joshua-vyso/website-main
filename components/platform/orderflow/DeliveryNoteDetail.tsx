@@ -343,7 +343,7 @@ export function DeliveryNoteDetail({
                   setVehicle(note.vehicle ?? '');
                   setFleetOpen(true);
                 }}
-                className="text-[12px] font-medium text-[#1E5E54] transition-colors hover:text-[#174A42]"
+                className="text-[12px] font-medium text-[#1F5FA8] transition-colors hover:text-[#174C87]"
               >
                 Edit
               </button>
@@ -364,13 +364,13 @@ export function DeliveryNoteDetail({
               <h3 className="text-[13px] font-semibold text-[#1A1C1E]">Source</h3>
               <div className="mt-3 space-y-2 text-[13px]">
                 {order ? (
-                  <Link href={`/app/orderflow/orders/${order.id}`} className="flex items-center justify-between gap-3 text-[#1E5E54] hover:text-[#174A42]">
+                  <Link href={`/app/orderflow/orders/${order.id}`} className="flex items-center justify-between gap-3 text-[#1F5FA8] hover:text-[#174C87]">
                     <span className="text-[#5F6368]">Order</span>
                     <span className="font-medium">{order.order_number || 'View order'}</span>
                   </Link>
                 ) : null}
                 {invoice ? (
-                  <Link href={`/app/orderflow/invoices/${invoice.id}`} className="flex items-center justify-between gap-3 text-[#1E5E54] hover:text-[#174A42]">
+                  <Link href={`/app/orderflow/invoices/${invoice.id}`} className="flex items-center justify-between gap-3 text-[#1F5FA8] hover:text-[#174C87]">
                     <span className="text-[#5F6368]">Invoice</span>
                     <span className="font-medium">{invoice.invoice_number}</span>
                   </Link>
@@ -387,7 +387,7 @@ export function DeliveryNoteDetail({
                 type="button"
                 onClick={() => fileRef.current?.click()}
                 disabled={uploading}
-                className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/40 disabled:opacity-60"
+                className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/40 disabled:opacity-60"
               >
                 {uploading ? 'Uploading…' : podDoc ? '↑ Replace' : '↑ Upload'}
               </button>
@@ -409,7 +409,7 @@ export function DeliveryNoteDetail({
                 type="button"
                 onClick={() => void openPod()}
                 disabled={!podDoc.storage_path || opening}
-                className="mt-3 block max-w-full truncate text-left text-[13px] font-medium text-[#1E5E54] transition-colors hover:text-[#174A42] disabled:text-[#9A9DA1]"
+                className="mt-3 block max-w-full truncate text-left text-[13px] font-medium text-[#1F5FA8] transition-colors hover:text-[#174C87] disabled:text-[#9A9DA1]"
                 title={podDoc.filename}
               >
                 {opening ? 'Opening…' : `✓ ${podDoc.filename}`}

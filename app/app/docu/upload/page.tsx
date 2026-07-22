@@ -76,7 +76,7 @@ export default function UploadPage() {
         PDF, JPG or PNG. Doc-U will extract the details automatically.
       </p>
 
-      <label className="mt-6 flex max-w-xl cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#E7E7E2] bg-white px-6 py-14 text-center transition-colors hover:border-[#1E5E54]/40">
+      <label className="mt-6 flex max-w-xl cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#E7E7E2] bg-white px-6 py-14 text-center transition-colors hover:border-[#3E7BC4]/40">
         <span className="text-[15px] font-medium text-[#1A1C1E]">
           {busy ? 'Uploading…' : 'Choose a file to upload'}
         </span>

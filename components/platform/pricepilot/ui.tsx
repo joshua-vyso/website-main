@@ -106,7 +106,7 @@ export function StatTile({
 }
 
 /** Thin progress meter toward a target (0–100% of target). */
-export function TargetMeter({ pct, color = '#1E5E54' }: { pct: number; color?: string }) {
+export function TargetMeter({ pct, color = '#3E7BC4' }: { pct: number; color?: string }) {
   const w = Math.max(0, Math.min(100, pct));
   return (
     <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-[#F0F0EC]">

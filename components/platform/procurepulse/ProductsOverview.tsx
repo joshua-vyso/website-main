@@ -141,7 +141,7 @@ export function ProductsOverview({
 
   const COLS = 'grid grid-cols-[minmax(180px,1fr)_120px_120px_120px_40px] gap-2 items-center';
   const cell =
-    'h-9 w-full rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:border-[#1E5E54]/40 focus:outline-none';
+    'h-9 w-full rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:border-[#3E7BC4]/40 focus:outline-none';
 
   return (
     <div>
@@ -155,7 +155,7 @@ export function ProductsOverview({
               setPage(0);
             }}
             placeholder="Search products…"
-            className="h-10 w-72 rounded-xl border border-[#E7E7E2] bg-white px-4 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none"
+            className="h-10 w-72 rounded-xl border border-[#E7E7E2] bg-white px-4 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
           />
           <span className="text-[13px] text-[#9A9DA1]">{filtered.length} products</span>
         </div>
@@ -163,7 +163,7 @@ export function ProductsOverview({
           <button
             type="button"
             onClick={addProduct}
-            className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-[#1E5E54]/40 bg-white px-3.5 text-[14px] font-medium text-[#1E5E54] transition-colors hover:bg-[#E9EFEC]"
+            className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-[#3E7BC4]/40 bg-white px-3.5 text-[14px] font-medium text-[#1F5FA8] transition-colors hover:bg-[#E7EEF8]"
           >
             + Add product
           </button>
@@ -171,7 +171,7 @@ export function ProductsOverview({
             type="button"
             onClick={() => void save()}
             disabled={busy || !dirty}
-            className="inline-flex h-10 items-center rounded-xl bg-[#1E5E54] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex h-10 items-center rounded-xl bg-[#1F5FA8] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:cursor-not-allowed disabled:opacity-40"
           >
             {busy ? 'Saving…' : dirty ? 'Save changes' : 'Saved'}
           </button>

@@ -17,10 +17,10 @@ import type {
 export { zar };
 
 // ---------------------------------------------------------------------------
-// Palette + score colours (calm teal/amber/red bands)
+// Palette + score colours (calm blue/amber/red bands)
 // ---------------------------------------------------------------------------
 
-export const TEAL = '#1E5E54';
+export const ACCENT = '#3E7BC4';
 export const GREEN = '#0F6E56';
 export const AMBER = '#854F0B';
 export const RED = '#A32D2D';
@@ -32,7 +32,7 @@ export const FAINT = '#9A9DA1';
 /** Score → colour band (0–100). */
 export function scoreColor(n: number): string {
   if (n >= 85) return GREEN;
-  if (n >= 72) return TEAL;
+  if (n >= 72) return ACCENT;
   if (n >= 60) return AMBER;
   return RED;
 }
@@ -173,7 +173,7 @@ export type Channel = (typeof CHANNELS)[number];
 
 export function channelColor(channel: string | null): string {
   switch (channel) {
-    case 'Call': return TEAL;
+    case 'Call': return ACCENT;
     case 'WhatsApp': return GREEN;
     case 'Email': return '#3A4DB0';
     case 'Meeting': return PURPLE;
@@ -194,9 +194,9 @@ export function eventMeta(eventType: string): { label: string; color: string } {
     delivery_issue: { label: 'Delivery issue', color: RED },
     compliance_issue: { label: 'Compliance issue', color: RED },
     marked_preferred: { label: 'Marked preferred', color: GREEN },
-    note_added: { label: 'Note added', color: TEAL },
+    note_added: { label: 'Note added', color: ACCENT },
     order_linked: { label: 'Order linked (ProcurePulse)', color: PURPLE },
-    call: { label: 'Call', color: TEAL },
+    call: { label: 'Call', color: ACCENT },
     whatsapp: { label: 'WhatsApp', color: GREEN },
     email: { label: 'Email', color: '#3A4DB0' },
     meeting: { label: 'Meeting', color: PURPLE },

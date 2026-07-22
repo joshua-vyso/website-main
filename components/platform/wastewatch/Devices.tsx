@@ -34,7 +34,7 @@ export function WasteDevices() {
           <h1 className="text-[24px] font-bold leading-tight text-[#1A1C1E]">Devices</h1>
           <p className="mt-0.5 text-[14px] text-[#5F6368]">Connected scales and sensors that measure waste automatically</p>
         </div>
-        <button type="button" onClick={() => setAddOpen(true)} className="inline-flex h-10 items-center rounded-xl bg-[#1E5E54] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#184D45]">+ Add device</button>
+        <button type="button" onClick={() => setAddOpen(true)} className="inline-flex h-10 items-center rounded-xl bg-[#1F5FA8] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87]">+ Add device</button>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
@@ -97,8 +97,8 @@ function DeviceDetail({ d, onAction }: { d: Device; onAction: (m: string) => voi
         <Field label="Events today" value={String(d.eventsToday)} />
       </div>
       <div className="flex gap-2">
-        <button type="button" onClick={() => onAction('Calibration started (demo)')} className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[12px] font-medium text-[#1A1C1E] hover:border-[#1E5E54]/40">Calibrate</button>
-        <button type="button" onClick={() => onAction('Sync requested (demo)')} className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[12px] font-medium text-[#1A1C1E] hover:border-[#1E5E54]/40">Sync now</button>
+        <button type="button" onClick={() => onAction('Calibration started (demo)')} className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[12px] font-medium text-[#1A1C1E] hover:border-[#3E7BC4]/40">Calibrate</button>
+        <button type="button" onClick={() => onAction('Sync requested (demo)')} className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[12px] font-medium text-[#1A1C1E] hover:border-[#3E7BC4]/40">Sync now</button>
       </div>
 
       {/* Current user */}
@@ -178,7 +178,7 @@ function DeviceDetail({ d, onAction }: { d: Device; onAction: (m: string) => voi
 }
 
 function historyColor(kind: DeviceHistoryEvent['kind']) {
-  return kind === 'disconnected' ? '#A32D2D' : kind === 'calibration' ? '#854F0B' : kind === 'connected' ? '#0F6E56' : '#1E5E54';
+  return kind === 'disconnected' ? '#A32D2D' : kind === 'calibration' ? '#854F0B' : kind === 'connected' ? '#0F6E56' : '#3E7BC4';
 }
 
 function AddDeviceWizard({ open, onClose, onSaved }: { open: boolean; onClose: () => void; onSaved: () => void }) {
@@ -189,7 +189,7 @@ function AddDeviceWizard({ open, onClose, onSaved }: { open: boolean; onClose: (
   const [location, setLocation] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const input = 'h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none';
+  const input = 'h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none';
 
   const canSave = !!org && name.trim().length > 0 && location.trim().length > 0 && !saving;
 
@@ -234,7 +234,7 @@ function AddDeviceWizard({ open, onClose, onSaved }: { open: boolean; onClose: (
           <span className="text-[12px] text-[#A32D2D]">{error ?? ''}</span>
           <div className="flex gap-2">
             <button type="button" onClick={onClose} className="rounded-lg px-3.5 py-2 text-[13px] text-[#5F6368] hover:bg-black/[0.03]">Cancel</button>
-            <button type="button" disabled={!canSave} onClick={connect} className="rounded-lg bg-[#1E5E54] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:cursor-not-allowed disabled:opacity-40">{saving ? 'Connecting…' : 'Connect device'}</button>
+            <button type="button" disabled={!canSave} onClick={connect} className="rounded-lg bg-[#1F5FA8] px-4 py-2 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:cursor-not-allowed disabled:opacity-40">{saving ? 'Connecting…' : 'Connect device'}</button>
           </div>
         </div>
       }
@@ -244,7 +244,7 @@ function AddDeviceWizard({ open, onClose, onSaved }: { open: boolean; onClose: (
           <div className="mb-1.5 text-[13px] font-medium text-[#1A1C1E]">Device type</div>
           <div className="grid grid-cols-2 gap-2">
             {DEVICE_TYPES.map((t) => (
-              <button key={t} type="button" onClick={() => setType(t)} className={`rounded-xl border px-3 py-2.5 text-left text-[13px] transition-colors ${type === t ? 'border-[#1E5E54] bg-[#F6FAF8] text-[#1A1C1E]' : 'border-[#E7E7E2] bg-white text-[#5F6368] hover:border-[#1E5E54]/40'}`}>{t}</button>
+              <button key={t} type="button" onClick={() => setType(t)} className={`rounded-xl border px-3 py-2.5 text-left text-[13px] transition-colors ${type === t ? 'border-[#3E7BC4] bg-[#F5F9FE] text-[#1A1C1E]' : 'border-[#E7E7E2] bg-white text-[#5F6368] hover:border-[#3E7BC4]/40'}`}>{t}</button>
             ))}
           </div>
         </div>
@@ -256,7 +256,7 @@ function AddDeviceWizard({ open, onClose, onSaved }: { open: boolean; onClose: (
           <label className="mb-1 block text-[13px] font-medium text-[#1A1C1E]">Location</label>
           <input value={location} onChange={(e) => setLocation(e.target.value)} className={input} placeholder="e.g. Cold prep" />
         </div>
-        <p className="rounded-lg bg-[#F6FAF8] px-3 py-2 text-[12px] text-[#5F6368]">More connectors (IoT sensors, barcode &amp; camera stations) plug in here as we add them.</p>
+        <p className="rounded-lg bg-[#F5F9FE] px-3 py-2 text-[12px] text-[#5F6368]">More connectors (IoT sensors, barcode &amp; camera stations) plug in here as we add them.</p>
       </div>
     </Drawer>
   );

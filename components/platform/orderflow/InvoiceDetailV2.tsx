@@ -44,7 +44,7 @@ function methodLabel(value: string): string {
 }
 
 const toolbarBtn =
-  'inline-flex h-9 items-center rounded-lg border border-[#D7DAD8] bg-white px-3.5 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/50 disabled:opacity-50';
+  'inline-flex h-9 items-center rounded-lg border border-[#D7DAD8] bg-white px-3.5 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/50 disabled:opacity-50';
 
 export function InvoiceDetailV2({ data, orgName }: { data: InvoiceDetailData; orgName: string | null }) {
   const router = useRouter();
@@ -85,7 +85,7 @@ export function InvoiceDetailV2({ data, orgName }: { data: InvoiceDetailData; or
       <div className="rounded-2xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] px-6 py-12 text-center">
         <p className="text-[15px] font-medium text-[#1A1C1E]">Invoice not found</p>
         <p className="mx-auto mt-1 max-w-md text-[13px] text-[#5F6368]">It may have been deleted, or the link is stale.</p>
-        <Link href="/app/orderflow/invoices" className="mt-3 inline-block text-[13px] font-medium text-[#1E5E54] hover:underline">
+        <Link href="/app/orderflow/invoices" className="mt-3 inline-block text-[13px] font-medium text-[#1F5FA8] hover:underline">
           ← Back to invoices
         </Link>
       </div>
@@ -262,7 +262,7 @@ export function InvoiceDetailV2({ data, orgName }: { data: InvoiceDetailData; or
           <span className="text-[#1A1C1E]">
             Created from order {order.order_number ?? `#${order.id.slice(0, 6).toUpperCase()}`}.
           </span>
-          <Link href={`/app/orderflow/orders/${order.id}`} className="font-medium text-[#1E5E54] hover:underline">
+          <Link href={`/app/orderflow/orders/${order.id}`} className="font-medium text-[#1F5FA8] hover:underline">
             View order →
           </Link>
         </div>
@@ -299,7 +299,7 @@ export function InvoiceDetailV2({ data, orgName }: { data: InvoiceDetailData; or
                 <button
                   type="button"
                   onClick={() => setPayOpen(true)}
-                  className="inline-flex h-8 items-center rounded-lg border border-[#D7DAD8] bg-white px-3 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/40"
+                  className="inline-flex h-8 items-center rounded-lg border border-[#D7DAD8] bg-white px-3 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/40"
                 >
                   + Record
                 </button>
@@ -360,7 +360,7 @@ export function InvoiceDetailV2({ data, orgName }: { data: InvoiceDetailData; or
               {canCredit ? (
                 <Link
                   href={`/app/orderflow/credit-notes/new?invoice=${inv.id}`}
-                  className="inline-flex h-8 items-center rounded-lg border border-[#D7DAD8] bg-white px-3 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/40"
+                  className="inline-flex h-8 items-center rounded-lg border border-[#D7DAD8] bg-white px-3 text-[12px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/40"
                 >
                   + Create
                 </Link>
@@ -375,7 +375,7 @@ export function InvoiceDetailV2({ data, orgName }: { data: InvoiceDetailData; or
                     <div className="min-w-0">
                       <Link
                         href={`/app/orderflow/credit-notes/${cn.id}`}
-                        className="block truncate text-[13px] font-medium text-[#1E5E54] hover:underline"
+                        className="block truncate text-[13px] font-medium text-[#1F5FA8] hover:underline"
                       >
                         {cn.credit_number}
                       </Link>

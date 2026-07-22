@@ -75,7 +75,7 @@ export function RoutingCard({
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="text-[13px] font-medium text-[#1A1C1E]">{route.label}</span>
                     {route.recommended ? (
-                      <span className="rounded-full bg-[#E3F0ED] px-2 py-0.5 text-[10px] font-medium text-[#1E5E54]">
+                      <span className="rounded-full bg-[#EAF2FC] px-2 py-0.5 text-[10px] font-medium text-[#1F5FA8]">
                         Recommended
                       </span>
                     ) : null}
@@ -112,7 +112,7 @@ export function RoutingCard({
                       type="button"
                       onClick={resync}
                       disabled={busy}
-                      className="shrink-0 rounded-lg bg-[#1E5E54] px-3 py-1.5 text-[13px] font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+                      className="shrink-0 rounded-lg bg-[#1F5FA8] px-3 py-1.5 text-[13px] font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
                     >
                       {busy ? 'Syncing…' : 'Push'}
                     </button>

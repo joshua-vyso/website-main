@@ -157,7 +157,7 @@ export function PriceListsDb({ data }: { data: CoreData }) {
         </p>
         <Link
           href="/app/orderflow/pricelists"
-          className="inline-flex h-9 items-center justify-center rounded-lg border border-[#D7DAD8] bg-white px-4 text-[13px] font-medium text-[#1E5E54] transition-colors hover:bg-[#F0F0EC]"
+          className="inline-flex h-9 items-center justify-center rounded-lg border border-[#D7DAD8] bg-white px-4 text-[13px] font-medium text-[#1F5FA8] transition-colors hover:bg-[#F0F0EC]"
         >
           Open the full editor →
         </Link>

@@ -35,17 +35,17 @@ export function ModuleHeader({
   );
 }
 
-/** Teal primary action used across skeleton modules. */
+/** Primary action used across skeleton modules. */
 export function PrimaryAction({ onClick, children }: { onClick: () => void; children: ReactNode }) {
   return (
-    <button type="button" onClick={onClick} className="inline-flex h-10 items-center rounded-xl bg-[#1E5E54] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#184D45]">
+    <button type="button" onClick={onClick} className="inline-flex h-10 items-center rounded-xl bg-[#1F5FA8] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87]">
       {children}
     </button>
   );
 }
 export function SecondaryAction({ onClick, children }: { onClick: () => void; children: ReactNode }) {
   return (
-    <button type="button" onClick={onClick} className="inline-flex h-10 items-center rounded-xl border border-[#D7DAD8] bg-white px-4 text-[14px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/40">
+    <button type="button" onClick={onClick} className="inline-flex h-10 items-center rounded-xl border border-[#D7DAD8] bg-white px-4 text-[14px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/40">
       {children}
     </button>
   );
@@ -115,7 +115,7 @@ export function SectionCard({ title, right, children, className = '' }: { title:
 
 const SAMPLE = [12, 18, 15, 22, 19, 27, 24, 31, 28, 35];
 
-export function PlaceholderChart({ data = SAMPLE, color = '#1E5E54', fill = '#E3F0ED', height = 120, caption = 'Illustrative — live data once connected' }: { data?: number[]; color?: string; fill?: string; height?: number; caption?: string }) {
+export function PlaceholderChart({ data = SAMPLE, color = '#3E7BC4', fill = '#EAF2FC', height = 120, caption = 'Illustrative — live data once connected' }: { data?: number[]; color?: string; fill?: string; height?: number; caption?: string }) {
   return (
     <div>
       <AreaChart data={data} color={color} fill={fill} height={height} />
@@ -334,7 +334,7 @@ export function ModuleWidgetCard({ widget, onAction }: { widget: ModuleWidget; o
       {widget.subtitle ? <div className="mt-1.5 text-[11px] text-[#9A9DA1]">{widget.subtitle}</div> : null}
       {widget.trend ? <div className="mt-1 text-[11px]" style={{ color: s.fg }}>{widget.trend}</div> : null}
       {widget.actionLabel && onAction ? (
-        <button type="button" onClick={() => onAction(widget)} className="mt-2 text-[12px] font-medium text-[#1E5E54] hover:underline">
+        <button type="button" onClick={() => onAction(widget)} className="mt-2 text-[12px] font-medium text-[#1F5FA8] hover:underline">
           {widget.actionLabel} →
         </button>
       ) : null}

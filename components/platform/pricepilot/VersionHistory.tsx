@@ -113,13 +113,13 @@ export function VersionHistory({
           value={note}
           onChange={(e) => setNote(e.target.value)}
           placeholder="Optional note (e.g. Q3 price increase)"
-          className="h-9 flex-1 min-w-[200px] rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] outline-none placeholder:text-[#9A9DA1] focus:border-[#1E5E54]"
+          className="h-9 flex-1 min-w-[200px] rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] outline-none placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]"
         />
         <button
           type="button"
           onClick={publish}
           disabled={busy !== null || upToDate}
-          className="inline-flex h-9 items-center rounded-lg bg-[#1E5E54] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:opacity-40"
+          className="inline-flex h-9 items-center rounded-lg bg-[#1F5FA8] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
         >
           {busy === 'publish' ? 'Publishing…' : 'Publish version'}
         </button>
@@ -155,7 +155,7 @@ export function VersionHistory({
                     <button
                       type="button"
                       onClick={() => setCompareId(open ? null : v.id)}
-                      className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[12px] font-medium text-[#5F6368] transition-colors hover:border-[#1E5E54]/40"
+                      className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[12px] font-medium text-[#5F6368] transition-colors hover:border-[#3E7BC4]/40"
                     >
                       {open ? 'Hide' : `Compare (${changeCount})`}
                     </button>
@@ -163,7 +163,7 @@ export function VersionHistory({
                       type="button"
                       disabled={busy !== null}
                       onClick={() => rollback(v)}
-                      className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[12px] font-medium text-[#5F6368] transition-colors hover:border-[#1E5E54]/40 disabled:opacity-40"
+                      className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[12px] font-medium text-[#5F6368] transition-colors hover:border-[#3E7BC4]/40 disabled:opacity-40"
                     >
                       {busy === v.id ? '…' : 'Restore'}
                     </button>

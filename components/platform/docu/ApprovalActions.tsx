@@ -73,7 +73,7 @@ export function ApprovalActions({
             onClick={() => run(t.action, t.toStatus)}
             className={`rounded-lg px-3.5 py-2 text-[13px] font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
               t.primary
-                ? 'bg-[#1E5E54] text-white hover:bg-[#184c44]'
+                ? 'bg-[#1F5FA8] text-white hover:bg-[#184c44]'
                 : 'border border-[#D7DAD8] text-[#5F6368] hover:bg-[#FAFAF8]'
             }`}
           >

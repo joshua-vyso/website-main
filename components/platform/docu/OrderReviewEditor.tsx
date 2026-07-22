@@ -187,7 +187,7 @@ export function OrderReviewEditor({
   }
 
   const cell =
-    'h-9 w-full rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:border-[#1E5E54]/40 focus:outline-none';
+    'h-9 w-full rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:border-[#3E7BC4]/40 focus:outline-none';
 
   return (
     <div className="flex flex-col rounded-2xl border border-[#E7E7E2] bg-white">
@@ -211,7 +211,7 @@ export function OrderReviewEditor({
               onFocus={() => setOpenList(true)}
               onBlur={() => setTimeout(() => setOpenList(false), 150)}
               placeholder="Search customers or type a new name"
-              className="h-10 w-full rounded-xl border border-[#E7E7E2] bg-white px-3.5 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none"
+              className="h-10 w-full rounded-xl border border-[#E7E7E2] bg-white px-3.5 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
             />
             {openList && (matches.length > 0 || (query.trim() && !exactExists)) ? (
               <div className="absolute left-0 right-0 top-[44px] z-20 max-h-[240px] overflow-auto rounded-xl border border-[#E7E7E2] bg-white py-1 shadow-[0_18px_50px_-8px_rgba(26,28,30,0.25)]">
@@ -238,7 +238,7 @@ export function OrderReviewEditor({
                       setCustomerId(null);
                       setOpenList(false);
                     }}
-                    className="block w-full truncate border-t border-[#F0F0EC] px-3 py-2 text-left text-[13px] font-medium text-[#1E5E54] hover:bg-[#FAFAF8]"
+                    className="block w-full truncate border-t border-[#F0F0EC] px-3 py-2 text-left text-[13px] font-medium text-[#1F5FA8] hover:bg-[#FAFAF8]"
                   >
                     + Create “{query.trim()}”
                   </button>
@@ -263,7 +263,7 @@ export function OrderReviewEditor({
           <button
             type="button"
             onClick={addLine}
-            className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[13px] font-medium text-[#1E5E54] transition-colors hover:border-[#1E5E54]/40"
+            className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[13px] font-medium text-[#1F5FA8] transition-colors hover:border-[#3E7BC4]/40"
           >
             + Add item
           </button>
@@ -322,7 +322,7 @@ export function OrderReviewEditor({
             <span className="h-1.5 w-1.5 rounded-full bg-[#0F6E56]" />
             Invoiced {doneInvoice}
             {orderId ? (
-              <Link href={`/app/orderflow/orders/${orderId}`} className="ml-1 font-medium text-[#1E5E54] hover:underline">
+              <Link href={`/app/orderflow/orders/${orderId}`} className="ml-1 font-medium text-[#1F5FA8] hover:underline">
                 View order ›
               </Link>
             ) : null}

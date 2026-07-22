@@ -100,14 +100,14 @@ export function QuoteRequests({ requests, total }: { requests: OfQuoteRequest[];
               type="button"
               disabled={busy === r.id}
               onClick={() => void act(r.id, { flagged_spam: false })}
-              className="shrink-0 rounded-lg border border-[#E7E7E2] bg-white px-2.5 py-1 text-[12px] text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/30 disabled:opacity-40"
+              className="shrink-0 rounded-lg border border-[#E7E7E2] bg-white px-2.5 py-1 text-[12px] text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/30 disabled:opacity-40"
             >
               Not spam
             </button>
           ) : (
             <Link
               href={`/app/orderflow/quotes/new?request=${r.id}`}
-              className="shrink-0 rounded-lg bg-[#1E5E54] px-2.5 py-1 text-[12px] font-medium text-white transition-colors hover:bg-[#184D45]"
+              className="shrink-0 rounded-lg bg-[#1F5FA8] px-2.5 py-1 text-[12px] font-medium text-white transition-colors hover:bg-[#174C87]"
             >
               Draft a quote
             </Link>
@@ -146,7 +146,7 @@ export function QuoteRequests({ requests, total }: { requests: OfQuoteRequest[];
 
             {/* For a flagged row, offer the draft action here too once it's expanded. */}
             {r.flagged_spam ? (
-              <Link href={`/app/orderflow/quotes/new?request=${r.id}`} className="inline-block text-[12px] font-medium text-[#1E5E54] hover:underline">
+              <Link href={`/app/orderflow/quotes/new?request=${r.id}`} className="inline-block text-[12px] font-medium text-[#1F5FA8] hover:underline">
                 Draft a quote from this anyway →
               </Link>
             ) : null}

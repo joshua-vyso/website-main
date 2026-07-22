@@ -9,6 +9,7 @@ const NAV_GROUPS = [
       { label: "OrderFlow", href: "/platform#orderflow" },
       { label: "Vyso AI", href: "/platform/vyso-ai" },
       { label: "Vyso for SMEs", href: "/platform/vyso-for-smes" },
+      { label: "Vyso in South Africa", href: "/south-africa" },
     ],
   },
   {
@@ -27,6 +28,7 @@ const NAV_GROUPS = [
       { label: "Pricing", href: "/pricing" },
       { label: "FAQ", href: "/faq" },
       { label: "Contact", href: "/contact" },
+      { label: "Privacy", href: "/privacy" },
     ],
   },
 ] as const;

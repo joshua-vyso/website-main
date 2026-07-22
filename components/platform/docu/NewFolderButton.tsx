@@ -54,7 +54,7 @@ export function NewFolderButton() {
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
-        className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-[#E7E7E2] bg-white px-4 text-[14px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/30"
+        className="inline-flex h-10 shrink-0 items-center gap-1.5 rounded-xl border border-[#E7E7E2] bg-white px-4 text-[14px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/30"
       >
         <svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" aria-hidden>
           <path d="M8 3.5v9M3.5 8h9" />
@@ -84,7 +84,7 @@ export function NewFolderButton() {
                 if (e.key === 'Escape') setOpen(false);
               }}
               placeholder="Folder name"
-              className="h-9 w-full rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none"
+              className="h-9 w-full rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
             />
             <div className="mt-2.5 grid grid-cols-8 gap-1.5">
               {FOLDER_COLORS.map((c) => (
@@ -108,7 +108,7 @@ export function NewFolderButton() {
                 type="button"
                 onClick={() => void create()}
                 disabled={busy || !name.trim()}
-                className="rounded-lg bg-[#1E5E54] px-3.5 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:opacity-40"
+                className="rounded-lg bg-[#1F5FA8] px-3.5 py-1.5 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
               >
                 {busy ? 'Creating…' : 'Create folder'}
               </button>

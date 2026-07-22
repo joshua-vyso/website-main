@@ -8,7 +8,7 @@ import {
   ScorePill,
   scoreColor,
   GREEN,
-  TEAL,
+  ACCENT,
   AMBER,
   RED,
   MUTE,
@@ -76,7 +76,7 @@ function pickMin(suppliers: Supplier[], value: (s: Supplier) => number): Supplie
 
 const SCORE_BANDS = [
   { key: 'excellent', label: '85+', min: 85, color: GREEN },
-  { key: 'good', label: '72–84', min: 72, color: TEAL },
+  { key: 'good', label: '72–84', min: 72, color: ACCENT },
   { key: 'watch', label: '60–71', min: 60, color: AMBER },
   { key: 'weak', label: '<60', min: 0, color: RED },
 ] as const;
@@ -223,7 +223,7 @@ export function PerformanceTab() {
         <SectionCard title="Reliability trend">
           {reliabilityAvg.length > 0 ? (
             <>
-              <AreaChart data={reliabilityAvg} color={TEAL} fill="#E3F0ED" height={130} />
+              <AreaChart data={reliabilityAvg} color={ACCENT} fill="#EAF2FC" height={130} />
               <ChartCaption />
             </>
           ) : (
@@ -320,7 +320,7 @@ export function PerformanceTab() {
             label="Most reliable"
             supplier={mostReliable}
             metric={mostReliable ? `${mostReliable.scorecard.reliability}` : '—'}
-            color={TEAL}
+            color={ACCENT}
           />
           <HighlightCard
             label="Most price-stable"

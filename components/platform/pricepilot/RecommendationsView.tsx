@@ -123,7 +123,7 @@ export function RecommendationsView({
               'all',
             );
           }}
-          className="inline-flex items-center justify-center rounded-lg bg-[#1E5E54] px-4 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:opacity-50"
+          className="inline-flex items-center justify-center rounded-lg bg-[#1F5FA8] px-4 py-2.5 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-50"
         >
           {busy === 'all' ? 'Publishing…' : 'Accept all'}
         </button>
@@ -177,7 +177,7 @@ export function RecommendationsView({
                 <div className="flex shrink-0 items-end gap-2">
                   <label className="text-[12px] text-[#9A9DA1]">
                     <span className="mb-1 block">Target margin</span>
-                    <span className="flex items-center rounded-lg border border-[#D7DAD8] bg-white px-2.5 focus-within:border-[#1E5E54]">
+                    <span className="flex items-center rounded-lg border border-[#D7DAD8] bg-white px-2.5 focus-within:border-[#3E7BC4]">
                       <input
                         inputMode="decimal"
                         value={edited[o.item.id] ?? String(Math.round(o.suggestedMargin))}
@@ -191,7 +191,7 @@ export function RecommendationsView({
                     type="button"
                     disabled={busy !== null}
                     onClick={() => publish([{ id: o.item.id, margin: m }], o.item.id)}
-                    className="inline-flex h-[38px] items-center justify-center rounded-lg bg-[#1E5E54] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:opacity-50"
+                    className="inline-flex h-[38px] items-center justify-center rounded-lg bg-[#1F5FA8] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-50"
                   >
                     {busy === o.item.id ? '…' : 'Accept'}
                   </button>
@@ -233,7 +233,7 @@ function EmptyState({
         {cta ? (
           <Link
             href={cta.href}
-            className="mt-4 inline-flex items-center justify-center rounded-lg bg-[#1E5E54] px-4 py-2.5 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45]"
+            className="mt-4 inline-flex items-center justify-center rounded-lg bg-[#1F5FA8] px-4 py-2.5 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87]"
           >
             {cta.label}
           </Link>

@@ -882,7 +882,7 @@ function StepBar({ step }: { step: Step }) {
           <span
             className={`rounded-full px-2.5 py-1 ${
               i === activeIndex
-                ? 'bg-[#1E5E54] text-white'
+                ? 'bg-[#1F5FA8] text-white'
                 : i < activeIndex
                   ? 'bg-[#E1F5EE] text-[#0F6E56]'
                   : 'bg-[#F0F0EC] text-[#9A9DA1]'
@@ -926,8 +926,8 @@ function SourceStep({
               onClick={() => setEntity(d.entity)}
               className={`rounded-2xl border px-4 py-4 text-left transition-colors ${
                 entity === d.entity
-                  ? 'border-[#1E5E54] bg-[#F3F8F6]'
-                  : 'border-[#E7E7E2] bg-white hover:border-[#1E5E54]/40 hover:bg-[#FAFAF8]'
+                  ? 'border-[#3E7BC4] bg-[#F3F8F6]'
+                  : 'border-[#E7E7E2] bg-white hover:border-[#3E7BC4]/40 hover:bg-[#FAFAF8]'
               }`}
             >
               <div className="text-[15px] font-semibold text-[#1A1C1E]">{d.label}</div>
@@ -941,7 +941,7 @@ function SourceStep({
         <div className="mb-2 text-[13px] font-medium text-[#1A1C1E]">Upload the file</div>
         <label
           className={`flex cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed px-6 py-10 text-center transition-colors ${
-            parsing ? 'border-[#D7DAD8] bg-[#FBFBF9]' : 'border-[#D7DAD8] bg-[#FBFBF9] hover:border-[#1E5E54]/50 hover:bg-[#F3F8F6]'
+            parsing ? 'border-[#D7DAD8] bg-[#FBFBF9]' : 'border-[#D7DAD8] bg-[#FBFBF9] hover:border-[#3E7BC4]/50 hover:bg-[#F3F8F6]'
           }`}
         >
           <input
@@ -1029,7 +1029,7 @@ function Grid({
                         title={col.dropped ? 'Keep column' : 'Drop column'}
                         className={`shrink-0 rounded px-1.5 py-0.5 text-[11px] font-medium transition-colors ${
                           col.dropped
-                            ? 'text-[#1E5E54] hover:bg-[#EAF3F0]'
+                            ? 'text-[#1F5FA8] hover:bg-[#EAF3F0]'
                             : 'text-[#9A9DA1] hover:bg-[#F3E7E7] hover:text-[#A32D2D]'
                         }`}
                       >
@@ -1039,7 +1039,7 @@ function Grid({
                     <select
                       value={col.field}
                       onChange={(e) => onFieldChange(ci, e.target.value)}
-                      className="mt-1.5 h-7 w-full rounded-md border border-[#D7DAD8] bg-white px-1.5 text-[12px] text-[#1A1C1E] focus:border-[#1E5E54]/50 focus:outline-none"
+                      className="mt-1.5 h-7 w-full rounded-md border border-[#D7DAD8] bg-white px-1.5 text-[12px] text-[#1A1C1E] focus:border-[#3E7BC4]/50 focus:outline-none"
                     >
                       <option value={DROP}>— (drop)</option>
                       {def.fields.map((f) => (
@@ -1090,7 +1090,7 @@ function Grid({
                               ? 'border-transparent bg-transparent text-[#9A9DA1]'
                               : cellBad
                                 ? 'border-[#E7C9A0] bg-[#FDF8EF] text-[#1A1C1E] focus:border-[#854F0B]'
-                                : 'border-transparent bg-transparent text-[#1A1C1E] hover:border-[#E7E7E2] focus:border-[#1E5E54]/50'
+                                : 'border-transparent bg-transparent text-[#1A1C1E] hover:border-[#E7E7E2] focus:border-[#3E7BC4]/50'
                           }`}
                         />
                       </td>
@@ -1173,7 +1173,7 @@ function AiPanel({
           value={instruction}
           onChange={(e) => setInstruction(e.target.value)}
           placeholder="e.g. Title-case the customer names, and map the Bill to columns to the billing address."
-          className="h-24 w-full rounded-lg border border-[#D7DAD8] bg-white px-2.5 py-2 text-[12px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/50 focus:outline-none"
+          className="h-24 w-full rounded-lg border border-[#D7DAD8] bg-white px-2.5 py-2 text-[12px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/50 focus:outline-none"
         />
         <SecondaryBtn className="mt-2 w-full" onClick={onCommand} disabled={aiBusy !== null || instruction.trim() === ''}>
           {aiBusy === 'command' ? 'Applying…' : 'Apply'}
@@ -1181,7 +1181,7 @@ function AiPanel({
       </div>
 
       {aiMessage ? (
-        <div className="mt-3 rounded-lg border border-[#D9E7E2] bg-[#F1F7F4] px-2.5 py-2 text-[12px] text-[#1E5E54]">
+        <div className="mt-3 rounded-lg border border-[#D9E7E2] bg-[#F1F7F4] px-2.5 py-2 text-[12px] text-[#1F5FA8]">
           {aiMessage}
         </div>
       ) : null}
@@ -1254,7 +1254,7 @@ function SummaryStep({
       <div className="mt-5 flex flex-wrap items-center gap-2">
         <Link
           href={dbHref}
-          className="inline-flex h-9 items-center justify-center rounded-lg bg-[#1E5E54] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174A42]"
+          className="inline-flex h-9 items-center justify-center rounded-lg bg-[#1F5FA8] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87]"
         >
           Done — view {def.label.toLowerCase()}
         </Link>

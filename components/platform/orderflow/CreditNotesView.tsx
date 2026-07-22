@@ -93,7 +93,7 @@ export function CreditNotesView({ data }: { data: CreditNotesData }) {
         {isAdmin ? (
           <Link
             href="/app/orderflow/credit-notes/new"
-            className="inline-flex h-10 items-center rounded-xl bg-[#1E5E54] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#184D45]"
+            className="inline-flex h-10 items-center rounded-xl bg-[#1F5FA8] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87]"
           >
             + New credit note
           </Link>
@@ -139,7 +139,7 @@ export function CreditNotesView({ data }: { data: CreditNotesData }) {
                           !isAdmin ? undefined : (
                           <Link
                             href="/app/orderflow/credit-notes/new"
-                            className="inline-flex h-9 items-center rounded-lg bg-[#1E5E54] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174A42]"
+                            className="inline-flex h-9 items-center rounded-lg bg-[#1F5FA8] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87]"
                           >
                             + New credit note
                           </Link>
@@ -171,7 +171,7 @@ export function CreditNotesView({ data }: { data: CreditNotesData }) {
                           <Link
                             href={`/app/orderflow/invoices/${e.invoice.id}`}
                             onClick={(ev) => ev.stopPropagation()}
-                            className="font-medium text-[#1E5E54] hover:underline"
+                            className="font-medium text-[#1F5FA8] hover:underline"
                           >
                             {e.invoice.invoice_number}
                           </Link>

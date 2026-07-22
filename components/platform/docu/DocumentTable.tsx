@@ -51,9 +51,9 @@ function ExtractingRow({ doc }: { doc: DocumentWithSupplier }) {
       aria-busy="true"
     >
       <div className="flex min-w-0 items-center gap-3">
-        <span className="relative h-7 w-7 shrink-0 rounded-md bg-[#E9EFEC]" aria-hidden>
-          <span className="absolute inset-0 m-auto h-2 w-2 animate-ping rounded-full bg-[#1E5E54]/60" />
-          <span className="absolute inset-0 m-auto h-2 w-2 rounded-full bg-[#1E5E54]" />
+        <span className="relative h-7 w-7 shrink-0 rounded-md bg-[#E7EEF8]" aria-hidden>
+          <span className="absolute inset-0 m-auto h-2 w-2 animate-ping rounded-full bg-[#1F5FA8]/60" />
+          <span className="absolute inset-0 m-auto h-2 w-2 rounded-full bg-[#1F5FA8]" />
         </span>
         <span className="truncate text-[#5F6368]">{doc.filename}</span>
       </div>
@@ -61,7 +61,7 @@ function ExtractingRow({ doc }: { doc: DocumentWithSupplier }) {
       <span className="text-[#5F6368]">{formatDate(doc.created_at)}</span>
       <span className="text-[#C9CCC8]">—</span>
       <span>
-        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#E9EFEC] px-2.5 py-1 text-[12px] font-medium text-[#0F6E56]">
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-[#E7EEF8] px-2.5 py-1 text-[12px] font-medium text-[#0F6E56]">
           <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-[#0F6E56]" />
           <span className="animate-pulse">Extracting…</span>
         </span>
@@ -99,13 +99,13 @@ function DocRow({
         type="button"
         onClick={() => onToggle(doc.id)}
         className={`grid ${COLS} w-full items-center border-b border-[#F0F0EC] px-6 py-3.5 text-left text-[14px] transition-colors last:border-b-0 ${
-          selected ? 'bg-[#E9EFEC]' : 'hover:bg-[#FAFAF8]'
+          selected ? 'bg-[#E7EEF8]' : 'hover:bg-[#FAFAF8]'
         }`}
       >
         <span className="flex min-w-0 items-center gap-3">
           <span
             className={`flex h-4 w-4 shrink-0 items-center justify-center rounded-[5px] border transition-colors ${
-              selected ? 'border-[#1E5E54] bg-[#1E5E54] text-white' : 'border-[#C9CCC8] bg-white'
+              selected ? 'border-[#3E7BC4] bg-[#1F5FA8] text-white' : 'border-[#C9CCC8] bg-white'
             }`}
           >
             {selected ? (

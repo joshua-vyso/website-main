@@ -50,7 +50,7 @@ export function CustomersView({
         </div>
         <Link
           href="/app/pricepilot/price-lists"
-          className="inline-flex items-center justify-center rounded-lg bg-[#1E5E54] px-4 py-2.5 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45]"
+          className="inline-flex items-center justify-center rounded-lg bg-[#1F5FA8] px-4 py-2.5 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87]"
         >
           New price list →
         </Link>
@@ -58,7 +58,7 @@ export function CustomersView({
 
       <div className="mt-5 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <KpiCard label="Customers" value={String(customers.length)} />
-        <KpiCard label="On contract pricing" value={String(onContract)} accent="#1E5E54" />
+        <KpiCard label="On contract pricing" value={String(onContract)} accent="#3E7BC4" />
         <KpiCard label="Expiring soon" value={String(expiring.length)} accent={expiring.length > 0 ? '#854F0B' : undefined} />
         <KpiCard label="Expired" value={String(expired.length)} accent={expired.length > 0 ? '#A32D2D' : undefined} />
       </div>
@@ -108,7 +108,7 @@ export function CustomersView({
               {c.lists.length === 0 ? (
                 <Link
                   href="/app/pricepilot/price-lists"
-                  className="mt-2 inline-block text-[13px] font-medium text-[#1E5E54] hover:underline"
+                  className="mt-2 inline-block text-[13px] font-medium text-[#1F5FA8] hover:underline"
                 >
                   Set up contract pricing →
                 </Link>
@@ -175,13 +175,13 @@ function ContractRow({ list, target }: { list: CustomerListRow; target: number }
           </span>
         </div>
         <div className="flex items-center gap-2">
-          <Link href={`/app/pricepilot/price-lists/${list.id}`} className="text-[12px] font-medium text-[#1E5E54] hover:underline">
+          <Link href={`/app/pricepilot/price-lists/${list.id}`} className="text-[12px] font-medium text-[#1F5FA8] hover:underline">
             Open
           </Link>
           <button
             type="button"
             onClick={() => setOpen((o) => !o)}
-            className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[12px] font-medium text-[#5F6368] transition-colors hover:border-[#1E5E54]/40"
+            className="rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[12px] font-medium text-[#5F6368] transition-colors hover:border-[#3E7BC4]/40"
           >
             {open ? 'Close' : 'Edit dates'}
           </button>
@@ -196,7 +196,7 @@ function ContractRow({ list, target }: { list: CustomerListRow; target: number }
               type="date"
               value={from}
               onChange={(e) => setFrom(e.target.value)}
-              className="rounded-lg border border-[#D7DAD8] bg-white px-2.5 py-2 text-[13px] text-[#1A1C1E] outline-none focus:border-[#1E5E54]"
+              className="rounded-lg border border-[#D7DAD8] bg-white px-2.5 py-2 text-[13px] text-[#1A1C1E] outline-none focus:border-[#3E7BC4]"
             />
           </label>
           <label className="text-[12px] text-[#9A9DA1]">
@@ -205,14 +205,14 @@ function ContractRow({ list, target }: { list: CustomerListRow; target: number }
               type="date"
               value={until}
               onChange={(e) => setUntil(e.target.value)}
-              className="rounded-lg border border-[#D7DAD8] bg-white px-2.5 py-2 text-[13px] text-[#1A1C1E] outline-none focus:border-[#1E5E54]"
+              className="rounded-lg border border-[#D7DAD8] bg-white px-2.5 py-2 text-[13px] text-[#1A1C1E] outline-none focus:border-[#3E7BC4]"
             />
           </label>
           <button
             type="button"
             disabled={busy}
             onClick={save}
-            className="inline-flex h-[38px] items-center rounded-lg bg-[#1E5E54] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:opacity-50"
+            className="inline-flex h-[38px] items-center rounded-lg bg-[#1F5FA8] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-50"
           >
             {busy ? 'Saving…' : 'Save'}
           </button>

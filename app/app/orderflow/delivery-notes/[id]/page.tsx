@@ -43,7 +43,7 @@ export default async function DeliveryNoteDetailPage({ params }: { params: Promi
           <p className="mt-1 text-[13px] text-[#5F6368]">It may have been deleted, or the migration has not run.</p>
           <Link
             href="/app/orderflow/delivery-notes"
-            className="mt-4 inline-flex h-9 items-center rounded-lg bg-[#1E5E54] px-4 text-[13px] font-medium text-white"
+            className="mt-4 inline-flex h-9 items-center rounded-lg bg-[#1F5FA8] px-4 text-[13px] font-medium text-white"
           >
             Back to Delivery notes
           </Link>

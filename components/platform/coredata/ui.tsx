@@ -13,7 +13,7 @@ const PORTAL_STYLE = { fontFamily: 'var(--font-inter)', ['--radius' as string]: 
 // ---------------------------------------------------------------------------
 
 export const inputClass =
-  'h-9 w-full rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/50 focus:outline-none';
+  'h-9 w-full rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/50 focus:outline-none';
 
 export function Field({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
   return (
@@ -36,7 +36,7 @@ export function PrimaryBtn({ className = '', ...props }: React.ButtonHTMLAttribu
     <button
       type="button"
       {...props}
-      className={`inline-flex h-9 items-center justify-center rounded-lg bg-[#1E5E54] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174A42] disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
+      className={`inline-flex h-9 items-center justify-center rounded-lg bg-[#1F5FA8] px-4 text-[13px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:cursor-not-allowed disabled:opacity-50 ${className}`}
     />
   );
 }
@@ -206,7 +206,7 @@ export function SearchInput({ value, onChange, placeholder }: { value: string; o
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder ?? 'Search…'}
-        className="h-9 w-full rounded-lg border border-[#D7DAD8] bg-white pl-8 pr-3 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/50 focus:outline-none sm:w-64"
+        className="h-9 w-full rounded-lg border border-[#D7DAD8] bg-white pl-8 pr-3 text-[13px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/50 focus:outline-none sm:w-64"
       />
     </div>
   );

@@ -45,7 +45,7 @@ function fmtDate(iso: string | null | undefined): string {
 }
 
 const filterSel =
-  'h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#1E5E54]';
+  'h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#3E7BC4]';
 
 const TERM_OPTIONS = [0, 7, 14, 30, 45, 60];
 
@@ -309,7 +309,7 @@ export function CustomersView({
           ))}
         </select>
         <label className="inline-flex h-9 cursor-pointer items-center gap-1.5 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#5F6368]">
-          <input type="checkbox" checked={overdueOnly} onChange={(e) => setOverdueOnly(e.target.checked)} className="accent-[#1E5E54]" />
+          <input type="checkbox" checked={overdueOnly} onChange={(e) => setOverdueOnly(e.target.checked)} className="accent-[#3E7BC4]" />
           Has overdue
         </label>
       </div>

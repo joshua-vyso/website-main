@@ -270,7 +270,7 @@ export function ProductsManager({
   const pageRows = filtered.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE);
 
   const cell =
-    'h-9 w-full rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:border-[#1E5E54]/40 focus:outline-none';
+    'h-9 w-full rounded-lg border border-[#E7E7E2] bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:border-[#3E7BC4]/40 focus:outline-none';
   const COLS = 'grid grid-cols-[minmax(170px,1fr)_120px_104px_104px_128px_40px] gap-2 items-center';
 
   return (
@@ -282,7 +282,7 @@ export function ProductsManager({
           right={
             <Link
               href="/app/orderflow/orders"
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#D7DAD8] bg-white px-3.5 py-2.5 text-[14px] font-medium text-[#5F6368] transition-colors hover:border-[#1E5E54]/30"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#D7DAD8] bg-white px-3.5 py-2.5 text-[14px] font-medium text-[#5F6368] transition-colors hover:border-[#3E7BC4]/30"
             >
               Create order in OrderFlow
               <span aria-hidden>→</span>
@@ -302,7 +302,7 @@ export function ProductsManager({
               setPage(0);
             }}
             placeholder="Search products…"
-            className="h-10 w-72 rounded-xl border border-[#E7E7E2] bg-white px-4 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none"
+            className="h-10 w-72 rounded-xl border border-[#E7E7E2] bg-white px-4 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
           />
           <span className="text-[13px] text-[#9A9DA1]">{filtered.length} products</span>
         </div>
@@ -311,7 +311,7 @@ export function ProductsManager({
             type="button"
             onClick={undo}
             disabled={past.length === 0}
-            className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-[#E7E7E2] bg-white px-3.5 text-[14px] text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/30 disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-[#E7E7E2] bg-white px-3.5 text-[14px] text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/30 disabled:cursor-not-allowed disabled:opacity-40"
           >
             ↶ Undo
           </button>
@@ -319,14 +319,14 @@ export function ProductsManager({
             type="button"
             onClick={redo}
             disabled={future.length === 0}
-            className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-[#E7E7E2] bg-white px-3.5 text-[14px] text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/30 disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-[#E7E7E2] bg-white px-3.5 text-[14px] text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/30 disabled:cursor-not-allowed disabled:opacity-40"
           >
             ↷ Redo
           </button>
           <button
             type="button"
             onClick={addProduct}
-            className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-[#1E5E54]/40 bg-white px-3.5 text-[14px] font-medium text-[#1E5E54] transition-colors hover:bg-[#E9EFEC]"
+            className="inline-flex h-10 items-center gap-1.5 rounded-xl border border-[#3E7BC4]/40 bg-white px-3.5 text-[14px] font-medium text-[#1F5FA8] transition-colors hover:bg-[#E7EEF8]"
           >
             + Add product
           </button>
@@ -334,7 +334,7 @@ export function ProductsManager({
             type="button"
             onClick={() => void save()}
             disabled={busy || dirtyCount === 0}
-            className="inline-flex h-10 items-center rounded-xl bg-[#1E5E54] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:cursor-not-allowed disabled:opacity-40"
+            className="inline-flex h-10 items-center rounded-xl bg-[#1F5FA8] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:cursor-not-allowed disabled:opacity-40"
           >
             {busy ? 'Saving…' : dirtyCount > 0 ? `Save changes (${dirtyCount})` : 'Saved'}
           </button>
@@ -406,7 +406,7 @@ export function ProductsManager({
                       onClick={() => void recalcUnit(r.id, baseUnit, r.unit)}
                       disabled={recalcBusy.has(r.id)}
                       title={`Recalculate stock from documents (${baseUnit} → ${r.unit})`}
-                      className="rounded-md bg-[#E9EFEC] px-1.5 py-0.5 text-[11px] font-medium text-[#1E5E54] transition-colors hover:bg-[#d9e6e0] disabled:opacity-50"
+                      className="rounded-md bg-[#E7EEF8] px-1.5 py-0.5 text-[11px] font-medium text-[#1F5FA8] transition-colors hover:bg-[#d9e6e0] disabled:opacity-50"
                     >
                       {recalcBusy.has(r.id) ? '…' : '↻ recalc'}
                     </button>
@@ -428,7 +428,7 @@ export function ProductsManager({
       </div>
 
       {recalcMsg ? (
-        <p className="mt-3 rounded-xl bg-[#E9EFEC] px-3 py-2 text-center text-[12px] text-[#0F4C44]">{recalcMsg}</p>
+        <p className="mt-3 rounded-xl bg-[#E7EEF8] px-3 py-2 text-center text-[12px] text-[#174C87]">{recalcMsg}</p>
       ) : null}
 
       {/* Pagination */}
@@ -438,7 +438,7 @@ export function ProductsManager({
             type="button"
             onClick={() => setPage((p) => Math.max(0, p - 1))}
             disabled={safePage === 0}
-            className="rounded-lg border border-[#E7E7E2] bg-white px-3 py-1.5 transition-colors hover:border-[#1E5E54]/30 disabled:opacity-40"
+            className="rounded-lg border border-[#E7E7E2] bg-white px-3 py-1.5 transition-colors hover:border-[#3E7BC4]/30 disabled:opacity-40"
           >
             ‹ Prev
           </button>
@@ -449,7 +449,7 @@ export function ProductsManager({
             type="button"
             onClick={() => setPage((p) => Math.min(pageCount - 1, p + 1))}
             disabled={safePage >= pageCount - 1}
-            className="rounded-lg border border-[#E7E7E2] bg-white px-3 py-1.5 transition-colors hover:border-[#1E5E54]/30 disabled:opacity-40"
+            className="rounded-lg border border-[#E7E7E2] bg-white px-3 py-1.5 transition-colors hover:border-[#3E7BC4]/30 disabled:opacity-40"
           >
             Next ›
           </button>

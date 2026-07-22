@@ -127,7 +127,7 @@ export function DocumentRowMenu({ id, filename }: { id: string; filename: string
                         if (e.key === 'Escape') close();
                       }}
                       aria-label="New document name"
-                      className="h-9 w-full rounded-lg border border-[#1E5E54]/40 bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:outline-none"
+                      className="h-9 w-full rounded-lg border border-[#3E7BC4]/40 bg-white px-2.5 text-[13px] text-[#1A1C1E] focus:outline-none"
                     />
                     <div className="mt-2 flex justify-end gap-1.5">
                       <button
@@ -141,7 +141,7 @@ export function DocumentRowMenu({ id, filename }: { id: string; filename: string
                         type="button"
                         onClick={() => void rename()}
                         disabled={busy || !value.trim()}
-                        className="rounded-lg bg-[#1E5E54] px-3 py-1.5 text-[12px] font-medium text-white hover:bg-[#184D45] disabled:opacity-40"
+                        className="rounded-lg bg-[#1F5FA8] px-3 py-1.5 text-[12px] font-medium text-white hover:bg-[#174C87] disabled:opacity-40"
                       >
                         {busy ? '…' : 'Save'}
                       </button>

@@ -240,7 +240,7 @@ export function RebatesView({ customers }: { customers: OfCustomer[] }) {
                               disabled={busyId === c.id}
                               inputMode="decimal"
                               aria-label={`Rebate % for ${c.name}`}
-                              className="h-8 w-[80px] rounded-lg border border-[#D7DAD8] bg-white px-2 text-right text-[13px] text-[#1A1C1E] tabular-nums placeholder:text-[#C9CCCA] focus:border-[#1E5E54]/50 focus:outline-none disabled:opacity-50"
+                              className="h-8 w-[80px] rounded-lg border border-[#D7DAD8] bg-white px-2 text-right text-[13px] text-[#1A1C1E] tabular-nums placeholder:text-[#C9CCCA] focus:border-[#3E7BC4]/50 focus:outline-none disabled:opacity-50"
                             />
                             <span className="text-[12px] text-[#9A9DA1]">%</span>
                           </div>

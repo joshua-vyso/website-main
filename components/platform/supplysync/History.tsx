@@ -9,7 +9,7 @@ import { SectionCard, DataTable, PrimaryAction } from '@/components/platform/mod
 import { useToast } from '@/components/platform/orderflow/ui';
 import type { SupplierHistoryEvent } from '@/lib/platform/supplysync-data';
 import { useSupplySync } from './context';
-import { AMBER, EmptyState, INK, MUTE, RED, FAINT, TEAL, channelColor, SupplierNameButton } from './shared';
+import { AMBER, EmptyState, INK, MUTE, RED, FAINT, ACCENT, channelColor, SupplierNameButton } from './shared';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -174,7 +174,7 @@ function LogCommunicationModal({
   if (!mounted || !open) return null;
 
   const input =
-    'h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none';
+    'h-10 w-full rounded-lg border border-[#E7E7E2] bg-white px-3 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none';
   const select = `${input} appearance-none`;
 
   return createPortal(
@@ -243,7 +243,7 @@ function LogCommunicationModal({
               }}
               rows={3}
               placeholder="What was discussed or agreed?"
-              className="w-full resize-none rounded-lg border border-[#E7E7E2] bg-white px-3 py-2 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none"
+              className="w-full resize-none rounded-lg border border-[#E7E7E2] bg-white px-3 py-2 text-[14px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
             />
           </div>
 
@@ -300,7 +300,7 @@ function LogCommunicationModal({
             type="button"
             onClick={save}
             disabled={busy}
-            className="rounded-lg bg-[#1E5E54] px-4 py-2 text-[13px] font-medium text-white hover:bg-[#184D45] disabled:opacity-60"
+            className="rounded-lg bg-[#1F5FA8] px-4 py-2 text-[13px] font-medium text-white hover:bg-[#174C87] disabled:opacity-60"
           >
             {busy ? 'Logging…' : 'Log communication'}
           </button>
@@ -493,7 +493,7 @@ export function HistoryTab() {
                 </div>
                 <ul className="mt-3 space-y-2.5">
                   {notes.map((n, i) => (
-                    <li key={i} className="border-l-2 pl-3" style={{ borderColor: `${TEAL}55` }}>
+                    <li key={i} className="border-l-2 pl-3" style={{ borderColor: `${ACCENT}55` }}>
                       <p className="text-[13px] leading-snug" style={{ color: INK }}>
                         {n.body}
                       </p>
@@ -560,7 +560,7 @@ export function HistoryTab() {
                     type="button"
                     onClick={() => markFollowUpDone(ev)}
                     disabled={savingId === ev.id}
-                    className="shrink-0 rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/40 hover:text-[#1E5E54] disabled:opacity-60"
+                    className="shrink-0 rounded-lg border border-[#D7DAD8] bg-white px-3 py-1.5 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/40 hover:text-[#174C87] disabled:opacity-60"
                   >
                     {savingId === ev.id ? 'Saving…' : 'Mark done'}
                   </button>

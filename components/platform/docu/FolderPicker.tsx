@@ -123,7 +123,7 @@ export function FolderPicker({
 
   const rowCls = (active: boolean) =>
     `flex w-full items-center gap-2 rounded-xl px-2.5 py-1.5 text-left text-[13px] transition-colors ${
-      active ? 'bg-[#E9EFEC] text-[#0F4C44]' : 'text-[#1A1C1E] hover:bg-[#FAFAF8]'
+      active ? 'bg-[#E7EEF8] text-[#174C87]' : 'text-[#1A1C1E] hover:bg-[#FAFAF8]'
     }`;
 
   return (
@@ -132,7 +132,7 @@ export function FolderPicker({
         type="button"
         onClick={() => setOpen((o) => !o)}
         disabled={busy}
-        className="inline-flex h-8 items-center gap-1.5 rounded-full border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#5F6368] transition-colors hover:border-[#1E5E54]/30 disabled:opacity-50"
+        className="inline-flex h-8 items-center gap-1.5 rounded-full border border-[#E7E7E2] bg-white px-3 text-[13px] text-[#5F6368] transition-colors hover:border-[#3E7BC4]/30 disabled:opacity-50"
       >
         <span
           className="h-2.5 w-2.5 rounded-full"
@@ -210,13 +210,13 @@ export function FolderPicker({
                       if (e.key === 'Enter') void createCustom();
                     }}
                     placeholder="New folder"
-                    className="h-7 flex-1 rounded-lg border border-[#E7E7E2] bg-white px-2 text-[12px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#1E5E54]/40 focus:outline-none"
+                    className="h-7 flex-1 rounded-lg border border-[#E7E7E2] bg-white px-2 text-[12px] text-[#1A1C1E] placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]/40 focus:outline-none"
                   />
                   <button
                     type="button"
                     onClick={() => void createCustom()}
                     disabled={creating || !newName.trim()}
-                    className="h-7 shrink-0 rounded-lg bg-[#1E5E54] px-2.5 text-[12px] font-medium text-white transition-colors hover:bg-[#184D45] disabled:opacity-40"
+                    className="h-7 shrink-0 rounded-lg bg-[#1F5FA8] px-2.5 text-[12px] font-medium text-white transition-colors hover:bg-[#174C87] disabled:opacity-40"
                   >
                     {creating ? '…' : 'Add'}
                   </button>

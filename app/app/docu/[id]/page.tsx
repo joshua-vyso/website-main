@@ -108,7 +108,10 @@ export default async function DocumentReviewPage({
     // overflow-y:auto on them and breaks position:sticky relative to the
     // viewport). Scrolling here instead keeps one clean page scroll AND lets
     // the preview stick.
-    <div className="h-screen overflow-y-auto px-8 py-7">
+    // h-full, not h-screen: <main> is a flex child under the 66px TopBar, so it
+    // is 100vh-67px. Hardcoding the viewport height here would overflow it and
+    // give the page a second scrollbar.
+    <div className="h-full overflow-y-auto px-8 py-7">
       <DocumentDetailPanel
         doc={doc}
         orgDocs={orgDocs}

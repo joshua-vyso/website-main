@@ -51,10 +51,10 @@ const FEATURE: Record<VysoModuleKey, FeatureKey> = {
 };
 
 const ACCENT: Record<VysoModuleKey, { bg: string; fg: string }> = {
-  docu: { bg: '#E3F0ED', fg: '#1E5E54' },
+  docu: { bg: '#EAF2FC', fg: '#1F5FA8' },
   procurepulse: { bg: '#E6F1FB', fg: '#2C5E8A' },
   pricepilot: { bg: '#E1F5EE', fg: '#2E7D67' },
-  planwise: { bg: '#E1F5EE', fg: '#1E5E54' },
+  planwise: { bg: '#E1F5EE', fg: '#0F6E56' },
   wastewatch: { bg: '#FBEFDD', fg: '#9A6314' },
   shiftboard: { bg: '#ECEAFB', fg: '#5B53C0' },
   supplysync: { bg: '#FBE9EE', fg: '#B0466A' },

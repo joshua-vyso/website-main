@@ -24,7 +24,7 @@ export function Roster() {
     return sb.roster.rows.filter((r) => (dept === 'all' || r.department === dept) && (!q || `${r.name} ${r.role}`.toLowerCase().includes(q)));
   }, [sb.roster, dept, search]);
 
-  const sel = 'h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#1E5E54]';
+  const sel = 'h-9 rounded-lg border border-[#D7DAD8] bg-white px-2.5 text-[13px] text-[#5F6368] outline-none focus:border-[#3E7BC4]';
   const dayIdx = DAYS.indexOf(day);
 
   return (
@@ -35,7 +35,7 @@ export function Roster() {
           <h1 className="text-[24px] font-bold leading-tight text-[#1A1C1E]">Roster</h1>
           <p className="mt-0.5 text-[14px] text-[#5F6368]">Plan shifts, spot conflicts and fill open slots</p>
         </div>
-        <button type="button" onClick={() => setAiOpen(true)} className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-[#1E5E54] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#184D45]">✦ Generate best roster</button>
+        <button type="button" onClick={() => setAiOpen(true)} className="inline-flex h-10 items-center gap-1.5 rounded-xl bg-[#1F5FA8] px-4 text-[14px] font-medium text-white transition-colors hover:bg-[#174C87]">✦ Generate best roster</button>
       </div>
 
       {/* Filters */}
@@ -46,7 +46,7 @@ export function Roster() {
           <button type="button" onClick={() => show('Next week (demo)')} className="rounded-md px-2 py-1 text-[13px] text-[#9A9DA1] hover:text-[#1A1C1E]">›</button>
         </div>
         <select value={dept} onChange={(e) => setDept(e.target.value)} className={sel}><option value="all">All departments</option>{sb.departments.map((d) => <option key={d.name} value={d.name}>{d.name}</option>)}</select>
-        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search staff…" className="h-9 min-w-[180px] flex-1 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] outline-none placeholder:text-[#9A9DA1] focus:border-[#1E5E54]" />
+        <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search staff…" className="h-9 min-w-[180px] flex-1 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] outline-none placeholder:text-[#9A9DA1] focus:border-[#3E7BC4]" />
         {view === 'day' ? (
           <select value={day} onChange={(e) => setDay(e.target.value)} className={sel}>{DAYS.map((d) => <option key={d} value={d}>{d}</option>)}</select>
         ) : null}
@@ -94,7 +94,7 @@ export function Roster() {
                 {dayRows.map((r) => {
                   const sh = r.days[dayIdx];
                   return (
-                    <div key={r.employeeId} onClick={() => show('Edit shift (demo)')} className="flex cursor-pointer items-center justify-between rounded-xl border border-[#F0F0EC] bg-white px-3.5 py-2.5 hover:border-[#1E5E54]/30">
+                    <div key={r.employeeId} onClick={() => show('Edit shift (demo)')} className="flex cursor-pointer items-center justify-between rounded-xl border border-[#F0F0EC] bg-white px-3.5 py-2.5 hover:border-[#3E7BC4]/30">
                       <span className="flex items-center gap-2"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: sb.deptColor(r.department) }} /><span className="text-[14px] font-medium text-[#1A1C1E]">{r.name}</span><span className="text-[12px] text-[#9A9DA1]">{r.department}</span></span>
                       <span className="flex items-center gap-3">{sh.conflict ? <ConflictBadge conflict={sh.conflict} /> : null}<span className="text-[13px] font-medium tabular-nums text-[#1A1C1E]">{sh.time}</span></span>
                     </div>
@@ -113,7 +113,7 @@ export function Roster() {
             <div key={i} className="rounded-xl border border-dashed border-[#D7DAD8] bg-[#FBFBF9] p-3.5">
               <div className="flex items-center gap-2 text-[13px] font-medium text-[#1A1C1E]"><span className="h-2 w-2 rounded-full" style={{ backgroundColor: sb.deptColor(o.department) }} />{o.department}</div>
               <div className="mt-1 text-[12px] text-[#9A9DA1]">{o.day} · {o.time}</div>
-              <button type="button" onClick={() => show('Fill shift (demo)')} className="mt-2.5 w-full rounded-lg bg-[#1E5E54] px-3 py-1.5 text-[12px] font-medium text-white hover:bg-[#184D45]">Fill shift</button>
+              <button type="button" onClick={() => show('Fill shift (demo)')} className="mt-2.5 w-full rounded-lg bg-[#1F5FA8] px-3 py-1.5 text-[12px] font-medium text-white hover:bg-[#174C87]">Fill shift</button>
             </div>
           ))}
         </div>
@@ -128,7 +128,7 @@ function ShiftCell({ s, onClick }: { s: Shift; onClick: () => void }) {
   if (s.status === 'off') return <div className="flex justify-center rounded-md bg-[#F0F0EC] py-1.5 text-[11px] font-medium text-[#9A9DA1]">Off</div>;
   if (s.status === 'leave') return <div className="flex justify-center rounded-md bg-[#FBEEDA] py-1.5 text-[11px] font-medium text-[#854F0B]">Leave</div>;
   return (
-    <button type="button" onClick={onClick} className={`w-full rounded-md border px-1.5 py-1 text-left transition-colors ${s.conflict ? 'border-[#F3C7C7] bg-[#FCF1F1]' : 'border-[#DCEAE5] bg-[#F3F8F6] hover:border-[#1E5E54]/40'}`} title={s.department}>
+    <button type="button" onClick={onClick} className={`w-full rounded-md border px-1.5 py-1 text-left transition-colors ${s.conflict ? 'border-[#F3C7C7] bg-[#FCF1F1]' : 'border-[#DCEAE5] bg-[#F3F8F6] hover:border-[#3E7BC4]/40'}`} title={s.department}>
       <div className="text-[11px] font-semibold text-[#1A1C1E]">{s.time}</div>
       {s.conflict ? <div className="mt-0.5"><ConflictBadge conflict={s.conflict} /></div> : <div className="mt-0.5 text-[10px] text-[#9A9DA1]">{s.department}</div>}
     </button>
@@ -163,11 +163,11 @@ function AiRosterModal({ open, onClose, onGenerate }: { open: boolean; onClose: 
           <div className="mt-2 flex flex-wrap gap-1.5">
             {AI_INPUTS.map((i) => (<span key={i} className="rounded-full border border-[#E7E7E2] bg-[#FAFAF8] px-2.5 py-1 text-[12px] text-[#5F6368]">{i}</span>))}
           </div>
-          <p className="mt-4 rounded-lg bg-[#F6FAF8] px-3 py-2 text-[12px] text-[#5F6368]">Coming soon. It will draft a conflict-free roster that minimises labour cost and overtime while keeping every department covered — then you approve or tweak it.</p>
+          <p className="mt-4 rounded-lg bg-[#F5F9FE] px-3 py-2 text-[12px] text-[#5F6368]">Coming soon. It will draft a conflict-free roster that minimises labour cost and overtime while keeping every department covered — then you approve or tweak it.</p>
         </div>
         <div className="mt-5 flex justify-end gap-2">
           <button type="button" onClick={onClose} className="rounded-lg px-3.5 py-2 text-[13px] text-[#5F6368] hover:bg-black/[0.03]">Cancel</button>
-          <button type="button" onClick={onGenerate} className="rounded-lg bg-[#1E5E54] px-4 py-2 text-[13px] font-medium text-white hover:bg-[#184D45]">Generate draft</button>
+          <button type="button" onClick={onGenerate} className="rounded-lg bg-[#1F5FA8] px-4 py-2 text-[13px] font-medium text-white hover:bg-[#174C87]">Generate draft</button>
         </div>
       </div>
     </div>,

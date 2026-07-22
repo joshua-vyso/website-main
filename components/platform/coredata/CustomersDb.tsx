@@ -330,7 +330,7 @@ export function CustomersDb({ data }: { data: CoreData }) {
         <select
           value={statusFilter}
           onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-          className="h-9 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] focus:border-[#1E5E54]/50 focus:outline-none"
+          className="h-9 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] focus:border-[#3E7BC4]/50 focus:outline-none"
         >
           {STATUS_FILTERS.map((s) => (
             <option key={s.value} value={s.value}>
@@ -341,7 +341,7 @@ export function CustomersDb({ data }: { data: CoreData }) {
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value as TypeFilter)}
-          className="h-9 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] focus:border-[#1E5E54]/50 focus:outline-none"
+          className="h-9 rounded-lg border border-[#D7DAD8] bg-white px-3 text-[13px] text-[#1A1C1E] focus:border-[#3E7BC4]/50 focus:outline-none"
         >
           <option value="all">All types</option>
           {CUSTOMER_TYPES.map((t) => (
@@ -400,7 +400,7 @@ export function CustomersDb({ data }: { data: CoreData }) {
                       <button
                         type="button"
                         onClick={() => openEdit(c)}
-                        className="text-left font-medium text-[#1A1C1E] transition-colors hover:text-[#1E5E54] hover:underline"
+                        className="text-left font-medium text-[#1A1C1E] transition-colors hover:text-[#174C87] hover:underline"
                       >
                         {c.name}
                       </button>
@@ -422,7 +422,7 @@ export function CustomersDb({ data }: { data: CoreData }) {
                         <button
                           type="button"
                           onClick={() => openEdit(c)}
-                          className="rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-[#1E5E54] transition-colors hover:bg-[#EAF3F0]"
+                          className="rounded-lg px-2.5 py-1.5 text-[12px] font-medium text-[#1F5FA8] transition-colors hover:bg-[#EAF3F0]"
                         >
                           Edit
                         </button>

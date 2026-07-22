@@ -34,7 +34,7 @@ export function ModuleSkeleton({
           <ul className="mt-3 space-y-2.5">
             {capabilities.map((c, i) => (
               <li key={i} className="flex items-start gap-2.5 text-[14px] text-[#3C3F43]">
-                <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#1E5E54]" aria-hidden />
+                <span className="mt-[7px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#1F5FA8]" aria-hidden />
                 <span>{c}</span>
               </li>
             ))}
@@ -51,7 +51,7 @@ export function ModuleSkeleton({
                 <Link
                   key={l.href}
                   href={l.href}
-                  className="inline-flex items-center justify-between rounded-xl border border-[#E7E7E2] bg-[#FAFAF8] px-3.5 py-2.5 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#1E5E54]/30"
+                  className="inline-flex items-center justify-between rounded-xl border border-[#E7E7E2] bg-[#FAFAF8] px-3.5 py-2.5 text-[13px] font-medium text-[#1A1C1E] transition-colors hover:border-[#3E7BC4]/30"
                 >
                   {l.label}
                   <span aria-hidden className="text-[#9A9DA1]">→</span>

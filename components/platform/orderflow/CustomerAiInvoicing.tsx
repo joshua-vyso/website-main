@@ -116,7 +116,7 @@ function SectionCard({ title, subtitle, action, children }: { title: string; sub
 function Toggle({ checked, onChange, label, hint }: { checked: boolean; onChange: (v: boolean) => void; label: string; hint?: string }) {
   return (
     <label className="flex cursor-pointer items-start gap-2.5 text-[13px]">
-      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="mt-0.5 accent-[#1E5E54]" />
+      <input type="checkbox" checked={checked} onChange={(e) => onChange(e.target.checked)} className="mt-0.5 accent-[#3E7BC4]" />
       <span>
         <span className="font-medium text-[#1A1C1E]">{label}</span>
         {hint ? <span className="mt-0.5 block text-[12px] font-normal text-[#9A9DA1]">{hint}</span> : null}
@@ -552,7 +552,7 @@ function OrderMappings({
       title="Order mappings"
       subtitle="Their order name → your catalogue item."
       action={
-        <button type="button" onClick={startNew} className="shrink-0 text-[12px] font-medium text-[#1E5E54] hover:underline">
+        <button type="button" onClick={startNew} className="shrink-0 text-[12px] font-medium text-[#1F5FA8] hover:underline">
           + Add mapping
         </button>
       }
@@ -688,7 +688,7 @@ function OrderMappings({
                           </span>
                         ) : null}
                       </span>
-                      <span className="shrink-0 text-[12px] font-medium text-[#1E5E54]">Select</span>
+                      <span className="shrink-0 text-[12px] font-medium text-[#1F5FA8]">Select</span>
                     </button>
                   ))
                 )}

@@ -109,7 +109,7 @@ export function BudgetWorkspace() {
                 <Detail label="Variance" value={`${activeRow.budgeted - activeRow.actual >= 0 ? '+' : '−'}${zar(Math.abs(activeRow.budgeted - activeRow.actual))}`} color={activeRow.actual > activeRow.budgeted ? '#A32D2D' : '#0F6E56'} />
                 <Detail label="% of budget" value={`${totalBudget > 0 ? Math.round((activeRow.budgeted / totalBudget) * 100) : 0}%`} />
               </div>
-              <p className="mt-4 rounded-lg bg-[#F6FAF8] px-3 py-2 text-[13px] text-[#5F6368]">{activeRow.suggestedAction}</p>
+              <p className="mt-4 rounded-lg bg-[#F5F9FE] px-3 py-2 text-[13px] text-[#5F6368]">{activeRow.suggestedAction}</p>
             </div>
           ) : (
             <div className="flex h-full flex-col justify-center">
@@ -132,7 +132,7 @@ export function BudgetWorkspace() {
               onMouseEnter={() => setHovered(b.cat)}
               onMouseLeave={() => setHovered(null)}
               onClick={() => toggle(b.cat)}
-              className={`rounded-2xl border bg-white p-3.5 text-left transition-all hover:shadow-sm ${isSel ? 'border-[#1E5E54] ring-1 ring-[#1E5E54]/20' : 'border-[#E7E7E2]'}`}
+              className={`rounded-2xl border bg-white p-3.5 text-left transition-all hover:shadow-sm ${isSel ? 'border-[#3E7BC4] ring-1 ring-[#3E7BC4]/20' : 'border-[#E7E7E2]'}`}
             >
               <div className="flex items-center gap-1.5">
                 <span className="h-2.5 w-2.5 rounded-sm" style={{ backgroundColor: b.color }} />
@@ -151,7 +151,7 @@ export function BudgetWorkspace() {
         {selected ? (
           <div className="mb-2 flex items-center gap-2 text-[13px]">
             <span className="text-[#5F6368]">Showing <span className="font-medium text-[#1A1C1E]">{selected}</span></span>
-            <button type="button" onClick={() => setSelected(null)} className="text-[12px] font-medium text-[#1E5E54] hover:underline">Clear filter</button>
+            <button type="button" onClick={() => setSelected(null)} className="text-[12px] font-medium text-[#1F5FA8] hover:underline">Clear filter</button>
           </div>
         ) : null}
         <BudgetTable filter={selected} />

@@ -30,7 +30,7 @@ export const NOTIFICATION_KINDS: Record<PpNotificationKind, { bg: string; fg: st
   new_direct_doc: { bg: '#E6F1FB', fg: '#0C447C', label: 'New document' },
   new_market_statement: { bg: '#E1F5EE', fg: '#0F6E56', label: 'Market statement' },
   price_change: { bg: '#FBEEDA', fg: '#854F0B', label: 'Price change' },
-  reorder: { bg: '#E3F0ED', fg: '#1E5E54', label: 'Reorder' },
+  reorder: { bg: '#EAF2FC', fg: '#1F5FA8', label: 'Reorder' },
 };
 
 export const TREND_UP = '#0F6E56';
@@ -373,7 +373,7 @@ export function computeRecipeKpis(plans: RecipeWithPlan[], ingredients: RecipeIn
 export const CATEGORY_COLORS: Record<string, string> = {
   Fruit: '#BA7517',
   Vegetables: '#1D9E75',
-  Herbs: '#1E5E54',
+  Herbs: '#3E7BC4',
   'Salad & Leafy Greens': '#0F6E56',
   Mushrooms: '#854F0B',
   Other: '#9A9DA1',
