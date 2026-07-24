@@ -9,10 +9,11 @@
  * the plumbing changes.
  */
 
-/** Modules the agent can currently assist with. Extend as coverage grows. */
-export type AgentModule = 'orderflow' | 'docu';
+/** Modules the agent can currently assist with. Extend as coverage grows.
+ *  'onboarding' is the guided first-run experience (see /onboarding). */
+export type AgentModule = 'orderflow' | 'docu' | 'onboarding';
 
-export const AGENT_MODULES: readonly AgentModule[] = ['orderflow', 'docu'];
+export const AGENT_MODULES: readonly AgentModule[] = ['orderflow', 'docu', 'onboarding'];
 
 export function isAgentModule(value: unknown): value is AgentModule {
   return typeof value === 'string' && (AGENT_MODULES as readonly string[]).includes(value);

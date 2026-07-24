@@ -25,6 +25,14 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const session = await getPlatformSession();
   if (!session) redirect('/login');
 
+  // D3 — a signed-in user who hasn't finished onboarding is sent to the guided
+  // /onboarding flow: no org yet (brand-new signup), or an org whose onboarding
+  // isn't complete. `=== null` (not a falsy check) is deliberate — existing orgs
+  // predating the onboarding migration have NO onboarding_completed_at column, so
+  // the field is `undefined` there and they are never redirected. Orgs created by
+  // the onboarding RPC have the column present-but-null until they finish.
+  if (!session.org || session.org.onboarding_completed_at === null) redirect('/onboarding');
+
   return (
     <PlatformProvider value={session}>
       <div

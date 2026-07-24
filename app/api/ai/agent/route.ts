@@ -30,6 +30,7 @@ const TOOL_ACTIVITY: Record<string, string> = {
   orderflow_get_order_lines: 'Reading the order lines…',
   orderflow_find_customer: 'Looking up the customer…',
   orderflow_prepare_order: 'Putting the order together…',
+  onboarding_get_progress: 'Checking your setup progress…',
 };
 
 /**

@@ -165,9 +165,51 @@ const ORDERFLOW_TOOLS: AgentTool[] = [
   },
 ];
 
+/** Read-only count of the org's rows in a table, tolerant of a missing table
+ *  (returns 0 rather than throwing so onboarding progress never crashes). */
+async function orgRowCount(ctx: ToolContext, table: string): Promise<number> {
+  const { count, error } = await ctx.supabase
+    .from(table)
+    .select('id', { count: 'exact', head: true })
+    .eq('org_id', ctx.orgId);
+  if (error) return 0;
+  return count ?? 0;
+}
+
+const ONBOARDING_TOOLS: AgentTool[] = [
+  {
+    name: 'onboarding_get_progress',
+    description:
+      'Get how far the business has got in setup: how many customers and products are in Core Data so far, how many documents have been filed, and which modules are unlocked on their trial. Call this whenever the user asks what they have loaded, how setup is going, or what is left to do — reference these real counts instead of guessing.',
+    input_schema: { type: 'object', properties: {}, additionalProperties: false },
+    run: async (ctx) => {
+      const [customers, products, documents] = await Promise.all([
+        orgRowCount(ctx, 'of_customers'),
+        orgRowCount(ctx, 'pp_stock_items'),
+        orgRowCount(ctx, 'documents'),
+      ]);
+      // Unlocked modules = the full set minus the org's locked_modules. Doc-U is
+      // always on. Tolerant of the column being absent (treats as none locked).
+      const { data: org } = await ctx.supabase
+        .from('organisations')
+        .select('locked_modules')
+        .eq('id', ctx.orgId)
+        .maybeSingle<{ locked_modules: string[] | null }>();
+      const locked = new Set((org?.locked_modules ?? []) as string[]);
+      const allKeys = [
+        'docu', 'procurepulse', 'pricepilot', 'marginview', 'wastelog',
+        'shiftboard', 'suppliers', 'reportgen', 'orderflow',
+      ];
+      const unlocked = allKeys.filter((k) => !locked.has(k));
+      return JSON.stringify({ customers, products, documents, unlockedModules: unlocked });
+    },
+  },
+];
+
 const TOOLS_BY_MODULE: Record<AgentModule, AgentTool[]> = {
   orderflow: ORDERFLOW_TOOLS,
   docu: [], // Doc-U tools land in a later phase.
+  onboarding: ONBOARDING_TOOLS,
 };
 
 /** The tool objects (with run handlers) for a module. Workflow tools are only

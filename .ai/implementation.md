@@ -632,3 +632,106 @@ copy renders correctly.
   `package.json`, `tsconfig.json`, `.vscode/`, `AUDIT_FINDINGS.md`, `.ai/*`
   other than this file, `tests/`, `supabase/serviceden*`) were left untouched
   and excluded from staging (`git add` used explicit paths, not `-A`).
+
+---
+
+# Phase D — Finch-guided onboarding flow `/onboarding` (finch-onboarding)
+
+Status: **complete**. `npx tsc --noEmit` clean; `eslint` clean on all Phase D
+files; `npm run build` succeeds (`/onboarding` registered as a dynamic route);
+live dev-server render check passed. Verified against
+`.ai/plan_finch-onboarding.md` §1, §2 (D1/D3/D5), §3, §4 Phase D, §5, §8, §9.
+
+## What was built
+
+A top-level `/onboarding` route: a three-stage, Finch-hosted first-run flow that
+provisions the org (stage 1), records the 3-module trial choice (stage 2), and
+hand-holds the user through bringing data into Core Data (stage 3), then lands
+them in `/app` with their chosen modules unlocked.
+
+### Files created
+| File | Purpose |
+| --- | --- |
+| `app/onboarding/layout.tsx` | Server shell. Guards: no session → `/login`; `org?.onboarding_completed_at` → `/app`. Instrument Sans + `--radius:0.625rem` wrapper, `#F6F6F4` page + the app-shell top-wash gradient, minimal chrome (Finch mark in a `.finch-gradient` badge + "Set up your workspace" + sign-out). |
+| `app/onboarding/page.tsx` | Server. Derives the resume stage from `org.onboarding_stage` (no org → profile; modules → modules; else data), infers already-chosen modules from `locked_modules` (chosen = valid non-docu keys NOT locked), reads the signUp-metadata `full_name` for the name prefill, and wraps `<OnboardingFlow>` in a `PlatformProvider` (the /onboarding layout has none — the embedded ImportWizard + counts need `usePlatform()`). |
+| `components/platform/onboarding/OnboardingFlow.tsx` | Client orchestrator. 3-step numbered `StepIndicator` (AddSupplierWizard idiom), a persistent Finch panel (FinchMark `animate="draw"`, re-keyed per stage, + short static intro copy) for stages 1–2, and `router.refresh()` after each RPC so the server session stays truthful for a resume/return. |
+| `components/platform/onboarding/StageProfile.tsx` | Name (prefilled) + company + industry select (8 options incl. Other → free-text) + employee-count band pills. Submit → `rpc('onboarding_create_org', …)`. |
+| `components/platform/onboarding/StageModules.tsx` | Card grid from `MODULES` (FeatureKey source of truth) + `MODULE_META` visuals (via a `featureKey→meta` index). Doc-U pre-selected/disabled, badged "Always included"; exactly 3 others selectable with a live "N of 3 selected" counter and the 14-day-trial framing. Submit → `rpc('onboarding_choose_modules', {p_modules})`. |
+| `components/platform/onboarding/StageData.tsx` | Split layout. Left: Finch chat via the shared `useFinchStream` hook (module `'onboarding'`). Right: progress checklist (Customers/Products/Documents, real counts via the browser client), an upload surface (Import customers / Import products → embedded ImportWizard modal; Upload documents → POST `/api/ai/agent/ingest-document` with image downscaling, result cards), a per-chosen-module "what this unlocks" summary, and Skip / Finish buttons → `rpc('onboarding_complete')` → `/app`. D5: on finish, if `pricepilot` chosen and `pl_price_lists` empty, a tolerant insert of one default global "Standard pricing" list (failure logged, never blocks). |
+| `components/platform/onboarding/OnboardingSignOut.tsx` | Small client sign-out link for the layout chrome (TopBar signOut idiom). |
+| `components/platform/onboarding/shared.tsx` | `isMissingRpcError()` + `MigrationMissingCard` — every stage shows a visible card naming `supabase/onboarding.sql` when the RPC is absent, never a white screen (§8). |
+| `components/platform/finch/useFinchStream.ts` | Shared Finch text-chat SSE hook (fetch → getReader → split('\n\n') → parse `{text|tool|done|error}`). |
+
+### Files modified
+| File | Change |
+| --- | --- |
+| `lib/ai/finch/config.ts` | `AgentModule` gains `'onboarding'` (+ `AGENT_MODULES`). |
+| `lib/ai/finch/knowledge.ts` | New `ONBOARDING_KNOWLEDGE` doc (what Core Data is; per-module data effects — OrderFlow/ProcurePulse automatic, PricePilot via price list, SupplySync via documents; spreadsheets→import, documents→chat; SA-SME tone) wired into the `MODULE_KNOWLEDGE`/`MODULE_LABEL` maps exactly like the existing docs. Guardrail structure/injection-hardening in `buildSystemPrompt` untouched. |
+| `lib/ai/finch/tools.ts` | New read-only `onboarding_get_progress` tool (counts of of_customers/pp_stock_items/documents + unlocked modules from `locked_modules`, all tolerant of missing tables/columns) registered for the onboarding module. |
+| `app/api/ai/agent/route.ts` | Added the `onboarding_get_progress` status label. Module `'onboarding'` routes correctly with no changes needed: `isAgentModule` now accepts it, workflow escalation is `module === 'orderflow'`-only (so onboarding stays Q&A/Haiku), tools = the onboarding set, rate limiting intact. |
+| `components/platform/coredata/ImportWizard.tsx` | Added optional `{embedded?, entity?, onComplete?}` props. Embedded: entity picker hidden when locked, the outbound "view" `<Link>` + post-import `router.refresh()` suppressed (reports via `onComplete` instead). **Default behaviour unchanged.** |
+| `app/app/layout.tsx` | D3 redirect: `!session.org || session.org.onboarding_completed_at === null` → `/onboarding`. (See deviation 1.) |
+
+## Verification
+
+```
+npx tsc --noEmit           # 0 errors
+eslint <all Phase D files> # clean (route.ts's pre-existing no-assign-module-variable
+                           #  error on `const module` is NOT from this phase)
+npm run build              # succeeds; /onboarding = ƒ (dynamic). (One stale
+                           #  ".next/…/chunks 2" Finder-duplicate had to be rm'd
+                           #  first — same artifact prior phases hit.)
+```
+
+Live (dev server + browser, logged in as the existing test org DD Fruits & Veg):
+- Unauthenticated `/onboarding` → redirects to `/login`. ✓
+- Existing-org login lands on `/app` with **NO** redirect to `/onboarding` — the
+  critical regression check. Confirms the `=== null` (not falsy) design: a
+  pre-migration org has NO `onboarding_completed_at` column (field is `undefined`)
+  so it is never redirected. ✓
+- `/onboarding` for that org renders **StageData** (stage falls to 'data' with an
+  existing org): step indicator, Finch chat, progress checklist showing the org's
+  REAL counts (1 customer / 9 products / 6 documents), upload surface, and the
+  "what your data unlocks" summary. ✓
+- "Import customers" opens the **embedded ImportWizard** modal — entity picker
+  hidden (locked), Upload→Review→Done step bar. ✓
+- Finch chat streamed a reply that called `onboarding_get_progress` and quoted the
+  real counts back ("1 customer, 9 products, and 6 documents loaded"), then gave
+  onboarding-appropriate advice. Confirms `useFinchStream`, onboarding module
+  routing, the knowledge doc, and the new tool end-to-end. ✓
+
+**Render-check limitation:** StageProfile (needs no org) and StageModules (needs
+`onboarding_stage='modules'`) could not be reached live — both states require the
+onboarding migration to be applied to the dev DB (it is not) or a brand-new signup
+(blocked by the manual OTP email-template step, D2). They are pure client
+components, tsc/eslint/build-clean, and share the exact patterns proven working in
+StageData (`createClient().rpc`, `MigrationMissingCard`, the platform-blue form
+language). A full new-signup walkthrough needs Joshua to (1) paste
+`supabase/onboarding.sql` and (2) set the Auth "Confirm signup" template to emit
+`{{ .Token }}` (both already documented in the migration header / Phase C).
+
+## Deviations / notes
+
+1. **D3 redirect uses `=== null`, not a falsy check.** The plan wrote "org.onboarding_completed_at null → redirect". A bare falsy check would also catch `undefined` (the column absent), redirecting EVERY existing org into onboarding before the migration is pasted — the opposite of "existing orgs completely unaffected" (§0/§8). Strict `=== null` redirects only orgs that have the column present-but-empty (brand-new orgs mid-flow) while leaving pre-migration orgs alone. Verified live (DD Fruits & Veg was not redirected).
+2. **FinchModal was NOT refactored onto `useFinchStream`.** Per the plan's own caveat ("…ONLY if the extraction is clean and behavior-identical; otherwise duplicate the small reader and note the deviation"): FinchModal's `send` carries branches this hook deliberately omits (deferred file attachments, order-draft cards, the workflow-tier arming), so widening the hook to cover them would not be behaviour-identical. The hook is the shared reader for the simpler onboarding chat; FinchModal keeps its own inline reader. Noted in the hook's header.
+3. **`page.tsx` wraps the flow in `PlatformProvider`.** The /onboarding layout has none, but the embedded ImportWizard and the data-stage counts call `usePlatform()`. The provider is fed the same session object; `router.refresh()` after each stage keeps its `org` current as the org is created/updated. This is additive (not in the plan's file list) but a mechanical necessity of reusing ImportWizard, not a design change.
+4. **D5 price-list failure is `console.warn`'d, not shown in a summary card.** Finish navigates straight to `/app`, so a post-completion summary card would never be seen; the tolerant insert logs on failure and never blocks completion, which honours the intent (§8: "tolerated, logged in summary, onboarding still completes").
+5. **StageData reads the ingest-document image-downscale logic as a compact local copy** (not imported from FinchModal, whose helpers aren't exported) — same 2000px-JPEG / PDF-passthrough approach, same size caps.
+
+## Files touched (to be committed — explicit paths, never `-A`)
+
+New: `app/onboarding/layout.tsx`, `app/onboarding/page.tsx`,
+`components/platform/onboarding/{OnboardingFlow,StageProfile,StageModules,StageData,OnboardingSignOut,shared}.tsx`,
+`components/platform/finch/useFinchStream.ts`.
+
+Modified: `lib/ai/finch/{config,knowledge,tools}.ts`,
+`app/api/ai/agent/route.ts`, `app/app/layout.tsx`,
+`components/platform/coredata/ImportWizard.tsx`, `.ai/implementation.md`.
+
+Left untouched (hard constraints / others' in-flight work — NOT staged):
+`package.json` + `tsconfig.json` (belong to the ServiceDen work — `test` script +
+`allowImportingTsExtensions`, not mine), all `serviceden*` files,
+`components/platform/orderflow/{CustomersManager,InvoicingView}.tsx`,
+`app/apps/`, `app/services/`, `tests/`, `.vscode/`, `AUDIT_FINDINGS.md`,
+`FABLE.md`, `Claude_Rules.md`, `supabase/serviceden*.sql`, and the other `.ai/*`
+files.

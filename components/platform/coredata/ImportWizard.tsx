@@ -147,13 +147,29 @@ function dedupeValue(resolved: Record<string, string>, def: ImportEntityDef): st
 // Component
 // ---------------------------------------------------------------------------
 
-export function ImportWizard({ initialEntity }: { initialEntity: ImportEntity }) {
+export function ImportWizard({
+  initialEntity,
+  embedded = false,
+  entity: lockedEntity,
+  onComplete,
+}: {
+  initialEntity: ImportEntity;
+  /** When true, hides the standalone page chrome (outbound "view" link + the
+   *  post-import router.refresh) and reports the result via onComplete instead,
+   *  so the wizard can be reused inside a modal/panel. Default behaviour is
+   *  UNCHANGED (embedded=false). */
+  embedded?: boolean;
+  /** Locks the wizard to one entity (hides the Customers/Products picker). */
+  entity?: ImportEntity;
+  /** Called after a confirm run with the entity + number of rows inserted. */
+  onComplete?: (summary: { entity: string; inserted: number }) => void;
+}) {
   const router = useRouter();
   const { org } = usePlatform();
   const { node: toastNode, show: toast } = useToast();
   const fileRef = useRef<HTMLInputElement>(null);
 
-  const [entity, setEntity] = useState<ImportEntity>(initialEntity);
+  const [entity, setEntity] = useState<ImportEntity>(lockedEntity ?? initialEntity);
   const def = IMPORT_ENTITIES[entity];
 
   const [step, setStep] = useState<Step>('source');
@@ -686,7 +702,9 @@ export function ImportWizard({ initialEntity }: { initialEntity: ImportEntity })
     setStep('summary');
     if (inserted > 0) {
       toast(`Imported ${inserted} ${def.label.toLowerCase()}`);
-      router.refresh();
+      // Embedded: let the host refresh its own view (no navigation side-effects).
+      if (embedded) onComplete?.({ entity, inserted });
+      else router.refresh();
     }
   }
 
@@ -743,6 +761,7 @@ export function ImportWizard({ initialEntity }: { initialEntity: ImportEntity })
           parseError={parseError}
           fileName={fileName}
           onFile={handleFile}
+          lockEntity={!!lockedEntity}
         />
       ) : step === 'grid' ? (
         <div className="mt-6 grid grid-cols-1 gap-5 lg:grid-cols-[1fr_300px]">
@@ -841,7 +860,7 @@ export function ImportWizard({ initialEntity }: { initialEntity: ImportEntity })
           />
         </div>
       ) : (
-        <SummaryStep entity={entity} def={def} summary={summary} onImportMore={() => setStep('source')} />
+        <SummaryStep entity={entity} def={def} summary={summary} onImportMore={() => setStep('source')} embedded={embedded} />
       )}
 
       {/* Sticky action bar (grid step) */}
@@ -905,6 +924,7 @@ function SourceStep({
   parseError,
   fileName,
   onFile,
+  lockEntity = false,
 }: {
   entity: ImportEntity;
   setEntity: (e: ImportEntity) => void;
@@ -913,29 +933,32 @@ function SourceStep({
   parseError: string | null;
   fileName: string | null;
   onFile: (f: File) => void;
+  lockEntity?: boolean;
 }) {
   return (
     <div className="mt-6 max-w-2xl space-y-5">
-      <div>
-        <div className="mb-2 text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">What are you importing?</div>
-        <div className="grid grid-cols-2 gap-3">
-          {(Object.values(IMPORT_ENTITIES) as ImportEntityDef[]).map((d) => (
-            <button
-              key={d.entity}
-              type="button"
-              onClick={() => setEntity(d.entity)}
-              className={`rounded-2xl border px-4 py-4 text-left transition-colors ${
-                entity === d.entity
-                  ? 'border-[#3E7BC4] bg-[#F3F8F6]'
-                  : 'border-[#EAEDF2] bg-white hover:border-[#3E7BC4]/40 hover:bg-[#F5F9FE]'
-              }`}
-            >
-              <div className="of-display text-[15px] font-semibold text-[#171A17]">{d.label}</div>
-              <div className="mt-0.5 font-mono text-[11px] text-[#A0A49C]">{d.table}</div>
-            </button>
-          ))}
+      {lockEntity ? null : (
+        <div>
+          <div className="mb-2 text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">What are you importing?</div>
+          <div className="grid grid-cols-2 gap-3">
+            {(Object.values(IMPORT_ENTITIES) as ImportEntityDef[]).map((d) => (
+              <button
+                key={d.entity}
+                type="button"
+                onClick={() => setEntity(d.entity)}
+                className={`rounded-2xl border px-4 py-4 text-left transition-colors ${
+                  entity === d.entity
+                    ? 'border-[#3E7BC4] bg-[#F3F8F6]'
+                    : 'border-[#EAEDF2] bg-white hover:border-[#3E7BC4]/40 hover:bg-[#F5F9FE]'
+                }`}
+              >
+                <div className="of-display text-[15px] font-semibold text-[#171A17]">{d.label}</div>
+                <div className="mt-0.5 font-mono text-[11px] text-[#A0A49C]">{d.table}</div>
+              </button>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       <div>
         <div className="mb-2 text-[12px] font-medium uppercase tracking-[0.05em] text-[#8A8E86]">Upload the file</div>
@@ -1199,11 +1222,13 @@ function SummaryStep({
   def,
   summary,
   onImportMore,
+  embedded = false,
 }: {
   entity: ImportEntity;
   def: ImportEntityDef;
   summary: ImportSummary | null;
   onImportMore: () => void;
+  embedded?: boolean;
 }) {
   const dbHref = `/app/docu/databases/${entity === 'customers' ? 'customers' : 'products'}`;
   if (!summary) {
@@ -1252,12 +1277,16 @@ function SummaryStep({
       ) : null}
 
       <div className="mt-5 flex flex-wrap items-center gap-2">
-        <Link
-          href={dbHref}
-          className="inline-flex h-[42px] items-center justify-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87]"
-        >
-          Done — view {def.label.toLowerCase()}
-        </Link>
+        {/* Embedded (onboarding): no outbound navigation — the host panel owns
+            the "done" affordance. Standalone Doc-U import keeps its view link. */}
+        {embedded ? null : (
+          <Link
+            href={dbHref}
+            className="inline-flex h-[42px] items-center justify-center rounded-[11px] bg-[#1F5FA8] px-[18px] text-[14px] font-semibold text-white transition-colors hover:bg-[#174C87]"
+          >
+            Done — view {def.label.toLowerCase()}
+          </Link>
+        )}
         <SecondaryBtn onClick={onImportMore}>Import another file</SecondaryBtn>
       </div>
     </div>
