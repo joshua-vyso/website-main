@@ -57,6 +57,16 @@ export interface Organisation {
   created_at: string;
   /** Module feature-keys this org may NOT open (locked in the sidebar). Empty = all open. */
   locked_modules?: string[];
+  /** Onboarding/trial columns (see supabase/onboarding.sql). All optional — the
+   *  app tolerates them being absent on orgs created before that migration. */
+  industry?: string | null;
+  /** Employee-count band: '1-5'|'6-20'|'21-50'|'51-200'|'200+'. */
+  employee_count?: string | null;
+  trial_started_at?: string | null;
+  trial_ends_at?: string | null;
+  /** 'profile'|'modules'|'data'|'done'. Existing orgs backfilled to 'done'. */
+  onboarding_stage?: string | null;
+  onboarding_completed_at?: string | null;
 }
 
 export interface OrgFeature {
