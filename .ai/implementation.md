@@ -353,3 +353,143 @@ Not touched (hard constraints, pre-existing working-tree changes left as-is):
 `lib/platform/serviceden*`, `components/platform/orderflow/CustomersManager.tsx`,
 `components/platform/orderflow/InvoicingView.tsx`, `tests/`, `.vscode/`,
 `AUDIT_FINDINGS.md`, `package.json`, `tsconfig.json`.
+
+---
+
+# Phase F — Rate limiting on Finch agent routes (finch-onboarding)
+
+Status: **complete**. `npx tsc --noEmit` clean. `eslint` clean on 3 of 4 files;
+1 pre-existing error on `app/api/ai/agent/route.ts` (the `module` variable
+assignment, not introduced by this phase).
+Verified against `.ai/plan_finch-onboarding.md` §2 (D6), §4 Phase F, §5, §9.
+
+## Outcomes
+
+Added per-user rate limiting to four Finch agent routes to close SEC-08:
+
+1. **`app/api/ai/agent/route.ts`** — bucket `ai-agent:<userId>`, 40 per 3600s.
+   Returns 429 JSON before stream opens: `{error: "You've hit the hourly Finch
+   limit. Try again soon."}`.
+2. **`app/api/ai/agent/ingest-document/route.ts`** — bucket
+   `ai-agent-ingest:<userId>`, 20 per 3600s. Same error format.
+3. **`app/api/ai/agent/parse-order/route.ts`** — bucket `ai-agent-parse:<userId>`,
+   20 per 3600s. Same error format.
+4. **`app/api/ai/agent/customers/route.ts`** — bucket
+   `ai-agent-customers:<userId>`, 120 per 3600s. Same error format.
+
+Pattern: imported `rateLimitAllowed` from `lib/platform/rate-limit`, checked
+immediately after auth resolution (user id resolved, before any heavy work or DB
+query), returns `NextResponse.json({ error: '...' }, { status: 429,
+headers: AI_CORS_HEADERS })` on limit exceeded. Matches the idiom in
+`app/api/ai/message/route.ts` exactly.
+
+## Files modified
+
+- `app/api/ai/agent/route.ts`
+- `app/api/ai/agent/ingest-document/route.ts`
+- `app/api/ai/agent/parse-order/route.ts`
+- `app/api/ai/agent/customers/route.ts`
+
+Total changes: 4 imports, 4 rate-limit guards (20 LOC added across all files).
+
+## Verification
+
+```
+npx tsc --noEmit  # 0 errors
+npm run lint -- app/api/ai/agent/{route,ingest-document,parse-order,customers}/route.ts
+                  # 3 files clean; 1 pre-existing error on route.ts line 112
+                  # (const module = ..., @next/next/no-assign-module-variable)
+                  # not introduced by this phase
+```
+
+## Deviations / notes
+
+- The eslint error on `app/api/ai/agent/route.ts:112` is pre-existing (the `module`
+  variable assignment violates Next.js linting rules but existed before Phase F).
+  This phase's rate-limit code passes eslint clean and does not touch that line.
+- All four rate-limit checks use consistent bucket naming (`ai-agent*`), error
+  copy, and response status per the plan §2 (D6).
+- Per-user bucketing means each user has their own window; the rate limiter's
+  FAILS OPEN behavior (tolerates missing migration or DB unavailability) preserves
+  the endpoint's availability even if `rate-limits.sql` is not yet pasted.
+
+---
+
+# Phase E — Trial surfacing (finch-onboarding)
+
+Status: **complete**. `npx tsc --noEmit` clean; `eslint` clean on all four files
+except one pre-existing, unrelated warning (below). Verified against
+`.ai/plan_finch-onboarding.md` §2 (Q2 hard lock), §3 (`PlatformSession.trial`),
+§4 Phase E, §5, §8, §9.
+
+## Outcomes
+
+1. **`lib/platform/supabase-server.ts`** — added a `computeTrial(org)` helper
+   and `trial: {endsAt, daysLeft, expired} | null` on `PlatformSession`,
+   computed from `org.trial_started_at`/`trial_ends_at`. Null whenever either
+   column is absent/null (existing orgs, or orgs mid-onboarding before stage 1
+   completes), so nothing changes for them. `daysLeft` = `ceil` of remaining
+   ms, floored at 0. `expired` = `trial_ends_at` in the past.
+2. **`lib/platform/session.tsx`** — `PlatformContextValue` gains the identical
+   `trial` field so the shape stays in sync with `PlatformSession` (the layout
+   passes the session straight into `PlatformProvider`).
+3. **`components/platform/TopBar.tsx`** — new `trialPillLabel(daysLeft)` helper
+   ("Trial ends today" at 0, "Trial · 1 day left" singular, "Trial · N days
+   left" otherwise) and a pill rendered next to the module label, visible only
+   when `trial && !trial.expired` (hidden entirely when `trial` is null or
+   expired — the gate owns the expired state). Styled `bg-[#EAF2FC]
+   text-[#174C87] rounded-full`, matching the existing account-menu/notification
+   accentWeak treatment already in this file; links to `/app/settings`.
+4. **New `components/platform/TrialGate.tsx`** — client component; renders
+   `children` unchanged unless `session.trial?.expired`, in which case it
+   renders a full-screen "Your trial has ended" screen instead, mirroring
+   `ModuleLockGuard`'s lock-screen structure/spacing/typography exactly (same
+   icon chip, heading size, copy color, mailto button styling). Copy states
+   data is retained/safe, includes the trial end date when known, and links
+   `mailto:joshua@vyso.co.za?subject=Continue%20with%20Vyso`. No "Sign out"
+   affordance inside the gate — the spec noted TopBar (rendered above it) still
+   provides that.
+5. **`app/app/layout.tsx`** — wired `TrialGate` around `ModuleLockGuard`
+   (inside the existing `<main>`, inside `PlatformProvider`), so an expired
+   trial takes precedence over the per-module lock screen while TopBar (and
+   thus sign-out) keeps rendering. No changes to the auth redirect or any other
+   layout structure; no `/onboarding` redirect added (explicitly Phase D's job,
+   not touched here).
+
+## Files touched
+
+- `lib/platform/supabase-server.ts`
+- `lib/platform/session.tsx`
+- `components/platform/TopBar.tsx`
+- `components/platform/TrialGate.tsx` (new)
+- `app/app/layout.tsx`
+
+## Verification
+
+```
+npx tsc --noEmit
+# 0 errors
+
+npx eslint lib/platform/supabase-server.ts lib/platform/session.tsx \
+  components/platform/TopBar.tsx components/platform/TrialGate.tsx app/app/layout.tsx
+# 1 warning: TopBar.tsx — 'SERVICEDEN_ACCOUNT_EMAIL' is defined but never used
+# (pre-existing, unrelated to this phase's edits — present before this change,
+# not touched by it)
+```
+
+`npx next build` was attempted but fails in this sandbox on unrelated Google
+Fonts network access (`@vercel/turbopack-next/internal/font/google/font` can't
+resolve — no outbound network to fonts.googleapis.com), not on anything this
+phase changed; `tsc --noEmit` is the verification command this phase's spec
+calls for and it is clean.
+
+## Deviations / notes
+
+- None from the plan. `PlatformSession.trial` and `PlatformContextValue.trial`
+  are structurally identical by design, matching how every other session field
+  (`org`, `features`, `lockedModules`, `finchEnabled`) is mirrored between the
+  two types.
+- The pre-existing `SERVICEDEN_ACCOUNT_EMAIL` unused-import warning in
+  `TopBar.tsx` was left untouched per §5 (touch only the four files named for
+  this phase; don't fix unrelated issues in-scope files beyond the assigned
+  change).

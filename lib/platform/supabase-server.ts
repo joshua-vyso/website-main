@@ -39,6 +39,22 @@ export interface PlatformSession {
   /** Whether Finch is enabled platform-wide (env kill switch). Client reads this
    *  to decide whether to render the launcher; the API enforces it server-side. */
   finchEnabled: boolean;
+  /** 14-day trial countdown, derived from `org.trial_started_at`/`trial_ends_at`.
+   *  Null when either column is absent — existing (pre-onboarding) orgs never see
+   *  a pill or a gate. `daysLeft` is ceil'd and floored at 0; `expired` is true
+   *  once `trial_ends_at` has passed. */
+  trial: { endsAt: string | null; daysLeft: number | null; expired: boolean } | null;
+}
+
+/** Computes the PlatformSession.trial shape from an org's trial columns. See
+ *  .ai/plan_finch-onboarding.md §3/§4 Phase E — null when either column is
+ *  absent so existing orgs (backfilled with no trial dates) are unaffected. */
+function computeTrial(org: Organisation | null): PlatformSession['trial'] {
+  if (!org?.trial_started_at || !org?.trial_ends_at) return null;
+  const endsAt = org.trial_ends_at;
+  const msLeft = new Date(endsAt).getTime() - Date.now();
+  const daysLeft = Math.max(0, Math.ceil(msLeft / (24 * 60 * 60 * 1000)));
+  return { endsAt, daysLeft, expired: msLeft <= 0 };
 }
 
 const emptyFeatures = (): Record<FeatureKey, boolean> =>
@@ -102,5 +118,6 @@ export const getPlatformSession = cache(async (): Promise<PlatformSession | null
     features,
     lockedModules,
     finchEnabled: isFinchEnabled(),
+    trial: computeTrial(org),
   };
 });

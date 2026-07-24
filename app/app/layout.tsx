@@ -4,6 +4,7 @@ import { getPlatformSession } from '@/lib/platform/supabase-server';
 import { PlatformProvider } from '@/lib/platform/session';
 import { TopBar } from '@/components/platform/TopBar';
 import { ModuleLockGuard } from '@/components/platform/ModuleLockGuard';
+import { TrialGate } from '@/components/platform/TrialGate';
 
 export const metadata: Metadata = {
   title: 'Vyso — Platform',
@@ -40,7 +41,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           className="min-h-0 min-w-0 flex-1 overflow-y-auto"
           style={{ background: 'linear-gradient(180deg, #F3F8FF 0%, #FFFFFF 340px)' }}
         >
-          <ModuleLockGuard>{children}</ModuleLockGuard>
+          <TrialGate>
+            <ModuleLockGuard>{children}</ModuleLockGuard>
+          </TrialGate>
         </main>
       </div>
     </PlatformProvider>

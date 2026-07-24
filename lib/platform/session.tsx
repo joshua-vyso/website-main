@@ -13,6 +13,9 @@ export interface PlatformContextValue {
   lockedModules: FeatureKey[];
   /** Whether Finch is enabled platform-wide (server-resolved env kill switch). */
   finchEnabled: boolean;
+  /** 14-day trial countdown (see PlatformSession.trial in supabase-server.ts). Null
+   *  for orgs with no trial dates (existing orgs, or onboarding not yet run). */
+  trial: { endsAt: string | null; daysLeft: number | null; expired: boolean } | null;
 }
 
 const PlatformContext = createContext<PlatformContextValue | undefined>(undefined);
