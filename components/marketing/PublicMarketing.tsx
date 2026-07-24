@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Navbar } from "@/components/Navbar";
 import { WebGLShaderBackground } from "@/components/WebGLShaderBackground";
 import { SiteFooter } from "@/components/sections/SiteFooter";
+import { WaitlistCtaButton } from "@/components/marketing/WaitlistCtaButton";
 
 import styles from "./public-marketing.module.css";
 
@@ -69,8 +70,7 @@ export function MarketingCta({
   eyebrow,
   title,
   copy,
-  primaryLabel = "Talk to Vyso",
-  primaryHref = "/contact",
+  primaryLabel = "Join Waitlist",
   secondaryLabel,
   secondaryHref,
 }: {
@@ -78,7 +78,6 @@ export function MarketingCta({
   title: string;
   copy: string;
   primaryLabel?: string;
-  primaryHref?: string;
   secondaryLabel?: string;
   secondaryHref?: string;
 }) {
@@ -89,9 +88,9 @@ export function MarketingCta({
         <h2 className={`${styles.sectionTitle} ${styles.blendPlain}`}>{title}</h2>
         <p className={styles.ctaCopy}>{copy}</p>
         <div className={styles.actions}>
-          <Link className={styles.primaryButton} href={primaryHref}>
+          <WaitlistCtaButton className={styles.primaryButton}>
             {primaryLabel} <span aria-hidden="true">→</span>
-          </Link>
+          </WaitlistCtaButton>
           {secondaryLabel && secondaryHref ? (
             <Link className={styles.glassButton} href={secondaryHref}>
               {secondaryLabel}

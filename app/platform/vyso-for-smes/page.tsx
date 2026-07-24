@@ -283,7 +283,6 @@ export default function VysoForSmesPage() {
         eyebrow="Choose the first problem"
         title="You do not need to implement everything at once."
         copy="Start with the one-week audit, define the highest-value workflow and build outward only when the operation is ready."
-        primaryLabel="Book an audit conversation"
         secondaryLabel="Become a founding client"
         secondaryHref="/founding-client"
       />

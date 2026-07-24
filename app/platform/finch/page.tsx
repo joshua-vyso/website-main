@@ -235,8 +235,6 @@ export default function FinchPage() {
         eyebrow="Shape the launch"
         title="Test Finch against real operational questions."
         copy="Founding clients help us test what is useful, what needs tighter guardrails and where an assistant genuinely saves time."
-        primaryLabel="Become a founding client"
-        primaryHref="/founding-client"
         secondaryLabel="Talk to us"
         secondaryHref="/contact"
       />

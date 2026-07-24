@@ -393,7 +393,6 @@ export default function SouthAfricaPage() {
         eyebrow="Start with the South African workflow you already have"
         title="Bring us the WhatsApp messages, spreadsheets and account admin."
         copy="We will map the current process, identify the highest-value starting point and show you what should move into Vyso first."
-        primaryLabel="Discuss your workflow"
         secondaryLabel="View South African pricing"
         secondaryHref="/pricing"
       />

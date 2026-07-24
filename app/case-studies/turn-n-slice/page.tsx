@@ -216,7 +216,6 @@ export default function TurnNSliceCaseStudyPage() {
         eyebrow="Replace the invoicing patchwork"
         title="Build one invoicing operation around the way your business actually works."
         copy="Bring us the pricing, customer-account and invoicing workflow you use today. We will map it, connect the right steps and identify what OrderFlow can automate."
-        primaryLabel="Discuss your invoicing workflow"
         secondaryLabel="Vyso for food suppliers"
         secondaryHref="/industries/food-suppliers"
       />

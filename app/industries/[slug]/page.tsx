@@ -361,7 +361,6 @@ export default async function IndustryPage({
         eyebrow="Start with the operation"
         title={`Show us how ${industry.shortName.toLowerCase()} handle the work today.`}
         copy="We will map the actual workflow, identify the highest-value gap and tell you honestly whether Vyso is the right system to address it."
-        primaryLabel="Talk to Vyso"
         secondaryLabel="View the platform"
         secondaryHref="/platform"
       />

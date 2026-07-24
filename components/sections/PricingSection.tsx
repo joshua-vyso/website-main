@@ -1,7 +1,7 @@
 "use client";
 import { useState, useEffect, useRef, useCallback } from "react";
-import Link from "next/link";
 import { useInView } from "@/hooks/useInView";
+import { WaitlistCtaButton } from "@/components/marketing/WaitlistCtaButton";
 
 /* ── Blend helpers ────────────────────────────────────────────────────────── */
 const blendWhite: React.CSSProperties = {
@@ -121,8 +121,7 @@ function AuditBanner() {
 
       {/* CTA */}
       <div style={{ flexShrink: 0, textAlign: "center" }}>
-        <Link
-          href="/contact"
+        <WaitlistCtaButton
           style={{
             display: "inline-flex", alignItems: "center", gap: "0.4rem",
             padding: "0.65rem 1.4rem", borderRadius: 50,
@@ -136,12 +135,12 @@ function AuditBanner() {
           onMouseEnter={e => { const el = e.currentTarget; el.style.background = "hsl(22,69%,44%)"; el.style.color = "#fff"; }}
           onMouseLeave={e => { const el = e.currentTarget; el.style.background = "transparent"; el.style.color = "hsl(22,69%,44%)"; }}
         >
-          Discuss the audit
+          Join Waitlist
           <svg width="13" height="13" viewBox="0 0 14 14" fill="none" stroke="currentColor"
             strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
             <path d="M2.5 7h9M8 3.5L11.5 7 8 10.5"/>
           </svg>
-        </Link>
+        </WaitlistCtaButton>
         <p style={{ fontFamily: "var(--font-body, var(--font-sans))", fontSize: "0.68rem",
           color: "#aaa", margin: "0.4rem 0 0" }}>Clear scope · no commitment</p>
       </div>
@@ -166,7 +165,7 @@ const TIERS = [
       { label: "Setup (once-off)", value: "R5,000", unit: "" },
       { label: "Retainer", value: "R3,000", unit: "/month" },
     ],
-    cta: "Get started",
+    cta: "Join Waitlist",
   },
   {
     num:      "Tier 2",
@@ -182,7 +181,7 @@ const TIERS = [
       { label: "Setup (once-off)", value: "R20,000", unit: "" },
       { label: "Retainer", value: "R6,000", unit: "/month", note: "+R3,000/month per additional module" },
     ],
-    cta: "Talk to us",
+    cta: "Join Waitlist",
   },
   {
     num:      "Tier 3",
@@ -200,7 +199,7 @@ const TIERS = [
       { label: "Setup (once-off)", value: "R30,000", unit: "" },
       { label: "Retainer", value: "R8,000", unit: "/month", note: "+R3,000/month per additional module" },
     ],
-    cta: "Talk to us",
+    cta: "Join Waitlist",
   },
 ];
 
@@ -315,8 +314,7 @@ function TierCard({ tier, active }: { tier: typeof TIERS[0]; active: boolean }) 
       </div>
 
       {/* CTA — flowing orange→blue gradient when active, plain glass when not */}
-      <Link
-        href="/contact"
+      <WaitlistCtaButton
         className={active ? "price-btn-active" : "price-btn-inactive"}
         style={{
           width: "100%", padding: "0.78rem 1.4rem", borderRadius: 50,
@@ -338,7 +336,7 @@ function TierCard({ tier, active }: { tier: typeof TIERS[0]; active: boolean }) 
           strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
           <path d="M2.5 7h9M8 3.5L11.5 7 8 10.5"/>
         </svg>
-      </Link>
+      </WaitlistCtaButton>
       <p style={{ fontFamily: "var(--font-body, var(--font-sans))", fontSize: "0.68rem",
         color: active ? "rgba(255,255,255,0.55)" : "#aaa", margin: "0.5rem 0 0", textAlign: "center" }}>
         Starts with a free 15-min discovery call
