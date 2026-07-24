@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { resolveUser, AI_CORS_HEADERS } from '@/lib/ai/auth';
-import { isVysoAiAllowed } from '@/lib/ai/vyso-agent/config';
+import { isFinchAllowed } from '@/lib/ai/finch/config';
 import { extractOrderDocument, aiConfigured } from '@/lib/ai/anthropic';
 
 // Reading an order document (PDF/photo) can take a few seconds.
@@ -14,9 +14,9 @@ export async function OPTIONS() {
 }
 
 /**
- * Vyso AI — parse an uploaded order document into structured line items (Haiku),
+ * Finch — parse an uploaded order document into structured line items (Haiku),
  * for the "read an order in chat → paste into a new order" flow. Read-only: this
- * does NOT upload or create anything. Gated by the VYSO_AI_ENABLED kill switch.
+ * does NOT upload or create anything. Gated by the FINCH_ENABLED kill switch.
  * Body: { base64, mediaType, filename }.
  */
 export async function POST(req: Request) {
@@ -28,8 +28,8 @@ export async function POST(req: Request) {
   if (!auth) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: AI_CORS_HEADERS });
   }
-  if (!isVysoAiAllowed(auth.email)) {
-    return NextResponse.json({ error: 'Vyso AI is not enabled for your account.' }, { status: 403, headers: AI_CORS_HEADERS });
+  if (!isFinchAllowed(auth.email)) {
+    return NextResponse.json({ error: 'Finch is not enabled for your account.' }, { status: 403, headers: AI_CORS_HEADERS });
   }
 
   const body = (await req.json().catch(() => ({}))) as {

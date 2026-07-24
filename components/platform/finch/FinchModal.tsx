@@ -3,9 +3,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
-import type { AgentModule } from '@/lib/ai/vyso-agent/config';
-import { stashParsedOrder, type ParsedOrder } from '@/lib/ai/vyso-agent/order-handoff';
+import type { AgentModule } from '@/lib/ai/finch/config';
+import { stashParsedOrder, type ParsedOrder } from '@/lib/ai/finch/order-handoff';
 import { BouncingDots } from './BouncingDots';
+import { FinchMark } from './FinchMark';
 
 /** Read a File as a data URL string. */
 function readDataUrl(file: File): Promise<string> {
@@ -156,7 +157,7 @@ function parseSse(
   }
 }
 
-export function VysoAIModal({
+export function FinchModal({
   open,
   onClose,
   module,
@@ -346,7 +347,7 @@ export function VysoAIModal({
       });
       if (!res.ok || !res.body) {
         const detail = (await res.json().catch(() => ({}))) as { error?: string };
-        throw new Error(detail.error ?? `Vyso AI request failed (${res.status})`);
+        throw new Error(detail.error ?? `Finch request failed (${res.status})`);
       }
 
       const reader = res.body.getReader();
@@ -522,7 +523,7 @@ export function VysoAIModal({
       <div
         role="dialog"
         aria-modal="true"
-        aria-label="Vyso AI"
+        aria-label="Finch"
         onDragOver={(e) => {
           e.preventDefault();
           if (!dragOver) setDragOver(true);
@@ -546,12 +547,10 @@ export function VysoAIModal({
         {/* Header */}
         <div className="flex items-center justify-between gap-3 border-b border-[#EEF1F5] px-5 py-3.5">
           <div className="flex items-center gap-2">
-            <span className="vyso-ai-gradient flex h-6 w-6 items-center justify-center rounded-full">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M12 3l1.6 4.6L18 9.2l-4.4 1.6L12 15l-1.6-4.2L6 9.2l4.4-1.6L12 3z" fill="#fff" />
-              </svg>
+            <span className="finch-gradient flex h-6 w-6 items-center justify-center rounded-full">
+              <FinchMark size={13} title="" />
             </span>
-            <span className="of-display text-[15px] font-semibold text-[#171A17]">Vyso AI</span>
+            <span className="of-display text-[15px] font-semibold text-[#171A17]">Finch</span>
           </div>
           <button
             type="button"
@@ -774,7 +773,7 @@ export function VysoAIModal({
               onClick={() => void send()}
               disabled={(!input.trim() && pending.length === 0) || streaming}
               aria-label="Send"
-              className="vyso-ai-gradient flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white transition-opacity disabled:opacity-40"
+              className="finch-gradient flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-white transition-opacity disabled:opacity-40"
             >
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
                 <path d="M4 12l16-8-6 8 6 8-16-8z" fill="#fff" />
@@ -782,7 +781,7 @@ export function VysoAIModal({
             </button>
           </div>
           <p className="mt-1.5 px-1 text-[10.5px] text-[#B4B7B4]">
-            Vyso AI can make mistakes — double-check anything important.
+            Finch can make mistakes — double-check anything important.
           </p>
         </div>
       </div>
@@ -812,7 +811,7 @@ function ParsedOrderCard({
   return (
     <div className="rounded-2xl border border-[#BBD9F5] bg-[#F2F8FE] p-3.5">
       <div className="flex items-center gap-2 text-[13px] font-semibold text-[#12324F]">
-        <span className="vyso-ai-gradient flex h-5 w-5 shrink-0 items-center justify-center rounded-full">
+        <span className="finch-gradient flex h-5 w-5 shrink-0 items-center justify-center rounded-full">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M12 3l1.6 4.6L18 9.2l-4.4 1.6L12 15l-1.6-4.2L6 9.2l4.4-1.6L12 3z" fill="#fff" />
           </svg>
@@ -855,7 +854,7 @@ function ParsedOrderCard({
         <button
           type="button"
           onClick={onOpen}
-          className="vyso-ai-gradient rounded-lg px-3.5 py-1.5 text-[12px] font-semibold text-white"
+          className="finch-gradient rounded-lg px-3.5 py-1.5 text-[12px] font-semibold text-white"
         >
           Open in a new order
         </button>
@@ -914,7 +913,7 @@ function IngestResultCard({
   return (
     <div className="rounded-2xl border border-[#BBD9F5] bg-[#F2F8FE] p-3.5">
       <div className="flex items-center gap-2 text-[13px] font-semibold text-[#12324F]">
-        <span className="vyso-ai-gradient flex h-5 w-5 shrink-0 items-center justify-center rounded-full">
+        <span className="finch-gradient flex h-5 w-5 shrink-0 items-center justify-center rounded-full">
           <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <path d="M5 12.5l4 4 10-11" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
@@ -957,7 +956,7 @@ function IngestResultCard({
             <button
               type="button"
               onClick={() => onOpenOrder(result.orderId!)}
-              className="vyso-ai-gradient rounded-lg px-3.5 py-1.5 text-[12px] font-semibold text-white"
+              className="finch-gradient rounded-lg px-3.5 py-1.5 text-[12px] font-semibold text-white"
             >
               View order &amp; invoice
             </button>
@@ -973,7 +972,7 @@ function IngestResultCard({
           <button
             type="button"
             onClick={() => onOpenDoc(result.documentId)}
-            className="vyso-ai-gradient rounded-lg px-3.5 py-1.5 text-[12px] font-semibold text-white"
+            className="finch-gradient rounded-lg px-3.5 py-1.5 text-[12px] font-semibold text-white"
           >
             {draftHeld ? 'Review order' : 'Open in Doc-U'}
           </button>

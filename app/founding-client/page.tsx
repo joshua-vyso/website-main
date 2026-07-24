@@ -161,7 +161,7 @@ export default function FoundingClientPage() {
               {
                 icon: Rocket,
                 title: "Early capability access",
-                copy: "Where it is appropriate and safe, founding clients can test selected platform and Vyso AI preview capabilities.",
+                copy: "Where it is appropriate and safe, founding clients can test selected platform and Finch preview capabilities.",
               },
             ].map(({ icon: Icon, title: featureTitle, copy }) => (
               <article key={featureTitle} className={styles.glassCard}>

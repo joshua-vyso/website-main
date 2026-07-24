@@ -1,5 +1,5 @@
 /**
- * Vyso AI tool registry. Tools are the agent's read-only window onto the live
+ * Finch tool registry. Tools are the agent's read-only window onto the live
  * data — namespaced per module so adding a module later is just more tool
  * entries (the route/loop is generic). Every tool runs through the caller's
  * RLS-scoped Supabase client, so a tool can only ever read the caller's own org.

@@ -7,7 +7,7 @@ const NAV_GROUPS = [
     links: [
       { label: "Overview", href: "/platform" },
       { label: "OrderFlow", href: "/platform#orderflow" },
-      { label: "Vyso AI", href: "/platform/vyso-ai" },
+      { label: "Finch", href: "/platform/finch" },
       { label: "Vyso for SMEs", href: "/platform/vyso-for-smes" },
       { label: "Vyso in South Africa", href: "/south-africa" },
     ],

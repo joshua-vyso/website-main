@@ -1,5 +1,5 @@
 /**
- * Read-only OrderFlow data access for Vyso AI's tools. Every query runs through
+ * Read-only OrderFlow data access for Finch's tools. Every query runs through
  * the caller's RLS-scoped Supabase client (so the agent can only ever read the
  * caller's own org), and the money maths mirrors the OrderFlow Dashboard exactly
  * (docTotals / paymentsTotal / balanceDue / effectiveInvoiceStatus) so the
@@ -429,7 +429,7 @@ export interface DraftItemInput {
 
 /**
  * Resolve a requested customer + item list against THIS org's real customers and
- * catalogue, so Vyso AI can hand a draft to the New Order builder. This is
+ * catalogue, so Finch can hand a draft to the New Order builder. This is
  * strictly READ-ONLY name resolution — it writes nothing. Matching mirrors the
  * builder's own rules (exact, else exactly one unambiguous ≥4-char substring) so
  * what the user is told matches what the builder will do. The builder still does

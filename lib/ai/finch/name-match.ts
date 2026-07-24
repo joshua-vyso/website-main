@@ -1,6 +1,6 @@
 /**
  * Match a query string to exactly one row by name, using the SAME rule the
- * OrderFlow New Order builder uses — so Vyso AI's narration ("matched 5 of 5")
+ * OrderFlow New Order builder uses — so Finch's narration ("matched 5 of 5")
  * can never drift from what the builder actually does. An exact (case-
  * insensitive) name wins; otherwise fall back to a substring match ONLY when the
  * query is ≥4 chars AND exactly one row (whose name is also ≥4 chars) contains it

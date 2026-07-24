@@ -19,7 +19,7 @@ import type { DocumentType, ExtractedData } from '@/lib/platform/types';
  * OrderFlow order (orders) or feed ProcurePulse (invoices/statements/etc).
  *
  * Shared by every entry point so there is a single audited write path:
- *   - Vyso AI chat        (app/api/ai/agent/ingest-document)  — RLS-scoped client, real user
+ *   - Finch chat          (app/api/ai/agent/ingest-document)  — RLS-scoped client, real user
  *   - Inbound email       (app/api/email/process)             — service-role client, no user
  *
  * The caller owns auth and supplies BOTH the Supabase client and the orgId; this

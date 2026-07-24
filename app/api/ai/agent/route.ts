@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import type Anthropic from '@anthropic-ai/sdk';
 import { resolveUser, AI_CORS_HEADERS } from '@/lib/ai/auth';
-import { agentClient, agentConfigured, sanitizeMessages } from '@/lib/ai/vyso-agent/runtime';
-import { AGENT_MODEL, WORKFLOW_MODEL, AGENT_MAX_TOKENS, isAgentModule, isVysoAiAllowed } from '@/lib/ai/vyso-agent/config';
-import { buildSystemPrompt } from '@/lib/ai/vyso-agent/knowledge';
-import { toolDefsFor, runTool, type ToolContext } from '@/lib/ai/vyso-agent/tools';
+import { agentClient, agentConfigured, sanitizeMessages } from '@/lib/ai/finch/runtime';
+import { AGENT_MODEL, WORKFLOW_MODEL, AGENT_MAX_TOKENS, isAgentModule, isFinchAllowed } from '@/lib/ai/finch/config';
+import { buildSystemPrompt } from '@/lib/ai/finch/knowledge';
+import { toolDefsFor, runTool, type ToolContext } from '@/lib/ai/finch/tools';
 
 // Tool-use turns can chain a couple of round-trips, and the workflow tier runs
 // on Sonnet (slower) — give headroom.
@@ -69,11 +69,11 @@ export async function OPTIONS() {
 }
 
 /**
- * Vyso AI chat — streams a Haiku reply as Server-Sent Events, with tool use so
+ * Finch chat — streams a Haiku reply as Server-Sent Events, with tool use so
  * the agent can read the caller's live OrderFlow data (via their RLS-scoped
  * Supabase client — a tool can only ever touch the caller's own org). Preview-
- * gated by the platform-wide kill switch on the server (isVysoAiAllowed →
- * VYSO_AI_ENABLED). Body: { messages, module, orgName? }.
+ * gated by the platform-wide kill switch on the server (isFinchAllowed →
+ * FINCH_ENABLED). Body: { messages, module, orgName? }.
  */
 export async function POST(req: Request) {
   if (!agentConfigured) {
@@ -84,8 +84,8 @@ export async function POST(req: Request) {
   if (!auth) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401, headers: AI_CORS_HEADERS });
   }
-  if (!isVysoAiAllowed(auth.email)) {
-    return NextResponse.json({ error: 'Vyso AI is not enabled for your account.' }, { status: 403, headers: AI_CORS_HEADERS });
+  if (!isFinchAllowed(auth.email)) {
+    return NextResponse.json({ error: 'Finch is not enabled for your account.' }, { status: 403, headers: AI_CORS_HEADERS });
   }
 
   const body = (await req.json().catch(() => ({}))) as {
@@ -197,7 +197,7 @@ export async function POST(req: Request) {
         safeEnqueue(send({ done: true }));
       } catch (err) {
         if (!req.signal.aborted) {
-          safeEnqueue(send({ error: err instanceof Error ? err.message : 'Vyso AI request failed' }));
+          safeEnqueue(send({ error: err instanceof Error ? err.message : 'Finch request failed' }));
         }
       } finally {
         try {

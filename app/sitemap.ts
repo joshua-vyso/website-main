@@ -16,7 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
-      url: `${BASE_URL}/platform/vyso-ai`,
+      url: `${BASE_URL}/platform/finch`,
       changeFrequency: "monthly",
       priority: 0.8,
     },

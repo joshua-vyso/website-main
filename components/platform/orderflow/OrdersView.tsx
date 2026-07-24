@@ -35,9 +35,9 @@ import {
 import { Field as FormField, PrimaryBtn, SecondaryBtn, ConfirmDialog, inputClass } from '@/components/platform/coredata/ui';
 import { Kpi, OrderStatusBadge, PaymentStatusBadge, RowActionsMenu, Drawer, useToast } from './ui';
 import { PublishOrderButton } from './PublishOrderButton';
-import { VysoAIOrderPrefill } from '@/components/platform/vyso-ai/VysoAIOrderPrefill';
-import { matchByName } from '@/lib/ai/vyso-agent/name-match';
-import type { ParsedOrder } from '@/lib/ai/vyso-agent/order-handoff';
+import { FinchOrderPrefill } from '@/components/platform/finch/FinchOrderPrefill';
+import { matchByName } from '@/lib/ai/finch/name-match';
+import type { ParsedOrder } from '@/lib/ai/finch/order-handoff';
 
 export interface OrderItemLite {
   stock_item_id?: string | null;
@@ -1172,7 +1172,7 @@ export function NewOrderBuilder({ context, defaultCustomerId }: { context: Build
   function pickCustomer(id: string | null) {
     setCustomerId(id);
     // Re-price product-linked lines (that haven't been manually overridden) to
-    // the new customer's price list. This is what lets a Vyso AI-loaded order
+    // the new customer's price list. This is what lets a Finch-loaded order
     // fill in prices when the customer is picked after loading — and also keeps
     // an already-built order correct when the customer is switched.
     const nextCustomer = context.customers.find((c) => c.id === id) ?? null;
@@ -1260,11 +1260,11 @@ export function NewOrderBuilder({ context, defaultCustomerId }: { context: Build
     }
   }
 
-  /** Load an order Vyso AI parsed in chat: match the customer, match each line
+  /** Load an order Finch parsed in chat: match the customer, match each line
    *  to a catalogue product so it prices from the customer's price list (just
    *  like adding it by hand), and drop the lines in for review. Lines with no
    *  confident product match stay free-text at whatever price the doc carried. */
-  function handleVysoLoad(order: ParsedOrder) {
+  function handleFinchLoad(order: ParsedOrder) {
     // Prefer an exact match; else exactly one unambiguous ≥4-char substring — an
     // ambiguous or short match would risk silently invoicing the wrong account,
     // so we leave the customer unset for the user to pick instead. Shared with
@@ -1322,7 +1322,7 @@ export function NewOrderBuilder({ context, defaultCustomerId }: { context: Build
     setBlines(lines);
     if (matched) pickCustomer(matched.id);
     const suffix = pricedCount ? ` · ${pricedCount} priced from ${pl?.name ?? 'price list'}` : '';
-    toast(`Loaded ${lines.length} item${lines.length === 1 ? '' : 's'} from Vyso AI${suffix}`);
+    toast(`Loaded ${lines.length} item${lines.length === 1 ? '' : 's'} from Finch${suffix}`);
   }
 
   return (
@@ -1353,7 +1353,7 @@ export function NewOrderBuilder({ context, defaultCustomerId }: { context: Build
       ) : null}
 
       <div className="mt-5">
-        <VysoAIOrderPrefill onLoad={handleVysoLoad} />
+        <FinchOrderPrefill onLoad={handleFinchLoad} />
       </div>
 
       <div className="mt-1 grid grid-cols-1 gap-5 lg:grid-cols-[340px_1fr]">

@@ -229,3 +229,127 @@ Phase C, §5, §8.
 - `onboarding_create_org` generates a unique org `slug` (loop-suffixed) since
   `organisations.slug` is used elsewhere as a unique identifier — the plan named
   the columns to set but not the slug; derived deterministically from the name.
+
+---
+
+# Phase A — Finch rebrand (finch-onboarding)
+
+Status: **complete**. `npx tsc --noEmit` and `npm run build` clean (post-rebrand).
+Verified against `.ai/plan_finch-onboarding.md` §1, §2 D8, §4 Phase A, §5, §9.
+
+## Outcomes
+
+- `lib/ai/vyso-agent/` → `lib/ai/finch/` via `git mv` (7 files). Identity string
+  in `knowledge.ts` now "You are **Finch**, the assistant built into the Vyso
+  operations platform…". `config.ts`: `isVysoAiEnabled`/`isVysoAiAllowed` →
+  `isFinchEnabled`/`isFinchAllowed`; env reads `FINCH_ENABLED ?? VYSO_AI_ENABLED`
+  (legacy var still honoured, per D8).
+- `components/platform/vyso-ai/` → `components/platform/finch/` via `git mv`,
+  with `VysoAIButton`→`FinchButton`, `VysoAILauncher`→`FinchLauncher`,
+  `VysoAIModal`→`FinchModal`, `VysoAIOrderPrefill`→`FinchOrderPrefill`
+  (`BouncingDots` keeps its name; its aria-label is now "Finch is thinking").
+  All user-visible copy, aria-labels and the mistakes disclaimer updated.
+- **New `components/platform/finch/FinchMark.tsx`**: a stroked (fill:none),
+  single-continuous-outline bird-in-profile SVG per the plan's spec (round
+  head, triangular beak, dot eye, leaf wing curve, long pointed tail, one short
+  leg + a detached base line), `linearGradient` cornflower-blue `#6C9BE0` →
+  warm-orange `#F0873C` (top-left to bottom-right), muted blue-grey `#7E93B8`
+  eye. Props `size` (default 20), `title` (a11y; empty string renders it
+  `aria-hidden` for decorative use inside an already-labelled control),
+  `animate?: 'draw' | 'none'`. `animate="draw"` measures the body path's real
+  length via `getTotalLength()` and animates `stroke-dashoffset` inline (~0.9s
+  ease-out) rather than a CSS keyframe, since the length is only known at
+  runtime; a `.finch-mark-settle` CSS class (globals.css) plays a one-time
+  2px translateY pop once the draw finishes. `prefers-reduced-motion` is
+  checked via `matchMedia` and skips straight to the static final frame.
+  Wired into `FinchButton` (replaces the sparkle icon) and `FinchModal`'s
+  header avatar, exactly as scoped for this phase — the sparkle SVG is left
+  in place everywhere else in `FinchModal` (composer send button, parsed-order
+  card badges, ingest-result card badge) since the plan only named the button
+  and modal-header spots for this phase.
+- Consumers updated: `app/app/orderflow/layout.tsx`,
+  `components/platform/docu/DocuNav.tsx`,
+  `components/platform/orderflow/OrdersView.tsx` (toast copy + internal
+  `handleVysoLoad`→`handleFinchLoad`), `components/platform/insightgen/View.tsx`
+  (demo copy), `components/platform/SubNav.tsx` (comment), the 4 routes under
+  `app/api/ai/agent/` (imports + user-facing 403 copy "Finch is not enabled…"),
+  `lib/platform/document-ingest.ts` (comment).
+- `lib/platform/supabase-server.ts` + `lib/platform/session.tsx`:
+  `vysoAiEnabled` → `finchEnabled`, all consumers updated.
+- `app/globals.css`: `.vyso-ai-gradient`/`.vyso-ai-dot` + keyframes →
+  `.finch-gradient`/`.finch-dot`; added the `.finch-mark-settle` keyframe
+  block beside it (see FinchMark note above for why the draw-in itself is
+  inline, not a CSS keyframe).
+- `lib/ai/finch/order-handoff.ts`: writes `finch:parsed_order`; `readParsedOrder`
+  reads the new key first, falling back to the legacy `vysoai:parsed_order`
+  (dual-read, D8); `clearParsedOrder` clears both keys.
+- Marketing: `git mv app/platform/vyso-ai app/platform/finch`; retitled page
+  copy/metadata/JSON-LD/FAQ/breadcrumb/heading id to Finch; **left the CTA
+  banner's `primaryLabel`/`secondaryLabel` untouched** ("Become a founding
+  client" / "Talk to us") per the plan — Phase B owns CTA label copy — but did
+  update the banner's own `title` text ("Test Finch against real operational
+  questions.") since that's page copy, not a CTA label. Added the 308 redirect
+  `/platform/vyso-ai` → `/platform/finch` in `next.config.ts`; updated
+  `app/sitemap.ts`, `components/Navbar.tsx` dropdown entry (label "Finch", href
+  `/platform/finch`; nav CTA buttons untouched), `components/sections/SiteFooter.tsx`
+  link, `app/platform/page.tsx` card, `app/founding-client/page.tsx:164` copy.
+
+## Deviation / addition beyond the plan's explicit file list
+
+- **`components/platform/TopBar.tsx`** imported `clearParsedOrder` from the old
+  `@/lib/ai/vyso-agent/order-handoff` path. This wasn't in the plan's Phase A
+  file inventory, but the `git mv` of that directory would have broken this
+  import (module-not-found) if left alone, so it was updated to
+  `@/lib/ai/finch/order-handoff` — a mechanical necessity of the rename, not a
+  new behavior or design decision.
+
+## Verification
+
+```
+npx tsc --noEmit     # 0 errors (after clearing stale .next/types cache)
+npm run build        # compiles clean; /platform/finch and the /platform/vyso-ai
+                      # redirect both resolve correctly (checked in-browser)
+grep -rni --include='*.ts' --include='*.tsx' --include='*.css' -E 'vyso ?ai' app components lib
+                      # 1 hit: lib/ai/finch/order-handoff.ts's LEGACY_KEY string
+                      # 'vysoai:parsed_order' — required by D8's dual-read, not
+                      # user-visible (a localStorage key), not a miss.
+```
+
+`npm run lint` does **not** cleanly pass, but this is pre-existing repo-wide
+debt, not a Phase A regression: ~68 errors exist across files this phase never
+touched (`components/platform/wastewatch/*`, `components/platform/supplysync/*`,
+`components/sections/HowItWorks.tsx`, `app/app/docu/recent/page.tsx`,
+`app/app/pricepilot/*`, etc.), almost all `react-hooks/set-state-in-effect` and
+`Cannot call impure function during render` from a strict eslint-plugin-react
+ruleset that predates this branch. Every lint hit inside a file this phase
+touched is either identical pre-existing code carried over by the `git mv`
+(e.g. `FinchModal.tsx`'s `useEffect(() => setMounted(true), [])`, and an
+apostrophe in copy that was never edited), or one new instance in
+`FinchMark.tsx` (`setSettled(true)` inside a `prefers-reduced-motion` branch)
+that follows the exact same mounted-flag idiom already pervasive in this
+codebase (SSR safety requires deferring the `window.matchMedia` check to an
+effect). Fixing this ruleset repo-wide is out of Phase A's scope per §5
+("Stage/commit only files this plan names").
+
+## Files touched (committed)
+
+Renamed (`git mv`): `lib/ai/vyso-agent/*` → `lib/ai/finch/*` (7 files),
+`components/platform/vyso-ai/*` → `components/platform/finch/*` (5 files),
+`app/platform/vyso-ai/page.tsx` → `app/platform/finch/page.tsx`.
+
+New: `components/platform/finch/FinchMark.tsx`.
+
+Modified: `app/api/ai/agent/{route,customers/route,ingest-document/route,parse-order/route}.ts`,
+`app/app/orderflow/layout.tsx`, `app/founding-client/page.tsx`, `app/globals.css`,
+`app/platform/page.tsx`, `app/sitemap.ts`, `components/Navbar.tsx`,
+`components/platform/SubNav.tsx`, `components/platform/TopBar.tsx`,
+`components/platform/docu/DocuNav.tsx`, `components/platform/insightgen/View.tsx`,
+`components/platform/orderflow/OrdersView.tsx`, `components/sections/SiteFooter.tsx`,
+`lib/platform/document-ingest.ts`, `lib/platform/session.tsx`,
+`lib/platform/supabase-server.ts`, `next.config.ts`.
+
+Not touched (hard constraints, pre-existing working-tree changes left as-is):
+`app/app/serviceden/*`, `components/platform/serviceden/*`,
+`lib/platform/serviceden*`, `components/platform/orderflow/CustomersManager.tsx`,
+`components/platform/orderflow/InvoicingView.tsx`, `tests/`, `.vscode/`,
+`AUDIT_FINDINGS.md`, `package.json`, `tsconfig.json`.

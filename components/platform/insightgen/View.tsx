@@ -60,7 +60,7 @@ export function InsightGenView({ data }: { data: InsightGenData }) {
         description={M.description}
         actions={
           <>
-            <SecondaryAction onClick={() => toast('Ask Vyso AI (demo)')}>Ask Vyso AI</SecondaryAction>
+            <SecondaryAction onClick={() => toast('Ask Finch (demo)')}>Ask Finch</SecondaryAction>
             <PrimaryAction onClick={() => setCreateOpen(true)}>+ Create report</PrimaryAction>
           </>
         }
@@ -69,7 +69,7 @@ export function InsightGenView({ data }: { data: InsightGenData }) {
       {empty ? (
         <div className="mt-8 rounded-2xl border border-dashed border-[#D8DFE8] bg-white px-6 py-12 text-center">
           <p className="of-display text-[18px] font-semibold text-[#171A17]">No insights yet</p>
-          <p className="mx-auto mt-2 max-w-md text-[14px] text-[#6B6F68]">As your other modules fill with data, Vyso AI will surface cross-module insights, anomalies and reports here.</p>
+          <p className="mx-auto mt-2 max-w-md text-[14px] text-[#6B6F68]">As your other modules fill with data, Finch will surface cross-module insights, anomalies and reports here.</p>
         </div>
       ) : (
         <>
@@ -95,7 +95,7 @@ export function InsightGenView({ data }: { data: InsightGenData }) {
               <div className="grid grid-cols-1 gap-5 lg:grid-cols-[1fr_360px]">
                 <SectionCard title="Business snapshot">
                   <p className="text-[14px] leading-relaxed text-[#171A17]">
-                    Vyso AI surfaced <span className="of-num font-semibold text-[#171A17]">{insights.length}</span> insight{insights.length === 1 ? '' : 's'} this cycle —{' '}
+                    Finch surfaced <span className="of-num font-semibold text-[#171A17]">{insights.length}</span> insight{insights.length === 1 ? '' : 's'} this cycle —{' '}
                     <span className="font-semibold text-[#A32D2D]"><span className="of-num">{sevCount('critical')}</span> critical</span>,{' '}
                     <span className="font-semibold text-[#854F0B]"><span className="of-num">{sevCount('warning')}</span> to watch</span> and{' '}
                     <span className="font-semibold text-[#0F6E56]"><span className="of-num">{sevCount('positive')}</span> positive</span>. {anomalies[0] ? <>Top concern: {anomalies[0].text}</> : null}

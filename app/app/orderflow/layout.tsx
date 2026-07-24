@@ -3,7 +3,7 @@ import { createServerSupabase, getPlatformSession } from '@/lib/platform/supabas
 import { isSetupError } from '@/lib/platform/orderflow';
 import { SubNav } from '@/components/platform/SubNav';
 import { OrderFlowSetupBanner } from '@/components/platform/orderflow/OrderFlowSetupBanner';
-import { VysoAILauncher } from '@/components/platform/vyso-ai/VysoAILauncher';
+import { FinchLauncher } from '@/components/platform/finch/FinchLauncher';
 
 const TABS = [
   { label: 'Dashboard', href: '/app/orderflow' },
@@ -48,7 +48,7 @@ export default async function OrderFlowLayout({ children }: { children: React.Re
         tabs={TABS}
         rootHref="/app/orderflow"
         accent="#E5651F"
-        right={<VysoAILauncher module="orderflow" />}
+        right={<FinchLauncher module="orderflow" />}
       />
       <div className="mt-6">{children}</div>
     </div>

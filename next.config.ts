@@ -29,6 +29,12 @@ const nextConfig: NextConfig = {
         destination: "/platform",
         permanent: true,
       },
+      // Finch rebrand (was "Vyso AI").
+      {
+        source: "/platform/vyso-ai",
+        destination: "/platform/finch",
+        permanent: true,
+      },
       {
         source: "/apps",
         destination: "/platform/vyso-for-smes",

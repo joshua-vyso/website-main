@@ -1,5 +1,5 @@
 /**
- * Vyso AI runtime — the server-only Anthropic client for the agent. Kept
+ * Finch runtime — the server-only Anthropic client for the agent. Kept
  * separate from lib/ai/anthropic.ts (the extraction pipeline) so the agent can
  * evolve its own streaming/tool-use surface without touching the parser. Reads
  * the same ANTHROPIC_API_KEY; the key never reaches any client bundle.

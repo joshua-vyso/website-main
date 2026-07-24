@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { VysoAILauncher } from '@/components/platform/vyso-ai/VysoAILauncher';
+import { FinchLauncher } from '@/components/platform/finch/FinchLauncher';
 
 const TABS = [
   { href: '/app/docu', label: 'Documents', match: 'documents' },
@@ -49,7 +49,7 @@ export function DocuNav({ reviewCount = 0 }: { reviewCount?: number }) {
         );
       })}
       <div className="ml-auto self-center pb-1.5">
-        <VysoAILauncher module="docu" />
+        <FinchLauncher module="docu" />
       </div>
     </div>
   );

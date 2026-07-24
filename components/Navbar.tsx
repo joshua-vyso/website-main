@@ -50,9 +50,9 @@ const PLATFORM_LINKS = [
     Icon:        Workflow,
   },
   {
-    label:       "Vyso AI",
+    label:       "Finch",
     description: "Find answers and take action across your operational data.",
-    href:        "/platform/vyso-ai",
+    href:        "/platform/finch",
     Icon:        Sparkles,
   },
 ];

@@ -7,7 +7,7 @@ import { MODULES } from '@/lib/platform/modules';
 import { SERVICEDEN_ACCOUNT_EMAIL } from '@/lib/platform/serviceden';
 import { usePlatform } from '@/lib/platform/session';
 import { createClient } from '@/lib/platform/supabase-browser';
-import { clearParsedOrder } from '@/lib/ai/vyso-agent/order-handoff';
+import { clearParsedOrder } from '@/lib/ai/finch/order-handoff';
 import { FeedbackModal } from './FeedbackModal';
 import { ModuleLockNotice } from './ModuleLockNotice';
 import { ModulesOverlay } from './ModulesOverlay';

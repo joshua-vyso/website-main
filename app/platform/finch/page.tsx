@@ -11,18 +11,18 @@ import {
   marketingStyles as styles,
 } from "@/components/marketing/PublicMarketing";
 
-const title = "Vyso AI | Operations Assistant for OrderFlow";
+const title = "Finch | Operations Assistant for OrderFlow";
 const description =
-  "See the private preview of Vyso AI: an operations assistant designed to answer questions, read authorised OrderFlow data and prepare work for human review.";
+  "See the private preview of Finch: an operations assistant designed to answer questions, read authorised OrderFlow data and prepare work for human review.";
 
 export const metadata: Metadata = {
   title,
   description,
-  alternates: { canonical: "/platform/vyso-ai" },
+  alternates: { canonical: "/platform/finch" },
   openGraph: {
     title,
     description,
-    url: "/platform/vyso-ai",
+    url: "/platform/finch",
     siteName: "Vyso",
     locale: "en_ZA",
     type: "website",
@@ -33,17 +33,17 @@ export const metadata: Metadata = {
 
 const FAQS = [
   {
-    question: "Is Vyso AI available to every customer?",
+    question: "Is Finch available to every customer?",
     answer:
-      "Not yet. Vyso AI is currently in a private preview while its permissions, answers and human-review workflows are tested with controlled accounts.",
+      "Not yet. Finch is currently in a private preview while its permissions, answers and human-review workflows are tested with controlled accounts.",
   },
   {
-    question: "Can Vyso AI send or finalise an invoice on its own?",
+    question: "Can Finch send or finalise an invoice on its own?",
     answer:
-      "No. The current design keeps consequential commercial actions under human control. Vyso AI can read authorised data and prepare selected drafts, but a person reviews and confirms the work.",
+      "No. The current design keeps consequential commercial actions under human control. Finch can read authorised data and prepare selected drafts, but a person reviews and confirms the work.",
   },
   {
-    question: "What data can Vyso AI see?",
+    question: "What data can Finch see?",
     answer:
       "It only uses the modules, records and financial visibility available to the signed-in user and their organisation. Existing role and organisation boundaries still apply.",
   },
@@ -54,28 +54,28 @@ const structuredData = {
   "@graph": [
     {
       "@type": "WebPage",
-      "@id": "https://vyso.co.za/platform/vyso-ai#webpage",
-      url: "https://vyso.co.za/platform/vyso-ai",
+      "@id": "https://vyso.co.za/platform/finch#webpage",
+      url: "https://vyso.co.za/platform/finch",
       name: title,
       description,
       isPartOf: { "@id": "https://vyso.co.za/#website" },
-      about: { "@id": "https://vyso.co.za/platform/vyso-ai#software" },
-      breadcrumb: { "@id": "https://vyso.co.za/platform/vyso-ai#breadcrumb" },
+      about: { "@id": "https://vyso.co.za/platform/finch#software" },
+      breadcrumb: { "@id": "https://vyso.co.za/platform/finch#breadcrumb" },
       inLanguage: "en-ZA",
     },
     {
       "@type": "BreadcrumbList",
-      "@id": "https://vyso.co.za/platform/vyso-ai#breadcrumb",
+      "@id": "https://vyso.co.za/platform/finch#breadcrumb",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: "https://vyso.co.za/" },
         { "@type": "ListItem", position: 2, name: "Platform", item: "https://vyso.co.za/platform" },
-        { "@type": "ListItem", position: 3, name: "Vyso AI", item: "https://vyso.co.za/platform/vyso-ai" },
+        { "@type": "ListItem", position: 3, name: "Finch", item: "https://vyso.co.za/platform/finch" },
       ],
     },
     {
       "@type": "SoftwareApplication",
-      "@id": "https://vyso.co.za/platform/vyso-ai#software",
-      name: "Vyso AI",
+      "@id": "https://vyso.co.za/platform/finch#software",
+      name: "Finch",
       applicationCategory: "BusinessApplication",
       applicationSuite: "Vyso",
       operatingSystem: "Web browser",
@@ -102,28 +102,28 @@ const structuredData = {
   ],
 };
 
-export default function VysoAiPage() {
+export default function FinchPage() {
   return (
     <PublicPageShell>
       <JsonLd data={structuredData} />
 
-      <section className={styles.compactHero} aria-labelledby="vyso-ai-heading">
+      <section className={styles.compactHero} aria-labelledby="finch-heading">
         <AbstractFlowBackdrop />
         <div className={styles.shell}>
           <Breadcrumbs
             items={[
               { label: "Home", href: "/" },
               { label: "Platform", href: "/platform" },
-              { label: "Vyso AI" },
+              { label: "Finch" },
             ]}
           />
           <span className={styles.statusPill}>Private preview · on track to launch</span>
-          <h1 id="vyso-ai-heading" className={styles.compactTitle}>
+          <h1 id="finch-heading" className={styles.compactTitle}>
             <span className={styles.blendPlain}>Ask the operation.</span>{" "}
             <span className={styles.blendAccent}>Get an answer grounded in your work.</span>
           </h1>
           <p className={styles.compactLead}>
-            Vyso AI is being built as an assistant inside the platform—not a separate
+            Finch is being built as an assistant inside the platform—not a separate
             chatbot. It understands the current module, follows the signed-in user&apos;s
             permissions and keeps people in control of consequential work.
           </p>
@@ -233,7 +233,7 @@ export default function VysoAiPage() {
 
       <MarketingCta
         eyebrow="Shape the launch"
-        title="Test Vyso AI against real operational questions."
+        title="Test Finch against real operational questions."
         copy="Founding clients help us test what is useful, what needs tighter guardrails and where an assistant genuinely saves time."
         primaryLabel="Become a founding client"
         primaryHref="/founding-client"
