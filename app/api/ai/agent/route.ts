@@ -5,6 +5,7 @@ import { agentClient, agentConfigured, sanitizeMessages } from '@/lib/ai/finch/r
 import { AGENT_MODEL, WORKFLOW_MODEL, AGENT_MAX_TOKENS, isAgentModule, isFinchAllowed } from '@/lib/ai/finch/config';
 import { buildSystemPrompt } from '@/lib/ai/finch/knowledge';
 import { toolDefsFor, runTool, type ToolContext } from '@/lib/ai/finch/tools';
+import { rateLimitAllowed } from '@/lib/platform/rate-limit';
 
 // Tool-use turns can chain a couple of round-trips, and the workflow tier runs
 // on Sonnet (slower) — give headroom.
@@ -86,6 +87,14 @@ export async function POST(req: Request) {
   }
   if (!isFinchAllowed(auth.email)) {
     return NextResponse.json({ error: 'Finch is not enabled for your account.' }, { status: 403, headers: AI_CORS_HEADERS });
+  }
+
+  // Per-user hourly cap on Finch agent requests.
+  if (!(await rateLimitAllowed(`ai-agent:${auth.userId}`, 40, 3600))) {
+    return NextResponse.json(
+      { error: "You've hit the hourly Finch limit. Try again soon." },
+      { status: 429, headers: AI_CORS_HEADERS },
+    );
   }
 
   const body = (await req.json().catch(() => ({}))) as {

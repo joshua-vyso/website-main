@@ -3,6 +3,7 @@ import { resolveUser, AI_CORS_HEADERS } from '@/lib/ai/auth';
 import { isFinchAllowed } from '@/lib/ai/finch/config';
 import { aiConfigured } from '@/lib/ai/anthropic';
 import { ingestDocument } from '@/lib/platform/document-ingest';
+import { rateLimitAllowed } from '@/lib/platform/rate-limit';
 
 // Classification + extraction + (for orders) invoicing can chain a few calls.
 export const maxDuration = 60;
@@ -37,6 +38,14 @@ export async function POST(req: Request) {
   }
   if (!isFinchAllowed(auth.email)) {
     return NextResponse.json({ error: 'Finch is not enabled for your account.' }, { status: 403, headers: AI_CORS_HEADERS });
+  }
+
+  // Per-user hourly cap on Finch document ingestion.
+  if (!(await rateLimitAllowed(`ai-agent-ingest:${auth.userId}`, 20, 3600))) {
+    return NextResponse.json(
+      { error: "You've hit the hourly Finch limit. Try again soon." },
+      { status: 429, headers: AI_CORS_HEADERS },
+    );
   }
 
   const body = (await req.json().catch(() => ({}))) as {

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { resolveUser, AI_CORS_HEADERS } from '@/lib/ai/auth';
 import { isFinchAllowed } from '@/lib/ai/finch/config';
 import { extractOrderDocument, aiConfigured } from '@/lib/ai/anthropic';
+import { rateLimitAllowed } from '@/lib/platform/rate-limit';
 
 // Reading an order document (PDF/photo) can take a few seconds.
 export const maxDuration = 45;
@@ -30,6 +31,14 @@ export async function POST(req: Request) {
   }
   if (!isFinchAllowed(auth.email)) {
     return NextResponse.json({ error: 'Finch is not enabled for your account.' }, { status: 403, headers: AI_CORS_HEADERS });
+  }
+
+  // Per-user hourly cap on Finch order parsing.
+  if (!(await rateLimitAllowed(`ai-agent-parse:${auth.userId}`, 20, 3600))) {
+    return NextResponse.json(
+      { error: "You've hit the hourly Finch limit. Try again soon." },
+      { status: 429, headers: AI_CORS_HEADERS },
+    );
   }
 
   const body = (await req.json().catch(() => ({}))) as {

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { resolveUser, AI_CORS_HEADERS } from '@/lib/ai/auth';
 import { isFinchAllowed } from '@/lib/ai/finch/config';
+import { rateLimitAllowed } from '@/lib/platform/rate-limit';
 
 /**
  * The caller's customer names, for Finch's "/" order-workflow picker. Gated to
@@ -18,6 +19,14 @@ export async function GET(req: Request) {
   }
   if (!isFinchAllowed(auth.email)) {
     return NextResponse.json({ error: 'Finch is not enabled for your account.' }, { status: 403, headers: AI_CORS_HEADERS });
+  }
+
+  // Per-user hourly cap on Finch customer lookups.
+  if (!(await rateLimitAllowed(`ai-agent-customers:${auth.userId}`, 120, 3600))) {
+    return NextResponse.json(
+      { error: "You've hit the hourly Finch limit. Try again soon." },
+      { status: 429, headers: AI_CORS_HEADERS },
+    );
   }
 
   const { data: profile } = await auth.supabase
