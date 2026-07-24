@@ -16,6 +16,9 @@ const LABEL = 'mb-[7px] block text-[12.5px] font-medium text-[#57524c]';
 
 type Pane = 'login' | 'signup' | 'verify';
 
+// Email OTP length — env-overridable, defaults to 8 to match the current Supabase setting.
+const CODE_LENGTH = Number(process.env.NEXT_PUBLIC_OTP_LENGTH) || 8;
+
 export default function LoginPage() {
   const router = useRouter();
   const [pane, setPane] = useState<Pane>('login');
@@ -33,7 +36,7 @@ export default function LoginPage() {
 
   // Verify pane
   const [verifyEmail, setVerifyEmail] = useState('');
-  const [code, setCode] = useState<string[]>(['', '', '', '', '', '']);
+  const [code, setCode] = useState<string[]>(() => Array(CODE_LENGTH).fill(''));
   const codeInputsRef = useRef<Array<HTMLInputElement | null>>([]);
   const [cooldown, setCooldown] = useState(0);
 
@@ -121,13 +124,13 @@ export default function LoginPage() {
 
     // Anti-enumeration: Supabase returns success whether or not the email is new.
     setVerifyEmail(cleanEmail);
-    setCode(['', '', '', '', '', '']);
+    setCode(Array(CODE_LENGTH).fill(''));
     setPane('verify');
-    setInfo("If this email is new you'll receive a 6-digit code. If you already have an account, log in instead.");
+    setInfo(`If this email is new you'll receive a ${CODE_LENGTH}-digit code. If you already have an account, log in instead.`);
     setCooldown(60);
   }
 
-  // ── Verify (6-digit OTP) ────────────────────────────────────────────────
+  // ── Verify (OTP) ────────────────────────────────────────────────────────
   function setCodeAt(i: number, value: string) {
     setCode((prev) => {
       const next = [...prev];
@@ -137,10 +140,10 @@ export default function LoginPage() {
   }
 
   function fillCode(digits: string) {
-    const next = ['', '', '', '', '', ''];
-    for (let j = 0; j < 6; j += 1) next[j] = digits[j] ?? '';
+    const next = Array(CODE_LENGTH).fill('');
+    for (let j = 0; j < CODE_LENGTH; j += 1) next[j] = digits[j] ?? '';
     setCode(next);
-    const focusIdx = Math.min(digits.length, 5);
+    const focusIdx = Math.min(digits.length, CODE_LENGTH - 1);
     codeInputsRef.current[focusIdx]?.focus();
   }
 
@@ -148,11 +151,11 @@ export default function LoginPage() {
     const digits = raw.replace(/\D/g, '');
     if (digits.length > 1) {
       // Multi-char (e.g. a paste landing in one box) → spread across boxes.
-      fillCode(digits.slice(0, 6));
+      fillCode(digits.slice(0, CODE_LENGTH));
       return;
     }
     setCodeAt(i, digits);
-    if (digits && i < 5) codeInputsRef.current[i + 1]?.focus();
+    if (digits && i < CODE_LENGTH - 1) codeInputsRef.current[i + 1]?.focus();
   }
 
   function handleCodeKeyDown(i: number, e: React.KeyboardEvent<HTMLInputElement>) {
@@ -165,13 +168,13 @@ export default function LoginPage() {
       }
     } else if (e.key === 'ArrowLeft' && i > 0) {
       codeInputsRef.current[i - 1]?.focus();
-    } else if (e.key === 'ArrowRight' && i < 5) {
+    } else if (e.key === 'ArrowRight' && i < CODE_LENGTH - 1) {
       codeInputsRef.current[i + 1]?.focus();
     }
   }
 
   function handleCodePaste(e: React.ClipboardEvent<HTMLInputElement>) {
-    const text = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6);
+    const text = e.clipboardData.getData('text').replace(/\D/g, '').slice(0, CODE_LENGTH);
     if (!text) return;
     e.preventDefault();
     fillCode(text);
@@ -182,8 +185,8 @@ export default function LoginPage() {
     setError(null);
 
     const token = code.join('');
-    if (token.length !== 6) {
-      setError('Enter the 6-digit code.');
+    if (token.length !== CODE_LENGTH) {
+      setError(`Enter the ${CODE_LENGTH}-digit code.`);
       return;
     }
 
@@ -238,7 +241,7 @@ export default function LoginPage() {
     pane === 'signup'
       ? 'Start your 14-day free trial'
       : pane === 'verify'
-        ? `Enter the 6-digit code we sent to ${verifyEmail || 'your email'}`
+        ? `Enter the ${CODE_LENGTH}-digit code we sent to ${verifyEmail || 'your email'}`
         : 'Welcome back to your operations platform';
 
   return (
@@ -487,7 +490,7 @@ export default function LoginPage() {
           {pane === 'verify' ? (
             <>
               <form onSubmit={handleVerify} noValidate>
-                <div className="mb-[18px] flex justify-between gap-2" onPaste={handleCodePaste}>
+                <div className="mb-[18px] flex flex-wrap justify-between gap-[6px]" onPaste={handleCodePaste}>
                   {code.map((digit, i) => (
                     <input
                       key={i}
@@ -501,8 +504,8 @@ export default function LoginPage() {
                       value={digit}
                       onChange={(e) => handleCodeChange(i, e.target.value)}
                       onKeyDown={(e) => handleCodeKeyDown(i, e)}
-                      aria-label={`Digit ${i + 1} of 6`}
-                      className="h-[54px] w-full rounded-[10px] border border-[#ece7e0] bg-[#faf9f7] text-center text-[22px] font-semibold text-[#141310] outline-none transition duration-150 focus:border-[#BE5D23] focus:bg-white focus:shadow-[0_0_0_3px_rgba(190,93,35,0.12)]"
+                      aria-label={`Digit ${i + 1} of ${CODE_LENGTH}`}
+                      className="h-[54px] min-w-0 flex-1 rounded-[10px] border border-[#ece7e0] bg-[#faf9f7] text-center text-[20px] font-semibold text-[#141310] outline-none transition duration-150 focus:border-[#BE5D23] focus:bg-white focus:shadow-[0_0_0_3px_rgba(190,93,35,0.12)]"
                     />
                   ))}
                 </div>
@@ -528,7 +531,7 @@ export default function LoginPage() {
 
                 <button
                   type="submit"
-                  disabled={loading || !supabaseConfigured || code.join('').length !== 6}
+                  disabled={loading || !supabaseConfigured || code.join('').length !== CODE_LENGTH}
                   className="w-full cursor-pointer rounded-[10px] bg-[#141310] py-[14px] text-[15px] font-semibold text-white transition hover:bg-[#2a2521] disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {loading ? 'Verifying…' : 'Verify & continue'}
